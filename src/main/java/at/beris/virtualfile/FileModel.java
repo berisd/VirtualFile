@@ -9,8 +9,6 @@
 
 package at.beris.virtualfile;
 
-import at.beris.jarcommander.filesystem.file.Attribute;
-
 import java.net.URL;
 import java.util.Date;
 import java.util.Set;

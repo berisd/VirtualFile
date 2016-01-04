@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.jarcommander.filesystem.file.FileManager;
-import at.beris.jarcommander.filesystem.file.client.IClient;
-import at.beris.jarcommander.filesystem.model.FileModel;
+import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.client.IClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static at.beris.jarcommander.filesystem.file.TestFileHelper.*;
+import static at.beris.virtualfile.TestFileHelper.*;
 
 @RunWith(Parameterized.class)
 public class FileOperationProviderTest {

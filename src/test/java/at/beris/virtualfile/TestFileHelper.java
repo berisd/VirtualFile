@@ -29,7 +29,7 @@ public class TestFileHelper {
     public static final String TEST_SOURCE_DIRECTORY_NAME = "testdirectory/";
     public static final String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory/";
 
-    public static final String TEST_CREDENTIALS_DIRECTORY = HOME_DIRECTORY + java.io.File.separator + "test";
+    public static final String TEST_CREDENTIALS_DIRECTORY = HOME_DIRECTORY;
 
     public static final String SSH_HOME_DIRECTORY = "/home/sshtest/";
 

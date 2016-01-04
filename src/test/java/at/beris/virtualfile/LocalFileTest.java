@@ -7,7 +7,7 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.jarcommander.filesystem.file;
+package at.beris.virtualfile;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static at.beris.jarcommander.filesystem.file.operation.CopyOperation.COPY_BUFFER_SIZE;
+import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
 import static org.junit.Assert.*;
 
 public class LocalFileTest extends AbstractFileTest {
@@ -165,9 +165,13 @@ public class LocalFileTest extends AbstractFileTest {
         List<IFile> sourceFileList = createFileTreeData(sourceFileNameList);
         IFile sourceDirectory = sourceFileList.get(0);
 
-        sourceFileList.stream().forEach(file -> assertTrue(file.exists()));
+        for (IFile file : sourceFileList) {
+            assertTrue(file.exists());
+        }
         sourceDirectory.delete();
-        sourceFileList.stream().forEach(file -> assertFalse(file.exists()));
+        for (IFile file : sourceFileList) {
+            assertFalse(file.exists());
+        }
     }
 
     private List<String> createFilenamesTree(String rootDirectory) {
@@ -187,7 +191,7 @@ public class LocalFileTest extends AbstractFileTest {
         StringBuilder dataString = new StringBuilder(testString);
 
         int index = 0;
-        List<at.beris.jarcommander.filesystem.file.IFile> fileList = new ArrayList<>();
+        List<at.beris.virtualfile.IFile> fileList = new ArrayList<>();
         for (String fileName : fileNameList) {
             File file = new File(fileName);
             if (fileName.indexOf('.') == -1) {
@@ -233,6 +237,9 @@ public class LocalFileTest extends AbstractFileTest {
 //        fileList.add(fileManager.newInstance(new File(TEST_SOURCE_DIRECTORY_NAME)));
 //        fileList.add(fileManager.newInstance(new File(TEST_TARGET_DIRECTORY_NAME)));
 
-        fileList.stream().filter(file -> file.exists()).forEach(IFile::delete);
+        for (IFile file : fileList) {
+            if (file.exists())
+                file.delete();
+        }
     }
 }

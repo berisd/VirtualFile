@@ -9,11 +9,9 @@
 
 package at.beris.virtualfile;
 
-import at.beris.jarcommander.filesystem.FileUtils;
-import at.beris.jarcommander.filesystem.file.client.IClient;
-import at.beris.jarcommander.filesystem.file.provider.IFileOperationProvider;
-import at.beris.jarcommander.filesystem.model.FileModel;
-import at.beris.jarcommander.filesystem.protocol.Protocol;
+import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.protocol.Protocol;
+import at.beris.virtualfile.provider.IFileOperationProvider;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.MalformedURLException;
@@ -140,7 +138,7 @@ public class FileContext {
             propertyValue = "";
         else
             propertyValue += "|";
-        propertyValue += "at.beris.jarcommander.filesystem.protocol";
+        propertyValue += at.beris.virtualfile.protocol.Protocol.class.getPackage().getName();
         System.getProperties().setProperty(propertyKey, propertyValue);
     }
 
