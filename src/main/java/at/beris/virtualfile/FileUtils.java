@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -64,6 +65,17 @@ public class FileUtils {
         try {
             return new URL(context, spec);
         } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static URL getUrlForLocalPath(String path) {
+        try {
+            return new URL(new java.io.File(path).toURI().toURL().toString() + (path.endsWith(java.io.File.separator) ? "/" : ""));
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

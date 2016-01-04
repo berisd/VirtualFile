@@ -9,11 +9,10 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.FileUtils;
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.operation.CopyOperation;
 import at.beris.virtualfile.provider.IFileOperationProvider;
-import at.beris.virtualfile.FileModel;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -104,7 +103,7 @@ public class File implements IFile {
     }
 
     @Override
-    public byte[] checksum() throws IOException {
+    public byte[] checksum() {
         return fileOperationProvider.checksum(client, model);
     }
 
@@ -144,8 +143,9 @@ public class File implements IFile {
     }
 
     @Override
-    public void create() throws IOException {
+    public void create() {
         fileOperationProvider.create(this.getClient(), this.getModel());
+        updateModel();
     }
 
     @Override
@@ -164,7 +164,7 @@ public class File implements IFile {
     }
 
     @Override
-    public List<IFile> list() throws IOException {
+    public List<IFile> list() {
         return fileOperationProvider.list(client, model);
     }
 
@@ -196,7 +196,7 @@ public class File implements IFile {
     }
 
     @Override
-    public void copy(IFile targetFile, CopyListener listener) throws IOException {
+    public void copy(IFile targetFile, CopyListener listener) {
         LOGGER.info("Copy " + model.getUrl().toString() + " to " + targetFile.getUrl().toString());
         new CopyOperation(this, targetFile, listener);
     }

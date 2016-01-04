@@ -9,12 +9,12 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileUtils;
 import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.FileUtils;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.client.IClient;
-import at.beris.virtualfile.FileModel;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.*;
@@ -57,12 +57,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
         String tempDir = System.getProperty("java.io.tmpdir");
         String tempFilePath = tempDir + File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
         IFile tempFile = copyToLocalFile(client, model, tempFilePath);
-        try {
-            return tempFile.checksum();
-        } catch (IOException e) {
-            new RuntimeException(e);
-        }
-        return null;
+        return tempFile.checksum();
     }
 
     @Override

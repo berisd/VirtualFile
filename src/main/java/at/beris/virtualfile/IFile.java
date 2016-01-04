@@ -10,8 +10,8 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.provider.IFileOperationProvider;
-import at.beris.virtualfile.FileModel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,13 +54,13 @@ public interface IFile {
 
     Set<Attribute> getAttributes();
 
-    List<IFile> list() throws IOException;
+    List<IFile> list();
 
     String getPath();
 
     void delete();
 
-    byte[] checksum() throws IOException;
+    byte[] checksum();
 
     /**
      * File is an archive
@@ -72,7 +72,7 @@ public interface IFile {
      */
     boolean isArchived();
 
-    void copy(IFile targetFile, CopyListener listener) throws IOException;
+    void copy(IFile targetFile, CopyListener listener);
 
     int compareTo(IFile file);
 
@@ -82,7 +82,7 @@ public interface IFile {
      * @return true if the named file does not exist and was successfully created; false if the named file already exists
      * @throws IOException
      */
-    void create() throws IOException;
+    void create();
 
     InputStream getInputStream() throws IOException;
 

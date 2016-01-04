@@ -11,10 +11,15 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.SftpClient;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
@@ -29,11 +34,11 @@ public class TestFileHelper {
     public static final String TEST_SOURCE_DIRECTORY_NAME = "testdirectory/";
     public static final String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory/";
 
-    public static final String TEST_CREDENTIALS_DIRECTORY = HOME_DIRECTORY;
+    public static final String TEST_CREDENTIALS_DIRECTORY = HOME_DIRECTORY + java.io.File.separator + "test" + java.io.File.separator;
 
     public static final String SSH_HOME_DIRECTORY = "/home/sshtest/";
 
-    public static void initTest() throws Exception {
+    public static void initIntegrationTest() throws Exception {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TEST_CREDENTIALS_DIRECTORY).toPath()));
     }
 
@@ -53,5 +58,70 @@ public class TestFileHelper {
         sftpClient.connect();
 
         return sftpClient;
+    }
+
+    public static boolean isDateCloseToNow(Date date, int seconds) {
+        long nowMillis = System.currentTimeMillis();
+        long dateMillis = date.getTime();
+
+        return (dateMillis > (nowMillis - seconds * 1000)) && (dateMillis < nowMillis);
+    }
+
+    public static IFile createLocalSourceFile(URL url) {
+        try {
+            java.io.File file = new File(url.toURI());
+
+            StringBuilder dataString = new StringBuilder("t");
+
+            while (dataString.length() < TEST_SOURCE_FILE_SIZE)
+                dataString.append("t");
+
+            Files.write(file.toPath(), dataString.toString().getBytes());
+            Files.setLastModifiedTime(file.toPath(), FileTime.from(TEST_SOURCE_FILE_LAST_MODIFIED));
+
+            return FileManager.newFile(file.toURI().toURL());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<String> createFilenamesTree(String rootUrl) {
+        List<String> fileList = new ArrayList<>();
+        fileList.add(rootUrl);
+        fileList.add(rootUrl + "testfile1.txt");
+        fileList.add(rootUrl + "testfile2.txt");
+        fileList.add(rootUrl + "subdir/");
+        fileList.add(rootUrl + "subdir/testfile3.txt");
+        fileList.add(rootUrl + "subdir/testfile4.txt");
+
+        return fileList;
+    }
+
+    public static List<IFile> createFileTreeData(List<String> fileUrlList) throws IOException {
+        String testString = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttest";
+        StringBuilder dataString = new StringBuilder(testString);
+
+        int index = 0;
+        List<at.beris.virtualfile.IFile> fileList = new ArrayList<>();
+        for (String fileUrl : fileUrlList) {
+            File file = new File(new URL(fileUrl).getPath());
+            if (fileUrl.indexOf('.') == -1) {
+                // directory
+                file.mkdirs();
+            } else {
+                // file
+                if (file.getParentFile() != null)
+                    file.getParentFile().mkdirs();
+
+                index++;
+                while (dataString.length() < COPY_BUFFER_SIZE * index + 10)
+                    dataString.append(testString);
+
+                Files.write(file.toPath(), dataString.toString().getBytes());
+            }
+        }
+        return fileList;
     }
 }

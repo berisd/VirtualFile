@@ -9,69 +9,128 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.SftpClient;
+import at.beris.virtualfile.operation.CopyListener;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileTime;
-import java.time.Instant;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
-import static at.beris.virtualfile.TestFileHelper.HOME_DIRECTORY;
+import static at.beris.virtualfile.TestFileHelper.createFilenamesTree;
 import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 
+/**
+ * Abstract class to test file operations for a protocol
+ * An abstract class was chosen because not every protocol supports all operations
+ */
 public abstract class AbstractFileTest {
     public static String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public static String TEST_TARGET_FILE_NAME = "targetfile1.txt";
     public static int TEST_SOURCE_FILE_SIZE = COPY_BUFFER_SIZE + 10;
-    public static Instant TEST_SOURCE_FILE_LAST_MODIFIED = Instant.now();
 
     public static String TEST_SOURCE_DIRECTORY_NAME = "testdirectory";
     public static String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory";
 
-    public static final String TEST_SITES_FILENAME = HOME_DIRECTORY + File.separator + "test" + File.separator + "sites.xml";
-
-    public static final String SSH_HOME_DIRECTORY = "/home/sshtest";
-
     protected static FileManager fileManager;
 
-    public static void initTest() throws Exception {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TEST_SITES_FILENAME).toPath()));
+    protected static URL sourceFileUrl;
+    protected static URL targetFileUrl;
+    protected static URL sourceDirectoryUrl;
+    protected static URL targetDirectoryUrl;
+
+    protected void createFile() {
+        IFile file = FileManager.newFile(sourceFileUrl);
+        file.create();
+
+        assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
+        assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModified(), 10));
+        assertEquals(0, file.getSize());
+        assertFalse(file.isDirectory());
+        file.delete();
     }
 
-    public static IFile createLocalSourceFile() throws IOException {
-        File file = new File(TEST_SOURCE_FILE_NAME);
+    protected void createDirectory() {
+        IFile file = FileManager.newFile(sourceDirectoryUrl);
+        file.create();
 
-        StringBuilder dataString = new StringBuilder("t");
-
-        while (dataString.length() < TEST_SOURCE_FILE_SIZE)
-            dataString.append("t");
-
-        Files.write(file.toPath(), dataString.toString().getBytes());
-        Files.setLastModifiedTime(file.toPath(), FileTime.from(TEST_SOURCE_FILE_LAST_MODIFIED));
-
-        return FileManager.newFile(file.toURI().toURL());
+        assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
+        assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModified(), 10));
+        assertTrue(file.isDirectory());
     }
 
-    public static IFile createSshFile(SftpClient sftpClient, String path) throws IOException {
-//        LocalFile localFile = createLocalSourceFile();
-//        URL url = new URL("file", "1.1.1.1", 80, path);
-//        SshFile sshFile = new SshFile(url, sftpClient);
-//        CopyListener copyListener = Mockito.mock(CopyListener.class);
-//
-//        localFile.copy(sshFile, copyListener);
-//        localFile.deleteFile();
-//
-//        return new SshFile(url, sftpClient);
-        return null;
+    protected void copyFile() {
+        IFile sourceFile = TestFileHelper.createLocalSourceFile(FileUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        IFile targetFile = FileManager.newFile(targetFileUrl);
+        CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
+        sourceFile.copy(targetFile, copyListenerMock);
+        assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
+        assertCopyListener(copyListenerMock);
+        sourceFile.delete();
+        targetFile.delete();
     }
 
-    public void assertCopyListener(CopyListener copyListener) {
+    protected void copyDirectory() {
+        try {
+            List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+            List<String> targetFileUrlList = createFilenamesTree(targetDirectoryUrl.toString());
+
+            TestFileHelper.createFileTreeData(sourceFileUrlList);
+
+            IFile sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+            IFile targetDirectory = FileManager.newFile(targetDirectoryUrl);
+
+            CopyListener copyListener = Mockito.mock(CopyListener.class);
+            Mockito.when(copyListener.interrupt()).thenReturn(false);
+
+            sourceDirectory.copy(targetDirectory, copyListener);
+            assertDirectory(sourceFileUrlList, targetFileUrlList);
+
+            sourceDirectory.delete();
+            targetDirectory.delete();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void deleteFile() {
+        IFile sourceFile = FileManager.newFile(sourceFileUrl);
+        sourceFile.create();
+        assertTrue(sourceFile.exists());
+        sourceFile.delete();
+        assertFalse(sourceFile.exists());
+    }
+
+    protected void deleteDirectory() {
+        try {
+            List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+            TestFileHelper.createFileTreeData(sourceFileUrlList);
+
+            IFile sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+            IFile targetDirectory = FileManager.newFile(targetDirectoryUrl);
+
+            sourceDirectory.copy(targetDirectory, Mockito.mock(CopyListener.class));
+
+            assertTrue(targetDirectory.exists());
+            targetDirectory.delete();
+            assertFalse(targetDirectory.exists());
+
+            sourceDirectory.delete();
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void assertCopyListener(CopyListener copyListener) {
         ArgumentCaptor<Long> bytesCopiedBlockArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<Long> bytesCopiedTotalArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<Long> fileSizeArgumentCaptor = ArgumentCaptor.forClass(Long.class);
@@ -88,4 +147,23 @@ public abstract class AbstractFileTest {
         assertEquals(TEST_SOURCE_FILE_SIZE, bytesCopiedTotalList.get(1).intValue());
     }
 
+    protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) {
+        for (int i = 0; i < sourceFileUrlList.size(); i++) {
+            IFile sourceFile = FileManager.newFile(sourceFileUrlList.get(i));
+            IFile targetFile = FileManager.newFile(targetFileUrlList.get(i));
+
+            if (!sourceFile.isDirectory())
+                assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
+        }
+    }
+
+    protected static void tearDown() {
+        for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
+            if (url != null) {
+                IFile file = FileManager.newFile(url);
+                if (file.exists())
+                    file.delete();
+            }
+        }
+    }
 }

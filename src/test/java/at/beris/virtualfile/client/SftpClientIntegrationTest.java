@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.exception.AccessDeniedException;
 import at.beris.virtualfile.TestFileHelper;
+import at.beris.virtualfile.exception.AccessDeniedException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import java.io.OutputStream;
 
 import static org.junit.Assert.*;
 
-public class SftpClientTest {
+public class SftpClientIntegrationTest {
     private static final String TEST_FILE = TestFileHelper.SSH_HOME_DIRECTORY + TestFileHelper.TEST_SOURCE_FILE_NAME;
     private static final String TEST_DIRECTORY = TestFileHelper.SSH_HOME_DIRECTORY + TestFileHelper.TEST_SOURCE_DIRECTORY_NAME;
     private static final String TEST_STRING = "This is a test string";
@@ -30,7 +30,7 @@ public class SftpClientTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        TestFileHelper.initTest();
+        TestFileHelper.initIntegrationTest();
         sftpClient = createSftpClient();
         sftpClient.init();
         sftpClient.connect();
@@ -39,7 +39,8 @@ public class SftpClientTest {
     @AfterClass
     public static void tearDown() {
         cleanUp();
-        sftpClient.disconnect();
+        if (sftpClient != null)
+            sftpClient.disconnect();
     }
 
     @Test
@@ -111,9 +112,9 @@ public class SftpClientTest {
     }
 
     private static void cleanUp() {
-        if (sftpClient.exists(TEST_FILE))
+        if (sftpClient != null && sftpClient.exists(TEST_FILE))
             sftpClient.deleteFile(TEST_FILE);
-        if (sftpClient.exists(TEST_DIRECTORY))
+        if (sftpClient != null && sftpClient.exists(TEST_DIRECTORY))
             sftpClient.deleteFile(TEST_DIRECTORY);
     }
 }

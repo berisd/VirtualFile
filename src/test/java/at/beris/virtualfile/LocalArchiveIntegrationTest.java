@@ -17,12 +17,12 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
-public class LocalArchiveTest extends AbstractFileTest {
+public class LocalArchiveIntegrationTest extends AbstractFileTest {
     public static final String ZIP_FILENAME = "test.zip";
 
     @BeforeClass
     public static void setUp() throws Exception {
-        initTest();
+//        TestFileHelper.initIntegrationTest();
     }
 
     @Test

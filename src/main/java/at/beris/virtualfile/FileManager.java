@@ -18,10 +18,6 @@ public class FileManager {
 
     }
 
-    public static FileContext newContext() {
-        return new FileContext(new FileConfig());
-    }
-
     /**
      * Creates a local file with with the given path. (Convenience method)
      *

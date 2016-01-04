@@ -9,7 +9,6 @@
 
 package at.beris.virtualfile.operation;
 
-import at.beris.virtualfile.CopyListener;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
 import org.junit.After;
@@ -22,22 +21,20 @@ import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
 import static at.beris.virtualfile.TestFileHelper.*;
+import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 
 @RunWith(Parameterized.class)
-public class CopyOperationTest {
+public class CopyOperationIntegrationTest {
     private static IFile sourceFile;
     private static IFile targetFile;
     private static String targetSite;
@@ -46,18 +43,18 @@ public class CopyOperationTest {
     public static Collection<Object[]> data() throws Exception {
         return Arrays.asList(new Object[][]{
                         {new File(".").toURI().toURL().toString()},
-                        {"sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22/home/sshtest/"},
+                {"sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22/home/sshtest/"},
                 }
         );
     }
 
-    public CopyOperationTest(String targetSite) {
+    public CopyOperationIntegrationTest(String targetSite) {
         this.targetSite = targetSite;
     }
 
     @BeforeClass
     public static void setUp() throws Exception {
-        initTest();
+        initIntegrationTest();
     }
 
     @After
@@ -74,7 +71,6 @@ public class CopyOperationTest {
             sourceFile.getClient().disconnect();
         if (targetFile != null && targetFile.getClient() != null)
             targetFile.getClient().disconnect();
-        deleteTestData();
     }
 
     @Test
@@ -147,44 +143,6 @@ public class CopyOperationTest {
         return FileManager.newLocalFile(pathName);
     }
 
-    private List<String> createFilenamesTree(String rootUrl) {
-        List<String> fileList = new ArrayList<>();
-        fileList.add(rootUrl);
-        fileList.add(rootUrl + "testfile1.txt");
-        fileList.add(rootUrl + "testfile2.txt");
-        fileList.add(rootUrl + "subdir/");
-        fileList.add(rootUrl + "subdir/testfile3.txt");
-        fileList.add(rootUrl + "subdir/testfile4.txt");
-
-        return fileList;
-    }
-
-    private List<IFile> createFileTreeData(List<String> fileUrlList) throws IOException {
-        String testString = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttest";
-        StringBuilder dataString = new StringBuilder(testString);
-
-        int index = 0;
-        List<at.beris.virtualfile.IFile> fileList = new ArrayList<>();
-        for (String fileUrl : fileUrlList) {
-            File file = new File(new URL(fileUrl).getPath());
-            if (fileUrl.indexOf('.') == -1) {
-                // directory
-                file.mkdirs();
-            } else {
-                // file
-                if (file.getParentFile() != null)
-                    file.getParentFile().mkdirs();
-
-                index++;
-                while (dataString.length() < COPY_BUFFER_SIZE * index + 10)
-                    dataString.append(testString);
-
-                Files.write(file.toPath(), dataString.toString().getBytes());
-            }
-        }
-        return fileList;
-    }
-
     private void assertFileTree(List<IFile> sourceFileList, List<IFile> targetFileList) throws IOException {
         for (int i = 0; i < sourceFileList.size(); i++) {
             if (sourceFileList.get(i).isDirectory())
@@ -201,18 +159,47 @@ public class CopyOperationTest {
         }
     }
 
-    private static void deleteTestData() {
-        List<IFile> fileList = new ArrayList<>();
+//    @Test
+//    public void copyFileCancelled() throws IOException {
+//        LocalFile sourceFile = createLocalSourceFile();
+//        super.copyFileToLocalHostCancelled(sourceFile, fileManager.newInstance(new File(TEST_TARGET_FILE_NAME)));
+//    }
 
-//        fileList.add(fileManager.newInstance(new File(TEST_SOURCE_FILE_NAME)));
-//        fileList.add(fileManager.newInstance(new File(TEST_TARGET_FILE_NAME)));
-//        fileList.add(fileManager.newInstance(new File(TEST_SOURCE_DIRECTORY_NAME)));
-//        fileList.add(fileManager.newInstance(new File(TEST_TARGET_DIRECTORY_NAME)));
 
-        for(IFile file : fileList) {
-            if (file.exists()) {
-                file.delete();
-            }
-        }
-    }
+//    @Test
+//    public void copyFilesTargetExists() throws IOException {
+//        List<String> sourceFileNameList = createFilenamesTree(TEST_SOURCE_DIRECTORY_NAME);
+//        List<String> targetFileNameList = createFilenamesTree(TEST_TARGET_DIRECTORY_NAME);
+//
+//        createFileTreeData(sourceFileNameList);
+//        createFileTreeData(targetFileNameList);
+//
+//        IFile sourceDirectory = fileManager.newInstance(new File(TEST_SOURCE_DIRECTORY_NAME));
+//        IFile targetDirectory = fileManager.newInstance(new File(TEST_TARGET_DIRECTORY_NAME));
+//
+//        CopyListener copyListener = Mockito.mock(CopyListener.class);
+//        Mockito.when(copyListener.interrupt()).thenReturn(false);
+//
+//        sourceDirectory.copy(targetDirectory, copyListener);
+//
+//        ArgumentCaptor<IFile> fileArgumentCaptor = ArgumentCaptor.forClass(IFile.class);
+//        Mockito.verify(copyListener, times(sourceFileNameList.size())).fileExists(fileArgumentCaptor.capture());
+//
+//        List<IFile> capturedFiles = fileArgumentCaptor.getAllValues();
+//        List<String> capturedFileNameList = new ArrayList<>();
+//
+//        String absoluteBasePath = capturedFiles.get(0).getFile();
+//        String relativeBasePath = targetFileNameList.get(0);
+//
+//        for (int i = 0; i < capturedFiles.size(); i++) {
+//            String capturedFileName = capturedFiles.get(i).getFile();
+//            capturedFileNameList.add(capturedFileName.replace(absoluteBasePath, relativeBasePath));
+//        }
+//
+//        assertEquals(targetFileNameList.size(), capturedFileNameList.size());
+//        assertTrue(targetFileNameList.containsAll(capturedFileNameList));
+//
+//        sourceDirectory.deleteFile();
+//        targetDirectory.deleteFile();
+//    }
 }

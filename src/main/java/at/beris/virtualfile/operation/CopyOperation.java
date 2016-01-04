@@ -9,7 +9,6 @@
 
 package at.beris.virtualfile.operation;
 
-import at.beris.virtualfile.CopyListener;
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
@@ -24,9 +23,13 @@ public class CopyOperation {
 
     private long filesProcessed;
 
-    public CopyOperation(IFile sourceFile, IFile targetFile, CopyListener listener) throws IOException {
+    public CopyOperation(IFile sourceFile, IFile targetFile, CopyListener listener) {
         filesProcessed = 0L;
-        copyRecursive((File) sourceFile, (File) targetFile, listener);
+        try {
+            copyRecursive((File) sourceFile, (File) targetFile, listener);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void copyRecursive(File sourceFile, File targetFile, CopyListener listener) throws IOException {

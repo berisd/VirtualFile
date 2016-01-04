@@ -53,7 +53,7 @@ public class FileOperationProviderTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        initTest();
+        initIntegrationTest();
     }
 
     @AfterClass
