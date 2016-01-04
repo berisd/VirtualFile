@@ -72,9 +72,6 @@ public class FileUtils {
     public static URL getUrlForLocalPath(String path) {
         try {
             return new URL(new java.io.File(path).toURI().toURL().toString() + (path.endsWith(java.io.File.separator) ? "/" : ""));
-
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
