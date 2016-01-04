@@ -1,0 +1,120 @@
+/*
+ * This file is part of JarCommander.
+ *
+ * Copyright 2015 by Bernd Riedl <bernd.riedl@gmail.com>
+ *
+ * Licensed under GNU General Public License 3.0 or later.
+ * Some rights reserved. See COPYING, AUTHORS.
+ */
+
+package at.beris.virtualfile.provider;
+
+import at.beris.jarcommander.filesystem.file.FileManager;
+import at.beris.jarcommander.filesystem.file.client.IClient;
+import at.beris.jarcommander.filesystem.model.FileModel;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+
+import static at.beris.jarcommander.filesystem.file.TestFileHelper.*;
+
+@RunWith(Parameterized.class)
+public class FileOperationProviderTest {
+
+    private IFileOperationProvider provider;
+    private static IClient client;
+    private URL testUrl;
+
+    @Parameters
+    public static Collection<Object[]> data() throws Exception {
+        FileManager.registerProtocolURLStreamHandlers();
+
+        return Arrays.asList(new Object[][]{
+                        {new File(TEST_SOURCE_FILE_NAME).toURI().toURL(), new LocalFileOperationProvider(), null},
+                        {new URL("sftp://sshtest:password@www.beris.at:22/home/sshtest/" + TEST_SOURCE_FILE_NAME), new SftpFileOperationProvider(), createSftpClient(new URL("sftp://sshtest:password@www.beris.at:22/home/sshtest/" + TEST_SOURCE_FILE_NAME))}
+                }
+        );
+    }
+
+    public FileOperationProviderTest(URL url, IFileOperationProvider fileOperationProvider, IClient client) {
+        this.provider = fileOperationProvider;
+        this.client = client;
+        this.testUrl = url;
+    }
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        initTest();
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        if (client != null)
+            client.disconnect();
+    }
+
+    @Test
+    public void testCreate() throws Exception {
+        FileModel model = createModelFromUrl(testUrl);
+        provider.create(client, model);
+        Assert.assertTrue(provider.exists(client, model));
+        provider.delete(client, model);
+    }
+
+    @Test
+    public void testExists() throws Exception {
+        FileModel model = createModelFromUrl(testUrl);
+        provider.create(client, model);
+        Assert.assertTrue(provider.exists(client, model));
+        provider.delete(client, model);
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        FileModel model = createModelFromUrl(testUrl);
+        provider.create(client, model);
+        Assert.assertTrue(provider.exists(client, model));
+        provider.delete(client, model);
+        Assert.assertFalse(provider.exists(client, model));
+    }
+
+    @Test
+    public void testList() throws Exception {
+
+    }
+
+    @Test
+    public void testCopy() throws Exception {
+
+    }
+
+    @Test
+    public void testAdd() throws Exception {
+
+    }
+
+    @Test
+    public void testUpdateModel() throws Exception {
+
+    }
+
+    @Test
+    public void testSave() throws Exception {
+
+    }
+
+    private FileModel createModelFromUrl(URL url) {
+        FileModel model = new FileModel();
+        model.setUrl(url);
+        return model;
+    }
+}
