@@ -34,6 +34,8 @@ public class LocalArchiveIntegrationTest extends AbstractFileTest {
 
         assertTrue(new File(archive.getPath()).exists());
 
+        archive.delete();
+
 //
 //        IFile archivedFile1 = fileManager.newFile(archive, "hallo.txt");
 //        IFile archivedFile2 = fileManager.newFile(archive, "hallo2.txt");
