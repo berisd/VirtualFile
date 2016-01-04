@@ -1,5 +1,5 @@
 /*
- * This file is part of JarCommander.
+ * This file is part of VirtualFile.
  *
  * Copyright 2015 by Bernd Riedl <bernd.riedl@gmail.com>
  *
