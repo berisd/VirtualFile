@@ -79,7 +79,7 @@ public class File implements IFile {
 
     @Override
     public Date getLastModified() {
-        return getModel().getLastModified();
+        return getModel().getLastModifiedTime();
     }
 
     @Override
@@ -160,6 +160,7 @@ public class File implements IFile {
 
     @Override
     public Set<Attribute> getAttributes() {
+        fileOperationProvider.updateModel(client, model);
         return model.getAttributes();
     }
 

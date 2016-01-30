@@ -9,15 +9,17 @@
 
 package at.beris.virtualfile.provider;
 
+import at.beris.virtualfile.Attribute;
+import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
-import at.beris.virtualfile.FileModel;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 
 public interface IFileOperationProvider {
     /**
@@ -66,4 +68,6 @@ public interface IFileOperationProvider {
     InputStream getInputStream(IClient client, FileModel model) throws IOException;
 
     OutputStream getOutputStream(IClient client, FileModel model) throws IOException;
+
+    Set<Attribute> getAttributes(IClient client, FileModel model);
 }

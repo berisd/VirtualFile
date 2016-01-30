@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.provider;
 
+import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
@@ -21,6 +22,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class LocalArchivedFileOperationProvider implements IFileOperationProvider {
     @Override
@@ -95,6 +97,11 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
     @Override
     public OutputStream getOutputStream(IClient client, FileModel model) throws IOException {
+        throw new NotImplementedException("");
+    }
+
+    @Override
+    public Set<Attribute> getAttributes(IClient client, FileModel model) {
         throw new NotImplementedException("");
     }
 }

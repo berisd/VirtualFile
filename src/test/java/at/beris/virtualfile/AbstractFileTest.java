@@ -130,6 +130,25 @@ public abstract class AbstractFileTest {
         }
     }
 
+    protected void getFileAttributes() {
+        IFile file = FileManager.newFile(sourceFileUrl);
+        file.create();
+
+        if (TestFileHelper.isOsWindows()) {
+            assertTrue(file.getAttributes().contains(Attribute.READ));
+            assertTrue(file.getAttributes().contains(Attribute.WRITE));
+        } else {
+            assertTrue(file.getAttributes().contains(Attribute.OWNER_READ));
+            assertTrue(file.getAttributes().contains(Attribute.OWNER_WRITE));
+            assertTrue(file.getAttributes().contains(Attribute.GROUP_READ));
+            if (this instanceof LocalFileIntegrationTest) {
+                assertTrue(file.getAttributes().contains(Attribute.GROUP_WRITE));
+            }
+            assertTrue(file.getAttributes().contains(Attribute.OTHERS_READ));
+        }
+        file.delete();
+    }
+
     protected void assertCopyListener(CopyListener copyListener) {
         ArgumentCaptor<Long> bytesCopiedBlockArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<Long> bytesCopiedTotalArgumentCaptor = ArgumentCaptor.forClass(Long.class);

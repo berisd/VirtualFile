@@ -9,18 +9,17 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileManager;
-import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.FileUtils;
-import at.beris.virtualfile.IFile;
-import at.beris.virtualfile.client.FileInfo;
+import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.client.IFileInfo;
 import org.apache.commons.lang3.NotImplementedException;
 
+import java.io.File;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class SftpFileOperationProvider implements IFileOperationProvider {
 
@@ -62,10 +61,10 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public List<IFile> list(IClient client, FileModel model) {
-        List<FileInfo> fileInfoList = client.list(model.getPath());
+        List<IFileInfo> fileInfoList = client.list(model.getPath());
         List<IFile> fileList = new ArrayList<>();
 
-        for (FileInfo fileInfo : fileInfoList) {
+        for (IFileInfo fileInfo : fileInfoList) {
             fileList.add(FileManager.newFile(FileUtils.newUrl(model.getUrl(), fileInfo.getPath())));
         }
         return fileList;
@@ -73,9 +72,10 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void updateModel(IClient client, FileModel model) {
-        FileInfo fileInfo = client.getFileInfo(model.getPath());
-        model.setLastModified(fileInfo.getLastModified());
+        IFileInfo fileInfo = client.getFileInfo(model.getPath());
+        model.setLastModifiedTime(fileInfo.getLastModified());
         model.setSize(fileInfo.getSize());
+        model.setAttributes(fileInfo.getAttributes());
     }
 
     @Override
@@ -91,6 +91,11 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     @Override
     public OutputStream getOutputStream(IClient client, FileModel model) {
         return client.getOutputStream(model.getPath());
+    }
+
+    @Override
+    public Set<Attribute> getAttributes(IClient client, FileModel model) {
+        return client.getFileInfo(model.getPath()).getAttributes();
     }
 
     private IFile copyToLocalFile(IClient client, FileModel model, String path) {

@@ -57,4 +57,9 @@ public class LocalFileIntegrationTest extends AbstractFileTest {
     public void deleteDirectory() {
         super.deleteDirectory();
     }
+
+    @Test
+    public void getFileAttributes() {
+        super.getFileAttributes();
+    }
 }

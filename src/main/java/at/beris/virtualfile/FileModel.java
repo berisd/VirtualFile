@@ -11,14 +11,21 @@ package at.beris.virtualfile;
 
 import java.net.URL;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Set;
 
 public class FileModel {
     private URL url;
-    private Date lastModified;
+    private Date lastModifiedTime;
+    private Date lastAccessTime;
+    private Date creationTime;
     private long size;
     private FileModel parent;
     private Set<Attribute> attributes;
+
+    public FileModel() {
+        attributes = EnumSet.noneOf(Attribute.class);
+    }
 
     public URL getUrl() {
         return url;
@@ -28,12 +35,28 @@ public class FileModel {
         this.url = url;
     }
 
-    public Date getLastModified() {
-        return lastModified;
+    public Date getLastModifiedTime() {
+        return lastModifiedTime;
     }
 
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
+    public void setLastModifiedTime(Date lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public Date getLastAccessTime() {
+        return lastAccessTime;
+    }
+
+    public void setLastAccessTime(Date lastAccessTime) {
+        this.lastAccessTime = lastAccessTime;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
     }
 
     public long getSize() {

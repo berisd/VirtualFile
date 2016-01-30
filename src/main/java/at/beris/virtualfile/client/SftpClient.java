@@ -17,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -197,14 +196,13 @@ public class SftpClient implements IClient {
     }
 
     @Override
-    public FileInfo getFileInfo(String path) {
-        FileInfo fileInfo = new FileInfo();
+    public IFileInfo getFileInfo(String path) {
+        SftpFileInfo fileInfo = new SftpFileInfo();
         try {
             checkChannel();
             SftpATTRS sftpATTRS = sftpChannel.stat(path);
             fileInfo.setPath(path + (sftpATTRS.isDir() && !path.endsWith("/") ? "/" : ""));
-            fileInfo.setSize(sftpATTRS.getSize());
-            fileInfo.setLastModified(new Date(sftpATTRS.getMTime() * 1000L));
+            fileInfo.setSftpATTRS(sftpATTRS);
         } catch (SftpException e) {
             handleSftpException(e);
         }
@@ -212,8 +210,8 @@ public class SftpClient implements IClient {
     }
 
     @Override
-    public List<FileInfo> list(String path) {
-        List<FileInfo> fileInfoList = new ArrayList<>();
+    public List<IFileInfo> list(String path) {
+        List<IFileInfo> IFileInfoList = new ArrayList<>();
 
         try {
             checkChannel();
@@ -221,13 +219,13 @@ public class SftpClient implements IClient {
             for (ChannelSftp.LsEntry entry : entries) {
                 if (entry.getFilename().equals(".") || entry.getFilename().equals(".."))
                     continue;
-                fileInfoList.add(getFileInfo(path + entry.getFilename()));
+                IFileInfoList.add(getFileInfo(path + entry.getFilename()));
             }
         } catch (SftpException e) {
             handleSftpException(e);
         }
 
-        return fileInfoList;
+        return IFileInfoList;
     }
 
     private void checkChannel() {

@@ -50,7 +50,7 @@ public interface IClient {
 
     OutputStream getOutputStream(String path);
 
-    FileInfo getFileInfo(String path);
+    IFileInfo getFileInfo(String path);
 
-    List<FileInfo> list(String path);
+    List<IFileInfo> list(String path);
 }

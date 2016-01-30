@@ -9,28 +9,31 @@
 
 package at.beris.virtualfile.provider;
 
+import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
-import at.beris.virtualfile.FileModel;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class LocalFileOperationProvider implements IFileOperationProvider {
     private final static Logger LOGGER = org.apache.log4j.Logger.getLogger(LocalFileOperationProvider.class);
+
+    private Map<PosixFilePermission, Attribute> posixFilePermissionToAttributeMap = new HashMap<>();
+
+    public LocalFileOperationProvider() {
+        posixFilePermissionToAttributeMap = createPosixFilePermissionToAttributeMap();
+    }
 
     @Override
     public IFile create(IClient client, FileModel model) {
@@ -110,9 +113,30 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     @Override
     public void updateModel(IClient client, FileModel model) {
         File file = new File(model.getPath());
+        Set<Attribute> attributes = model.getAttributes();
 
-        model.setSize(file.length());
-        model.setLastModified(new java.util.Date(file.lastModified()));
+        try {
+            FileStore fileStore = Files.getFileStore(file.toPath());
+            boolean basicFileAttributeViewSupported = fileStore.supportsFileAttributeView(BasicFileAttributeView.class);
+            boolean posixFileAttributeViewSupported = fileStore.supportsFileAttributeView(PosixFileAttributeView.class);
+            boolean dosFileAttributeViewSupported = fileStore.supportsFileAttributeView(DosFileAttributeView.class);
+
+            if (basicFileAttributeViewSupported) {
+                fillBasicFileAttributes(model, file);
+            }
+
+            if (dosFileAttributeViewSupported) {
+                fillDosFileAttributes(file, attributes);
+            }
+
+            if (posixFileAttributeViewSupported) {
+                fillPosixFileAttributes(file, attributes);
+            } else {
+                fillDefaultFileAttributes(file, attributes);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -130,7 +154,13 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         return new FileOutputStream(model.getPath());
     }
 
+    @Override
+    public Set<Attribute> getAttributes(IClient client, FileModel model) {
+        return model.getAttributes();
+    }
+
     private class LocalFileDeletingVisitor extends SimpleFileVisitor<Path> {
+
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attributes)
                 throws IOException {
@@ -151,6 +181,61 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         public FileVisitResult visitFileFailed(Path file, IOException ioe)
                 throws IOException {
             return FileVisitResult.CONTINUE;
+        }
+    }
+
+    private Map<PosixFilePermission, Attribute> createPosixFilePermissionToAttributeMap() {
+        Map<PosixFilePermission, Attribute> map = new HashMap<>();
+        map.put(PosixFilePermission.OWNER_READ, Attribute.OWNER_READ);
+        map.put(PosixFilePermission.OWNER_WRITE, Attribute.OWNER_WRITE);
+        map.put(PosixFilePermission.OWNER_EXECUTE, Attribute.OWNER_EXECUTE);
+        map.put(PosixFilePermission.GROUP_READ, Attribute.GROUP_READ);
+        map.put(PosixFilePermission.GROUP_WRITE, Attribute.GROUP_WRITE);
+        map.put(PosixFilePermission.GROUP_EXECUTE, Attribute.GROUP_EXECUTE);
+        map.put(PosixFilePermission.OTHERS_READ, Attribute.OTHERS_READ);
+        map.put(PosixFilePermission.OTHERS_WRITE, Attribute.OTHERS_WRITE);
+        map.put(PosixFilePermission.OTHERS_EXECUTE, Attribute.OTHERS_EXECUTE);
+        return map;
+    }
+
+    private void fillBasicFileAttributes(FileModel model, File file) throws IOException {
+        BasicFileAttributes basicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+        model.setLastModifiedTime(new Date(basicFileAttributes.lastModifiedTime().toMillis()));
+        model.setLastAccessTime(new Date(basicFileAttributes.lastAccessTime().toMillis()));
+        model.setCreationTime(new Date(basicFileAttributes.creationTime().toMillis()));
+        model.setSize(basicFileAttributes.size());
+    }
+
+    private void fillDosFileAttributes(File file, Set<Attribute> attributes) throws IOException {
+        DosFileAttributes dosFileAttributes = Files.readAttributes(file.toPath(), DosFileAttributes.class);
+        if (dosFileAttributes.isArchive())
+            attributes.add(Attribute.ARCHIVE);
+        if (dosFileAttributes.isHidden())
+            attributes.add(Attribute.HIDDEN);
+        if (dosFileAttributes.isReadOnly())
+            attributes.add(Attribute.READ_ONLY);
+        if (dosFileAttributes.isSystem())
+            attributes.add(Attribute.SYSTEM);
+    }
+
+    private void fillDefaultFileAttributes(File file, Set<Attribute> attributes) {
+        if (file.canRead()) {
+            attributes.add(Attribute.READ);
+        }
+        if (file.canWrite()) {
+            attributes.add(Attribute.WRITE);
+        }
+        if (file.canExecute()) {
+            attributes.add(Attribute.EXECUTE);
+        }
+    }
+
+    private void fillPosixFileAttributes(File file, Set<Attribute> attributes) throws IOException {
+        PosixFileAttributes posixFileAttributes = Files.readAttributes(file.toPath(), PosixFileAttributes.class);
+        Set<PosixFilePermission> permissions = posixFileAttributes.permissions();
+
+        for (PosixFilePermission permission : permissions) {
+            attributes.add(posixFilePermissionToAttributeMap.get(permission));
         }
     }
 }
