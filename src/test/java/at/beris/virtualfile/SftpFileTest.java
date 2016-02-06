@@ -1,7 +1,7 @@
 /*
- * This file is part of JarCommander.
+ * This file is part of VirtualFile.
  *
- * Copyright 2015 by Bernd Riedl <bernd.riedl@gmail.com>
+ * Copyright 2016 by Bernd Riedl <bernd.riedl@gmail.com>
  *
  * Licensed under GNU General Public License 3.0 or later.
  * Some rights reserved. See COPYING, AUTHORS.
@@ -13,14 +13,23 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class LocalFileIntegrationTest extends AbstractFileTest {
+import java.net.URL;
+
+import static at.beris.virtualfile.TestFileHelper.initIntegrationTest;
+import static at.beris.virtualfile.TestFileHelper.readSftpPassword;
+
+public class SftpFileTest extends AbstractFileTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        sourceFileUrl = FileUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
-        targetFileUrl = FileUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);
-        sourceDirectoryUrl = FileUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/");
-        targetDirectoryUrl = FileUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/");
+        initIntegrationTest();
+        FileManager.registerProtocolURLStreamHandlers();
+
+        URL siteUrl = FileUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestFileHelper.SSH_HOME_DIRECTORY);
+        sourceFileUrl = FileUtils.newUrl(siteUrl, TEST_SOURCE_FILE_NAME);
+        targetFileUrl = FileUtils.newUrl(siteUrl, TEST_TARGET_FILE_NAME);
+        sourceDirectoryUrl = FileUtils.newUrl(siteUrl, TEST_SOURCE_DIRECTORY_NAME + "/");
+        targetDirectoryUrl = FileUtils.newUrl(siteUrl, TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
     @AfterClass

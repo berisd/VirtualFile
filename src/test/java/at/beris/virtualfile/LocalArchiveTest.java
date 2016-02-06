@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
-public class LocalArchiveIntegrationTest extends AbstractFileTest {
+public class LocalArchiveTest extends AbstractFileTest {
     public static final String ZIP_FILENAME = "test.zip";
 
     @BeforeClass

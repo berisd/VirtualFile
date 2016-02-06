@@ -141,7 +141,7 @@ public abstract class AbstractFileTest {
             assertTrue(file.getAttributes().contains(Attribute.OWNER_READ));
             assertTrue(file.getAttributes().contains(Attribute.OWNER_WRITE));
             assertTrue(file.getAttributes().contains(Attribute.GROUP_READ));
-            if (this instanceof LocalFileIntegrationTest) {
+            if (this instanceof LocalFileTest) {
                 assertTrue(file.getAttributes().contains(Attribute.GROUP_WRITE));
             }
             assertTrue(file.getAttributes().contains(Attribute.OTHERS_READ));
