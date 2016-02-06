@@ -218,4 +218,20 @@ public class File implements IFile {
     public int compareTo(IFile file) {
         return file.getModel().getUrl().toString().compareTo(file.getUrl().toString());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        File file = (File) o;
+
+        return model.getUrl().toString().equals(file.getModel().getUrl().toString());
+    }
+
+    @Override
+    public int hashCode() {
+        String url = model.getUrl().toString();
+        return 17 + url.length() * url.charAt(0);
+    }
 }
