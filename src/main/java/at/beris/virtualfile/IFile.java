@@ -36,11 +36,7 @@ public interface IFile {
 
     long getSize();
 
-    void setSize(long size);
-
     boolean isDirectory();
-
-    void setParent(IFile parent);
 
     IFile getParent();
 
@@ -76,8 +72,6 @@ public interface IFile {
     boolean isArchived();
 
     void copy(IFile targetFile, CopyListener listener);
-
-    int compareTo(IFile file);
 
     /**
      * Creates an empty file

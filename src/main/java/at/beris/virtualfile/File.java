@@ -94,11 +94,6 @@ public class File implements IFile {
     }
 
     @Override
-    public void setSize(long size) {
-        model.setSize(size);
-    }
-
-    @Override
     public String getPath() {
         return model.getPath();
     }
@@ -176,11 +171,6 @@ public class File implements IFile {
     }
 
     @Override
-    public void setParent(IFile parent) {
-        this.parent = parent;
-    }
-
-    @Override
     public boolean isArchive() {
         if (!isDirectory() && FileUtils.isArchive(getName()))
             return true;
@@ -216,11 +206,6 @@ public class File implements IFile {
     @Override
     public String toString() {
         return model.getUrl().toString();
-    }
-
-    @Override
-    public int compareTo(IFile file) {
-        return file.getModel().getUrl().toString().compareTo(file.getUrl().toString());
     }
 
     @Override
