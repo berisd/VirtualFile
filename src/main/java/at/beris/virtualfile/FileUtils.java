@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class FileUtils {
             URI uri = URI.create(url.toString());
             return uri.normalize().toURL();
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -44,7 +45,7 @@ public class FileUtils {
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -52,7 +53,7 @@ public class FileUtils {
         try {
             return new URL(context, spec);
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -60,7 +61,7 @@ public class FileUtils {
         try {
             return new URL(new java.io.File(path).toURI().toURL().toString() + (path.endsWith(java.io.File.separator) ? "/" : ""));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 

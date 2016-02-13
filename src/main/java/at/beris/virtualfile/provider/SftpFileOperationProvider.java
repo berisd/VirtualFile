@@ -12,6 +12,7 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.client.IFileInfo;
+import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.File;
@@ -112,7 +113,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
         } catch (FileNotFoundException e) {
             throw new at.beris.virtualfile.exception.FileNotFoundException(e);
         } catch (IOException e) {
-            new RuntimeException(e);
+            new VirtualFileException(e);
         }
 
         return FileManager.newLocalFile(path);

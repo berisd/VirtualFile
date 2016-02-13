@@ -13,6 +13,7 @@ import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -65,9 +66,9 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider {
         } catch (FileNotFoundException e) {
             throw new at.beris.virtualfile.exception.FileNotFoundException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         } catch (ArchiveException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         } finally {
             try {
                 if (ais != null)
@@ -75,7 +76,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider {
                 if (fis != null)
                     fis.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new VirtualFileException(e);
             }
         }
         return fileList;

@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.operation.CopyListener;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -93,9 +94,9 @@ public abstract class AbstractFileTest {
             sourceDirectory.delete();
             targetDirectory.delete();
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 

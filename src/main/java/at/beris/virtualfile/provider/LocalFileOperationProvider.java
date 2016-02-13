@@ -11,6 +11,7 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.File;
@@ -43,7 +44,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
                 if (!file.createNewFile())
                     throw new at.beris.virtualfile.exception.FileAlreadyExistsException(pathName);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new VirtualFileException(e);
             }
         }
         return null;
@@ -62,7 +63,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
                 try {
                     fileList.add(FileManager.newFile(childFile.toURI().toURL()));
                 } catch (MalformedURLException e) {
-                    throw new RuntimeException(e);
+                    throw new VirtualFileException(e);
                 }
             }
         }
@@ -78,7 +79,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
                 Files.walkFileTree(new File(file.getPath()).toPath(), new LocalFileDeletingVisitor());
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -100,9 +101,9 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
             }
             return md.digest();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -139,7 +140,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
                 fillDefaultFileAttributes(file, attributes);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 

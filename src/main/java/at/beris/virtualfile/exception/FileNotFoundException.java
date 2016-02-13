@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.exception;
 
-public class FileNotFoundException extends RuntimeException {
+public class FileNotFoundException extends VirtualFileException {
     public FileNotFoundException(Throwable cause) {
         super(cause);
     }

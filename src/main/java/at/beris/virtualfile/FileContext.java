@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.IFileOperationProvider;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +44,7 @@ public class FileContext {
                 url = new URL(url.toString() + "/");
             return newFile(url);
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -57,7 +58,7 @@ public class FileContext {
         try {
             return newFile((IFile) null, new URL(url));
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -79,11 +80,11 @@ public class FileContext {
         try {
             protocol = Protocol.valueOf(normalizedUrl.getProtocol().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Unknown protocol: " + protocolString);
+            throw new VirtualFileException("Unknown protocol: " + protocolString);
         }
 
         if (fileConfig.getFileOperationProviderClassMap(protocol) == null)
-            throw new RuntimeException("No configuration found for protocol: " + protocolString);
+            throw new VirtualFileException("No configuration found for protocol: " + protocolString);
 
         File file = null;
         try {
@@ -97,9 +98,9 @@ public class FileContext {
             if (file.exists())
                 file.updateModel();
         } catch (InstantiationException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
         return file;
     }
@@ -126,7 +127,7 @@ public class FileContext {
                     URL pathUrl = new URL(pathUrlString);
                     parentFile = newFile(parentFile, pathUrl);
                 } catch (MalformedURLException e) {
-                    throw new RuntimeException(e);
+                    throw new VirtualFileException(e);
                 }
             }
         }

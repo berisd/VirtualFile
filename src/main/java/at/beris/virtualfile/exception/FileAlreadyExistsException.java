@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.exception;
 
-public class FileAlreadyExistsException extends RuntimeException {
+public class FileAlreadyExistsException extends VirtualFileException {
     public FileAlreadyExistsException(String message) {
         super(message);
     }

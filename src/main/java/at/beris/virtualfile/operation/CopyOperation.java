@@ -12,6 +12,7 @@ package at.beris.virtualfile.operation;
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.exception.VirtualFileException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,7 @@ public class CopyOperation {
         try {
             copyRecursive((File) sourceFile, (File) targetFile, listener);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 

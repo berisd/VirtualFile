@@ -11,6 +11,7 @@ package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.exception.AccessDeniedException;
 import at.beris.virtualfile.exception.FileNotFoundException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import com.jcraft.jsch.*;
 
 import java.io.ByteArrayInputStream;
@@ -41,7 +42,7 @@ public class SftpClient implements IClient {
             session.setConfig(config);
             session.setPassword(password);
         } catch (JSchException e) {
-            new RuntimeException(e);
+            new VirtualFileException(e);
         }
     }
 
@@ -92,7 +93,7 @@ public class SftpClient implements IClient {
             sftpChannel = (ChannelSftp) session.openChannel("sftp");
             sftpChannel.connect();
         } catch (JSchException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -237,7 +238,7 @@ public class SftpClient implements IClient {
             if (sftpChannel.isClosed() || !sftpChannel.isConnected())
                 sftpChannel.connect();
         } catch (JSchException e) {
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
         }
     }
 
@@ -247,7 +248,7 @@ public class SftpClient implements IClient {
         else if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
             throw new FileNotFoundException(e);
         else
-            throw new RuntimeException(e);
+            throw new VirtualFileException(e);
     }
 
     private boolean isDir(String path) throws SftpException {

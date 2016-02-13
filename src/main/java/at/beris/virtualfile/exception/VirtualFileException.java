@@ -9,8 +9,11 @@
 
 package at.beris.virtualfile.exception;
 
-public class AccessDeniedException extends VirtualFileException {
-    public AccessDeniedException(Throwable cause) {
+public class VirtualFileException extends RuntimeException {
+    public VirtualFileException(Throwable cause) {
         super(cause);
+    }
+    public VirtualFileException(String message) {
+        super(message);
     }
 }
