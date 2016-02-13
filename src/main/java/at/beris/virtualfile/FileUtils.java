@@ -9,6 +9,8 @@
 
 package at.beris.virtualfile;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -60,5 +62,38 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Masks sensitive information in an url (e.g. for logging)
+     *
+     * @param file
+     * @return
+     */
+    public static String maskedUrlString(IFile file) {
+        URL url = file.getUrl();
+        StringBuilder stringBuilder = new StringBuilder("");
+
+        stringBuilder.append(url.getProtocol());
+        stringBuilder.append(':');
+
+        String authority = url.getAuthority();
+        if (! StringUtils.isEmpty(authority)) {
+            String[] authorityParts = authority.split("@");
+            String[] userInfoParts = authorityParts[0].split(":");
+
+            stringBuilder.append("//");
+            stringBuilder.append(userInfoParts[0]);
+
+            if (userInfoParts.length > 1) {
+                stringBuilder.append(":***");
+            }
+            stringBuilder.append('@');
+            stringBuilder.append(authorityParts[1]);
+        }
+
+        stringBuilder.append(url.getPath());
+
+        return stringBuilder.toString();
     }
 }

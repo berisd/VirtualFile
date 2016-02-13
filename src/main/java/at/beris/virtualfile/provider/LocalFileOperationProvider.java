@@ -12,7 +12,6 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.IClient;
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.*;
@@ -25,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class LocalFileOperationProvider implements IFileOperationProvider {
-    private final static Logger LOGGER = org.apache.log4j.Logger.getLogger(LocalFileOperationProvider.class);
 
     private Map<PosixFilePermission, Attribute> posixFilePermissionToAttributeMap = new HashMap<>();
 

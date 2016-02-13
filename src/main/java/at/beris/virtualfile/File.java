@@ -13,7 +13,8 @@ import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.operation.CopyOperation;
 import at.beris.virtualfile.provider.IFileOperationProvider;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static at.beris.virtualfile.FileUtils.maskedUrlString;
+
 public class File implements IFile {
-    private final static Logger LOGGER = org.apache.log4j.Logger.getLogger(File.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
 
     private IFile parent;
     private FileModel model;
@@ -100,6 +103,7 @@ public class File implements IFile {
 
     @Override
     public void delete() {
+        LOGGER.info("Delete " + maskedUrlString(this));
         getFileOperationProvider().delete(client, model);
     }
 
@@ -145,6 +149,7 @@ public class File implements IFile {
 
     @Override
     public void create() {
+        LOGGER.info("Create " + maskedUrlString(this));
         getFileOperationProvider().create(this.getClient(), this.getModel());
         updateModel();
     }
@@ -192,7 +197,7 @@ public class File implements IFile {
 
     @Override
     public void copy(IFile targetFile, CopyListener listener) {
-        LOGGER.info("Copy " + model.getUrl().toString() + " to " + targetFile.getUrl().toString());
+        LOGGER.info("Copy " + maskedUrlString(this) + " to " + maskedUrlString(targetFile));
         new CopyOperation(this, targetFile, listener);
     }
 
