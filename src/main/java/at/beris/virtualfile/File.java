@@ -138,11 +138,6 @@ public class File implements IFile {
     }
 
     @Override
-    public void add(IFile file) {
-        getFileOperationProvider().add(this, file);
-    }
-
-    @Override
     public boolean exists() {
         return getFileOperationProvider().exists(this.getClient(), this.getModel());
     }

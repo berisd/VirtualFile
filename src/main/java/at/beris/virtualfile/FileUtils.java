@@ -28,6 +28,10 @@ public class FileUtils {
         return false;
     }
 
+    public static boolean isDirectory(String urlString) {
+        return urlString.endsWith("/");
+    }
+
     public static List<String> getArchiveExtensions() {
         return Arrays.asList(new String[]{"ZIP", "JAR", "TAR", "7Z", "ARJ"});
     }

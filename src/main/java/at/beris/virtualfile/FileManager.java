@@ -29,11 +29,27 @@ public class FileManager {
     }
 
     /**
-     * Creates file with an URL String. (Convenience method)
+     * Creates a local directory with with the given path. (Convenience method)
      *
-     * @param url
+     * @param path
      * @return
      */
+    public static IDirectory newLocalDirectory(String path) {
+        return (IDirectory) getFileContext().newLocalFile(path +
+                (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator));
+    }
+
+    /**
+     * Creates a local archive with with the given path. (Convenience method)
+     *
+     * @param path
+     * @return
+     */
+    public static IArchive newLocalArchive(String path) {
+        return (IArchive) getFileContext().newLocalFile(path);
+    }
+
+
     public static IFile newFile(String url) {
         return getFileContext().newFile(url);
     }
@@ -42,19 +58,20 @@ public class FileManager {
         return getFileContext().newFile(parentUrl, url);
     }
 
-    /**
-     * Creates a file instance for the corresponding url
-     *
-     * @param parent
-     * @param url
-     * @return
-     */
     public static IFile newFile(IFile parent, URL url) {
         return getFileContext().newFile(parent, url);
     }
 
     public static IFile newFile(URL url) {
         return getFileContext().newFile(url);
+    }
+
+    public static IDirectory newDirectory(URL url) {
+        return (IDirectory) getFileContext().newFile(url);
+    }
+
+    public static IArchive newArchive(URL url) {
+        return (IArchive) getFileContext().newFile(url);
     }
 
     private static FileContext getFileContext() {

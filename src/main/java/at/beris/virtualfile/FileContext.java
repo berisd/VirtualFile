@@ -12,9 +12,11 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
+import at.beris.virtualfile.provider.Archive;
 import at.beris.virtualfile.provider.IFileOperationProvider;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -86,7 +88,7 @@ public class FileContext {
         if (fileConfig.getFileOperationProviderClassMap(protocol) == null)
             throw new VirtualFileException("No configuration found for protocol: " + protocolString);
 
-        File file = null;
+        IFile file = null;
         try {
             IClient client = createClientInstance(normalizedUrl, fileConfig.getClientClass(protocol));
             Map<FileType, IFileOperationProvider> fileOperationProviderMap = new HashMap<>();
@@ -94,7 +96,7 @@ public class FileContext {
                 fileOperationProviderMap.put(fileType, (IFileOperationProvider) fileConfig.getFileOperationProviderClassMap(protocol).get(fileType).newInstance());
             }
 
-            file = new File(parent, normalizedUrl, new FileModel(), fileOperationProviderMap, client);
+            file = createFileInstance(parent, normalizedUrl, client, fileOperationProviderMap);
             if (file.exists())
                 file.updateModel();
         } catch (InstantiationException e) {
@@ -169,5 +171,29 @@ public class FileContext {
             }
         }
         return client;
+    }
+
+    private IFile createFileInstance(IFile parent, URL normalizedUrl, IClient client, Map<FileType, IFileOperationProvider> fileOperationProviderMap) {
+        Class instanceClass;
+        IFile instance;
+        String urlString = normalizedUrl.toString();
+        String[] pathParts = urlString.split("/");
+
+        if (FileUtils.isDirectory(urlString))
+            instanceClass = Directory.class;
+        else if (FileUtils.isArchive(pathParts[pathParts.length - 1]))
+            instanceClass = Archive.class;
+        else
+            instanceClass = File.class;
+
+        Constructor constructor = null;
+        try {
+            constructor = instanceClass.getConstructor(IFile.class, URL.class, FileModel.class, Map.class, IClient.class);
+            instance = (IFile) constructor.newInstance(parent, normalizedUrl, new FileModel(), fileOperationProviderMap, client);
+        } catch (ReflectiveOperationException e) {
+            throw new VirtualFileException(e);
+        }
+
+        return instance;
     }
 }

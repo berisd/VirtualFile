@@ -30,6 +30,8 @@ public interface IFile {
 
     IFileOperationProvider getFileOperationProvider();
 
+    void updateModel();
+
     String getName();
 
     Date getLastModified();
@@ -45,9 +47,6 @@ public interface IFile {
     boolean isRoot();
 
     //TODO create a move method that combines copy and delete
-
-    //TODO delete method. a file is added with copy
-    void add(IFile file);
 
     boolean exists();
 
