@@ -23,13 +23,11 @@ public class FileContext {
     private FileConfig fileConfig;
 
     private Map<String, IClient> siteToClientMap;
-    private Map<Protocol, Map<FileType, IFileOperationProvider>> protocolFileTypeToFileOperationProviderMap;
 
     public FileContext(FileConfig fileConfig) {
         registerProtocolURLStreamHandlers();
         this.fileConfig = fileConfig;
         this.siteToClientMap = new HashMap<>();
-        this.protocolFileTypeToFileOperationProviderMap = new HashMap<>();
     }
 
     /**
@@ -40,7 +38,10 @@ public class FileContext {
      */
     public IFile newLocalFile(String path) {
         try {
-            return newFile((IFile) null, new java.io.File(path).toURI().toURL());
+            URL url = new java.io.File(path).toURI().toURL();
+            if (path.endsWith(java.io.File.separator))
+                url = new URL(url.toString() + "/");
+            return newFile(url);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -87,8 +88,12 @@ public class FileContext {
         File file = null;
         try {
             IClient client = createClientInstance(normalizedUrl, fileConfig.getClientClass(protocol));
-            IFileOperationProvider fileOperationProvider = createFileOperationProviderInstance(normalizedUrl, fileConfig.getFileOperationProviderClassMap(protocol));
-            file = new File(parent, normalizedUrl, new FileModel(), fileOperationProvider, client);
+            Map<FileType, IFileOperationProvider> fileOperationProviderMap = new HashMap<>();
+            for (FileType fileType : FileType.values()) {
+                fileOperationProviderMap.put(fileType, (IFileOperationProvider) fileConfig.getFileOperationProviderClassMap(protocol).get(fileType).newInstance());
+            }
+
+            file = new File(parent, normalizedUrl, new FileModel(), fileOperationProviderMap, client);
             if (file.exists())
                 file.updateModel();
         } catch (InstantiationException e) {
@@ -163,36 +168,5 @@ public class FileContext {
             }
         }
         return client;
-    }
-
-    private IFileOperationProvider createFileOperationProviderInstance(URL url, Map<FileType, Class> fileTypeToFileOperationProviderClassMap) throws IllegalAccessException, InstantiationException {
-        IFileOperationProvider fileOperationProvider = null;
-        Class fileOperationProviderClass = null;
-        Protocol protocol = Protocol.valueOf(url.getProtocol().toUpperCase());
-        FileType fileType = null;
-
-        if (fileTypeToFileOperationProviderClassMap != null && fileTypeToFileOperationProviderClassMap.size() > 0) {
-            if (FileUtils.isArchive(url.getPath())) {
-                fileType = FileType.ARCHIVE.ARCHIVE;
-                fileOperationProviderClass = fileTypeToFileOperationProviderClassMap.get(fileType);
-            } else if (FileUtils.isArchived(url)) {
-                fileType = FileType.ARCHIVED;
-                fileOperationProviderClass = fileTypeToFileOperationProviderClassMap.get(fileType);
-            } else {
-                fileType = FileType.DEFAULT;
-                fileOperationProviderClass = fileTypeToFileOperationProviderClassMap.get(fileType);
-            }
-        }
-
-        fileOperationProvider = (IFileOperationProvider) fileOperationProviderClass.newInstance();
-
-        Map<FileType, IFileOperationProvider> fileTypeToFileOpProviderMap = protocolFileTypeToFileOperationProviderMap.get(protocol);
-        if (fileTypeToFileOpProviderMap == null) {
-            fileTypeToFileOpProviderMap = new HashMap<>();
-            protocolFileTypeToFileOperationProviderMap.put(protocol, fileTypeToFileOpProviderMap);
-        }
-        fileTypeToFileOpProviderMap.put(fileType, fileOperationProvider);
-
-        return fileOperationProvider;
     }
 }

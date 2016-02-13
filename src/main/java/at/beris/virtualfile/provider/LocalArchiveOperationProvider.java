@@ -10,14 +10,15 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
-import at.beris.virtualfile.FileModel;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.net.URL;
@@ -41,6 +42,8 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider {
         ArchiveInputStream ais = null;
         InputStream fis = null;
 
+        URL rootUrl = model.getUrl();
+
         try {
             ArchiveStreamFactory factory = new ArchiveStreamFactory();
             fis = new BufferedInputStream(new FileInputStream(new File(model.getPath())));
@@ -48,10 +51,15 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider {
             ArchiveEntry ae;
 
             while ((ae = ais.getNextEntry()) != null) {
-                String path = ae.getName();
-                URL parentUrl = model.getUrl();
-                URL childUrl = new URL(parentUrl.toString() + "/" + path);
-                IFile file = FileManager.newFile(parentUrl, childUrl);
+                String archiveEntryPath = ae.getName();
+                String[] pathParts = archiveEntryPath.split("/");
+                String path = StringUtils.join(pathParts, "/", 0, pathParts.length - 1);
+
+                String parentUrlString = rootUrl.toString() + "/" + path + (path != "" ? "/" : "");
+                String urlString = parentUrlString + pathParts[pathParts.length - 1]
+                        + (archiveEntryPath.endsWith("/") ? "/" : "");
+
+                IFile file = FileManager.newFile(path.equals("") ? rootUrl : new URL(parentUrlString), new URL(urlString));
                 fileList.add(file);
             }
         } catch (FileNotFoundException e) {

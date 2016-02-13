@@ -16,7 +16,6 @@ import at.beris.virtualfile.provider.LocalArchivedFileOperationProvider;
 import at.beris.virtualfile.provider.LocalFileOperationProvider;
 import at.beris.virtualfile.provider.SftpFileOperationProvider;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public class FileConfig {
         fileOperationProviderClassMap = new HashMap<>();
         clientClassMap = new HashMap<>();
         put(Protocol.FILE, createLocalFileOperationProviderClassMap(), null);
-        put(Protocol.SFTP, Collections.singletonMap(FileType.DEFAULT, (Class) SftpFileOperationProvider.class), SftpClient.class);
+        put(Protocol.SFTP, createSftpFileOperationProviderClassMap(), SftpClient.class);
     }
 
     public Map<FileType, Class> getFileOperationProviderClassMap(Protocol protocol) {
@@ -47,6 +46,14 @@ public class FileConfig {
     private Map<FileType, Class> createLocalFileOperationProviderClassMap() {
         Map<FileType, Class> localFileProviderForExtMap = new HashMap<>();
         localFileProviderForExtMap.put(FileType.DEFAULT, LocalFileOperationProvider.class);
+        localFileProviderForExtMap.put(FileType.ARCHIVED, LocalArchivedFileOperationProvider.class);
+        localFileProviderForExtMap.put(FileType.ARCHIVE, LocalArchiveOperationProvider.class);
+        return localFileProviderForExtMap;
+    }
+
+    private Map<FileType, Class> createSftpFileOperationProviderClassMap() {
+        Map<FileType, Class> localFileProviderForExtMap = new HashMap<>();
+        localFileProviderForExtMap.put(FileType.DEFAULT, SftpFileOperationProvider.class);
         localFileProviderForExtMap.put(FileType.ARCHIVED, LocalArchivedFileOperationProvider.class);
         localFileProviderForExtMap.put(FileType.ARCHIVE, LocalArchiveOperationProvider.class);
         return localFileProviderForExtMap;

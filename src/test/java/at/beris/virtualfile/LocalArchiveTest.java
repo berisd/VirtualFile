@@ -10,31 +10,36 @@
 package at.beris.virtualfile;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class LocalArchiveTest extends AbstractFileTest {
-    public static final String ZIP_FILENAME = "test.zip";
+    private static final String ZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.zip";
+    private static final int NUMBER_OF_ARCHIVE_ENTRIES = 33;
 
     @BeforeClass
     public static void setUp() throws Exception {
-//        TestFileHelper.initIntegrationTest();
     }
 
     @Test
+    @Ignore
     public void createArchive() throws IOException {
 
-        IFile archive = fileManager.newLocalFile(ZIP_FILENAME);
+        IFile archiveFile = fileManager.newLocalFile(ZIP_FILENAME);
 
-        archive.create();
+        archiveFile.create();
 
-        assertTrue(new File(archive.getPath()).exists());
+        assertTrue(new File(archiveFile.getPath()).exists());
+        assertTrue(archiveFile.isArchive());
+        assertFalse(archiveFile.isArchived());
 
-        archive.delete();
+        archiveFile.delete();
 
 //
 //        IFile archivedFile1 = fileManager.newFile(archive, "hallo.txt");
@@ -49,5 +54,13 @@ public class LocalArchiveTest extends AbstractFileTest {
 //        archive.add(archivedFile1);
 //        archive.add(archivedFile2);
 //        archive.add(directory3);
+    }
+
+    @Test
+    public void listArchive() throws IOException {
+        IFile file = fileManager.newLocalFile(ZIP_FILENAME);
+        assertTrue(file.getSize() > 0);
+        List<IFile> list = file.list();
+        assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, list.size());
     }
 }

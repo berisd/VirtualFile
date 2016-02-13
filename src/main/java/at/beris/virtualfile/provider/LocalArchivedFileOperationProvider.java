@@ -11,12 +11,12 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.FileUtils;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.*;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.net.URL;
@@ -62,7 +62,53 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
     @Override
     public boolean exists(IClient client, FileModel model) {
-        throw new NotImplementedException("");
+        String archivePath = getArchivePath(model);
+        String targetArchiveEntryPath = model.getPath().substring(archivePath.length() + 1);
+
+        ArchiveInputStream ais = null;
+        InputStream fis = null;
+
+        try {
+            ArchiveStreamFactory factory = new ArchiveStreamFactory();
+            fis = new BufferedInputStream(new FileInputStream(new File(archivePath)));
+            ais = factory.createArchiveInputStream(fis);
+            ArchiveEntry archiveEntry;
+
+            while ((archiveEntry = ais.getNextEntry()) != null) {
+                String archiveEntryPath = archiveEntry.getName();
+
+                if (archiveEntryPath.equals(targetArchiveEntryPath)) {
+                    model.setSize(archiveEntry.getSize());
+                    model.setLastModifiedTime(archiveEntry.getLastModifiedDate());
+
+                    if (model.getUrl().toString().endsWith("/") && (!archiveEntry.isDirectory())) {
+                        String urlString = model.getUrl().toString();
+                        model.setUrl(FileUtils.newUrl(urlString.substring(0, urlString.length() - 1)));
+                    } else if (!model.getUrl().toString().endsWith("/") && (archiveEntry.isDirectory())) {
+                        String urlString = model.getUrl().toString() + "/";
+                        model.setUrl(FileUtils.newUrl(urlString));
+                    }
+                    break;
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ArchiveException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (ais != null)
+                    ais.close();
+                if (fis != null)
+                    fis.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -103,5 +149,17 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
     @Override
     public Set<Attribute> getAttributes(IClient client, FileModel model) {
         throw new NotImplementedException("");
+    }
+
+    private String getArchivePath(FileModel model) {
+        String[] pathParts = model.getPath().split("/");
+        String archivePath = "";
+        for (int endIndex = pathParts.length - 2; endIndex >= 0; endIndex--) {
+            if (FileUtils.isArchive(pathParts[endIndex])) {
+                archivePath = StringUtils.join(pathParts, "/", 0, endIndex + 1);
+                break;
+            }
+        }
+        return archivePath;
     }
 }

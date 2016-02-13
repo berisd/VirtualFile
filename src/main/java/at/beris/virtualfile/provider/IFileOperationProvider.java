@@ -28,13 +28,19 @@ public interface IFileOperationProvider {
      * @param model
      * @return
      */
-    //TODO void zurückgeben. calling object is what we want
+    //TODO return void
     IFile create(IClient client, FileModel model);
 
     boolean exists(IClient client, FileModel model);
 
     void delete(IClient client, FileModel model);
 
+    /**
+     * Convenience method calling copy
+     *
+     * @param parent
+     * @param child
+     */
     void add(IFile parent, IFile child);
 
     byte[] checksum(IClient client, FileModel model);

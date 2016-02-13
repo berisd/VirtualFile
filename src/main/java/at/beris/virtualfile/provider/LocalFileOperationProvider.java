@@ -9,14 +9,12 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.Attribute;
-import at.beris.virtualfile.FileManager;
-import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.IClient;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -114,6 +112,14 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     public void updateModel(IClient client, FileModel model) {
         File file = new File(model.getPath());
         Set<Attribute> attributes = model.getAttributes();
+
+        if (model.getUrl().toString().endsWith("/") && (!file.isDirectory())) {
+            String urlString = model.getUrl().toString();
+            model.setUrl(FileUtils.newUrl(urlString.substring(0, urlString.length() - 1)));
+        } else if (!model.getUrl().toString().endsWith("/") && (file.isDirectory())) {
+            String urlString = model.getUrl().toString() + "/";
+            model.setUrl(FileUtils.newUrl(urlString));
+        }
 
         try {
             FileStore fileStore = Files.getFileStore(file.toPath());

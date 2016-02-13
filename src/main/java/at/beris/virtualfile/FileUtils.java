@@ -14,28 +14,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public class FileUtils {
     public static boolean isArchive(String pathName) {
         for (String extension : getArchiveExtensions()) {
-            if (pathName.endsWith("." + extension))
+            if (pathName.toUpperCase().endsWith("." + extension))
                 return true;
-        }
-        return false;
-    }
-
-    public static boolean isArchived(URL url) {
-        LinkedList<String> pathParts = new LinkedList(Arrays.asList(url.getPath().split("/")));
-
-        if (pathParts.size() > 0) {
-            pathParts.removeLast();
-
-            for (String pathPart : pathParts) {
-                if (isArchive(pathPart))
-                    return true;
-            }
         }
         return false;
     }

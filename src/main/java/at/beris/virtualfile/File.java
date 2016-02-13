@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class File implements IFile {
@@ -28,22 +29,22 @@ public class File implements IFile {
 
     private IFile parent;
     private FileModel model;
-    private IFileOperationProvider fileOperationProvider;
+    private Map<FileType, IFileOperationProvider> fileOperationProviderMap;
     private IClient client;
 
-    public File(URL url, FileModel model, IFileOperationProvider fileOperationProvider, IClient client) {
-        this(null, url, model, fileOperationProvider, client);
+    public File(URL url, FileModel model, Map<FileType, IFileOperationProvider> fileOperationProviderMap, IClient client) {
+        this(null, url, model, fileOperationProviderMap, client);
     }
 
-    public File(IFile parent, URL url, FileModel model, IFileOperationProvider fileOperationProvider) {
-        this(parent, url, model, fileOperationProvider, null);
+    public File(IFile parent, URL url, FileModel model, Map<FileType, IFileOperationProvider> fileOperationProviderMap) {
+        this(parent, url, model, fileOperationProviderMap, null);
     }
 
-    public File(IFile parent, URL url, FileModel model, IFileOperationProvider fileOperationProvider, IClient client) {
+    public File(IFile parent, URL url, FileModel model, Map<FileType, IFileOperationProvider> fileOperationProviderMap, IClient client) {
         this.parent = parent;
         this.model = model;
         this.model.setUrl(url);
-        this.fileOperationProvider = fileOperationProvider;
+        this.fileOperationProviderMap = fileOperationProviderMap;
         this.client = client;
     }
 
@@ -64,7 +65,12 @@ public class File implements IFile {
 
     @Override
     public IFileOperationProvider getFileOperationProvider() {
-        return fileOperationProvider;
+        if (isArchive())
+            return fileOperationProviderMap.get(FileType.ARCHIVE);
+        else if (isArchived())
+            return fileOperationProviderMap.get(FileType.ARCHIVED);
+        else
+            return fileOperationProviderMap.get(FileType.DEFAULT);
     }
 
     @Override
@@ -99,12 +105,12 @@ public class File implements IFile {
 
     @Override
     public void delete() {
-        fileOperationProvider.delete(client, model);
+        getFileOperationProvider().delete(client, model);
     }
 
     @Override
     public byte[] checksum() {
-        return fileOperationProvider.checksum(client, model);
+        return getFileOperationProvider().checksum(client, model);
     }
 
     @Override
@@ -134,39 +140,39 @@ public class File implements IFile {
 
     @Override
     public void add(IFile file) {
-        fileOperationProvider.add(this, file);
+        getFileOperationProvider().add(this, file);
     }
 
     @Override
     public boolean exists() {
-        return fileOperationProvider.exists(this.getClient(), this.getModel());
+        return getFileOperationProvider().exists(this.getClient(), this.getModel());
     }
 
     @Override
     public void create() {
-        fileOperationProvider.create(this.getClient(), this.getModel());
+        getFileOperationProvider().create(this.getClient(), this.getModel());
         updateModel();
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return fileOperationProvider.getInputStream(client, model);
+        return getFileOperationProvider().getInputStream(client, model);
     }
 
     @Override
     public OutputStream getOutputStream() throws IOException {
-        return fileOperationProvider.getOutputStream(client, model);
+        return getFileOperationProvider().getOutputStream(client, model);
     }
 
     @Override
     public Set<Attribute> getAttributes() {
-        fileOperationProvider.updateModel(client, model);
+        getFileOperationProvider().updateModel(client, model);
         return model.getAttributes();
     }
 
     @Override
     public List<IFile> list() {
-        return fileOperationProvider.list(client, model);
+        return getFileOperationProvider().list(client, model);
     }
 
     @Override
@@ -176,12 +182,8 @@ public class File implements IFile {
 
     @Override
     public boolean isArchive() {
-        List<String> archiveExtensions = FileUtils.getArchiveExtensions();
-
-        for (String extension : archiveExtensions) {
-            if (getName().toUpperCase().endsWith("." + extension) && !isDirectory())
-                return true;
-        }
+        if (!isDirectory() && FileUtils.isArchive(getName()))
+            return true;
         return false;
     }
 
@@ -189,6 +191,8 @@ public class File implements IFile {
     public boolean isArchived() {
         IFile parent = getParent();
         while (parent != null) {
+            if (parent.isArchive())
+                return true;
             if (parent.isArchived())
                 return true;
             parent = parent.getParent();
