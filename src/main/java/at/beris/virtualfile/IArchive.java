@@ -9,6 +9,8 @@
 
 package at.beris.virtualfile;
 
+import java.util.List;
+
 public interface IArchive extends IFileContainer {
-    void extract();
+    List<IFile> extract(IFile target);
 }

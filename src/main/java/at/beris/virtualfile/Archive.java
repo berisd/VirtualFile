@@ -7,16 +7,23 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.provider;
+package at.beris.virtualfile;
 
-import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.IClient;
-import org.apache.commons.lang3.NotImplementedException;
+import at.beris.virtualfile.provider.IArchiveOperationProvider;
+import at.beris.virtualfile.provider.IFileOperationProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
+import static at.beris.virtualfile.FileUtils.maskedUrlString;
+
 public class Archive extends FileContainer implements IArchive {
+    private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
+
     public Archive(URL url, FileModel model, Map<FileType, IFileOperationProvider> fileOperationProviderMap, IClient client) {
         super(url, model, fileOperationProviderMap, client);
     }
@@ -30,7 +37,9 @@ public class Archive extends FileContainer implements IArchive {
     }
 
     @Override
-    public void extract() {
-        throw new NotImplementedException("");
+    public List<IFile> extract(IFile target) {
+        LOGGER.info("Extract " + maskedUrlString(this) + " to " + maskedUrlString(target));
+        IArchiveOperationProvider opProvider = (IArchiveOperationProvider) getFileOperationProvider();
+        return opProvider.extract(getClient(), getModel(), target);
     }
 }

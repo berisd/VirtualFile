@@ -12,7 +12,6 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
-import at.beris.virtualfile.provider.Archive;
 import at.beris.virtualfile.provider.IFileOperationProvider;
 import org.apache.commons.lang3.StringUtils;
 
