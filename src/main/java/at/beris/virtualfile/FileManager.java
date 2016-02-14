@@ -9,7 +9,11 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.protocol.Protocol;
+
 import java.net.URL;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class FileManager {
     private static FileContext fileContext;
@@ -72,6 +76,15 @@ public class FileManager {
 
     public static IArchive newArchive(URL url) {
         return (IArchive) getFileContext().newFile(url);
+    }
+
+    public static Set<Protocol> enabledProtocols() {
+        //TODO only return enabled Protocols
+        return EnumSet.allOf(Protocol.class);
+    }
+
+    public static Set<Protocol> allProtocols() {
+        return EnumSet.allOf(Protocol.class);
     }
 
     private static FileContext getFileContext() {
