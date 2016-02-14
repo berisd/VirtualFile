@@ -10,6 +10,9 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.filter.BasicFilter;
+import at.beris.virtualfile.filter.CollectionFilter;
+import at.beris.virtualfile.filter.DefaultFilter;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.operation.CopyOperation;
 import at.beris.virtualfile.provider.IFileOperationProvider;
@@ -20,10 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static at.beris.virtualfile.FileUtils.maskedUrlString;
 
@@ -166,8 +166,41 @@ public class File implements IFile {
     }
 
     @Override
+    public void addAttributes(Attribute... attributes) {
+        if (attributes.length < 1)
+            return;
+
+        for (Attribute attribute : attributes)
+            getModel().addAttribute(attribute);
+    }
+
+    @Override
+    public void removeAttributes(Attribute... attributes) {
+        if (attributes.length < 1)
+            return;
+
+        for (Attribute attribute : attributes)
+            getModel().removeAttribute(attribute);
+    }
+
+    @Override
     public List<IFile> list() {
         return getFileOperationProvider().list(client, model);
+    }
+
+    @Override
+    public List<IFile> list(BasicFilter filter) {
+        return filterList(getFileOperationProvider().list(client, model), filter);
+    }
+
+    @Override
+    public List<IFile> list(DefaultFilter filter) {
+        return filterList(getFileOperationProvider().list(client, model), filter);
+    }
+
+    @Override
+    public List<IFile> list(CollectionFilter filter) {
+        return filterList(getFileOperationProvider().list(client, model), filter);
     }
 
     @Override
@@ -222,5 +255,15 @@ public class File implements IFile {
     public int hashCode() {
         String url = model.getUrl().toString();
         return 17 + url.length() * url.charAt(0);
+    }
+
+    private List<IFile> filterList(List<IFile> fileList, BasicFilter filter) {
+        List<IFile> filteredList = new ArrayList<>();
+        for (IFile file : fileList) {
+            if (filter.filter(file)) {
+                filteredList.add(file);
+            }
+        }
+        return filteredList;
     }
 }

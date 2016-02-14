@@ -10,6 +10,9 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.filter.BasicFilter;
+import at.beris.virtualfile.filter.CollectionFilter;
+import at.beris.virtualfile.filter.DefaultFilter;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.provider.IFileOperationProvider;
 
@@ -52,7 +55,17 @@ public interface IFile {
 
     Set<Attribute> getAttributes();
 
+    void addAttributes(Attribute... attributes);
+
+    void removeAttributes(Attribute... attributes);
+
     List<IFile> list();
+
+    List<IFile> list(BasicFilter filter);
+
+    List<IFile> list(DefaultFilter filter);
+
+    List<IFile> list(CollectionFilter filter);
 
     String getPath();
 

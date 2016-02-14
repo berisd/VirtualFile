@@ -87,6 +87,10 @@ public class FileModel {
         attributes.add(attribute);
     }
 
+    public void removeAttribute(Attribute attribute) {
+        attributes.remove(attribute);
+    }
+
     public Boolean isDirectory() {
         return url.getPath().endsWith("/");
     }
@@ -94,4 +98,5 @@ public class FileModel {
     public String getPath() {
         return url.getPath();
     }
+
 }
