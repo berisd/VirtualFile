@@ -27,7 +27,7 @@ import java.util.*;
 
 import static at.beris.virtualfile.FileUtils.maskedUrlString;
 
-public class File implements IFile {
+public class File implements IFile, Comparable<File> {
     private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
 
     private IFile parent;
@@ -246,15 +246,19 @@ public class File implements IFile {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        File file = (File) o;
+        File otherFile = (File) o;
 
-        return model.getUrl().toString().equals(file.getModel().getUrl().toString());
+        return compareTo(otherFile) == 0;
     }
 
     @Override
     public int hashCode() {
-        String url = model.getUrl().toString();
-        return 17 + url.length() * url.charAt(0);
+        return model.getUrl().toString().hashCode();
+    }
+
+    @Override
+    public int compareTo(File o) {
+        return model.getUrl().toString().compareTo(o.getUrl().toString());
     }
 
     private List<IFile> filterList(List<IFile> fileList, BasicFilter filter) {
