@@ -13,35 +13,38 @@ import at.beris.virtualfile.IFile;
 
 import java.util.*;
 
-public abstract class BasicFilter<T> {
-    private Map<Operation, DefaultFilter> combiningOperators;
+public abstract class BasicFilter<T> implements IFilter {
+    private Map<Operation, IFilter> combiningOperators;
     private Map<Operation, Collection<T>> operationValuesMap;
 
     public BasicFilter() {
-        combiningOperators = new HashMap<Operation, DefaultFilter>();
-        operationValuesMap = new HashMap<Operation, Collection<T>>();
+        combiningOperators = new HashMap<>();
+        operationValuesMap = new HashMap<>();
     }
 
     protected void putOperationValues(Operation operation, Collection<T> values) {
         operationValuesMap.put(operation, values);
     }
 
-    protected void putCombiningOperator(Operation operation, DefaultFilter defaultFilter) {
-        combiningOperators.put(operation, defaultFilter);
+    protected void putCombiningOperator(Operation operation, IFilter filter) {
+        combiningOperators.put(operation, filter);
     }
 
-    public BasicFilter not(DefaultFilter defaultFilter) {
-        putCombiningOperator(Operation.NOT, defaultFilter);
+    @Override
+    public IFilter not(IFilter filter) {
+        putCombiningOperator(Operation.NOT, filter);
         return this;
     }
 
-    public BasicFilter and(DefaultFilter defaultFilter) {
-        putCombiningOperator(Operation.AND, defaultFilter);
+    @Override
+    public IFilter and(IFilter filter) {
+        putCombiningOperator(Operation.AND, filter);
         return this;
     }
 
-    public BasicFilter or(DefaultFilter defaultFilter) {
-        putCombiningOperator(Operation.OR, defaultFilter);
+    @Override
+    public IFilter or(IFilter filter) {
+        putCombiningOperator(Operation.OR, filter);
         return this;
     }
 
@@ -50,6 +53,7 @@ public abstract class BasicFilter<T> {
         return this;
     }
 
+    @Override
     public boolean filter(IFile file) {
         boolean valid = true;
         T value = getValue(file);
@@ -61,7 +65,7 @@ public abstract class BasicFilter<T> {
                 valid = valid && matchFilter(value, entry.getKey(), entry.getValue());
             }
 
-            for (Map.Entry<Operation, DefaultFilter> entry : combiningOperators.entrySet()) {
+            for (Map.Entry<Operation, IFilter> entry : combiningOperators.entrySet()) {
                 if (!valid)
                     break;
                 combineFilter(valid, file, entry.getKey(), entry.getValue());
@@ -71,16 +75,16 @@ public abstract class BasicFilter<T> {
         return valid;
     }
 
-    private void combineFilter(boolean valid, IFile file, Operation operation, DefaultFilter defaultFilter) {
+    private void combineFilter(boolean valid, IFile file, Operation operation, IFilter filter) {
         switch (operation) {
             case NOT:
-                valid = valid && (!defaultFilter.filter(file));
+                valid = valid && (!filter.filter(file));
                 break;
             case AND:
-                valid = valid && defaultFilter.filter(file);
+                valid = valid && filter.filter(file);
                 break;
             case OR:
-                valid = valid || defaultFilter.filter(file);
+                valid = valid || filter.filter(file);
                 break;
         }
     }

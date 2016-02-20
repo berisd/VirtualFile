@@ -10,9 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
-import at.beris.virtualfile.filter.BasicFilter;
-import at.beris.virtualfile.filter.CollectionFilter;
-import at.beris.virtualfile.filter.DefaultFilter;
+import at.beris.virtualfile.filter.IFilter;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.operation.CopyOperation;
 import at.beris.virtualfile.provider.IFileOperationProvider;
@@ -189,17 +187,7 @@ public class File implements IFile, Comparable<File> {
     }
 
     @Override
-    public List<IFile> list(BasicFilter filter) {
-        return filterList(getFileOperationProvider().list(client, model), filter);
-    }
-
-    @Override
-    public List<IFile> list(DefaultFilter filter) {
-        return filterList(getFileOperationProvider().list(client, model), filter);
-    }
-
-    @Override
-    public List<IFile> list(CollectionFilter filter) {
+    public List<IFile> list(IFilter filter) {
         return filterList(getFileOperationProvider().list(client, model), filter);
     }
 
@@ -261,7 +249,7 @@ public class File implements IFile, Comparable<File> {
         return model.getUrl().toString().compareTo(o.getUrl().toString());
     }
 
-    private List<IFile> filterList(List<IFile> fileList, BasicFilter filter) {
+    private List<IFile> filterList(List<IFile> fileList, IFilter filter) {
         List<IFile> filteredList = new ArrayList<>();
         for (IFile file : fileList) {
             if (filter.filter(file)) {
