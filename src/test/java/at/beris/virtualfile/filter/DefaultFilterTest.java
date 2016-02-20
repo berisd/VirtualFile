@@ -20,12 +20,11 @@ import java.util.List;
 
 public class DefaultFilterTest {
     private static final String TEST_DIRECTORY = "testdir/";
-    private static List<IFile> fileList;
     private static IFile testDirectory;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        fileList = TestFilterHelper.createFiles(TestFilterHelper.createFileNameList(TEST_DIRECTORY));
+        TestFilterHelper.createFiles(TEST_DIRECTORY);
         testDirectory = FileManager.newLocalFile(TEST_DIRECTORY);
     }
 

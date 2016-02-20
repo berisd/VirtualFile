@@ -30,38 +30,27 @@ public class TestFilterHelper {
         return fileNameList;
     }
 
-    public static List<IFile> createFiles(List<String> fileNamesList) throws Exception {
+    public static List<IFile> createFiles(String rootDir) throws Exception {
         List<IFile> fileList = new ArrayList<>();
         String dataString = "0123456789ABCDEF";
 
-        IFile file = FileManager.newLocalFile(fileNamesList.get(0));
-        file.create();
-        fileList.add(file);
+        List<FileData> fileDataList = new ArrayList<>();
+        fileDataList.add(new FileData(rootDir, 0, null));
+        fileDataList.add(new FileData(rootDir + "testfile1.txt", 640, Attribute.OWNER_READ, Attribute.GROUP_READ, Attribute.OTHERS_READ));
+        fileDataList.add(new FileData(rootDir + "testfile2.txt", 800, Attribute.OWNER_READ, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ));
+        fileDataList.add(new FileData(rootDir + "subdir/", 0, null));
+        fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, Attribute.OWNER_READ, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ, Attribute.GROUP_EXECUTE));
 
-        file = FileManager.newLocalFile(fileNamesList.get(1));
-        file.addAttributes(Attribute.OWNER_READ, Attribute.GROUP_READ, Attribute.OTHERS_READ);
-        file.create();
-        Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, 40).getBytes());
-        file.updateModel();
-        fileList.add(file);
-
-        file = FileManager.newLocalFile(fileNamesList.get(2));
-        file.addAttributes(Attribute.OWNER_READ, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ);
-        file.create();
-        Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, 50).getBytes());
-        file.updateModel();
-        fileList.add(file);
-
-        file = FileManager.newLocalFile(fileNamesList.get(3));
-        file.create();
-        fileList.add(file);
-
-        file = FileManager.newLocalFile(fileNamesList.get(4));
-        file.addAttributes(Attribute.OWNER_READ, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ, Attribute.GROUP_EXECUTE);
-        file.create();
-        Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, 200).getBytes());
-        file.updateModel();
-        fileList.add(file);
+        for(FileData fileData: fileDataList) {
+            IFile file = FileManager.newLocalFile(fileData.name);
+            file.create();
+            if (! file.isDirectory()) {
+                file.addAttributes(fileData.attributes);
+                Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, fileData.size/dataString.length()).getBytes());
+            }
+            file.refresh();
+            fileList.add(file);
+        }
 
         return fileList;
     }
@@ -71,5 +60,17 @@ public class TestFilterHelper {
         for (IFile file : fileList)
             nameList.add(file.getName());
         return nameList;
+    }
+
+    private static class FileData {
+        public String name;
+        public int size;
+        public Attribute[] attributes;
+
+        public FileData(String name, int size, Attribute... attributes) {
+            this.name = name;
+            this.size = size;
+            this.attributes = attributes;
+        }
     }
 }

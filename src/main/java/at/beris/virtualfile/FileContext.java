@@ -88,7 +88,7 @@ public class FileContext {
         if (fileConfig.getFileOperationProviderClassMap(protocol) == null)
             throw new VirtualFileException("No configuration found for protocol: " + protocolString);
 
-        IFile file = null;
+        File file = null;
         try {
             IClient client = createClientInstance(normalizedUrl, fileConfig.getClientClass(protocol));
             Map<FileType, IFileOperationProvider> fileOperationProviderMap = new HashMap<>();
@@ -173,9 +173,9 @@ public class FileContext {
         return client;
     }
 
-    private IFile createFileInstance(IFile parent, URL normalizedUrl, IClient client, Map<FileType, IFileOperationProvider> fileOperationProviderMap) {
+    private File createFileInstance(IFile parent, URL normalizedUrl, IClient client, Map<FileType, IFileOperationProvider> fileOperationProviderMap) {
         Class instanceClass;
-        IFile instance;
+        File instance;
         String urlString = normalizedUrl.toString();
         String[] pathParts = urlString.split("/");
 
@@ -189,7 +189,7 @@ public class FileContext {
         Constructor constructor = null;
         try {
             constructor = instanceClass.getConstructor(IFile.class, URL.class, FileModel.class, Map.class, IClient.class);
-            instance = (IFile) constructor.newInstance(parent, normalizedUrl, new FileModel(), fileOperationProviderMap, client);
+            instance = (File) constructor.newInstance(parent, normalizedUrl, new FileModel(), fileOperationProviderMap, client);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
         }

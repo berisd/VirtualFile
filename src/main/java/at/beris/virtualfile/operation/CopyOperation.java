@@ -55,7 +55,7 @@ public class CopyOperation {
             copyFile(sourceFile, targetFile, listener);
             filesProcessed++;
         }
-        targetFile.updateModel();
+        targetFile.refresh();
     }
 
     private void copyFile(File sourceFile, File targetFile, CopyListener listener) throws IOException {

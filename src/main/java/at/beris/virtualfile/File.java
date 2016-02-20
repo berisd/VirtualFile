@@ -242,11 +242,10 @@ public class File implements IFile, Comparable<File> {
         new CopyOperation(this, targetFile, listener);
     }
 
-    /**
-     * Updates the model with information from the physical file
-     */
-    public void updateModel() {
-        getFileOperationProvider().updateModel(client, model);
+    @Override
+    public void refresh() {
+        LOGGER.info("Refresh " + maskedUrlString(this));
+        updateModel();
     }
 
     @Override
@@ -272,5 +271,9 @@ public class File implements IFile, Comparable<File> {
     @Override
     public int compareTo(File o) {
         return model.getUrl().toString().compareTo(o.getUrl().toString());
+    }
+
+    void updateModel() {
+        getFileOperationProvider().updateModel(client, model);
     }
 }

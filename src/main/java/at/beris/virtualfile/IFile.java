@@ -31,7 +31,10 @@ public interface IFile {
 
     IFileOperationProvider getFileOperationProvider();
 
-    void updateModel();
+    /**
+     * Updates the model with information from the physical file
+     */
+    void refresh();
 
     String getName();
 
