@@ -14,6 +14,7 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.filter.IFilter;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -27,10 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LocalArchiveOperationProvider extends LocalFileOperationProvider implements IArchiveOperationProvider {
 
@@ -48,7 +46,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model) {
+    public List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter) {
         List<IFile> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
@@ -64,7 +62,8 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
             while ((archiveEntry = ais.getNextEntry()) != null) {
                 Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
                 IFile file = FileManager.newFile(urlMap.get(PARENT_URL), urlMap.get(URL));
-                fileList.add(file);
+                if (!filter.isPresent() || filter.get().filter(file))
+                    fileList.add(file);
             }
         } catch (FileNotFoundException e) {
             throw new at.beris.virtualfile.exception.FileNotFoundException(e);

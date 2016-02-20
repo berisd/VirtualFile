@@ -9,13 +9,14 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.IFile;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 public class LocalArchiveOperationProviderTest {
     @Test
@@ -25,7 +26,7 @@ public class LocalArchiveOperationProviderTest {
         FileModel fileModel = new FileModel();
         fileModel.setUrl(file.toURI().toURL());
         LocalArchiveOperationProvider provider = new LocalArchiveOperationProvider();
-        List<IFile> fileList = provider.list(null, fileModel);
+        List<IFile> fileList = provider.list(null, fileModel, Optional.empty());
         Assert.assertTrue(fileList.size()>0);
     }
 }

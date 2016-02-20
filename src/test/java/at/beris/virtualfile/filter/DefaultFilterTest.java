@@ -11,7 +11,10 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -41,13 +44,11 @@ public class DefaultFilterTest {
     }
 
     @Test
-    @Ignore
     public void filterGreaterThan() {
-        List<IFile> filteredList = testDirectory.list(new FileSizeFilter().greaterThan(16 * 40L));
+        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().greaterThan(16 * 40L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
-        //TODO list() is not recursively.
         Assert.assertTrue(filteredFileNameList.contains("goodmovie.avi"));
     }
 }

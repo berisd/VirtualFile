@@ -11,9 +11,11 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.operation.CopyOperation;
 import at.beris.virtualfile.provider.IFileOperationProvider;
+import at.beris.virtualfile.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +25,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.*;
 
-import static at.beris.virtualfile.FileUtils.maskedUrlString;
+import static at.beris.virtualfile.util.FileUtils.maskedUrlString;
 
 public class File implements IFile, Comparable<File> {
     private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
@@ -112,7 +114,12 @@ public class File implements IFile, Comparable<File> {
 
     @Override
     public boolean isDirectory() {
-        return model.isDirectory();
+        return this instanceof IDirectory;
+    }
+
+    @Override
+    public boolean isContainer() {
+        return this instanceof IFileContainer;
     }
 
     @Override
@@ -182,20 +189,38 @@ public class File implements IFile, Comparable<File> {
     }
 
     @Override
+    public List<IFile> find(IFilter filter) {
+        IFilter directoriesFilter = new IsDirectoryFilter().equal(true);
+        IFilter withDirectoriesFilter = ((IFilter) filter.clone()).or(new IsDirectoryFilter().equal(true));
+
+        List<IFile> fileList = getFileOperationProvider().list(client, model, Optional.of(withDirectoriesFilter));
+        Map<IFilter, List<IFile>> partitionedFileList = FileUtils.partitionFileListByFilters(fileList, Arrays.asList(filter, directoriesFilter));
+
+        fileList.clear();
+        fileList = partitionedFileList.get(filter);
+        List<IFile> directoryList = partitionedFileList.get(directoriesFilter);
+
+        for (IFile directory : directoryList) {
+            fileList.addAll(directory.find(filter));
+        }
+        directoryList.clear();
+
+        return fileList;
+    }
+
+    @Override
     public List<IFile> list() {
-        return getFileOperationProvider().list(client, model);
+        return getFileOperationProvider().list(client, model, Optional.empty());
     }
 
     @Override
     public List<IFile> list(IFilter filter) {
-        return filterList(getFileOperationProvider().list(client, model), filter);
+        return getFileOperationProvider().list(client, model, Optional.of(filter));
     }
 
     @Override
     public boolean isArchive() {
-        if (!isDirectory() && FileUtils.isArchive(getName()))
-            return true;
-        return false;
+        return this instanceof IArchive;
     }
 
     @Override
@@ -247,15 +272,5 @@ public class File implements IFile, Comparable<File> {
     @Override
     public int compareTo(File o) {
         return model.getUrl().toString().compareTo(o.getUrl().toString());
-    }
-
-    private List<IFile> filterList(List<IFile> fileList, IFilter filter) {
-        List<IFile> filteredList = new ArrayList<>();
-        for (IFile file : fileList) {
-            if (filter.filter(file)) {
-                filteredList.add(file);
-            }
-        }
-        return filteredList;
     }
 }

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Optional;
 
 public class CopyOperation {
     public final static int COPY_BUFFER_SIZE = 1024 * 16;
@@ -42,7 +43,7 @@ public class CopyOperation {
             if (!targetFile.exists())
                 targetFile.create();
 
-            for (IFile sourceChildFile : sourceFile.getFileOperationProvider().list(sourceFile.getClient(), sourceFile.getModel())) {
+            for (IFile sourceChildFile : sourceFile.getFileOperationProvider().list(sourceFile.getClient(), sourceFile.getModel(), Optional.empty())) {
                 URL targetUrl = targetFile.getUrl();
                 URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
 

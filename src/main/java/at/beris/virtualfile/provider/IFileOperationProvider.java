@@ -13,12 +13,14 @@ import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.filter.IFilter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface IFileOperationProvider {
@@ -50,10 +52,10 @@ public interface IFileOperationProvider {
      *
      * @param client
      * @param model
+     * @param filter
      * @return
-     * @throws IOException
      */
-    List<IFile> list(IClient client, FileModel model);
+    List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter);
 
     /**
      * Updates the Model with information from the physical file.

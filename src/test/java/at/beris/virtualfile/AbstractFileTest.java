@@ -11,6 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.operation.CopyListener;
+import at.beris.virtualfile.util.FileUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 

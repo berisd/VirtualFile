@@ -13,6 +13,8 @@ import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.client.IFileInfo;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.util.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.File;
@@ -20,6 +22,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class SftpFileOperationProvider implements IFileOperationProvider {
@@ -61,12 +64,15 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model) {
+    public List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter) {
         List<IFileInfo> fileInfoList = client.list(model.getPath());
         List<IFile> fileList = new ArrayList<>();
 
         for (IFileInfo fileInfo : fileInfoList) {
-            fileList.add(FileManager.newFile(FileUtils.newUrl(model.getUrl(), fileInfo.getPath())));
+            IFile file = FileManager.newFile(FileUtils.newUrl(model.getUrl(), fileInfo.getPath()));
+            if (!filter.isPresent() || filter.get().filter(file)) {
+                fileList.add(file);
+            }
         }
         return fileList;
     }

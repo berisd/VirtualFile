@@ -11,14 +11,9 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.IFile;
 
-public interface IFilter {
-    IFilter not(IFilter filter);
-
-    IFilter or(IFilter filter);
-
-    IFilter and(IFilter filter);
-
-    boolean filter(IFile file);
-
-    Object clone();
+public class IsDirectoryFilter extends DefaultFilter<Boolean> {
+    @Override
+    protected Boolean getValue(IFile file) {
+        return file.isDirectory();
+    }
 }

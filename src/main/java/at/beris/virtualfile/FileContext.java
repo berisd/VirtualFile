@@ -13,6 +13,7 @@ import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.IFileOperationProvider;
+import at.beris.virtualfile.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Constructor;

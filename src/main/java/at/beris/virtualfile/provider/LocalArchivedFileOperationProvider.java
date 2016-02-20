@@ -11,10 +11,11 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.FileUtils;
+import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.filter.IFilter;
 import org.apache.commons.compress.archivers.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
@@ -23,11 +24,12 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class LocalArchivedFileOperationProvider implements IFileOperationProvider {
     @Override
-    public List<IFile> list(IClient client, FileModel model) {
+    public List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter) {
         List<IFile> files = new ArrayList<>();
 //        IFile backFile = add(this.archiveFile, createEmptyArchiveEntry());
 //        backFile.setParent(this.parentFile);

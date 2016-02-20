@@ -7,17 +7,18 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile;
+package at.beris.virtualfile.util;
 
+import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.filter.IFilter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class FileUtils {
     public static boolean isArchive(String pathName) {
@@ -100,5 +101,22 @@ public class FileUtils {
         stringBuilder.append(url.getPath());
 
         return stringBuilder.toString();
+    }
+
+    public static Map<IFilter, List<IFile>> partitionFileListByFilters(List<IFile> fileList, List<IFilter> filterList) {
+        Map<IFilter, List<IFile>> partitionedFileList = new HashMap<>();
+
+        for (IFilter filter : filterList) {
+            partitionedFileList.put(filter, new ArrayList<>());
+        }
+
+        for (IFile file : fileList) {
+            for (IFilter filter : filterList) {
+                if (filter.filter(file))
+                    partitionedFileList.get(filter).add(file);
+            }
+        }
+
+        return partitionedFileList;
     }
 }

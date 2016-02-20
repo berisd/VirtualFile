@@ -41,6 +41,8 @@ public interface IFile {
 
     boolean isDirectory();
 
+    boolean isContainer();
+
     IFile getParent();
 
     IFile getRoot();
@@ -57,8 +59,26 @@ public interface IFile {
 
     void removeAttributes(Attribute... attributes);
 
+    /**
+     * Find files recursively matching a filter
+     *
+     * @param filter A filter
+     * @return A list of files
+     */
+    List<IFile> find(IFilter filter);
+
+    /**
+     * List contained files non-recursively
+     *
+     * @return A list of files
+     */
     List<IFile> list();
 
+    /**
+     * List contained files non-recursively filtered by a filter
+     *
+     * @return A list of files
+     */
     List<IFile> list(IFilter filter);
 
     String getPath();

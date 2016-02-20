@@ -11,6 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.provider.IFileOperationProvider;
+import at.beris.virtualfile.util.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;

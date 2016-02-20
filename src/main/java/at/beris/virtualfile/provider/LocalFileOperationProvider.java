@@ -12,6 +12,8 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.util.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.File;
@@ -56,12 +58,14 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model) {
+    public List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter) {
         List<IFile> fileList = new ArrayList<>();
         if (model.isDirectory()) {
             for (File childFile : new File(model.getPath()).listFiles()) {
                 try {
-                    fileList.add(FileManager.newFile(childFile.toURI().toURL()));
+                    IFile file = FileManager.newFile(childFile.toURI().toURL());
+                    if (!filter.isPresent() || filter.get().filter(file))
+                        fileList.add(file);
                 } catch (MalformedURLException e) {
                     throw new VirtualFileException(e);
                 }
@@ -208,7 +212,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         model.setLastModifiedTime(new Date(basicFileAttributes.lastModifiedTime().toMillis()));
         model.setLastAccessTime(new Date(basicFileAttributes.lastAccessTime().toMillis()));
         model.setCreationTime(new Date(basicFileAttributes.creationTime().toMillis()));
-        model.setSize(basicFileAttributes.size());
+        model.setSize(file.isDirectory() ? file.list().length : basicFileAttributes.size());
     }
 
     private void fillDosFileAttributes(File file, Set<Attribute> attributes) throws IOException {

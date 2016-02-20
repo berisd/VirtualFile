@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

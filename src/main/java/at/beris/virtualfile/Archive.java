@@ -19,7 +19,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import static at.beris.virtualfile.FileUtils.maskedUrlString;
+import static at.beris.virtualfile.util.FileUtils.maskedUrlString;
 
 public class Archive extends FileContainer implements IArchive {
     private final static Logger LOGGER = LoggerFactory.getLogger(File.class);

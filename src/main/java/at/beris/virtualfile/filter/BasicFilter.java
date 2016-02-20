@@ -10,16 +10,30 @@
 package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.exception.VirtualFileException;
 
 import java.util.*;
 
-public abstract class BasicFilter<T> implements IFilter {
+public abstract class BasicFilter<T> implements IFilter, Cloneable {
     private Map<Operation, IFilter> combiningOperators;
     private Map<Operation, Collection<T>> operationValuesMap;
 
     public BasicFilter() {
         combiningOperators = new HashMap<>();
         operationValuesMap = new HashMap<>();
+    }
+
+    @Override
+    public Object clone() {
+        BasicFilter cloned = null;
+        try {
+            cloned = (BasicFilter) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new VirtualFileException(e);
+        }
+        cloned.combiningOperators = new HashMap<>(combiningOperators);
+        cloned.operationValuesMap = new HashMap<>(operationValuesMap);
+        return cloned;
     }
 
     protected void putOperationValues(Operation operation, Collection<T> values) {
@@ -66,26 +80,23 @@ public abstract class BasicFilter<T> implements IFilter {
             }
 
             for (Map.Entry<Operation, IFilter> entry : combiningOperators.entrySet()) {
-                if (!valid)
-                    break;
-                combineFilter(valid, file, entry.getKey(), entry.getValue());
+                valid = combineFilter(valid, file, entry.getKey(), entry.getValue());
             }
         }
 
         return valid;
     }
 
-    private void combineFilter(boolean valid, IFile file, Operation operation, IFilter filter) {
+    private boolean combineFilter(boolean valid, IFile file, Operation operation, IFilter filter) {
         switch (operation) {
             case NOT:
-                valid = valid && (!filter.filter(file));
-                break;
+                return valid && (!filter.filter(file));
             case AND:
-                valid = valid && filter.filter(file);
-                break;
+                return valid && filter.filter(file);
             case OR:
-                valid = valid || filter.filter(file);
-                break;
+                return valid || filter.filter(file);
+            default:
+                return false;
         }
     }
 
