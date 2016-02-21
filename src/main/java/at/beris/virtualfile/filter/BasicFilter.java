@@ -59,8 +59,20 @@ public abstract class BasicFilter<T> implements IFilter<T>, Cloneable {
     }
 
     @Override
+    public IFilter andNot(IFilter filter) {
+        putCombiningOperator(Operation.AND_NOT, filter);
+        return this;
+    }
+
+    @Override
     public IFilter or(IFilter filter) {
         putCombiningOperator(Operation.OR, filter);
+        return this;
+    }
+
+    @Override
+    public IFilter orNot(IFilter filter) {
+        putCombiningOperator(Operation.OR_NOT, filter);
         return this;
     }
 
@@ -99,8 +111,12 @@ public abstract class BasicFilter<T> implements IFilter<T>, Cloneable {
                 return valid && (!filter.filter(file));
             case AND:
                 return valid && filter.filter(file);
+            case AND_NOT:
+                return valid && !filter.filter(file);
             case OR:
                 return valid || filter.filter(file);
+            case OR_NOT:
+                return valid || !filter.filter(file);
             default:
                 return false;
         }

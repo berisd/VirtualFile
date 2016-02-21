@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.filter;
 
+import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
 import org.junit.AfterClass;
@@ -50,12 +51,30 @@ public class BasicFilterTest {
     }
 
     @Test
+    public void filterAndNot() {
+        List<IFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt").andNot(new FileAttributesFilter().contains(Attribute.OTHERS_READ)));
+        Assert.assertEquals(1, filteredList.size());
+        List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
+        Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
+    }
+
+    @Test
     public void filterOr() {
         List<IFile> filteredList = testDirectory.find(new FileNameFilter().equalTo("testfile1.txt").or(new FileNameFilter().equalTo("subdir")));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
         Assert.assertTrue(filteredFileNameList.contains("subdir"));
+    }
+
+    @Test
+    public void filterOrNot() {
+        List<IFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt").orNot(new FileSizeFilter().lessThan(800L)));
+        Assert.assertEquals(3, filteredList.size());
+        List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
+        Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
+        Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
+        Assert.assertTrue(filteredFileNameList.contains("goodmovie.avi"));
     }
 
     @Test

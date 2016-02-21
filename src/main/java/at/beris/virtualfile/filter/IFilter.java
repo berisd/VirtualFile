@@ -18,7 +18,11 @@ public interface IFilter<T> {
 
     IFilter or(IFilter filter);
 
+    IFilter orNot(IFilter filter);
+
     IFilter and(IFilter filter);
+
+    IFilter andNot(IFilter filter);
 
     boolean filter(IFile file);
 

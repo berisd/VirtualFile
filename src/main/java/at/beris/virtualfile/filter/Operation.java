@@ -11,7 +11,9 @@ package at.beris.virtualfile.filter;
 
 public enum Operation {
     AND,
+    AND_NOT,
     OR,
+    OR_NOT,
     NOT,
     EQUAL,
     GREATER_THAN,
