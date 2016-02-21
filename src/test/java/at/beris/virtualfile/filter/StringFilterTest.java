@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class BasicFilterTest {
+public class StringFilterTest {
     private static final String TEST_DIRECTORY = "testdir/";
     private static IFile testDirectory;
 
@@ -34,37 +34,36 @@ public class BasicFilterTest {
     }
 
     @Test
-    public void filterEqual() {
-        List<IFile> filteredList = testDirectory.find(new FileNameFilter().equalTo("testfile1.txt"));
+    public void filterContains() {
+        List<IFile> filteredList = testDirectory.find(new FileNameFilter().contains("good"));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
-        Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
+        Assert.assertTrue(filteredFileNameList.contains("goodmovie.avi"));
     }
 
     @Test
-    public void filterAnd() {
-        List<IFile> filteredList = testDirectory.find(new FileNameFilter().equalTo("testfile1.txt").and(new IsDirectoryFilter().equalTo(false)));
-        Assert.assertEquals(1, filteredList.size());
-        List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
-        Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
-    }
-
-    @Test
-    public void filterOr() {
-        List<IFile> filteredList = testDirectory.find(new FileNameFilter().equalTo("testfile1.txt").or(new FileNameFilter().equalTo("subdir")));
+    public void filterStartsWith() {
+        List<IFile> filteredList = testDirectory.find(new FileNameFilter().startsWith("test"));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
-        Assert.assertTrue(filteredFileNameList.contains("subdir"));
+        Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
     }
 
     @Test
-    public void filterNot() {
-        List<IFile> filteredList = testDirectory.find(new FileNameFilter().not().equalTo("testfile1.txt"));
-        Assert.assertEquals(3, filteredList.size());
+    public void filterEndsWith() {
+        List<IFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt"));
+        Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
+        Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
-        Assert.assertTrue(filteredFileNameList.contains("subdir"));
+    }
+
+    @Test
+    public void filterMatches() {
+        List<IFile> filteredList = testDirectory.find(new FileNameFilter().matches(".*odm.*$"));
+        Assert.assertEquals(1, filteredList.size());
+        List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("goodmovie.avi"));
     }
 }

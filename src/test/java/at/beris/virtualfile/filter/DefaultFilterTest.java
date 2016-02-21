@@ -35,7 +35,7 @@ public class DefaultFilterTest {
 
     @Test
     public void filterBetween() {
-        List<IFile> filteredList = testDirectory.list(new FileSizeFilter().between(16 * 40L, 16 * 51L));
+        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().between(640L, 816L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
@@ -44,10 +44,45 @@ public class DefaultFilterTest {
 
     @Test
     public void filterGreaterThan() {
-        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().greaterThan(16 * 40L));
+        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().greaterThan(640L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
         Assert.assertTrue(filteredFileNameList.contains("goodmovie.avi"));
+    }
+
+    @Test
+    public void filterGreaterThanOrEqual() {
+        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().greaterThanOrEqualTo(640L));
+        Assert.assertEquals(3, filteredList.size());
+        List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
+        Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
+        Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
+        Assert.assertTrue(filteredFileNameList.contains("goodmovie.avi"));
+    }
+
+    @Test
+    public void filterIn() {
+        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().in(640L, 800L));
+        Assert.assertEquals(2, filteredList.size());
+        List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
+        Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
+        Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
+    }
+
+    @Test
+    public void filterLessThan() {
+        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().lessThan(640L));
+        Assert.assertEquals(1, filteredList.size());
+        List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
+        Assert.assertTrue(filteredFileNameList.contains("subdir"));
+    }
+    @Test
+    public void filterLessThanOrEqual() {
+        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().lessThanOrEqualTo(640L));
+        Assert.assertEquals(2, filteredList.size());
+        List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
+        Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
+        Assert.assertTrue(filteredFileNameList.contains("subdir"));
     }
 }

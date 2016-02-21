@@ -30,7 +30,7 @@ public abstract class DefaultFilter<T> extends BasicFilter<T> {
     }
 
     public DefaultFilter lessThanOrEqualTo(T value) {
-        putOperationValues(Operation.GREATER_THAN_OR_EQUAL, Collections.singletonList(value));
+        putOperationValues(Operation.LESS_THAN_OR_EQUAL, Collections.singletonList(value));
         return this;
     }
 

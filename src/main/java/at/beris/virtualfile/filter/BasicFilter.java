@@ -14,13 +14,15 @@ import at.beris.virtualfile.exception.VirtualFileException;
 
 import java.util.*;
 
-public abstract class BasicFilter<T> implements IFilter, Cloneable {
+public abstract class BasicFilter<T> implements IFilter<T>, Cloneable {
     private Map<Operation, IFilter> combiningOperators;
     private Map<Operation, Collection<T>> operationValuesMap;
+    private boolean inverseValue;
 
     public BasicFilter() {
         combiningOperators = new HashMap<>();
         operationValuesMap = new HashMap<>();
+        inverseValue = false;
     }
 
     @Override
@@ -45,8 +47,8 @@ public abstract class BasicFilter<T> implements IFilter, Cloneable {
     }
 
     @Override
-    public IFilter not(IFilter filter) {
-        putCombiningOperator(Operation.NOT, filter);
+    public IFilter not() {
+        inverseValue = true;
         return this;
     }
 
@@ -62,7 +64,8 @@ public abstract class BasicFilter<T> implements IFilter, Cloneable {
         return this;
     }
 
-    public BasicFilter equal(T value) {
+    @Override
+    public IFilter equalTo(T value) {
         operationValuesMap.put(Operation.EQUAL, Collections.singletonList(value));
         return this;
     }
@@ -78,10 +81,13 @@ public abstract class BasicFilter<T> implements IFilter, Cloneable {
                     break;
                 valid = valid && matchFilter(value, entry.getKey(), entry.getValue());
             }
+        }
 
-            for (Map.Entry<Operation, IFilter> entry : combiningOperators.entrySet()) {
-                valid = combineFilter(valid, file, entry.getKey(), entry.getValue());
-            }
+        if (inverseValue)
+            valid = !valid;
+
+        for (Map.Entry<Operation, IFilter> entry : combiningOperators.entrySet()) {
+            valid = combineFilter(valid, file, entry.getKey(), entry.getValue());
         }
 
         return valid;
@@ -133,13 +139,14 @@ public abstract class BasicFilter<T> implements IFilter, Cloneable {
     }
 
     protected boolean matchMultipleValues(T value, Collection<T> filterValues, Operation operation) {
+        boolean valid = false;
         switch (operation) {
             case IN:
                 for (T filterValue : filterValues) {
-                    matchSingleValue(value, filterValue, Operation.EQUAL);
+                    valid = valid || matchSingleValue(value, filterValue, Operation.EQUAL);
                 }
         }
-        return false;
+        return valid;
     }
 
     abstract protected T getValue(IFile file);

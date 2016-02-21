@@ -11,8 +11,10 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.IFile;
 
-public interface IFilter {
-    IFilter not(IFilter filter);
+public interface IFilter<T> {
+    IFilter equalTo(T value);
+
+    IFilter not();
 
     IFilter or(IFilter filter);
 

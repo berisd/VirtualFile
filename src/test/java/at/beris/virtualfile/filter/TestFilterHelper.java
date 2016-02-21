@@ -20,15 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestFilterHelper {
-    public static List<String> createFileNameList(String rootDir) {
-        List<String> fileNameList = new ArrayList<>();
-        fileNameList.add(rootDir);
-        fileNameList.add(rootDir + "testfile1.txt");
-        fileNameList.add(rootDir + "testfile2.txt");
-        fileNameList.add(rootDir + "subdir/");
-        fileNameList.add(rootDir + "subdir/goodmovie.avi");
-        return fileNameList;
-    }
 
     public static List<IFile> createFiles(String rootDir) throws Exception {
         List<IFile> fileList = new ArrayList<>();
@@ -41,12 +32,12 @@ public class TestFilterHelper {
         fileDataList.add(new FileData(rootDir + "subdir/", 0, null));
         fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, Attribute.OWNER_READ, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ, Attribute.GROUP_EXECUTE));
 
-        for(FileData fileData: fileDataList) {
+        for (FileData fileData : fileDataList) {
             IFile file = FileManager.newLocalFile(fileData.name);
             file.create();
-            if (! file.isDirectory()) {
+            if (!file.isDirectory()) {
                 file.addAttributes(fileData.attributes);
-                Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, fileData.size/dataString.length()).getBytes());
+                Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, fileData.size / dataString.length()).getBytes());
             }
             file.refresh();
             fileList.add(file);

@@ -166,7 +166,6 @@ public class File implements IFile, Comparable<File> {
 
     @Override
     public Set<Attribute> getAttributes() {
-        getFileOperationProvider().updateModel(client, model);
         return model.getAttributes();
     }
 
@@ -190,8 +189,8 @@ public class File implements IFile, Comparable<File> {
 
     @Override
     public List<IFile> find(IFilter filter) {
-        IFilter directoriesFilter = new IsDirectoryFilter().equal(true);
-        IFilter withDirectoriesFilter = ((IFilter) filter.clone()).or(new IsDirectoryFilter().equal(true));
+        IFilter directoriesFilter = new IsDirectoryFilter().equalTo(true);
+        IFilter withDirectoriesFilter = ((IFilter) filter.clone()).or(new IsDirectoryFilter().equalTo(true));
 
         List<IFile> fileList = getFileOperationProvider().list(client, model, Optional.of(withDirectoriesFilter));
         Map<IFilter, List<IFile>> partitionedFileList = FileUtils.partitionFileListByFilters(fileList, Arrays.asList(filter, directoriesFilter));
