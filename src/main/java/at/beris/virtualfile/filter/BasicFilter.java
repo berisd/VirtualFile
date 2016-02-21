@@ -106,7 +106,7 @@ public abstract class BasicFilter<T> implements IFilter<T>, Cloneable {
         }
     }
 
-    private boolean matchFilter(T value, Operation operation, Collection<T> filterValues) {
+    protected boolean matchFilter(T value, Operation operation, Collection<T> filterValues) {
         boolean valid = true;
         if (filterValues.size() < 1)
             return false;

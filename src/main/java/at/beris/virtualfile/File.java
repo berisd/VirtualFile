@@ -165,6 +165,12 @@ public class File implements IFile, Comparable<File> {
     }
 
     @Override
+    public void setAttributes(Attribute... attributes) {
+        model.setAttributes(new HashSet<>(Arrays.asList(attributes)));
+        getFileOperationProvider().setAttributes(client, model);
+    }
+
+    @Override
     public Set<Attribute> getAttributes() {
         return model.getAttributes();
     }

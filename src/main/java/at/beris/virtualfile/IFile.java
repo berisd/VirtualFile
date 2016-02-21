@@ -58,6 +58,8 @@ public interface IFile {
 
     Set<Attribute> getAttributes();
 
+    void setAttributes(Attribute... attributes);
+
     void addAttributes(Attribute... attributes);
 
     void removeAttributes(Attribute... attributes);

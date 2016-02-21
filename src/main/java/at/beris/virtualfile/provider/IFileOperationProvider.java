@@ -78,4 +78,6 @@ public interface IFileOperationProvider {
     OutputStream getOutputStream(IClient client, FileModel model) throws IOException;
 
     Set<Attribute> getAttributes(IClient client, FileModel model);
+
+    void setAttributes(IClient client, FileModel model);
 }

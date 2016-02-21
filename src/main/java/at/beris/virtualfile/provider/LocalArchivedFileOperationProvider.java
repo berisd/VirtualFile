@@ -11,11 +11,11 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.util.FileUtils;
 import org.apache.commons.compress.archivers.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
@@ -151,6 +151,11 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
     @Override
     public Set<Attribute> getAttributes(IClient client, FileModel model) {
+        throw new NotImplementedException("");
+    }
+
+    @Override
+    public void setAttributes(IClient client, FileModel model) {
         throw new NotImplementedException("");
     }
 

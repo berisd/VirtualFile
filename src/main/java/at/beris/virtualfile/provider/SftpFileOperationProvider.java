@@ -105,6 +105,11 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
         return client.getFileInfo(model.getPath()).getAttributes();
     }
 
+    @Override
+    public void setAttributes(IClient client, FileModel model) {
+        throw new NotImplementedException("");
+    }
+
     private IFile copyToLocalFile(IClient client, FileModel model, String path) {
         byte[] buffer = new byte[1024];
         int length;

@@ -12,7 +12,10 @@ package at.beris.virtualfile.filter;
 import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.exception.PermissionDeniedException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -20,27 +23,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestFilterHelper {
+    private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
 
     public static List<IFile> createFiles(String rootDir) throws Exception {
         List<IFile> fileList = new ArrayList<>();
         String dataString = "0123456789ABCDEF";
 
         List<FileData> fileDataList = new ArrayList<>();
-        fileDataList.add(new FileData(rootDir, 0, null));
-        fileDataList.add(new FileData(rootDir + "testfile1.txt", 640, Attribute.OWNER_READ, Attribute.GROUP_READ, Attribute.OTHERS_READ));
-        fileDataList.add(new FileData(rootDir + "testfile2.txt", 800, Attribute.OWNER_READ, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ));
-        fileDataList.add(new FileData(rootDir + "subdir/", 0, null));
-        fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, Attribute.OWNER_READ, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ, Attribute.GROUP_EXECUTE));
+        fileDataList.add(new FileData(rootDir, 0, new Attribute[] {Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE}));
+        fileDataList.add(new FileData(rootDir + "testfile1.txt", 640, Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OTHERS_READ));
+        fileDataList.add(new FileData(rootDir + "testfile2.txt", 800, Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ));
+        fileDataList.add(new FileData(rootDir + "subdir/", 0, new Attribute[] {Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE}));
+        fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ, Attribute.GROUP_EXECUTE));
 
         for (FileData fileData : fileDataList) {
             IFile file = FileManager.newLocalFile(fileData.name);
-            file.create();
-            if (!file.isDirectory()) {
-                file.addAttributes(fileData.attributes);
-                Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, fileData.size / dataString.length()).getBytes());
+            try {
+
+                file.create();
+                file.setAttributes(fileData.attributes);
+                if (!file.isDirectory()) {
+                    Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, fileData.size / dataString.length()).getBytes());
+                }
+                file.refresh();
+                fileList.add(file);
             }
-            file.refresh();
-            fileList.add(file);
+            catch(PermissionDeniedException e) {
+                LOGGER.warn("Permission denied - " + file.toString());
+            }
         }
 
         return fileList;
