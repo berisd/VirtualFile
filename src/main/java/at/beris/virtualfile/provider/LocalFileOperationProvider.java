@@ -42,7 +42,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public IFile create(IClient client, FileModel model) {
+    public void create(IClient client, FileModel model) {
         String pathName = model.getPath();
         File file = new File(pathName);
         if (model.isDirectory()) {
@@ -59,7 +59,6 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
                     throw new VirtualFileException(e);
             }
         }
-        return null;
     }
 
     @Override

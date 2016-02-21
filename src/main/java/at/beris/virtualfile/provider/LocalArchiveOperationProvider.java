@@ -36,7 +36,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     private final static String PARENT_URL = "parentUrl";
 
     @Override
-    public IFile create(IClient client, FileModel model) {
+    public void create(IClient client, FileModel model) {
         throw new NotImplementedException();
     }
 

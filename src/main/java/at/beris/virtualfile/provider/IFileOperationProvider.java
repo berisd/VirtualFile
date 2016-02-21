@@ -30,8 +30,7 @@ public interface IFileOperationProvider {
      * @param model
      * @return
      */
-    //TODO return void
-    IFile create(IClient client, FileModel model);
+    void create(IClient client, FileModel model);
 
     boolean exists(IClient client, FileModel model);
 

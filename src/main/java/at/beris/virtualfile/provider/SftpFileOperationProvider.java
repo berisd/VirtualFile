@@ -30,13 +30,12 @@ import java.util.Set;
 public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
-    public IFile create(IClient client, FileModel model) {
+    public void create(IClient client, FileModel model) {
         if (model.isDirectory())
             client.createDirectory(model.getPath());
         else {
             client.createFile(model.getPath());
         }
-        return null;
     }
 
     @Override

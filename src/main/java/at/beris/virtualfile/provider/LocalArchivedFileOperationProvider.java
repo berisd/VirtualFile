@@ -45,7 +45,7 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
 
     @Override
-    public IFile create(IClient client, FileModel model) {
+    public void create(IClient client, FileModel model) {
         try {
             // if not exists create Archive
             // insert or update ArchiveEntry
@@ -53,7 +53,6 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
             ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
             ArchiveOutputStream archiveOutputStream = archiveStreamFactory.createArchiveOutputStream(ArchiveStreamFactory.ZIP, fileOutputStream);
             archiveOutputStream.close();
-            return null;
 
         } catch (ArchiveException e) {
             throw new VirtualFileException(e);
