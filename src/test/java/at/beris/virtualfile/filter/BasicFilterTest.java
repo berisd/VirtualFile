@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.attribute.PosixFilePermission;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -52,7 +52,7 @@ public class BasicFilterTest {
 
     @Test
     public void filterAndNot() {
-        List<IFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt").andNot(new FileAttributesFilter().contains(Attribute.OTHERS_READ)));
+        List<IFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt").andNot(new FileAttributesFilter().contains(PosixFilePermission.OTHERS_READ)));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));

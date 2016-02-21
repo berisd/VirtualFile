@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.filter.IFilter;
 
@@ -77,7 +77,7 @@ public interface IFileOperationProvider {
 
     OutputStream getOutputStream(IClient client, FileModel model) throws IOException;
 
-    Set<Attribute> getAttributes(IClient client, FileModel model);
+    Set<IAttribute> getAttributes(IClient client, FileModel model);
 
     void setAttributes(IClient client, FileModel model);
 }

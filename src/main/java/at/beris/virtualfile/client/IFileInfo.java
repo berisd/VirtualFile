@@ -9,19 +9,19 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.Attribute;
+import at.beris.virtualfile.attribute.IAttribute;
 
-import java.util.Date;
+import java.nio.file.attribute.FileTime;
 import java.util.Set;
 
 public interface IFileInfo {
     String getPath();
 
-    Date getLastModified();
+    FileTime getLastModified();
 
     long getSize();
 
     boolean isDirectory();
 
-    Set<Attribute> getAttributes();
+    Set<IAttribute> getAttributes();
 }

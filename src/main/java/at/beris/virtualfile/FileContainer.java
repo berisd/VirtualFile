@@ -11,8 +11,8 @@ package at.beris.virtualfile;
 
 
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.provider.IFileOperationProvider;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.net.URL;
 import java.util.Map;
@@ -37,6 +37,6 @@ public class FileContainer extends File implements IFileContainer {
 
     @Override
     public void delete(IFile file) {
-        throw new NotImplementedException("");
+        throw new NotImplementedException();
     }
 }

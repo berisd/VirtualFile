@@ -19,11 +19,9 @@ import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.time.Instant;
-import java.util.Date;
 
 import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class FileManagerTest {
     public final static String TEST_SOURCE_FILE_NAME = "testfile1.txt";
@@ -40,7 +38,7 @@ public class FileManagerTest {
         assertEquals(TEST_SOURCE_FILE_SIZE, file.getSize());
         Assert.assertFalse(file.isDirectory());
         assertEquals(sourceFile.getAbsolutePath(), file.getPath());
-        assertEquals(Date.from(TEST_SOURCE_FILE_LAST_MODIFIED).toString(), file.getLastModified().toString());
+        assertTrue(TestFileHelper.isInstantClose(TEST_SOURCE_FILE_LAST_MODIFIED, file.getLastModifiedTime().toInstant(), 2));
         assertNotNull(file.getParent());
         Assert.assertArrayEquals(expectedCheckSum, file.checksum());
         Assert.assertFalse(file.isArchive());

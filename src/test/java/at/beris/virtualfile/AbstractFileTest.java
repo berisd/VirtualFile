@@ -9,6 +9,8 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.attribute.DefaultPermission;
+import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
@@ -50,7 +52,7 @@ public abstract class AbstractFileTest {
         file.create();
 
         assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
-        assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModified(), 10));
+        assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
         assertEquals(0, file.getSize());
         assertFalse(file.isDirectory());
         file.delete();
@@ -61,7 +63,7 @@ public abstract class AbstractFileTest {
         file.create();
 
         assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
-        assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModified(), 10));
+        assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
         assertTrue(file.isDirectory());
     }
 
@@ -137,16 +139,16 @@ public abstract class AbstractFileTest {
         file.create();
 
         if (TestFileHelper.isOsWindows()) {
-            assertTrue(file.getAttributes().contains(Attribute.READ));
-            assertTrue(file.getAttributes().contains(Attribute.WRITE));
+            assertTrue(file.getAttributes().contains(DefaultPermission.READ));
+            assertTrue(file.getAttributes().contains(DefaultPermission.WRITE));
         } else {
-            assertTrue(file.getAttributes().contains(Attribute.OWNER_READ));
-            assertTrue(file.getAttributes().contains(Attribute.OWNER_WRITE));
-            assertTrue(file.getAttributes().contains(Attribute.GROUP_READ));
+            assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
+            assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
+            assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
             if (this instanceof LocalFileTest) {
-                assertTrue(file.getAttributes().contains(Attribute.GROUP_WRITE));
+                assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_WRITE));
             }
-            assertTrue(file.getAttributes().contains(Attribute.OTHERS_READ));
+            assertTrue(file.getAttributes().contains(PosixFilePermission.OTHERS_READ));
         }
         file.delete();
     }

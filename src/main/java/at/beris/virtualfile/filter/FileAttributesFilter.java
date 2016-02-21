@@ -9,14 +9,14 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.attribute.IAttribute;
 
 import java.util.Set;
 
-public class FileAttributesFilter extends CollectionFilter<Set<Attribute>, Attribute> {
+public class FileAttributesFilter extends CollectionFilter<Set<IAttribute>, IAttribute> {
     @Override
-    protected Set<Attribute> getValue(IFile file) {
+    protected Set<IAttribute> getValue(IFile file) {
         return file.getAttributes();
     }
 }

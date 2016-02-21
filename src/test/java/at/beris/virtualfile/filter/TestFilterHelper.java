@@ -9,9 +9,10 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.exception.PermissionDeniedException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,11 +31,11 @@ public class TestFilterHelper {
         String dataString = "0123456789ABCDEF";
 
         List<FileData> fileDataList = new ArrayList<>();
-        fileDataList.add(new FileData(rootDir, 0, new Attribute[] {Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE}));
-        fileDataList.add(new FileData(rootDir + "testfile1.txt", 640, Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OTHERS_READ));
-        fileDataList.add(new FileData(rootDir + "testfile2.txt", 800, Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ));
-        fileDataList.add(new FileData(rootDir + "subdir/", 0, new Attribute[] {Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE}));
-        fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ, Attribute.GROUP_EXECUTE));
+        fileDataList.add(new FileData(rootDir, 0, new IAttribute[]{PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE}));
+        fileDataList.add(new FileData(rootDir + "testfile1.txt", 640, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OTHERS_READ));
+        fileDataList.add(new FileData(rootDir + "testfile2.txt", 800, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ));
+        fileDataList.add(new FileData(rootDir + "subdir/", 0, new PosixFilePermission[]{PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE}));
+        fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ, PosixFilePermission.GROUP_EXECUTE));
 
         for (FileData fileData : fileDataList) {
             IFile file = FileManager.newLocalFile(fileData.name);
@@ -47,8 +48,7 @@ public class TestFilterHelper {
                 }
                 file.refresh();
                 fileList.add(file);
-            }
-            catch(PermissionDeniedException e) {
+            } catch (PermissionDeniedException e) {
                 LOGGER.warn("Permission denied - " + file.toString());
             }
         }
@@ -66,9 +66,9 @@ public class TestFilterHelper {
     private static class FileData {
         public String name;
         public int size;
-        public Attribute[] attributes;
+        public IAttribute[] attributes;
 
-        public FileData(String name, int size, Attribute... attributes) {
+        public FileData(String name, int size, IAttribute... attributes) {
             this.name = name;
             this.size = size;
             this.attributes = attributes;

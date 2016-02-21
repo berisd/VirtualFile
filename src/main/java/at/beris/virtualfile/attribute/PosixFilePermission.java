@@ -7,10 +7,9 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile;
+package at.beris.virtualfile.attribute;
 
-public enum Attribute {
-    // Posix
+public enum PosixFilePermission implements IAttribute {
     GROUP_EXECUTE,
     GROUP_READ,
     GROUP_WRITE,
@@ -20,15 +19,4 @@ public enum Attribute {
     OWNER_EXECUTE,
     OWNER_READ,
     OWNER_WRITE,
-
-    // DOS
-    ARCHIVE,
-    HIDDEN,
-    READ_ONLY,
-    SYSTEM,
-
-    // Default
-    READ,
-    WRITE,
-    EXECUTE,
 }

@@ -10,9 +10,14 @@
 package at.beris.virtualfile.exception;
 
 public class VirtualFileException extends RuntimeException {
+    public VirtualFileException() {
+        super();
+    }
+
     public VirtualFileException(Throwable cause) {
         super(cause);
     }
+
     public VirtualFileException(String message) {
         super(message);
     }

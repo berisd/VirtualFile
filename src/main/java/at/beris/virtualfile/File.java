@@ -9,7 +9,9 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.filter.IFilter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.operation.CopyListener;
@@ -23,6 +25,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.UserPrincipal;
 import java.util.*;
 
 import static at.beris.virtualfile.util.FileUtils.maskedUrlString;
@@ -87,8 +93,18 @@ public class File implements IFile, Comparable<File> {
     }
 
     @Override
-    public Date getLastModified() {
+    public FileTime getCreationTime() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public FileTime getLastModifiedTime() {
         return getModel().getLastModifiedTime();
+    }
+
+    @Override
+    public FileTime getLastAccessTime() {
+        throw new NotImplementedException();
     }
 
     @Override
@@ -115,6 +131,11 @@ public class File implements IFile, Comparable<File> {
     @Override
     public boolean isDirectory() {
         return this instanceof IDirectory;
+    }
+
+    @Override
+    public boolean isSymbolicLink() {
+        throw new NotImplementedException();
     }
 
     @Override
@@ -165,31 +186,61 @@ public class File implements IFile, Comparable<File> {
     }
 
     @Override
-    public void setAttributes(Attribute... attributes) {
+    public List<AclEntry> getAcl() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setAcl(List<AclEntry> acl) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public UserPrincipal getOwner() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setOwner(UserPrincipal owner) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public GroupPrincipal getGroup() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setGroup(GroupPrincipal group) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setAttributes(IAttribute... attributes) {
         model.setAttributes(new HashSet<>(Arrays.asList(attributes)));
         getFileOperationProvider().setAttributes(client, model);
     }
 
     @Override
-    public Set<Attribute> getAttributes() {
+    public Set<IAttribute> getAttributes() {
         return model.getAttributes();
     }
 
     @Override
-    public void addAttributes(Attribute... attributes) {
+    public void addAttributes(IAttribute... attributes) {
         if (attributes.length < 1)
             return;
 
-        for (Attribute attribute : attributes)
+        for (IAttribute attribute : attributes)
             getModel().addAttribute(attribute);
     }
 
     @Override
-    public void removeAttributes(Attribute... attributes) {
+    public void removeAttributes(IAttribute... attributes) {
         if (attributes.length < 1)
             return;
 
-        for (Attribute attribute : attributes)
+        for (IAttribute attribute : attributes)
             getModel().removeAttribute(attribute);
     }
 

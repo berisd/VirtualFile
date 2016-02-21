@@ -9,15 +9,17 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.*;
+import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.client.IFileInfo;
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.IFilter;
 import at.beris.virtualfile.util.FileUtils;
-import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.File;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -52,7 +54,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void add(IFile parent, IFile child) {
-        throw new NotImplementedException("");
+        throw new NotImplementedException();
     }
 
     @Override
@@ -87,7 +89,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void save(URL url, FileModel model) {
-        throw new NotImplementedException("");
+        throw new NotImplementedException();
     }
 
     @Override
@@ -101,13 +103,13 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public Set<Attribute> getAttributes(IClient client, FileModel model) {
+    public Set<IAttribute> getAttributes(IClient client, FileModel model) {
         return client.getFileInfo(model.getPath()).getAttributes();
     }
 
     @Override
     public void setAttributes(IClient client, FileModel model) {
-        throw new NotImplementedException("");
+        throw new NotImplementedException();
     }
 
     private IFile copyToLocalFile(IClient client, FileModel model, String path) {

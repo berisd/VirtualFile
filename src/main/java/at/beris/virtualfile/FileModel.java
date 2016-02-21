@@ -9,22 +9,24 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.attribute.IAttribute;
+
 import java.net.URL;
-import java.util.Date;
-import java.util.EnumSet;
+import java.nio.file.attribute.FileTime;
+import java.util.HashSet;
 import java.util.Set;
 
 public class FileModel {
     private URL url;
-    private Date lastModifiedTime;
-    private Date lastAccessTime;
-    private Date creationTime;
+    private FileTime lastModifiedTime;
+    private FileTime lastAccessTime;
+    private FileTime creationTime;
     private long size;
     private FileModel parent;
-    private Set<Attribute> attributes;
+    private Set<IAttribute> attributes;
 
     public FileModel() {
-        attributes = EnumSet.noneOf(Attribute.class);
+        attributes = new HashSet<>();
     }
 
     public URL getUrl() {
@@ -35,27 +37,27 @@ public class FileModel {
         this.url = url;
     }
 
-    public Date getLastModifiedTime() {
+    public FileTime getLastModifiedTime() {
         return lastModifiedTime;
     }
 
-    public void setLastModifiedTime(Date lastModifiedTime) {
+    public void setLastModifiedTime(FileTime lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
 
-    public Date getLastAccessTime() {
+    public FileTime getLastAccessTime() {
         return lastAccessTime;
     }
 
-    public void setLastAccessTime(Date lastAccessTime) {
+    public void setLastAccessTime(FileTime lastAccessTime) {
         this.lastAccessTime = lastAccessTime;
     }
 
-    public Date getCreationTime() {
+    public FileTime getCreationTime() {
         return creationTime;
     }
 
-    public void setCreationTime(Date creationTime) {
+    public void setCreationTime(FileTime creationTime) {
         this.creationTime = creationTime;
     }
 
@@ -75,19 +77,19 @@ public class FileModel {
         this.parent = parent;
     }
 
-    public Set<Attribute> getAttributes() {
+    public Set<IAttribute> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Set<Attribute> attributes) {
+    public void setAttributes(Set<IAttribute> attributes) {
         this.attributes = attributes;
     }
 
-    public void addAttribute(Attribute attribute) {
+    public void addAttribute(IAttribute attribute) {
         attributes.add(attribute);
     }
 
-    public void removeAttribute(Attribute attribute) {
+    public void removeAttribute(IAttribute attribute) {
         attributes.remove(attribute);
     }
 

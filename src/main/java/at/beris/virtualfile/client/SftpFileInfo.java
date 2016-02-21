@@ -1,9 +1,14 @@
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.Attribute;
+import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.PosixFilePermission;
 import com.jcraft.jsch.SftpATTRS;
 
-import java.util.*;
+import java.nio.file.attribute.FileTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class SftpFileInfo implements IFileInfo {
     static final int S_IRUSR = 00400; // read by owner
@@ -20,7 +25,7 @@ public class SftpFileInfo implements IFileInfo {
 
     private SftpATTRS sftpATTRS;
     private String path;
-    private Map<Integer, Attribute> permissionToAttributeMap;
+    private Map<Integer, IAttribute> permissionToAttributeMap;
 
     public SftpFileInfo() {
         permissionToAttributeMap = createPermissionToAttributeMap();
@@ -45,11 +50,11 @@ public class SftpFileInfo implements IFileInfo {
     }
 
     @Override
-    public Set<Attribute> getAttributes() {
-        Set<Attribute> attributeSet = new HashSet<>();
+    public Set<IAttribute> getAttributes() {
+        Set<IAttribute> attributeSet = new HashSet<>();
         int permissions = sftpATTRS.getPermissions();
 
-        for (Map.Entry<Integer, Attribute> entry : permissionToAttributeMap.entrySet()) {
+        for (Map.Entry<Integer, IAttribute> entry : permissionToAttributeMap.entrySet()) {
             if ((permissions & entry.getKey()) != 0) {
                 attributeSet.add(entry.getValue());
             }
@@ -64,21 +69,21 @@ public class SftpFileInfo implements IFileInfo {
     }
 
     @Override
-    public Date getLastModified() {
-        return new Date(sftpATTRS.getMTime() * 1000L);
+    public FileTime getLastModified() {
+        return FileTime.fromMillis(sftpATTRS.getMTime() * 1000L);
     }
 
-    private HashMap<Integer, Attribute> createPermissionToAttributeMap() {
-        HashMap<Integer, Attribute> map = new HashMap<>();
-        map.put(S_IRUSR, Attribute.OWNER_READ);
-        map.put(S_IWUSR, Attribute.OWNER_WRITE);
-        map.put(S_IXUSR, Attribute.OWNER_EXECUTE);
-        map.put(S_IRGRP, Attribute.GROUP_READ);
-        map.put(S_IWGRP, Attribute.GROUP_WRITE);
-        map.put(S_IXGRP, Attribute.GROUP_EXECUTE);
-        map.put(S_IROTH, Attribute.OTHERS_READ);
-        map.put(S_IWOTH, Attribute.OTHERS_WRITE);
-        map.put(S_IXOTH, Attribute.OTHERS_EXECUTE);
+    private HashMap<Integer, IAttribute> createPermissionToAttributeMap() {
+        HashMap<Integer, IAttribute> map = new HashMap<>();
+        map.put(S_IRUSR, PosixFilePermission.OWNER_READ);
+        map.put(S_IWUSR, PosixFilePermission.OWNER_WRITE);
+        map.put(S_IXUSR, PosixFilePermission.OWNER_EXECUTE);
+        map.put(S_IRGRP, PosixFilePermission.GROUP_READ);
+        map.put(S_IWGRP, PosixFilePermission.GROUP_WRITE);
+        map.put(S_IXGRP, PosixFilePermission.GROUP_EXECUTE);
+        map.put(S_IROTH, PosixFilePermission.OTHERS_READ);
+        map.put(S_IWOTH, PosixFilePermission.OTHERS_WRITE);
+        map.put(S_IXOTH, PosixFilePermission.OTHERS_EXECUTE);
         return map;
     }
 }

@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.filter.IFilter;
 import at.beris.virtualfile.operation.CopyListener;
@@ -18,7 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Date;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
@@ -38,11 +42,17 @@ public interface IFile {
 
     String getName();
 
-    Date getLastModified();
+    FileTime getCreationTime();
+
+    FileTime getLastModifiedTime();
+
+    FileTime getLastAccessTime();
 
     long getSize();
 
     boolean isDirectory();
+
+    boolean isSymbolicLink();
 
     boolean isContainer();
 
@@ -56,13 +66,13 @@ public interface IFile {
 
     boolean exists();
 
-    Set<Attribute> getAttributes();
+    Set<IAttribute> getAttributes();
 
-    void setAttributes(Attribute... attributes);
+    void setAttributes(IAttribute... attributes);
 
-    void addAttributes(Attribute... attributes);
+    void addAttributes(IAttribute... attributes);
 
-    void removeAttributes(Attribute... attributes);
+    void removeAttributes(IAttribute... attributes);
 
     /**
      * Find files recursively matching a filter
@@ -115,4 +125,16 @@ public interface IFile {
     InputStream getInputStream() throws IOException;
 
     OutputStream getOutputStream() throws IOException;
+
+    List<AclEntry> getAcl();
+
+    void setAcl(List<AclEntry> acl);
+
+    UserPrincipal getOwner();
+
+    void setOwner(UserPrincipal owner);
+
+    GroupPrincipal getGroup();
+
+    void setGroup(GroupPrincipal group);
 }

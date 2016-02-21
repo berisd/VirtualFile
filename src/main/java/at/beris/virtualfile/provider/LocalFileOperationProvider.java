@@ -9,16 +9,18 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.attribute.DefaultPermission;
+import at.beris.virtualfile.attribute.DosAttribute;
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.PermissionDeniedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.IFilter;
 import at.beris.virtualfile.util.FileUtils;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -31,8 +33,8 @@ import java.util.*;
 
 public class LocalFileOperationProvider implements IFileOperationProvider {
 
-    private Map<PosixFilePermission, Attribute> posixFilePermissionToAttributeMap = new HashMap<>();
-    private Map<Attribute, PosixFilePermission> attributeToPosixFilePermissionMap = new HashMap<>();
+    private Map<PosixFilePermission, IAttribute> posixFilePermissionToAttributeMap = new HashMap<>();
+    private Map<IAttribute, PosixFilePermission> attributeToPosixFilePermissionMap = new HashMap<>();
 
     public LocalFileOperationProvider() {
         posixFilePermissionToAttributeMap = createPosixFilePermissionToAttributeMap();
@@ -97,7 +99,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void add(IFile parent, IFile child) {
-        throw new NotImplementedException("");
+        throw new NotImplementedException();
     }
 
     @Override
@@ -122,7 +124,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     @Override
     public void updateModel(IClient client, FileModel model) {
         File file = new File(model.getPath());
-        Set<Attribute> attributes = model.getAttributes();
+        Set<IAttribute> attributes = model.getAttributes();
 
         if (model.getUrl().toString().endsWith("/") && (!file.isDirectory())) {
             String urlString = model.getUrl().toString();
@@ -158,7 +160,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void save(URL url, FileModel model) {
-        throw new NotImplementedException("");
+        throw new NotImplementedException();
     }
 
     @Override
@@ -172,14 +174,14 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public Set<Attribute> getAttributes(IClient client, FileModel model) {
+    public Set<IAttribute> getAttributes(IClient client, FileModel model) {
         return model.getAttributes();
     }
 
     @Override
     public void setAttributes(IClient client, FileModel model) {
         File file = new File(model.getPath());
-        Set<Attribute> attributes = model.getAttributes();
+        Set<IAttribute> attributes = model.getAttributes();
 
         try {
             FileStore fileStore = Files.getFileStore(file.toPath());
@@ -188,7 +190,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
             boolean dosFileAttributeViewSupported = fileStore.supportsFileAttributeView(DosFileAttributeView.class);
 
             Set<PosixFilePermission> newPermissions = new HashSet<>();
-            for (Attribute attribute : model.getAttributes()) {
+            for (IAttribute attribute : model.getAttributes()) {
                 newPermissions.add(attributeToPosixFilePermissionMap.get(attribute));
             }
 
@@ -227,67 +229,67 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         }
     }
 
-    private Map<PosixFilePermission, Attribute> createPosixFilePermissionToAttributeMap() {
-        Map<PosixFilePermission, Attribute> map = new HashMap<>();
-        map.put(PosixFilePermission.OWNER_READ, Attribute.OWNER_READ);
-        map.put(PosixFilePermission.OWNER_WRITE, Attribute.OWNER_WRITE);
-        map.put(PosixFilePermission.OWNER_EXECUTE, Attribute.OWNER_EXECUTE);
-        map.put(PosixFilePermission.GROUP_READ, Attribute.GROUP_READ);
-        map.put(PosixFilePermission.GROUP_WRITE, Attribute.GROUP_WRITE);
-        map.put(PosixFilePermission.GROUP_EXECUTE, Attribute.GROUP_EXECUTE);
-        map.put(PosixFilePermission.OTHERS_READ, Attribute.OTHERS_READ);
-        map.put(PosixFilePermission.OTHERS_WRITE, Attribute.OTHERS_WRITE);
-        map.put(PosixFilePermission.OTHERS_EXECUTE, Attribute.OTHERS_EXECUTE);
+    private Map<PosixFilePermission, IAttribute> createPosixFilePermissionToAttributeMap() {
+        Map<PosixFilePermission, IAttribute> map = new HashMap<>();
+        map.put(PosixFilePermission.OWNER_READ, at.beris.virtualfile.attribute.PosixFilePermission.OWNER_READ);
+        map.put(PosixFilePermission.OWNER_WRITE, at.beris.virtualfile.attribute.PosixFilePermission.OWNER_WRITE);
+        map.put(PosixFilePermission.OWNER_EXECUTE, at.beris.virtualfile.attribute.PosixFilePermission.OWNER_EXECUTE);
+        map.put(PosixFilePermission.GROUP_READ, at.beris.virtualfile.attribute.PosixFilePermission.GROUP_READ);
+        map.put(PosixFilePermission.GROUP_WRITE, at.beris.virtualfile.attribute.PosixFilePermission.GROUP_WRITE);
+        map.put(PosixFilePermission.GROUP_EXECUTE, at.beris.virtualfile.attribute.PosixFilePermission.GROUP_EXECUTE);
+        map.put(PosixFilePermission.OTHERS_READ, at.beris.virtualfile.attribute.PosixFilePermission.OTHERS_READ);
+        map.put(PosixFilePermission.OTHERS_WRITE, at.beris.virtualfile.attribute.PosixFilePermission.OTHERS_WRITE);
+        map.put(PosixFilePermission.OTHERS_EXECUTE, at.beris.virtualfile.attribute.PosixFilePermission.OTHERS_EXECUTE);
         return map;
     }
 
-    private Map<Attribute, PosixFilePermission> createAttributeToPosixFilePermissionMap() {
-        Map<Attribute, PosixFilePermission> map = new HashMap<>();
-        map.put(Attribute.OWNER_READ, PosixFilePermission.OWNER_READ);
-        map.put(Attribute.OWNER_WRITE, PosixFilePermission.OWNER_WRITE);
-        map.put(Attribute.OWNER_EXECUTE, PosixFilePermission.OWNER_EXECUTE);
-        map.put(Attribute.GROUP_READ, PosixFilePermission.GROUP_READ);
-        map.put(Attribute.GROUP_WRITE, PosixFilePermission.GROUP_WRITE);
-        map.put(Attribute.GROUP_EXECUTE, PosixFilePermission.GROUP_EXECUTE);
-        map.put(Attribute.OTHERS_READ, PosixFilePermission.OTHERS_READ);
-        map.put(Attribute.OTHERS_WRITE, PosixFilePermission.OTHERS_WRITE);
-        map.put(Attribute.OTHERS_EXECUTE, PosixFilePermission.OTHERS_EXECUTE);
+    private Map<IAttribute, PosixFilePermission> createAttributeToPosixFilePermissionMap() {
+        Map<IAttribute, PosixFilePermission> map = new HashMap<>();
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_READ);
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_WRITE);
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_EXECUTE);
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.GROUP_READ, PosixFilePermission.GROUP_READ);
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.GROUP_WRITE, PosixFilePermission.GROUP_WRITE);
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.GROUP_EXECUTE, PosixFilePermission.GROUP_EXECUTE);
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_READ);
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.OTHERS_WRITE, PosixFilePermission.OTHERS_WRITE);
+        map.put(at.beris.virtualfile.attribute.PosixFilePermission.OTHERS_EXECUTE, PosixFilePermission.OTHERS_EXECUTE);
         return map;
     }
 
     private void fillBasicFileAttributes(FileModel model, File file) throws IOException {
         BasicFileAttributes basicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-        model.setLastModifiedTime(new Date(basicFileAttributes.lastModifiedTime().toMillis()));
-        model.setLastAccessTime(new Date(basicFileAttributes.lastAccessTime().toMillis()));
-        model.setCreationTime(new Date(basicFileAttributes.creationTime().toMillis()));
+        model.setLastModifiedTime(basicFileAttributes.lastModifiedTime());
+        model.setLastAccessTime(basicFileAttributes.lastAccessTime());
+        model.setCreationTime(basicFileAttributes.creationTime());
         model.setSize(file.isDirectory() ? file.list().length : basicFileAttributes.size());
     }
 
-    private void fillDosFileAttributes(File file, Set<Attribute> attributes) throws IOException {
+    private void fillDosFileAttributes(File file, Set<IAttribute> attributes) throws IOException {
         DosFileAttributes dosFileAttributes = Files.readAttributes(file.toPath(), DosFileAttributes.class);
         if (dosFileAttributes.isArchive())
-            attributes.add(Attribute.ARCHIVE);
+            attributes.add(DosAttribute.ARCHIVE);
         if (dosFileAttributes.isHidden())
-            attributes.add(Attribute.HIDDEN);
+            attributes.add(DosAttribute.HIDDEN);
         if (dosFileAttributes.isReadOnly())
-            attributes.add(Attribute.READ_ONLY);
+            attributes.add(DosAttribute.READ_ONLY);
         if (dosFileAttributes.isSystem())
-            attributes.add(Attribute.SYSTEM);
+            attributes.add(DosAttribute.SYSTEM);
     }
 
-    private void fillDefaultFileAttributes(File file, Set<Attribute> attributes) {
+    private void fillDefaultFileAttributes(File file, Set<IAttribute> attributes) {
         if (file.canRead()) {
-            attributes.add(Attribute.READ);
+            attributes.add(DefaultPermission.READ);
         }
         if (file.canWrite()) {
-            attributes.add(Attribute.WRITE);
+            attributes.add(DefaultPermission.WRITE);
         }
         if (file.canExecute()) {
-            attributes.add(Attribute.EXECUTE);
+            attributes.add(DefaultPermission.EXECUTE);
         }
     }
 
-    private void fillPosixFileAttributes(File file, Set<Attribute> attributes) throws IOException {
+    private void fillPosixFileAttributes(File file, Set<IAttribute> attributes) throws IOException {
         PosixFileAttributes posixFileAttributes = Files.readAttributes(file.toPath(), PosixFileAttributes.class);
         Set<PosixFilePermission> permissions = posixFileAttributes.permissions();
 

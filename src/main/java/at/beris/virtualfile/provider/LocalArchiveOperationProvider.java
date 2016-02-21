@@ -13,6 +13,7 @@ import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.IFilter;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -20,7 +21,6 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -37,12 +37,12 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
     @Override
     public IFile create(IClient client, FileModel model) {
-        throw new NotImplementedException("");
+        throw new NotImplementedException();
     }
 
     @Override
     public void add(IFile parent, IFile child) {
-        throw new NotImplementedException("");
+        throw new NotImplementedException();
     }
 
     @Override

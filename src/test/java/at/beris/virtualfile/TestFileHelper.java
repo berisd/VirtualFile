@@ -18,8 +18,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
@@ -60,11 +60,16 @@ public class TestFileHelper {
         return sftpClient;
     }
 
-    public static boolean isDateCloseToNow(Date date, int seconds) {
+    public static boolean isDateCloseToNow(FileTime fileTime, int seconds) {
         long nowMillis = System.currentTimeMillis();
-        long dateMillis = date.getTime();
+        long dateMillis = fileTime.toMillis();
 
         return (dateMillis > (nowMillis - seconds * 1000)) && (dateMillis < nowMillis);
+    }
+
+    public static boolean isInstantClose(Instant instant, Instant otherInstant, int seconds) {
+        Instant instantPlusSeconds = instant.plus(seconds, ChronoUnit.SECONDS);
+        return otherInstant.compareTo(instantPlusSeconds) < 0;
     }
 
     public static IFile createLocalSourceFile(URL url) {

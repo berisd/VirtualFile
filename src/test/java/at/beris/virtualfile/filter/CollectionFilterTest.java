@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.Attribute;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.attribute.PosixFilePermission;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -39,7 +39,7 @@ public class CollectionFilterTest {
     @Test
     public void filterEqual() {
         List<IFile> filteredList = testDirectory.find(new FileAttributesFilter().equalTo(
-                new HashSet<>(Arrays.asList(Attribute.OWNER_READ, Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE))));
+                new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE))));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("subdir"));
@@ -47,7 +47,7 @@ public class CollectionFilterTest {
 
     @Test
     public void filterContains() {
-        List<IFile> filteredList = testDirectory.find(new FileAttributesFilter().contains(Attribute.GROUP_READ));
+        List<IFile> filteredList = testDirectory.find(new FileAttributesFilter().contains(PosixFilePermission.GROUP_READ));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
@@ -57,7 +57,7 @@ public class CollectionFilterTest {
     @Test
     public void filterContainsAll() {
         List<IFile> filteredList = testDirectory.find(new FileAttributesFilter().containsAll(
-                new HashSet<>(Arrays.asList(Attribute.OWNER_WRITE, Attribute.OWNER_EXECUTE, Attribute.GROUP_READ))));
+                new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ))));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
