@@ -25,18 +25,6 @@ import java.util.Set;
 
 public interface IFileOperationProvider {
     /**
-     * Creates a new  physical representation
-     *
-     * @param model
-     * @return
-     */
-    void create(IClient client, FileModel model);
-
-    boolean exists(IClient client, FileModel model);
-
-    void delete(IClient client, FileModel model);
-
-    /**
      * Convenience method calling copy
      *
      * @param parent
@@ -45,6 +33,24 @@ public interface IFileOperationProvider {
     void add(IFile parent, IFile child);
 
     byte[] checksum(IClient client, FileModel model);
+
+    /**
+     * Creates a new  physical representation
+     *
+     * @param model
+     * @return
+     */
+    void create(IClient client, FileModel model);
+
+    void delete(IClient client, FileModel model);
+
+    boolean exists(IClient client, FileModel model);
+
+    Set<IAttribute> getAttributes(IClient client, FileModel model);
+
+    InputStream getInputStream(IClient client, FileModel model) throws IOException;
+
+    OutputStream getOutputStream(IClient client, FileModel model) throws IOException;
 
     /**
      * List files in this file
@@ -71,12 +77,6 @@ public interface IFileOperationProvider {
      * @param model
      */
     void save(URL url, FileModel model);
-
-    InputStream getInputStream(IClient client, FileModel model) throws IOException;
-
-    OutputStream getOutputStream(IClient client, FileModel model) throws IOException;
-
-    Set<IAttribute> getAttributes(IClient client, FileModel model);
 
     void setAttributes(IClient client, FileModel model);
 }

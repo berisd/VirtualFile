@@ -27,52 +27,23 @@ import java.util.List;
 import java.util.Set;
 
 public interface IFile {
-    URL getUrl();
-
-    FileModel getModel();
-
-    IClient getClient();
-
-    IFileOperationProvider getFileOperationProvider();
-
-    /**
-     * Updates the model with information from the physical file
-     */
-    void refresh();
-
-    String getName();
-
-    FileTime getCreationTime();
-
-    FileTime getLastModifiedTime();
-
-    FileTime getLastAccessTime();
-
-    long getSize();
-
-    boolean isDirectory();
-
-    boolean isSymbolicLink();
-
-    boolean isContainer();
-
-    IFile getParent();
-
-    IFile getRoot();
-
-    boolean isRoot();
-
-    //TODO create a move method that combines copy and delete
-
-    boolean exists();
-
-    Set<IAttribute> getAttributes();
-
-    void setAttributes(IAttribute... attributes);
-
     void addAttributes(IAttribute... attributes);
 
-    void removeAttributes(IAttribute... attributes);
+    byte[] checksum();
+
+    void copy(IFile targetFile, CopyListener listener);
+
+    /**
+     * Creates an empty file
+     *
+     * @return true if the named file does not exist and was successfully created; false if the named file already exists
+     * @throws IOException
+     */
+    void create();
+
+    void delete();
+
+    boolean exists();
 
     /**
      * Find files recursively matching a filter
@@ -81,6 +52,61 @@ public interface IFile {
      * @return A list of files
      */
     List<IFile> find(IFilter filter);
+
+    List<AclEntry> getAcl();
+
+    //TODO create a move method that combines copy and delete
+    Set<IAttribute> getAttributes();
+
+    IClient getClient();
+
+    FileTime getCreationTime();
+
+    IFileOperationProvider getFileOperationProvider();
+
+    GroupPrincipal getGroup();
+
+    InputStream getInputStream() throws IOException;
+
+    FileTime getLastAccessTime();
+
+    FileTime getLastModifiedTime();
+
+    FileModel getModel();
+
+    String getName();
+
+    OutputStream getOutputStream() throws IOException;
+
+    UserPrincipal getOwner();
+
+    IFile getParent();
+
+    String getPath();
+
+    IFile getRoot();
+
+    long getSize();
+
+    URL getUrl();
+
+    /**
+     * File is an archive
+     */
+    boolean isArchive();
+
+    /**
+     * File is archived within an archive
+     */
+    boolean isArchived();
+
+    boolean isContainer();
+
+    boolean isDirectory();
+
+    boolean isRoot();
+
+    boolean isSymbolicLink();
 
     /**
      * List contained files non-recursively
@@ -96,45 +122,18 @@ public interface IFile {
      */
     List<IFile> list(IFilter filter);
 
-    String getPath();
-
-    void delete();
-
-    byte[] checksum();
-
     /**
-     * File is an archive
+     * Updates the model with information from the physical file
      */
-    boolean isArchive();
+    void refresh();
 
-    /**
-     * File is archived within an archive
-     */
-    boolean isArchived();
-
-    void copy(IFile targetFile, CopyListener listener);
-
-    /**
-     * Creates an empty file
-     *
-     * @return true if the named file does not exist and was successfully created; false if the named file already exists
-     * @throws IOException
-     */
-    void create();
-
-    InputStream getInputStream() throws IOException;
-
-    OutputStream getOutputStream() throws IOException;
-
-    List<AclEntry> getAcl();
+    void removeAttributes(IAttribute... attributes);
 
     void setAcl(List<AclEntry> acl);
 
-    UserPrincipal getOwner();
-
-    void setOwner(UserPrincipal owner);
-
-    GroupPrincipal getGroup();
+    void setAttributes(IAttribute... attributes);
 
     void setGroup(GroupPrincipal group);
+
+    void setOwner(UserPrincipal owner);
 }

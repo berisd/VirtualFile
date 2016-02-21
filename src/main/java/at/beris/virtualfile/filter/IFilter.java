@@ -12,19 +12,19 @@ package at.beris.virtualfile.filter;
 import at.beris.virtualfile.IFile;
 
 public interface IFilter<T> {
+    IFilter and(IFilter filter);
+
+    IFilter andNot(IFilter filter);
+
+    Object clone();
+
     IFilter equalTo(T value);
+
+    boolean filter(IFile file);
 
     IFilter not();
 
     IFilter or(IFilter filter);
 
     IFilter orNot(IFilter filter);
-
-    IFilter and(IFilter filter);
-
-    IFilter andNot(IFilter filter);
-
-    boolean filter(IFile file);
-
-    Object clone();
 }
