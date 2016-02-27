@@ -11,7 +11,6 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
-import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.filter.IFilter;
 
@@ -20,7 +19,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface IFileOperationProvider {
     /**
@@ -44,8 +42,6 @@ public interface IFileOperationProvider {
     void delete(IClient client, FileModel model);
 
     boolean exists(IClient client, FileModel model);
-
-    Set<IAttribute> getAttributes(IClient client, FileModel model);
 
     InputStream getInputStream(IClient client, FileModel model) throws IOException;
 

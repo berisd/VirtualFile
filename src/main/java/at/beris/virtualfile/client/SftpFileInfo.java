@@ -1,8 +1,8 @@
 package at.beris.virtualfile.client;
 
+import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
-import at.beris.virtualfile.exception.OperationNotSupportedException;
 import com.jcraft.jsch.SftpATTRS;
 
 import java.nio.file.attribute.FileTime;
@@ -25,8 +25,8 @@ public class SftpFileInfo implements IFileInfo {
     static final int S_IXOTH = 00001; // execute/search by others
 
     private SftpATTRS sftpATTRS;
-    private String path;
     private Map<Integer, IAttribute> permissionToAttributeMap;
+    private String path;
 
     public SftpFileInfo() {
         permissionToAttributeMap = createPermissionToAttributeMap();
@@ -36,22 +36,24 @@ public class SftpFileInfo implements IFileInfo {
         this.sftpATTRS = sftpATTRS;
     }
 
+    public String getPath() {
+        return this.path;
+    }
+
+    @Override
+    public void fillModel(FileModel model) {
+        model.setSize(sftpATTRS.getSize());
+        model.setCreationTime(null);
+        model.setLastModifiedTime(FileTime.fromMillis(sftpATTRS.getMTime() * 1000L));
+        model.setLastAccessTime(FileTime.fromMillis(sftpATTRS.getATime() * 1000L));
+        model.setAttributes(createAttributes());
+    }
+
     public void setPath(String path) {
         this.path = path;
     }
 
-    @Override
-    public long getSize() {
-        return sftpATTRS.getSize();
-    }
-
-    @Override
-    public boolean isDirectory() {
-        return sftpATTRS.isDir();
-    }
-
-    @Override
-    public Set<IAttribute> getAttributes() {
+    private Set<IAttribute> createAttributes() {
         Set<IAttribute> attributeSet = new HashSet<>();
         int permissions = sftpATTRS.getPermissions();
 
@@ -62,26 +64,6 @@ public class SftpFileInfo implements IFileInfo {
         }
 
         return attributeSet;
-    }
-
-    @Override
-    public String getPath() {
-        return this.path;
-    }
-
-    @Override
-    public FileTime getCreationTime() {
-        throw new OperationNotSupportedException();
-    }
-
-    @Override
-    public FileTime getLastModifiedTime() {
-        return FileTime.fromMillis(sftpATTRS.getMTime() * 1000L);
-    }
-
-    @Override
-    public FileTime getLastAccessTime() {
-        return FileTime.fromMillis(sftpATTRS.getATime() * 1000L);
     }
 
     private HashMap<Integer, IAttribute> createPermissionToAttributeMap() {

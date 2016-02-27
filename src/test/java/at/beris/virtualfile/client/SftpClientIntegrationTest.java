@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.client;
 
+import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
 import at.beris.virtualfile.exception.AccessDeniedException;
 import org.junit.AfterClass;
@@ -67,9 +68,12 @@ public class SftpClientIntegrationTest {
 
         }
 
-        IFileInfo IFileInfo = sftpClient.getFileInfo(TEST_FILE);
-        assertNotNull(IFileInfo.getLastModifiedTime());
-        assertEquals(TEST_STRING.length(), IFileInfo.getSize());
+        IFileInfo fileInfo = sftpClient.getFileInfo(TEST_FILE);
+        FileModel model = new FileModel();
+        fileInfo.fillModel(model);
+
+        assertNotNull(model.getLastModifiedTime());
+        assertEquals(TEST_STRING.length(), model.getSize());
         sftpClient.deleteFile(TEST_FILE);
     }
 

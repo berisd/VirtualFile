@@ -168,11 +168,6 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public Set<IAttribute> getAttributes(IClient client, FileModel model) {
-        return model.getAttributes();
-    }
-
-    @Override
     public void setAcl(IClient client, FileModel model) {
         File file = new File(model.getPath());
         FileStore fileStore = null;

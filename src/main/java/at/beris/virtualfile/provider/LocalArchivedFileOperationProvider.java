@@ -11,7 +11,6 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
-import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -25,7 +24,6 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class LocalArchivedFileOperationProvider implements IFileOperationProvider {
     @Override
@@ -145,11 +143,6 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
     @Override
     public OutputStream getOutputStream(IClient client, FileModel model) throws IOException {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Set<IAttribute> getAttributes(IClient client, FileModel model) {
         throw new NotImplementedException();
     }
 

@@ -9,23 +9,10 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.attribute.IAttribute;
-
-import java.nio.file.attribute.FileTime;
-import java.util.Set;
+import at.beris.virtualfile.FileModel;
 
 public interface IFileInfo {
     String getPath();
 
-    FileTime getCreationTime();
-
-    FileTime getLastModifiedTime();
-
-    FileTime getLastAccessTime();
-
-    long getSize();
-
-    boolean isDirectory();
-
-    Set<IAttribute> getAttributes();
+    void fillModel(FileModel model);
 }

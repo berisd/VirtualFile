@@ -12,7 +12,6 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
-import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.client.IClient;
 import at.beris.virtualfile.client.IFileInfo;
 import at.beris.virtualfile.exception.NotImplementedException;
@@ -25,7 +24,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class SftpFileOperationProvider implements IFileOperationProvider {
 
@@ -81,10 +79,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     @Override
     public void updateModel(IClient client, FileModel model) {
         IFileInfo fileInfo = client.getFileInfo(model.getPath());
-        model.setLastAccessTime(fileInfo.getLastAccessTime());
-        model.setLastModifiedTime(fileInfo.getLastModifiedTime());
-        model.setSize(fileInfo.getSize());
-        model.setAttributes(fileInfo.getAttributes());
+        fileInfo.fillModel(model);
     }
 
     @Override
@@ -100,11 +95,6 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     @Override
     public OutputStream getOutputStream(IClient client, FileModel model) {
         return client.getOutputStream(model.getPath());
-    }
-
-    @Override
-    public Set<IAttribute> getAttributes(IClient client, FileModel model) {
-        return client.getFileInfo(model.getPath()).getAttributes();
     }
 
     @Override
