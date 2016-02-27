@@ -17,6 +17,7 @@ import com.jcraft.jsch.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -227,6 +228,16 @@ public class SftpClient implements IClient {
         }
 
         return IFileInfoList;
+    }
+
+    @Override
+    public void setLastModifiedTime(String path, FileTime time) {
+        try {
+            checkChannel();
+            sftpChannel.setMtime(path, (int) (time.toMillis() / 1000));
+        } catch (SftpException e) {
+            handleSftpException(e);
+        }
     }
 
     private void checkChannel() {

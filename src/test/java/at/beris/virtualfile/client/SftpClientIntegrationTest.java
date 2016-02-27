@@ -68,7 +68,7 @@ public class SftpClientIntegrationTest {
         }
 
         IFileInfo IFileInfo = sftpClient.getFileInfo(TEST_FILE);
-        assertNotNull(IFileInfo.getLastModified());
+        assertNotNull(IFileInfo.getLastModifiedTime());
         assertEquals(TEST_STRING.length(), IFileInfo.getSize());
         sftpClient.deleteFile(TEST_FILE);
     }

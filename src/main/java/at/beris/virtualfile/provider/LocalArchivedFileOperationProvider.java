@@ -21,7 +21,6 @@ import org.apache.commons.compress.archivers.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +134,7 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
     }
 
     @Override
-    public void save(URL url, FileModel model) {
+    public void setAcl(IClient client, FileModel model) {
         throw new NotImplementedException();
     }
 
@@ -156,6 +155,31 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
     @Override
     public void setAttributes(IClient client, FileModel model) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setCreationTime(IClient client, FileModel model) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setGroup(IClient client, FileModel model) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setLastAccessTime(IClient client, FileModel model) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setLastModifiedTime(IClient client, FileModel model) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void setOwner(IClient client, FileModel model) {
         throw new NotImplementedException();
     }
 

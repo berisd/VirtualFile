@@ -19,8 +19,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import static at.beris.virtualfile.util.FileUtils.maskedUrlString;
-
 public class Archive extends FileContainer implements IArchive {
     private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
 
@@ -38,7 +36,7 @@ public class Archive extends FileContainer implements IArchive {
 
     @Override
     public List<IFile> extract(IFile target) {
-        LOGGER.info("Extract " + maskedUrlString(this) + " to " + maskedUrlString(target));
+        LOGGER.info("Extract " + this + " to " + target);
         IArchiveOperationProvider opProvider = (IArchiveOperationProvider) getFileOperationProvider();
         return opProvider.extract(getClient(), getModel(), target);
     }

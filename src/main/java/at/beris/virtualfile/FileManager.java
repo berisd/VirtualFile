@@ -78,6 +78,11 @@ public class FileManager {
         return (IArchive) getFileContext().newFile(url);
     }
 
+
+    public static void dispose(IFile file) {
+        file.dispose();
+    }
+
     public static Set<Protocol> enabledProtocols() {
         //TODO only return enabled Protocols
         return EnumSet.allOf(Protocol.class);

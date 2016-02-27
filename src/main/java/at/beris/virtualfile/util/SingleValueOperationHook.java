@@ -7,8 +7,10 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.attribute;
+package at.beris.virtualfile.util;
 
-public interface IAttribute {
-    String toString();
+public interface SingleValueOperationHook<O, T> {
+    void setValue(O object, T value);
+
+    T getValue(O object);
 }

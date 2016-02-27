@@ -2,6 +2,7 @@ package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
+import at.beris.virtualfile.exception.OperationNotSupportedException;
 import com.jcraft.jsch.SftpATTRS;
 
 import java.nio.file.attribute.FileTime;
@@ -69,8 +70,18 @@ public class SftpFileInfo implements IFileInfo {
     }
 
     @Override
-    public FileTime getLastModified() {
+    public FileTime getCreationTime() {
+        throw new OperationNotSupportedException();
+    }
+
+    @Override
+    public FileTime getLastModifiedTime() {
         return FileTime.fromMillis(sftpATTRS.getMTime() * 1000L);
+    }
+
+    @Override
+    public FileTime getLastAccessTime() {
+        return FileTime.fromMillis(sftpATTRS.getATime() * 1000L);
     }
 
     private HashMap<Integer, IAttribute> createPermissionToAttributeMap() {

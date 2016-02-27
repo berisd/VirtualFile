@@ -86,6 +86,10 @@ public interface IFile {
 
     IFile getRoot();
 
+    /**
+     * Returns the size in bytes for a file and the number of contained items for a directory
+     * @return
+     */
     long getSize();
 
     URL getUrl();
@@ -133,7 +137,18 @@ public interface IFile {
 
     void setAttributes(IAttribute... attributes);
 
+    void setCreationTime(FileTime time);
+
     void setGroup(GroupPrincipal group);
 
+    void setLastAccessTime(FileTime time);
+
+    void setLastModifiedTime(FileTime time);
+
     void setOwner(UserPrincipal owner);
+
+    /**
+     * Free the file with all resources
+     */
+    void dispose();
 }

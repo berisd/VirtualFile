@@ -129,8 +129,4 @@ public class TestFileHelper {
         }
         return fileList;
     }
-
-    public static boolean isOsWindows() {
-        return System.getProperty("os.name").toLowerCase().indexOf("windows") >= 0;
-    }
 }

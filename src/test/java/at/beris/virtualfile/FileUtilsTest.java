@@ -33,7 +33,7 @@ public class FileUtilsTest {
     public void maskLocalUnixFileString() throws Exception {
         String urlString = "file:/home/bernd/IdeaProjects/VirtualFile/testfile1.txt";
         IFile file = createFile(urlString);
-        assertEquals(urlString, FileUtils.maskedUrlString(file));
+        assertEquals(urlString, FileUtils.maskedUrlString(file.getUrl()));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class FileUtilsTest {
         //TODO urls with Windows style Filename not working
         String urlString = "file:///C:/Documents%20and%20Settings/davris/FileSchemeURIs.doc";
         IFile file = createFile(urlString);
-        assertEquals(urlString, FileUtils.maskedUrlString(file));
+        assertEquals(urlString, FileUtils.maskedUrlString(file.getUrl()));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class FileUtilsTest {
         String urlString = "sftp://sshtest:mypassword@www.example.com:22/home/sshtest/targetfile1.txt";
         String expectedString = "sftp://sshtest:***@www.example.com:22/home/sshtest/targetfile1.txt";
         IFile file = createFile(urlString);
-        assertEquals(expectedString, FileUtils.maskedUrlString(file));
+        assertEquals(expectedString, FileUtils.maskedUrlString(file.getUrl()));
     }
 
     private IFile createFile(String urlString) throws MalformedURLException {

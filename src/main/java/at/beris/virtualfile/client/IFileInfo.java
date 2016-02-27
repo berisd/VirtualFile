@@ -17,7 +17,11 @@ import java.util.Set;
 public interface IFileInfo {
     String getPath();
 
-    FileTime getLastModified();
+    FileTime getCreationTime();
+
+    FileTime getLastModifiedTime();
+
+    FileTime getLastAccessTime();
 
     long getSize();
 

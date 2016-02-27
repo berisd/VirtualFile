@@ -9,11 +9,11 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.attribute.DefaultPermission;
-import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
+import at.beris.virtualfile.util.SingleValueOperationHook;
+import at.beris.virtualfile.util.VoidOperationHook;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -21,6 +21,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.UserPrincipal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static at.beris.virtualfile.TestFileHelper.createFilenamesTree;
@@ -48,13 +55,24 @@ public abstract class AbstractFileTest {
     protected static URL targetDirectoryUrl;
 
     protected void createFile() {
+        createFile(null);
+    }
+
+    protected void createFile(VoidOperationHook<IFile> assertHook) {
         IFile file = FileManager.newFile(sourceFileUrl);
         file.create();
 
-        assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
-        assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
-        assertEquals(0, file.getSize());
-        assertFalse(file.isDirectory());
+        if (assertHook != null) {
+            assertHook.execute(file);
+        } else {
+            assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
+            assertTrue(TestFileHelper.isDateCloseToNow(file.getCreationTime(), 10));
+            assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
+            assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
+            assertTrue(file.getOwner() instanceof UserPrincipal);
+            assertEquals(0, file.getSize());
+            assertFalse(file.isDirectory());
+        }
         file.delete();
     }
 
@@ -134,23 +152,78 @@ public abstract class AbstractFileTest {
         }
     }
 
-    protected void getFileAttributes() {
+    protected void getFileAttributes(VoidOperationHook assertHook) {
         IFile file = FileManager.newFile(sourceFileUrl);
         file.create();
-
-        if (TestFileHelper.isOsWindows()) {
-            assertTrue(file.getAttributes().contains(DefaultPermission.READ));
-            assertTrue(file.getAttributes().contains(DefaultPermission.WRITE));
-        } else {
-            assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
-            assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
-            assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
-            if (this instanceof LocalFileTest) {
-                assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_WRITE));
-            }
-            assertTrue(file.getAttributes().contains(PosixFilePermission.OTHERS_READ));
-        }
+        assertHook.execute(file);
         file.delete();
+    }
+
+    protected void setOwner(UserPrincipal owner) {
+        IFile file = FileManager.newFile(sourceFileUrl);
+        file.create();
+        file.setOwner(owner);
+
+        FileManager.dispose(file);
+
+        file = FileManager.newFile(sourceFileUrl);
+        assertEquals(owner.getName(), file.getOwner().getName());
+        file.delete();
+    }
+
+    protected void setGroup() {
+        IFile file = FileManager.newFile(sourceFileUrl);
+        file.create();
+        GroupPrincipal group = file.getGroup();
+        file.setGroup(group);
+
+        FileManager.dispose(file);
+
+        file = FileManager.newFile(sourceFileUrl);
+        assertEquals(group.getName(), file.getGroup().getName());
+        file.delete();
+    }
+
+    protected void setCreationTime() {
+        setTime(new SingleValueOperationHook<IFile, FileTime>() {
+            @Override
+            public void setValue(IFile object, FileTime value) {
+                object.setCreationTime(value);
+            }
+
+            @Override
+            public FileTime getValue(IFile object) {
+                return object.getCreationTime();
+            }
+        });
+    }
+
+    protected void setLastModifiedTime() {
+        setTime(new SingleValueOperationHook<IFile, FileTime>() {
+            @Override
+            public void setValue(IFile object, FileTime value) {
+                object.setLastModifiedTime(value);
+            }
+
+            @Override
+            public FileTime getValue(IFile object) {
+                return object.getLastModifiedTime();
+            }
+        });
+    }
+
+    protected void setLastAccessTime() {
+        setTime(new SingleValueOperationHook<IFile, FileTime>() {
+            @Override
+            public void setValue(IFile object, FileTime value) {
+                object.setLastAccessTime(value);
+            }
+
+            @Override
+            public FileTime getValue(IFile object) {
+                return object.getLastAccessTime();
+            }
+        });
     }
 
     protected void assertCopyListener(CopyListener copyListener) {
@@ -188,5 +261,25 @@ public abstract class AbstractFileTest {
                     file.delete();
             }
         }
+    }
+
+    private void setTime(SingleValueOperationHook<IFile, FileTime> operation) {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.roll(Calendar.YEAR, false);
+
+        FileTime fileTime = FileTime.fromMillis(calendar.getTimeInMillis());
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        IFile file = FileManager.newFile(sourceFileUrl);
+        file.create();
+        operation.setValue(file, fileTime);
+
+        FileManager.dispose(file);
+
+        file = FileManager.newFile(sourceFileUrl);
+        assertEquals(dateFormat.format(new Date(fileTime.toMillis())), dateFormat.format(new Date(operation.getValue(file).toMillis())));
+        file.delete();
     }
 }

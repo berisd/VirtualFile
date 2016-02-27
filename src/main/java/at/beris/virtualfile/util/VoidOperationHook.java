@@ -7,8 +7,8 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.attribute;
+package at.beris.virtualfile.util;
 
-public interface IAttribute {
-    String toString();
+public interface VoidOperationHook<O> {
+    void execute(O object);
 }

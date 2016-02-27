@@ -7,10 +7,9 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.attribute;
+package at.beris.virtualfile.os;
 
-public enum DefaultPermission implements IAttribute {
-    READ,
-    WRITE,
-    EXECUTE,
+public enum OsFamily {
+    UNIX,
+    WINDOWS
 }

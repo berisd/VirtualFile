@@ -97,8 +97,8 @@ public class FileContext {
             }
 
             file = createFileInstance(parent, normalizedUrl, client, fileOperationProviderMap);
-            if (file.exists())
-                file.updateModel();
+            if (file._exists())
+                file._updateModel();
         } catch (InstantiationException e) {
             throw new VirtualFileException(e);
         } catch (IllegalAccessException e) {

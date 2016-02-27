@@ -7,8 +7,7 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.attribute;
+package at.beris.virtualfile.exception;
 
-public interface IAttribute {
-    String toString();
+public class OperationNotSupportedException extends VirtualFileException {
 }

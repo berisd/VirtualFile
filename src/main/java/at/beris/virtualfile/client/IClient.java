@@ -11,6 +11,7 @@ package at.beris.virtualfile.client;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 
 public interface IClient {
@@ -53,4 +54,6 @@ public interface IClient {
     IFileInfo getFileInfo(String path);
 
     List<IFileInfo> list(String path);
+
+    void setLastModifiedTime(String path, FileTime time);
 }

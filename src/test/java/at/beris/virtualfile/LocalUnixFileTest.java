@@ -11,29 +11,30 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.FileUtils;
+import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.VoidOperationHook;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.net.URL;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipalLookupService;
 
-import static at.beris.virtualfile.TestFileHelper.initIntegrationTest;
-import static at.beris.virtualfile.TestFileHelper.readSftpPassword;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-public class SftpFileTest extends AbstractFileTest {
+public class LocalUnixFileTest extends AbstractFileTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        initIntegrationTest();
-        FileManager.registerProtocolURLStreamHandlers();
+        org.junit.Assume.assumeTrue("Host operating system isn't Unix. Skipping test..", !OsUtils.isWindows());
 
-        URL siteUrl = FileUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestFileHelper.SSH_HOME_DIRECTORY);
-        sourceFileUrl = FileUtils.newUrl(siteUrl, TEST_SOURCE_FILE_NAME);
-        targetFileUrl = FileUtils.newUrl(siteUrl, TEST_TARGET_FILE_NAME);
-        sourceDirectoryUrl = FileUtils.newUrl(siteUrl, TEST_SOURCE_DIRECTORY_NAME + "/");
-        targetDirectoryUrl = FileUtils.newUrl(siteUrl, TEST_TARGET_DIRECTORY_NAME + "/");
+        sourceFileUrl = FileUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
+        targetFileUrl = FileUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);
+        sourceDirectoryUrl = FileUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/");
+        targetDirectoryUrl = FileUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
     @AfterClass
@@ -43,17 +44,7 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void createFile() {
-        super.createFile(new VoidOperationHook<IFile>() {
-            @Override
-            public void execute(IFile file) {
-                assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
-                assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
-                assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
-//                assertTrue(file.getOwner() instanceof UserPrincipal);
-                assertEquals(0, file.getSize());
-                assertFalse(file.isDirectory());
-            }
-        });
+        super.createFile();
     }
 
     @Test
@@ -92,5 +83,33 @@ public class SftpFileTest extends AbstractFileTest {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OTHERS_READ));
             }
         });
+    }
+
+    @Test
+    public void setOwner() throws IOException {
+        UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
+        UserPrincipal userPrincipal = lookupService.lookupPrincipalByName(System.getProperty("user.name"));
+        super.setOwner(userPrincipal);
+    }
+
+    @Test
+    public void setGroup() {
+        super.setGroup();
+    }
+
+    @Test
+    @Ignore("On Linux creationTime doesn't seem to be set")
+    public void setCreationTime() {
+        super.setCreationTime();
+    }
+
+    @Test
+    public void setLastModifiedTime() {
+        super.setLastModifiedTime();
+    }
+
+    @Test
+    public void setLastAccessTime() {
+        super.setLastAccessTime();
     }
 }

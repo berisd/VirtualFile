@@ -18,7 +18,6 @@ import at.beris.virtualfile.filter.IFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -70,13 +69,17 @@ public interface IFileOperationProvider {
      */
     void updateModel(IClient client, FileModel model);
 
-    /**
-     * Saves Model on the filesystem
-     *
-     * @param url
-     * @param model
-     */
-    void save(URL url, FileModel model);
+    void setAcl(IClient client, FileModel model);
 
     void setAttributes(IClient client, FileModel model);
+
+    void setCreationTime(IClient client, FileModel model);
+
+    void setGroup(IClient client, FileModel model);
+
+    void setLastAccessTime(IClient client, FileModel model);
+
+    void setLastModifiedTime(IClient client, FileModel model);
+
+    void setOwner(IClient client, FileModel model);
 }

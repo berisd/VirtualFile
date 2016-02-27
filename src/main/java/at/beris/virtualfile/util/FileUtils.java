@@ -73,18 +73,17 @@ public class FileUtils {
     /**
      * Masks sensitive information in an url (e.g. for logging)
      *
-     * @param file
+     * @param url
      * @return
      */
-    public static String maskedUrlString(IFile file) {
-        URL url = file.getUrl();
+    public static String maskedUrlString(URL url) {
         StringBuilder stringBuilder = new StringBuilder("");
 
         stringBuilder.append(url.getProtocol());
         stringBuilder.append(':');
 
         String authority = url.getAuthority();
-        if (! StringUtils.isEmpty(authority)) {
+        if (!StringUtils.isEmpty(authority)) {
             String[] authorityParts = authority.split("@");
             String[] userInfoParts = authorityParts[0].split(":");
 
