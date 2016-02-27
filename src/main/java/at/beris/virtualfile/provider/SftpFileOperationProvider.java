@@ -23,7 +23,6 @@ import at.beris.virtualfile.util.FileUtils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class SftpFileOperationProvider implements IFileOperationProvider {
 
@@ -63,13 +62,13 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter) {
+    public List<IFile> list(IClient client, FileModel model, IFilter filter) {
         List<IFileInfo> fileInfoList = client.list(model.getPath());
         List<IFile> fileList = new ArrayList<>();
 
         for (IFileInfo fileInfo : fileInfoList) {
             IFile file = FileManager.newFile(FileUtils.newUrl(model.getUrl(), fileInfo.getPath()));
-            if (!filter.isPresent() || filter.get().filter(file)) {
+            if (filter == null || filter.filter(file)) {
                 fileList.add(file);
             }
         }

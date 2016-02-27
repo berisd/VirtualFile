@@ -43,7 +43,7 @@ public class CopyOperation {
             if (!targetFile.exists())
                 targetFile.create();
 
-            for (IFile sourceChildFile : sourceFile.getFileOperationProvider().list(sourceFile.getClient(), sourceFile.getModel(), Optional.empty())) {
+            for (IFile sourceChildFile : sourceFile.getFileOperationProvider().list(sourceFile.getClient(), sourceFile.getModel(), null)) {
                 URL targetUrl = targetFile.getUrl();
                 URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
 

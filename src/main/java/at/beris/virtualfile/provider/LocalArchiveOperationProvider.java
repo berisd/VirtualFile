@@ -46,7 +46,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter) {
+    public List<IFile> list(IClient client, FileModel model, IFilter filter) {
         List<IFile> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
@@ -62,7 +62,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
             while ((archiveEntry = ais.getNextEntry()) != null) {
                 Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
                 IFile file = FileManager.newFile(urlMap.get(PARENT_URL), urlMap.get(URL));
-                if (!filter.isPresent() || filter.get().filter(file))
+                if (filter == null || filter.filter(file))
                     fileList.add(file);
             }
         } catch (FileNotFoundException e) {

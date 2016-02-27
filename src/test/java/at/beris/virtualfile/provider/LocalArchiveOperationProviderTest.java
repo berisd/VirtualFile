@@ -26,7 +26,7 @@ public class LocalArchiveOperationProviderTest {
         FileModel fileModel = new FileModel();
         fileModel.setUrl(file.toURI().toURL());
         LocalArchiveOperationProvider provider = new LocalArchiveOperationProvider();
-        List<IFile> fileList = provider.list(null, fileModel, Optional.empty());
+        List<IFile> fileList = provider.list(null, fileModel, null);
         Assert.assertTrue(fileList.size()>0);
     }
 }

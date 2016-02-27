@@ -102,11 +102,11 @@ public class FileUtils {
         return stringBuilder.toString();
     }
 
-    public static Map<IFilter, List<IFile>> partitionFileListByFilters(List<IFile> fileList, List<IFilter> filterList) {
+    public static Map<IFilter, List<IFile>> groupFileListByFilters(List<IFile> fileList, List<IFilter> filterList) {
         Map<IFilter, List<IFile>> partitionedFileList = new HashMap<>();
 
         for (IFilter filter : filterList) {
-            partitionedFileList.put(filter, new ArrayList<>());
+            partitionedFileList.put(filter, new ArrayList<IFile>());
         }
 
         for (IFile file : fileList) {

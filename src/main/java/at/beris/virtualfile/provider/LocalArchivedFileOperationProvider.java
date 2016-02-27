@@ -27,7 +27,7 @@ import java.util.Optional;
 
 public class LocalArchivedFileOperationProvider implements IFileOperationProvider {
     @Override
-    public List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter) {
+    public List<IFile> list(IClient client, FileModel model, IFilter filter) {
         List<IFile> files = new ArrayList<>();
 //        IFile backFile = add(this.archiveFile, createEmptyArchiveEntry());
 //        backFile.setParent(this.parentFile);

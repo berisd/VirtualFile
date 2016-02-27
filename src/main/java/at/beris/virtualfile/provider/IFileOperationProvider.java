@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Optional;
 
 public interface IFileOperationProvider {
     /**
@@ -55,7 +54,7 @@ public interface IFileOperationProvider {
      * @param filter
      * @return
      */
-    List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter);
+    List<IFile> list(IClient client, FileModel model, IFilter filter);
 
     /**
      * Updates the Model with information from the physical file.

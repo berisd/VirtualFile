@@ -11,6 +11,7 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -39,7 +40,7 @@ public class CollectionFilterTest {
     @Test
     public void filterEqual() {
         List<IFile> filteredList = testDirectory.find(new FileAttributesFilter().equalTo(
-                new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE))));
+                new HashSet<IAttribute>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE))));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("subdir"));
@@ -57,7 +58,7 @@ public class CollectionFilterTest {
     @Test
     public void filterContainsAll() {
         List<IFile> filteredList = testDirectory.find(new FileAttributesFilter().containsAll(
-                new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ))));
+                new HashSet<IAttribute>(Arrays.asList(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ))));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));

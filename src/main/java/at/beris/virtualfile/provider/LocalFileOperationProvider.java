@@ -31,7 +31,10 @@ import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class LocalFileOperationProvider implements IFileOperationProvider {
     private final static Logger LOGGER = LoggerFactory.getLogger(LocalFileOperationProvider.class);
@@ -62,13 +65,13 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model, Optional<IFilter> filter) {
+    public List<IFile> list(IClient client, FileModel model, IFilter filter) {
         List<IFile> fileList = new ArrayList<>();
         if (model.isDirectory()) {
             for (File childFile : new File(model.getPath()).listFiles()) {
                 try {
                     IFile file = FileManager.newFile(childFile.toURI().toURL());
-                    if (!filter.isPresent() || filter.get().filter(file))
+                    if (filter == null || filter.filter(file))
                         fileList.add(file);
                 } catch (MalformedURLException e) {
                     throw new VirtualFileException(e);

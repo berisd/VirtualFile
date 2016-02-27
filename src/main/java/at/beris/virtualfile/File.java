@@ -325,8 +325,8 @@ public class File implements IFile, Comparable<File> {
         IFilter directoriesFilter = new IsDirectoryFilter().equalTo(true);
         IFilter withDirectoriesFilter = ((IFilter) filter.clone()).or(new IsDirectoryFilter().equalTo(true));
 
-        List<IFile> fileList = getFileOperationProvider().list(client, model, Optional.of(withDirectoriesFilter));
-        Map<IFilter, List<IFile>> partitionedFileList = FileUtils.partitionFileListByFilters(fileList, Arrays.asList(filter, directoriesFilter));
+        List<IFile> fileList = getFileOperationProvider().list(client, model, withDirectoriesFilter);
+        Map<IFilter, List<IFile>> partitionedFileList = FileUtils.groupFileListByFilters(fileList, Arrays.asList(filter, directoriesFilter));
 
         fileList.clear();
         fileList = partitionedFileList.get(filter);
@@ -343,13 +343,13 @@ public class File implements IFile, Comparable<File> {
     @Override
     public List<IFile> list() {
         LOGGER.info("List children for " + this);
-        return getFileOperationProvider().list(client, model, Optional.empty());
+        return getFileOperationProvider().list(client, model, null);
     }
 
     @Override
     public List<IFile> list(IFilter filter) {
         LOGGER.info("List children for " + this + " with filter " + filter);
-        return getFileOperationProvider().list(client, model, Optional.of(filter));
+        return getFileOperationProvider().list(client, model, filter);
     }
 
     @Override
