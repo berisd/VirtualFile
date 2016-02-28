@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.config.FileConfig;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
@@ -24,14 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileContext {
-    private FileConfig fileConfig;
+    private FileConfig defaultFileConfig;
 
     private Map<String, IClient> siteToClientMap;
+    private Map<URL, FileConfig> fileConfigMap;
 
     public FileContext(FileConfig fileConfig) {
         registerProtocolURLStreamHandlers();
-        this.fileConfig = fileConfig;
+        this.defaultFileConfig = fileConfig;
         this.siteToClientMap = new HashMap<>();
+        this.fileConfigMap = new HashMap<>();
     }
 
     /**
@@ -40,12 +43,12 @@ public class FileContext {
      * @param path
      * @return
      */
-    public IFile newLocalFile(String path) {
+    public IFile newLocalFile(String path, FileConfig fileConfig) {
         try {
             URL url = new java.io.File(path).toURI().toURL();
             if (path.endsWith(java.io.File.separator))
                 url = new URL(url.toString() + "/");
-            return newFile(url);
+            return newFile(url, fileConfig);
         } catch (MalformedURLException e) {
             throw new VirtualFileException(e);
         }
@@ -57,16 +60,16 @@ public class FileContext {
      * @param url
      * @return
      */
-    public IFile newFile(String url) {
+    public IFile newFile(String url, FileConfig fileConfig) {
         try {
-            return newFile((IFile) null, new URL(url));
+            return newFile((IFile) null, new URL(url), fileConfig);
         } catch (MalformedURLException e) {
             throw new VirtualFileException(e);
         }
     }
 
-    public IFile newFile(URL parentUrl, URL url) {
-        return newFile(newFile(parentUrl), url);
+    public IFile newFile(URL parentUrl, URL url, FileConfig fileConfig) {
+        return newFile(newFile(parentUrl, fileConfig), url, fileConfig);
     }
 
     /**
@@ -76,7 +79,15 @@ public class FileContext {
      * @param url
      * @return
      */
-    public IFile newFile(IFile parent, URL url) {
+    public IFile newFile(IFile parent, URL url, FileConfig fileConfig) {
+        if (fileConfig == null) {
+            fileConfig = fileConfigMap.get(url);
+            if (fileConfig == null)
+                fileConfig = defaultFileConfig;
+        } else {
+            fileConfigMap.put(url, fileConfig);
+        }
+
         URL normalizedUrl = FileUtils.normalizeUrl(url);
         String protocolString = normalizedUrl.getProtocol();
         Protocol protocol = null;
@@ -91,15 +102,12 @@ public class FileContext {
 
         File file = null;
         try {
-            IClient client = createClientInstance(normalizedUrl, fileConfig.getClientClass(protocol));
+            IClient client = createClientInstance(normalizedUrl, fileConfig.getClientClass(protocol), fileConfig);
             Map<FileType, IFileOperationProvider> fileOperationProviderMap = new HashMap<>();
             for (FileType fileType : FileType.values()) {
                 fileOperationProviderMap.put(fileType, (IFileOperationProvider) fileConfig.getFileOperationProviderClassMap(protocol).get(fileType).newInstance());
             }
-
             file = createFileInstance(parent, normalizedUrl, client, fileOperationProviderMap);
-            if (file._exists())
-                file._updateModel();
         } catch (InstantiationException e) {
             throw new VirtualFileException(e);
         } catch (IllegalAccessException e) {
@@ -108,14 +116,14 @@ public class FileContext {
         return file;
     }
 
-    public IFile newFile(URL url) {
+    public IFile newFile(URL url, FileConfig fileConfig) {
         URL normalizedUrl = FileUtils.normalizeUrl(url);
         String fullPath = normalizedUrl.getPath();
         IFile parentFile = null;
 
         String[] pathParts;
         if (fullPath.equals("/"))
-            return newFile((IFile) null, normalizedUrl);
+            return newFile((IFile) null, normalizedUrl, fileConfig);
         else {
             pathParts = fullPath.split("/");
             String path = "";
@@ -128,7 +136,7 @@ public class FileContext {
                 try {
                     String pathUrlString = getSiteUrlString(normalizedUrl) + path;
                     URL pathUrl = new URL(pathUrlString);
-                    parentFile = newFile(parentFile, pathUrl);
+                    parentFile = newFile(parentFile, pathUrl, fileConfig);
                 } catch (MalformedURLException e) {
                     throw new VirtualFileException(e);
                 }
@@ -156,13 +164,18 @@ public class FileContext {
         return urlString.substring(0, urlString.indexOf("/", urlString.indexOf("//") + 2));
     }
 
-    private IClient createClientInstance(URL url, Class clientClass) throws InstantiationException, IllegalAccessException {
+    private IClient createClientInstance(URL url, Class clientClass, FileConfig fileConfig) throws InstantiationException, IllegalAccessException {
         IClient client = null;
         if (clientClass != null) {
             String siteUrl = getSiteUrlString(url);
             client = siteToClientMap.get(siteUrl);
             if (client == null) {
-                client = (IClient) clientClass.newInstance();
+                try {
+                    Constructor constructor = clientClass.getConstructor(FileConfig.class);
+                    client = (IClient) constructor.newInstance(fileConfig);
+                } catch (ReflectiveOperationException e) {
+                    throw new VirtualFileException(e);
+                }
                 client.setHost(url.getHost());
                 client.setPort(url.getPort());
                 String userInfoParts[] = url.getUserInfo().split(":");

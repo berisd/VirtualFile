@@ -26,6 +26,7 @@ public class SftpFileInfo implements IFileInfo {
 
     @Override
     public void fillModel(FileModel model) {
+        model.setFileExists(true);
         model.setSize(sftpATTRS.getSize());
         model.setCreationTime(null);
         model.setLastModifiedTime(FileTime.fromMillis(sftpATTRS.getMTime() * 1000L));

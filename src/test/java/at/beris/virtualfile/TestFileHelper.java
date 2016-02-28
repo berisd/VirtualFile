@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.SftpClient;
+import at.beris.virtualfile.config.FileConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,16 +40,21 @@ public class TestFileHelper {
     public static final String SSH_HOME_DIRECTORY = "/home/sshtest/";
 
     public static void initIntegrationTest() throws Exception {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
     }
 
-    public static String readSftpPassword() throws IOException {
-        List<String> stringList = Files.readAllLines(new java.io.File(TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "sshlogin.txt").toPath());
+    public static String readSftpPassword() {
+        List<String> stringList = null;
+        try {
+            stringList = Files.readAllLines(new File(TEST_CREDENTIALS_DIRECTORY + File.separator + "sshlogin.txt").toPath());
+        } catch (IOException e) {
+            return "";
+        }
         return stringList.get(0);
     }
 
     public static SftpClient createSftpClient(URL url) throws IOException {
-        SftpClient sftpClient = new SftpClient();
+        SftpClient sftpClient = new SftpClient(new FileConfig());
         sftpClient.setHost(url.getHost());
         sftpClient.setPort(url.getPort());
         sftpClient.setUsername(url.getUserInfo().split(":")[0]);

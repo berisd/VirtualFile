@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.config.FileConfig;
 import at.beris.virtualfile.protocol.Protocol;
 
 import java.net.URL;
@@ -29,7 +30,11 @@ public class FileManager {
      * @return
      */
     public static IFile newLocalFile(String path) {
-        return getFileContext().newLocalFile(path);
+        return newLocalFile(path, null);
+    }
+
+    public static IFile newLocalFile(String path, FileConfig fileConfig) {
+        return getFileContext().newLocalFile(path, fileConfig);
     }
 
     /**
@@ -39,8 +44,12 @@ public class FileManager {
      * @return
      */
     public static IDirectory newLocalDirectory(String path) {
+        return newLocalDirectory(path, null);
+    }
+
+    public static IDirectory newLocalDirectory(String path, FileConfig fileConfig) {
         return (IDirectory) getFileContext().newLocalFile(path +
-                (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator));
+                (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator), fileConfig);
     }
 
     /**
@@ -49,33 +58,62 @@ public class FileManager {
      * @param path
      * @return
      */
+
     public static IArchive newLocalArchive(String path) {
-        return (IArchive) getFileContext().newLocalFile(path);
+        return newLocalArchive(path, null);
+    }
+
+    public static IArchive newLocalArchive(String path, FileConfig fileConfig) {
+        return (IArchive) getFileContext().newLocalFile(path, fileConfig);
     }
 
 
     public static IFile newFile(String url) {
-        return getFileContext().newFile(url);
+        return getFileContext().newFile(url, null);
+    }
+
+    public static IFile newFile(String url, FileConfig fileConfig) {
+        return getFileContext().newFile(url, fileConfig);
     }
 
     public static IFile newFile(URL parentUrl, URL url) {
-        return getFileContext().newFile(parentUrl, url);
+        return newFile(parentUrl, url, null);
+    }
+
+    public static IFile newFile(URL parentUrl, URL url, FileConfig fileConfig) {
+        return getFileContext().newFile(parentUrl, url, fileConfig);
     }
 
     public static IFile newFile(IFile parent, URL url) {
-        return getFileContext().newFile(parent, url);
+        return newFile(parent, url, null);
+    }
+
+    public static IFile newFile(IFile parent, URL url, FileConfig fileConfig) {
+        return getFileContext().newFile(parent, url, fileConfig);
     }
 
     public static IFile newFile(URL url) {
-        return getFileContext().newFile(url);
+        return newFile(url, (FileConfig) null);
+    }
+
+    public static IFile newFile(URL url, FileConfig fileConfig) {
+        return getFileContext().newFile(url, fileConfig);
     }
 
     public static IDirectory newDirectory(URL url) {
-        return (IDirectory) getFileContext().newFile(url);
+        return newDirectory(url, null);
+    }
+
+    public static IDirectory newDirectory(URL url, FileConfig fileConfig) {
+        return (IDirectory) getFileContext().newFile(url, fileConfig);
     }
 
     public static IArchive newArchive(URL url) {
-        return (IArchive) getFileContext().newFile(url);
+        return newArchive(url, null);
+    }
+
+    public static IArchive newArchive(URL url, FileConfig fileConfig) {
+        return (IArchive) getFileContext().newFile(url, fileConfig);
     }
 
 

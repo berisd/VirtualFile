@@ -39,7 +39,7 @@ public class LocalArchivedFileTest {
         Object[][] data = new Object[archiveExtensions.length][3];
         for (int i = 0; i < archiveExtensions.length; i++) {
             String archiveExtension = archiveExtensions[i];
-            data[i] = new Object[]{directoryUrlPattern.replace("??", archiveExtension), fileNameUrlPattern.replace("??", archiveExtension), 920};
+            data[i] = new Object[]{directoryUrlPattern.replace("??", archiveExtension), fileNameUrlPattern.replace("??", archiveExtension), 0};
         }
 
         return Arrays.asList(data);

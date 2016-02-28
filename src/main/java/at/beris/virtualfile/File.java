@@ -146,7 +146,7 @@ public class File implements IFile, Comparable<File> {
     @Override
     public boolean isDirectory() {
         LOGGER.info("Check isDirectory for " + this);
-        return this instanceof IDirectory;
+        return model.isDirectory();
     }
 
     @Override
