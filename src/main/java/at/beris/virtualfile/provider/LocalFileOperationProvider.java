@@ -13,7 +13,7 @@ import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.attribute.BasicFilePermission;
-import at.beris.virtualfile.attribute.DosAttribute;
+import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.client.IClient;
@@ -193,14 +193,14 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         File file = new File(model.getPath());
 
         Set<BasicFilePermission> basicFilePermissionSet = new HashSet<>();
-        Set<DosAttribute> dosAttributeSet = new HashSet<>();
+        Set<DosFileAttribute> dosAttributeSet = new HashSet<>();
         Set<PosixFilePermission> posixFilePermissionSet = new HashSet<>();
 
         for (IAttribute attribute : model.getAttributes()) {
             if (attribute instanceof BasicFilePermission)
                 basicFilePermissionSet.add((BasicFilePermission) attribute);
-            else if (attribute instanceof DosAttribute)
-                dosAttributeSet.add((DosAttribute) attribute);
+            else if (attribute instanceof DosFileAttribute)
+                dosAttributeSet.add((DosFileAttribute) attribute);
             else if (attribute instanceof PosixFilePermission)
                 posixFilePermissionSet.add((PosixFilePermission) attribute);
         }
@@ -311,13 +311,13 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         Set<IAttribute> attributes = model.getAttributes();
         DosFileAttributes dosFileAttributes = Files.readAttributes(file.toPath(), DosFileAttributes.class);
         if (dosFileAttributes.isArchive())
-            attributes.add(DosAttribute.ARCHIVE);
+            attributes.add(DosFileAttribute.ARCHIVE);
         if (dosFileAttributes.isHidden())
-            attributes.add(DosAttribute.HIDDEN);
+            attributes.add(DosFileAttribute.HIDDEN);
         if (dosFileAttributes.isReadOnly())
-            attributes.add(DosAttribute.READ_ONLY);
+            attributes.add(DosFileAttribute.READ_ONLY);
         if (dosFileAttributes.isSystem())
-            attributes.add(DosAttribute.SYSTEM);
+            attributes.add(DosFileAttribute.SYSTEM);
     }
 
     private void fillDefaultFileAttributes(File file, FileModel model) {
@@ -353,12 +353,12 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         file.setWritable(basicFilePermissionSet.contains(BasicFilePermission.WRITE));
     }
 
-    private void setDosFileAttributes(File file, Set<DosAttribute> dosAttributeSet) throws IOException {
+    private void setDosFileAttributes(File file, Set<DosFileAttribute> dosAttributeSet) throws IOException {
         DosFileAttributeView dosFileAttributeView = Files.getFileAttributeView(file.toPath(), DosFileAttributeView.class);
-        dosFileAttributeView.setArchive(dosAttributeSet.contains(DosAttribute.ARCHIVE));
-        dosFileAttributeView.setHidden(dosAttributeSet.contains(DosAttribute.HIDDEN));
-        dosFileAttributeView.setReadOnly(dosAttributeSet.contains(DosAttribute.READ_ONLY));
-        dosFileAttributeView.setSystem(dosAttributeSet.contains(DosAttribute.SYSTEM));
+        dosFileAttributeView.setArchive(dosAttributeSet.contains(DosFileAttribute.ARCHIVE));
+        dosFileAttributeView.setHidden(dosAttributeSet.contains(DosFileAttribute.HIDDEN));
+        dosFileAttributeView.setReadOnly(dosAttributeSet.contains(DosFileAttribute.READ_ONLY));
+        dosFileAttributeView.setSystem(dosAttributeSet.contains(DosFileAttribute.SYSTEM));
     }
 
     private void setPosixFilePermissions(File file, Set<PosixFilePermission> posixFilePermissionSet) throws IOException {

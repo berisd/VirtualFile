@@ -10,9 +10,11 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.BasicFilePermission;
+import at.beris.virtualfile.attribute.DosFileAttribute;
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.OsUtils;
-import at.beris.virtualfile.util.VoidOperationHook;
+import at.beris.virtualfile.util.VoidOperation;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,6 +23,8 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -73,13 +77,21 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() {
-        super.getFileAttributes(new VoidOperationHook<IFile>() {
+        super.getFileAttributes(new VoidOperation<IFile>() {
             @Override
             public void execute(IFile file) {
                 assertTrue(file.getAttributes().contains(BasicFilePermission.READ));
                 assertTrue(file.getAttributes().contains(BasicFilePermission.WRITE));
             }
         });
+    }
+
+    @Test
+    public void setFileAttributes() {
+        Set<IAttribute> attributes = new HashSet<>();
+        attributes.add(BasicFilePermission.EXECUTE);
+        attributes.add(DosFileAttribute.HIDDEN);
+        super.setFileAttributes(attributes);
     }
 
     @Test

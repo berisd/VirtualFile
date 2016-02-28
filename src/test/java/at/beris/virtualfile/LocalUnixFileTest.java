@@ -9,10 +9,11 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.OsUtils;
-import at.beris.virtualfile.util.VoidOperationHook;
+import at.beris.virtualfile.util.VoidOperation;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -74,7 +77,7 @@ public class LocalUnixFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() {
-        super.getFileAttributes(new VoidOperationHook<IFile>() {
+        super.getFileAttributes(new VoidOperation<IFile>() {
             @Override
             public void execute(IFile file) {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
@@ -83,6 +86,14 @@ public class LocalUnixFileTest extends AbstractFileTest {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OTHERS_READ));
             }
         });
+    }
+
+    @Test
+    public void setFileAttributes() {
+        Set<IAttribute> attributes = new HashSet<>();
+        attributes.add(PosixFilePermission.OTHERS_EXECUTE);
+        attributes.add(PosixFilePermission.GROUP_EXECUTE);
+        super.setFileAttributes(attributes);
     }
 
     @Test

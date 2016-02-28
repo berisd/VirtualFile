@@ -9,11 +9,12 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
-import at.beris.virtualfile.util.SingleValueOperationHook;
-import at.beris.virtualfile.util.VoidOperationHook;
+import at.beris.virtualfile.util.SingleValueOperation;
+import at.beris.virtualfile.util.VoidOperation;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -25,10 +26,7 @@ import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 import static at.beris.virtualfile.TestFileHelper.createFilenamesTree;
 import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
@@ -58,7 +56,7 @@ public abstract class AbstractFileTest {
         createFile(null);
     }
 
-    protected void createFile(VoidOperationHook<IFile> assertHook) {
+    protected void createFile(VoidOperation<IFile> assertHook) {
         IFile file = FileManager.newFile(sourceFileUrl);
         file.create();
 
@@ -152,10 +150,25 @@ public abstract class AbstractFileTest {
         }
     }
 
-    protected void getFileAttributes(VoidOperationHook assertHook) {
+    protected void getFileAttributes(VoidOperation assertHook) {
         IFile file = FileManager.newFile(sourceFileUrl);
         file.create();
         assertHook.execute(file);
+        file.delete();
+    }
+
+    protected void setFileAttributes(Set<IAttribute> attributes) {
+        IFile file = FileManager.newFile(sourceFileUrl);
+        file.create();
+        file.setAttributes(attributes.toArray(new IAttribute[0]));
+        FileManager.dispose(file);
+
+        file = FileManager.newFile(sourceFileUrl);
+        Set<IAttribute> actualAttributes = file.getAttributes();
+
+        assertTrue(attributes.containsAll(actualAttributes));
+        assertEquals(attributes.size(), actualAttributes.size());
+
         file.delete();
     }
 
@@ -172,9 +185,14 @@ public abstract class AbstractFileTest {
     }
 
     protected void setGroup() {
+        setGroup(null);
+    }
+
+    protected void setGroup(GroupPrincipal group) {
         IFile file = FileManager.newFile(sourceFileUrl);
         file.create();
-        GroupPrincipal group = file.getGroup();
+        if (group == null)
+            group = file.getGroup();
         file.setGroup(group);
 
         FileManager.dispose(file);
@@ -185,7 +203,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void setCreationTime() {
-        setTime(new SingleValueOperationHook<IFile, FileTime>() {
+        setTime(new SingleValueOperation<IFile, FileTime>() {
             @Override
             public void setValue(IFile object, FileTime value) {
                 object.setCreationTime(value);
@@ -199,7 +217,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void setLastModifiedTime() {
-        setTime(new SingleValueOperationHook<IFile, FileTime>() {
+        setTime(new SingleValueOperation<IFile, FileTime>() {
             @Override
             public void setValue(IFile object, FileTime value) {
                 object.setLastModifiedTime(value);
@@ -213,7 +231,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void setLastAccessTime() {
-        setTime(new SingleValueOperationHook<IFile, FileTime>() {
+        setTime(new SingleValueOperation<IFile, FileTime>() {
             @Override
             public void setValue(IFile object, FileTime value) {
                 object.setLastAccessTime(value);
@@ -263,7 +281,7 @@ public abstract class AbstractFileTest {
         }
     }
 
-    private void setTime(SingleValueOperationHook<IFile, FileTime> operation) {
+    private void setTime(SingleValueOperation<IFile, FileTime> operation) {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         calendar.roll(Calendar.YEAR, false);

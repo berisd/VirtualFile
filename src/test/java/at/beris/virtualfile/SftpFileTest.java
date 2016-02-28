@@ -9,14 +9,19 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.FileUtils;
-import at.beris.virtualfile.util.VoidOperationHook;
+import at.beris.virtualfile.util.VoidOperation;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.URL;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.UserPrincipal;
+import java.util.HashSet;
+import java.util.Set;
 
 import static at.beris.virtualfile.TestFileHelper.initIntegrationTest;
 import static at.beris.virtualfile.TestFileHelper.readSftpPassword;
@@ -43,13 +48,15 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void createFile() {
-        super.createFile(new VoidOperationHook<IFile>() {
+        super.createFile(new VoidOperation<IFile>() {
             @Override
             public void execute(IFile file) {
                 assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
-//                assertTrue(file.getOwner() instanceof UserPrincipal);
+                assertTrue(file.getOwner() instanceof UserPrincipal);
+                assertTrue(file.getGroup() instanceof GroupPrincipal);
+                assertTrue(file.getAttributes().size() > 0);
                 assertEquals(0, file.getSize());
                 assertFalse(file.isDirectory());
             }
@@ -83,7 +90,7 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() {
-        super.getFileAttributes(new VoidOperationHook<IFile>() {
+        super.getFileAttributes(new VoidOperation<IFile>() {
             @Override
             public void execute(IFile file) {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
@@ -92,5 +99,25 @@ public class SftpFileTest extends AbstractFileTest {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OTHERS_READ));
             }
         });
+    }
+
+    @Test
+    public void setFileAttributes() {
+        Set<IAttribute> attributes = new HashSet<>();
+        attributes.add(PosixFilePermission.OTHERS_EXECUTE);
+        attributes.add(PosixFilePermission.GROUP_EXECUTE);
+        super.setFileAttributes(attributes);
+    }
+
+    @Test(expected = at.beris.virtualfile.exception.AccessDeniedException.class)
+    public void setOwner() {
+        UnixUserPrincipal user = new UnixUserPrincipal(1002, 1002);
+        super.setOwner(user);
+    }
+
+    @Test(expected = at.beris.virtualfile.exception.AccessDeniedException.class)
+    public void setGroup() {
+        UnixGroupPrincipal group = new UnixGroupPrincipal(1002);
+        super.setGroup(group);
     }
 }

@@ -98,7 +98,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void setAttributes(IClient client, FileModel model) {
-        throw new NotImplementedException();
+        client.setAttributes(model.getPath(), model.getAttributes());
     }
 
     @Override
@@ -108,7 +108,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void setGroup(IClient client, FileModel model) {
-        throw new NotImplementedException();
+        client.setGroup(model.getPath(), model.getGroup());
     }
 
     @Override
@@ -123,7 +123,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void setOwner(IClient client, FileModel model) {
-        throw new NotImplementedException();
+        client.setOwner(model.getPath(), model.getOwner());
     }
 
     private IFile copyToLocalFile(IClient client, FileModel model, String path) {

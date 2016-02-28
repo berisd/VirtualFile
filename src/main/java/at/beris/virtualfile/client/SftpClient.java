@@ -9,6 +9,9 @@
 
 package at.beris.virtualfile.client;
 
+import at.beris.virtualfile.UnixGroupPrincipal;
+import at.beris.virtualfile.UnixUserPrincipal;
+import at.beris.virtualfile.attribute.IAttribute;
 import at.beris.virtualfile.exception.AccessDeniedException;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -18,8 +21,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.UserPrincipal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 public class SftpClient implements IClient {
@@ -235,6 +241,50 @@ public class SftpClient implements IClient {
         try {
             checkChannel();
             sftpChannel.setMtime(path, (int) (time.toMillis() / 1000));
+        } catch (SftpException e) {
+            handleSftpException(e);
+        }
+    }
+
+    @Override
+    public void setAttributes(String path, Set<IAttribute> attributes) {
+        try {
+            checkChannel();
+            SftpATTRS sftpATTRS = sftpChannel.stat(path);
+
+            int permissions = 0;
+            for (IAttribute attribute : attributes) {
+                permissions = permissions | Sftp.getPermission(attribute);
+            }
+
+            sftpATTRS.setPERMISSIONS(permissions);
+            sftpChannel.setStat(path, sftpATTRS);
+        } catch (SftpException e) {
+            handleSftpException(e);
+        }
+    }
+
+    @Override
+    public void setOwner(String path, UserPrincipal owner) {
+        try {
+            UnixUserPrincipal user = (UnixUserPrincipal) owner;
+            checkChannel();
+            SftpATTRS sftpATTRS = sftpChannel.stat(path);
+            sftpATTRS.setUIDGID(user.getUid(), sftpATTRS.getGId());
+            sftpChannel.setStat(path, sftpATTRS);
+        } catch (SftpException e) {
+            handleSftpException(e);
+        }
+    }
+
+    @Override
+    public void setGroup(String path, GroupPrincipal group) {
+        try {
+            UnixGroupPrincipal unixGroup = (UnixGroupPrincipal) group;
+            checkChannel();
+            SftpATTRS sftpATTRS = sftpChannel.stat(path);
+            sftpATTRS.setUIDGID(sftpATTRS.getUId(), unixGroup.getGid());
+            sftpChannel.setStat(path, sftpATTRS);
         } catch (SftpException e) {
             handleSftpException(e);
         }

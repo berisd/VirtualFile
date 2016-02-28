@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.util;
 
-public interface SingleValueOperationHook<O, T> {
+public interface SingleValueOperation<O, T> {
     void setValue(O object, T value);
 
     T getValue(O object);

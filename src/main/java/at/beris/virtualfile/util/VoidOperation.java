@@ -9,6 +9,6 @@
 
 package at.beris.virtualfile.util;
 
-public interface VoidOperationHook<O> {
+public interface VoidOperation<O> {
     void execute(O object);
 }
