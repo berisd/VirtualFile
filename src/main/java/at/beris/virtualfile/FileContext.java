@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.IFileOperationProvider;
@@ -176,12 +177,20 @@ public class FileContext {
     private File createFileInstance(IFile parent, URL normalizedUrl, IClient client, Map<FileType, IFileOperationProvider> fileOperationProviderMap) {
         Class instanceClass;
         File instance;
-        String urlString = normalizedUrl.toString();
-        String[] pathParts = urlString.split("/");
 
-        if (FileUtils.isDirectory(urlString))
+        FileModel fileModel = new FileModel();
+        if (parent != null)
+            fileModel.setParent(parent.getModel());
+        fileModel.setUrl(normalizedUrl);
+
+        try {
+            fileOperationProviderMap.get(fileModel.requiredFileOperationProviderType()).updateModel(client, fileModel);
+        } catch (FileNotFoundException e) {
+        }
+
+        if (fileModel.isDirectory()) {
             instanceClass = Directory.class;
-        else if (FileUtils.isArchive(pathParts[pathParts.length - 1]))
+        } else if (fileModel.isArchive())
             instanceClass = Archive.class;
         else
             instanceClass = File.class;
@@ -189,7 +198,7 @@ public class FileContext {
         Constructor constructor = null;
         try {
             constructor = instanceClass.getConstructor(IFile.class, URL.class, FileModel.class, Map.class, IClient.class);
-            instance = (File) constructor.newInstance(parent, normalizedUrl, new FileModel(), fileOperationProviderMap, client);
+            instance = (File) constructor.newInstance(parent, normalizedUrl, fileModel, fileOperationProviderMap, client);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
         }

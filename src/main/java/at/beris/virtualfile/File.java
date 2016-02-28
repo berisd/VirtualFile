@@ -58,13 +58,13 @@ public class File implements IFile, Comparable<File> {
 
     @Override
     public URL getUrl() {
-        LOGGER.info("Get URL for " + this);
+//        LOGGER.info("Get URL for " + this);
         return model.getUrl();
     }
 
     @Override
     public FileModel getModel() {
-        LOGGER.info("Get model for " + this);
+//        LOGGER.info("Get model for " + this);
         return model;
     }
 
@@ -77,12 +77,7 @@ public class File implements IFile, Comparable<File> {
     @Override
     public IFileOperationProvider getFileOperationProvider() {
 //        LOGGER.info("Get fileOperationProvider for " + this);
-        if (isArchive())
-            return fileOperationProviderMap.get(FileType.ARCHIVE);
-        else if (isArchived())
-            return fileOperationProviderMap.get(FileType.ARCHIVED);
-        else
-            return fileOperationProviderMap.get(FileType.DEFAULT);
+        return fileOperationProviderMap.get(model.requiredFileOperationProviderType());
     }
 
     @Override
@@ -308,6 +303,16 @@ public class File implements IFile, Comparable<File> {
     }
 
     @Override
+    public IArchive asArchive() {
+        return (IArchive) this;
+    }
+
+    @Override
+    public IDirectory asDirectory() {
+        return (IDirectory) this;
+    }
+
+    @Override
     public void removeAttributes(IAttribute... attributes) {
         LOGGER.info("Remove attributes " + getAttributesString(attributes) + " from " + this);
         if (attributes.length < 1)
@@ -361,15 +366,7 @@ public class File implements IFile, Comparable<File> {
     @Override
     public boolean isArchived() {
 //        LOGGER.info("Check isArchived for " + this);
-        IFile parent = getParent();
-        while (parent != null) {
-            if (parent.isArchive())
-                return true;
-            if (parent.isArchived())
-                return true;
-            parent = parent.getParent();
-        }
-        return false;
+        return model.isArchived();
     }
 
     @Override
@@ -412,10 +409,6 @@ public class File implements IFile, Comparable<File> {
 
     boolean _exists() {
         return getFileOperationProvider().exists(client, model);
-    }
-
-    IFile _getParent() {
-        return parent;
     }
 
     void _updateModel() {

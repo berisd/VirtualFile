@@ -33,6 +33,8 @@ public class SftpFileInfo implements IFileInfo {
         model.setAttributes(createAttributes());
         model.setOwner(new UnixUserPrincipal(sftpATTRS.getUId(), sftpATTRS.getGId()));
         model.setGroup(new UnixGroupPrincipal(sftpATTRS.getGId()));
+        model.setDirectory(sftpATTRS.isDir());
+        model.setSymbolicLink(sftpATTRS.isLink());
     }
 
     public void setPath(String path) {

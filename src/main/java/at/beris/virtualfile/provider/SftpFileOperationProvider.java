@@ -77,6 +77,7 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void updateModel(IClient client, FileModel model) {
+        model.setFileExists(false);
         IFileInfo fileInfo = client.getFileInfo(model.getPath());
         fileInfo.fillModel(model);
     }

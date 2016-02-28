@@ -39,7 +39,7 @@ public class LocalArchivedFileTest {
         Object[][] data = new Object[archiveExtensions.length][3];
         for (int i = 0; i < archiveExtensions.length; i++) {
             String archiveExtension = archiveExtensions[i];
-            data[i] = new Object[]{directoryUrlPattern.replace("??", archiveExtension), fileNameUrlPattern.replace("??", archiveExtension), 0};
+            data[i] = new Object[]{directoryUrlPattern.replace("??", archiveExtension), fileNameUrlPattern.replace("??", archiveExtension), 920};
         }
 
         return Arrays.asList(data);
@@ -48,7 +48,6 @@ public class LocalArchivedFileTest {
     public LocalArchivedFileTest(String directoryPath, String filePath, int fileSize) {
         this.filePath = filePath;
         this.directoryPath = directoryPath;
-        //TODO FileSize is always 0. Save file to disk to get real fileSize and other file attributes.
         this.fileSize = fileSize;
     }
 

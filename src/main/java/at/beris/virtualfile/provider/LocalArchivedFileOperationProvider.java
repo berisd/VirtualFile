@@ -23,7 +23,6 @@ import java.io.*;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class LocalArchivedFileOperationProvider implements IFileOperationProvider {
     @Override
@@ -128,7 +127,7 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
     @Override
     public void updateModel(IClient client, FileModel model) {
-        throw new NotImplementedException();
+        //TODO Call new class ArchiveClient here
     }
 
     @Override

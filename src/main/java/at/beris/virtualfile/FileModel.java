@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.util.FileUtils;
 
 import java.net.URL;
 import java.nio.file.attribute.AclEntry;
@@ -33,6 +34,8 @@ public class FileModel {
     private UserPrincipal owner;
     private GroupPrincipal group;
     private List<AclEntry> acl;
+    private boolean isDirectory;
+    private boolean fileExists;
 
     public FileModel() {
         attributes = new HashSet<>();
@@ -104,8 +107,37 @@ public class FileModel {
         attributes.remove(attribute);
     }
 
+    public void setDirectory(boolean isDirectory) {
+        this.isDirectory = isDirectory;
+    }
+
     public Boolean isDirectory() {
-        return url.getPath().endsWith("/");
+        return (fileExists && isDirectory) || (!fileExists && url.getPath().endsWith("/"));
+    }
+
+    public Boolean isArchive() {
+        String[] pathParts = url.toString().split("/");
+        return FileUtils.isArchive(pathParts[pathParts.length - 1]);
+    }
+
+    public boolean isArchived() {
+        FileModel parentModel = parent;
+        while (parentModel != null) {
+            if (parentModel.isArchive())
+                return true;
+            if (parentModel.isArchived())
+                return true;
+            parentModel = parentModel.getParent();
+        }
+        return false;
+    }
+
+    public boolean isFileExists() {
+        return fileExists;
+    }
+
+    public void setFileExists(boolean fileExists) {
+        this.fileExists = fileExists;
     }
 
     public String getPath() {
@@ -156,5 +188,14 @@ public class FileModel {
         owner = null;
         group = null;
         url = null;
+    }
+
+    public FileType requiredFileOperationProviderType() {
+        if (isArchive())
+            return FileType.ARCHIVE;
+        else if (isArchived())
+            return FileType.ARCHIVED;
+        else
+            return FileType.DEFAULT;
     }
 }

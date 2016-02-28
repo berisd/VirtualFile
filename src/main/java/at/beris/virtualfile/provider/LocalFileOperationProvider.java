@@ -21,7 +21,6 @@ import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.PermissionDeniedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.IFilter;
-import at.beris.virtualfile.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,10 +119,10 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
 
     @Override
     public void updateModel(IClient client, FileModel model) {
-        File file = new File(model.getPath());
-        model.setUrl(FileUtils.getUrlForLocalPath(file.getPath().toString()));
-
         try {
+            File file = new File(model.getPath());
+            model.setFileExists(file.exists());
+
             FileStore fileStore = Files.getFileStore(file.toPath());
             boolean basicFileAttributeViewSupported = fileStore.supportsFileAttributeView(BasicFileAttributeView.class);
             boolean fileOwnerAttributeViewSupported = fileStore.supportsFileAttributeView(FileOwnerAttributeView.class);
@@ -156,7 +155,10 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
                 fillDefaultFileAttributes(file, model);
             }
         } catch (IOException e) {
-            throw new VirtualFileException(e);
+            if (e instanceof NoSuchFileException)
+                throw new at.beris.virtualfile.exception.FileNotFoundException(e);
+            else
+                throw new VirtualFileException(e);
         }
     }
 
@@ -304,6 +306,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         model.setLastAccessTime(basicFileAttributes.lastAccessTime());
         model.setCreationTime(basicFileAttributes.creationTime());
         model.setSize(file.isDirectory() ? file.list().length : basicFileAttributes.size());
+        model.setDirectory(file.isDirectory());
         model.setSymbolicLink(basicFileAttributes.isSymbolicLink());
     }
 

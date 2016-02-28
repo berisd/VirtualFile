@@ -29,6 +29,10 @@ import java.util.Set;
 public interface IFile {
     void addAttributes(IAttribute... attributes);
 
+    IArchive asArchive();
+
+    IDirectory asDirectory();
+
     byte[] checksum();
 
     void copy(IFile targetFile, CopyListener listener);
@@ -88,6 +92,7 @@ public interface IFile {
 
     /**
      * Returns the size in bytes for a file and the number of contained items for a directory
+     *
      * @return
      */
     long getSize();

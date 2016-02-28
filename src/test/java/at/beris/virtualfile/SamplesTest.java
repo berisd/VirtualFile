@@ -33,8 +33,8 @@ public class SamplesTest {
 
     @Test
     public void extractArchive() {
-        IArchive archive = FileManager.newLocalArchive("src" + java.io.File.separator + "test" + File.separator +
-                "resources" + File.separator + "testarchive.zip");
+        IArchive archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + File.separator +
+                "resources" + File.separator + "testarchive.zip").asArchive();
         IDirectory directory = FileManager.newLocalDirectory("extracted");
         List<IFile> extractedFiles = archive.extract(directory);
         Assert.assertEquals(33, extractedFiles.size());
