@@ -35,6 +35,8 @@ public interface File {
 
     byte[] checksum();
 
+    void copy(File targetFile);
+
     void copy(File targetFile, CopyListener listener);
 
     /**

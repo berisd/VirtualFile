@@ -53,6 +53,15 @@ public class SamplesTest {
     }
 
     @Test
+    public void copyFileToDirectory() {
+        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
+        file.copy(FileManager.newLocalFile ("."));
+        File copiedFile = FileManager.newLocalFile("dokuwiki-stable.tgz");
+        Assert.assertArrayEquals(file.checksum(), copiedFile.checksum());
+        copiedFile.delete();
+    }
+
+    @Test
     public void AuthWithPublicKey() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         FileConfig config = new FileConfig().setClientAuthenticationType(AuthenticationType.PUBLIC_KEY)

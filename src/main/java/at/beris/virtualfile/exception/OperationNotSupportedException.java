@@ -10,4 +10,11 @@
 package at.beris.virtualfile.exception;
 
 public class OperationNotSupportedException extends VirtualFileException {
+    public OperationNotSupportedException() {
+        super();
+    }
+
+    public OperationNotSupportedException(String message) {
+        super(message);
+    }
 }

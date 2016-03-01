@@ -370,6 +370,12 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
+    public void copy(File targetFile) {
+        LOGGER.info("Copy " + this + " to " + targetFile);
+        new CopyOperation(this, targetFile, null);
+    }
+
+    @Override
     public void copy(File targetFile, CopyListener listener) {
         LOGGER.info("Copy " + this + " to " + targetFile);
         new CopyOperation(this, targetFile, listener);

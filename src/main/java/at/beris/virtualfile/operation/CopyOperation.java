@@ -9,10 +9,12 @@
 
 package at.beris.virtualfile.operation;
 
-import at.beris.virtualfile.UrlFile;
-import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.File;
+import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.UrlFile;
+import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.util.FileUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +29,10 @@ public class CopyOperation {
     public CopyOperation(File sourceFile, File targetFile, CopyListener listener) {
         filesProcessed = 0L;
         try {
+            if (sourceFile.isDirectory() && ! targetFile.isDirectory())
+                throw new OperationNotSupportedException("Can't copy directory to a file!");
+            if (! sourceFile.isDirectory() && targetFile.isDirectory())
+                targetFile = FileManager.newFile(FileUtils.newUrl(targetFile.getUrl(), sourceFile.getName()));
             copyRecursive((UrlFile) sourceFile, (UrlFile) targetFile, listener);
         } catch (IOException e) {
             throw new VirtualFileException(e);
@@ -35,7 +41,8 @@ public class CopyOperation {
 
     private void copyRecursive(UrlFile sourceFile, UrlFile targetFile, CopyListener listener) throws IOException {
         if (targetFile.exists()) {
-            listener.fileExists(targetFile);
+            if (listener != null)
+                listener.fileExists(targetFile);
         }
 
         if (sourceFile.isDirectory()) {
@@ -50,7 +57,8 @@ public class CopyOperation {
                 copyRecursive((UrlFile) sourceChildFile, targetChildFile, listener);
             }
         } else {
-            listener.startCopyFile(sourceFile.getPath(), filesProcessed + 1);
+            if (listener != null)
+                listener.startCopyFile(sourceFile.getPath(), filesProcessed + 1);
             copyFile(sourceFile, targetFile, listener);
             filesProcessed++;
         }
@@ -70,8 +78,9 @@ public class CopyOperation {
                 outputStream.write(buffer, 0, length);
                 bytesWrittenBlock = length;
                 bytesWrittenTotal += bytesWrittenBlock;
-                listener.afterBlockCopied(sourceFile.getSize(), bytesWrittenBlock, bytesWrittenTotal);
-                if (listener.interrupt())
+                if (listener!=null)
+                    listener.afterBlockCopied(sourceFile.getSize(), bytesWrittenBlock, bytesWrittenTotal);
+                if (listener!=null && listener.interrupt())
                     break;
             }
         } finally {
