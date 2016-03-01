@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile.operation;
 
+import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileManager;
-import at.beris.virtualfile.IFile;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -35,14 +34,14 @@ import static org.mockito.Mockito.times;
 
 @RunWith(Parameterized.class)
 public class CopyOperationIntegrationTest {
-    private static IFile sourceFile;
-    private static IFile targetFile;
+    private static File sourceFile;
+    private static File targetFile;
     private static String targetSite;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() throws Exception {
         return Arrays.asList(new Object[][]{
-                        {new File(".").toURI().toURL().toString()},
+                        {new java.io.File(".").toURI().toURL().toString()},
                 {"sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22/home/sshtest/"},
                 }
         );
@@ -101,21 +100,21 @@ public class CopyOperationIntegrationTest {
 
     @Test
     public void copyFilesRecursivelyToTargetSuccessFully() throws Exception {
-        List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+        List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         List<String> targetFileUrlList = createFilenamesTree(targetSite + TEST_TARGET_DIRECTORY_NAME);
 
         createFileTreeData(sourceFileUrlList);
 
-        IFile sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+        File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
 
         CopyListener copyListener = Mockito.mock(CopyListener.class);
         Mockito.when(copyListener.interrupt()).thenReturn(false);
 
-        IFile targetDirectory = FileManager.newFile(targetSite + TEST_TARGET_DIRECTORY_NAME);
+        File targetDirectory = FileManager.newFile(targetSite + TEST_TARGET_DIRECTORY_NAME);
         sourceDirectory.copy(targetDirectory, copyListener);
 
-//        List<IFile> targetFileList = targetFileUrlList.stream().map(f -> fileManager.newInstance(new File(f))).collect(Collectors.toList());
-//        List<IFile> sourceFileList = sourceFileUrlList.stream().map(f -> fileManager.newInstance(new File(f))).collect(Collectors.toList());
+//        List<File> targetFileList = targetFileUrlList.stream().map(f -> fileManager.newInstance(new UrlFile(f))).collect(Collectors.toList());
+//        List<File> sourceFileList = sourceFileUrlList.stream().map(f -> fileManager.newInstance(new UrlFile(f))).collect(Collectors.toList());
 //
 //        assertFileTree(sourceFileList, targetFileList);
 //
@@ -132,8 +131,8 @@ public class CopyOperationIntegrationTest {
         targetDirectory.delete();
     }
 
-    private static IFile createLocalSourceFile(String pathName) throws IOException {
-        File file = new File(pathName);
+    private static File createLocalSourceFile(String pathName) throws IOException {
+        java.io.File file = new java.io.File(pathName);
         StringBuilder dataString = new StringBuilder("t");
 
         while (dataString.length() < TEST_SOURCE_FILE_SIZE)
@@ -143,13 +142,13 @@ public class CopyOperationIntegrationTest {
         return FileManager.newLocalFile(pathName);
     }
 
-    private void assertFileTree(List<IFile> sourceFileList, List<IFile> targetFileList) throws IOException {
+    private void assertFileTree(List<File> sourceFileList, List<File> targetFileList) throws IOException {
         for (int i = 0; i < sourceFileList.size(); i++) {
             if (sourceFileList.get(i).isDirectory())
                 continue;
 
-            IFile sourceFile = sourceFileList.get(i);
-            IFile targetFile = targetFileList.get(i);
+            File sourceFile = sourceFileList.get(i);
+            File targetFile = targetFileList.get(i);
 
             if (targetFile.exists()) {
                 assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
@@ -162,7 +161,7 @@ public class CopyOperationIntegrationTest {
 //    @Test
 //    public void copyFileCancelled() throws IOException {
 //        LocalFile sourceFile = createLocalSourceFile();
-//        super.copyFileToLocalHostCancelled(sourceFile, fileManager.newInstance(new File(TEST_TARGET_FILE_NAME)));
+//        super.copyFileToLocalHostCancelled(sourceFile, fileManager.newInstance(new UrlFile(TEST_TARGET_FILE_NAME)));
 //    }
 
 
@@ -174,18 +173,18 @@ public class CopyOperationIntegrationTest {
 //        createFileTreeData(sourceFileNameList);
 //        createFileTreeData(targetFileNameList);
 //
-//        IFile sourceDirectory = fileManager.newInstance(new File(TEST_SOURCE_DIRECTORY_NAME));
-//        IFile targetDirectory = fileManager.newInstance(new File(TEST_TARGET_DIRECTORY_NAME));
+//        File sourceDirectory = fileManager.newInstance(new UrlFile(TEST_SOURCE_DIRECTORY_NAME));
+//        File targetDirectory = fileManager.newInstance(new UrlFile(TEST_TARGET_DIRECTORY_NAME));
 //
 //        CopyListener copyListener = Mockito.mock(CopyListener.class);
 //        Mockito.when(copyListener.interrupt()).thenReturn(false);
 //
 //        sourceDirectory.copy(targetDirectory, copyListener);
 //
-//        ArgumentCaptor<IFile> fileArgumentCaptor = ArgumentCaptor.forClass(IFile.class);
+//        ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
 //        Mockito.verify(copyListener, times(sourceFileNameList.size())).fileExists(fileArgumentCaptor.capture());
 //
-//        List<IFile> capturedFiles = fileArgumentCaptor.getAllValues();
+//        List<File> capturedFiles = fileArgumentCaptor.getAllValues();
 //        List<String> capturedFileNameList = new ArrayList<>();
 //
 //        String absoluteBasePath = capturedFiles.get(0).getFile();

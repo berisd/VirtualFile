@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 
 import java.util.HashMap;
@@ -28,10 +28,10 @@ public class Sftp {
     static final int S_IWOTH = 00002; // write by others
     static final int S_IXOTH = 00001; // execute/search by others
 
-    public static Map<Integer, IAttribute> permissionToAttributeMap = createPermissionToAttributeMap();
+    public static Map<Integer, FileAttribute> permissionToAttributeMap = createPermissionToAttributeMap();
 
-    private static HashMap<Integer, IAttribute> createPermissionToAttributeMap() {
-        HashMap<Integer, IAttribute> map = new HashMap<>();
+    private static HashMap<Integer, FileAttribute> createPermissionToAttributeMap() {
+        HashMap<Integer, FileAttribute> map = new HashMap<>();
         map.put(S_IRUSR, PosixFilePermission.OWNER_READ);
         map.put(S_IWUSR, PosixFilePermission.OWNER_WRITE);
         map.put(S_IXUSR, PosixFilePermission.OWNER_EXECUTE);
@@ -44,15 +44,15 @@ public class Sftp {
         return map;
     }
 
-    public static int getPermission(IAttribute attribute) {
-        for (Map.Entry<Integer, IAttribute> entry : permissionToAttributeMap.entrySet()) {
+    public static int getPermission(FileAttribute attribute) {
+        for (Map.Entry<Integer, FileAttribute> entry : permissionToAttributeMap.entrySet()) {
             if (entry.getValue().equals(attribute))
                 return entry.getKey();
         }
         return 0;
     }
 
-    public static IAttribute getAttribute(int permission) {
+    public static FileAttribute getAttribute(int permission) {
         return permissionToAttributeMap.get(permission);
     }
 }

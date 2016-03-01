@@ -10,23 +10,21 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.File;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.List;
-import java.util.Optional;
 
 public class LocalArchiveOperationProviderTest {
     @Test
     public void testList() throws Exception {
-        File file = new File("src/test/resources/testarchive.zip");
+        java.io.File file = new java.io.File("src/test/resources/testarchive.zip");
 
         FileModel fileModel = new FileModel();
         fileModel.setUrl(file.toURI().toURL());
         LocalArchiveOperationProvider provider = new LocalArchiveOperationProvider();
-        List<IFile> fileList = provider.list(null, fileModel, null);
+        List<File> fileList = provider.list(null, fileModel, null);
         Assert.assertTrue(fileList.size()>0);
     }
 }

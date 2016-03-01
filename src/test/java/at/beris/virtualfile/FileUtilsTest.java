@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.IClient;
-import at.beris.virtualfile.provider.IFileOperationProvider;
+import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -32,7 +32,7 @@ public class FileUtilsTest {
     @Test
     public void maskLocalUnixFileString() throws Exception {
         String urlString = "file:/home/bernd/IdeaProjects/VirtualFile/testfile1.txt";
-        IFile file = createFile(urlString);
+        File file = createFile(urlString);
         assertEquals(urlString, FileUtils.maskedUrlString(file.getUrl()));
     }
 
@@ -41,7 +41,7 @@ public class FileUtilsTest {
     public void maskLocalWindowsFileString() throws Exception {
         //TODO urls with Windows style Filename not working
         String urlString = "file:///C:/Documents%20and%20Settings/davris/FileSchemeURIs.doc";
-        IFile file = createFile(urlString);
+        File file = createFile(urlString);
         assertEquals(urlString, FileUtils.maskedUrlString(file.getUrl()));
     }
 
@@ -49,14 +49,14 @@ public class FileUtilsTest {
     public void maskSftpFileString() throws Exception {
         String urlString = "sftp://sshtest:mypassword@www.example.com:22/home/sshtest/targetfile1.txt";
         String expectedString = "sftp://sshtest:***@www.example.com:22/home/sshtest/targetfile1.txt";
-        IFile file = createFile(urlString);
+        File file = createFile(urlString);
         assertEquals(expectedString, FileUtils.maskedUrlString(file.getUrl()));
     }
 
-    private IFile createFile(String urlString) throws MalformedURLException {
-        IFileOperationProvider fileOperationProvider = Mockito.mock(IFileOperationProvider.class);
-        IClient client = Mockito.mock(IClient.class);
+    private File createFile(String urlString) throws MalformedURLException {
+        FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
+        Client client = Mockito.mock(Client.class);
         FileModel model = new FileModel();
-        return new File(new URL(urlString), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider), client);
+        return new UrlFile(new URL(urlString), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider), client);
     }
 }

@@ -9,22 +9,22 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.File;
 
-public interface IFilter<T> {
-    IFilter and(IFilter filter);
+public interface Filter<T> {
+    Filter and(Filter filter);
 
-    IFilter andNot(IFilter filter);
+    Filter andNot(Filter filter);
 
     Object clone();
 
-    IFilter equalTo(T value);
+    Filter equalTo(T value);
 
-    boolean filter(IFile file);
+    boolean filter(File file);
 
-    IFilter not();
+    Filter not();
 
-    IFilter or(IFilter filter);
+    Filter or(Filter filter);
 
-    IFilter orNot(IFilter filter);
+    Filter orNot(Filter filter);
 }

@@ -10,11 +10,11 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.IFile;
-import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.File;
+import at.beris.virtualfile.client.Client;
 
 import java.util.List;
 
-public interface IArchiveOperationProvider {
-    List<IFile> extract(IClient client, FileModel model, IFile target);
+public interface ArchiveOperationProvider {
+    List<File> extract(Client client, FileModel model, File target);
 }

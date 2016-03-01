@@ -11,7 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.VoidOperation;
@@ -77,9 +77,9 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() {
-        super.getFileAttributes(new VoidOperation<IFile>() {
+        super.getFileAttributes(new VoidOperation<File>() {
             @Override
-            public void execute(IFile file) {
+            public void execute(File file) {
                 assertTrue(file.getAttributes().contains(BasicFilePermission.READ));
                 assertTrue(file.getAttributes().contains(BasicFilePermission.WRITE));
             }
@@ -88,7 +88,7 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void setFileAttributes() {
-        Set<IAttribute> attributes = new HashSet<>();
+        Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(BasicFilePermission.EXECUTE);
         attributes.add(DosFileAttribute.HIDDEN);
         super.setFileAttributes(attributes);

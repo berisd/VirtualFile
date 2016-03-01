@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.OsUtils;
@@ -77,9 +77,9 @@ public class LocalUnixFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() {
-        super.getFileAttributes(new VoidOperation<IFile>() {
+        super.getFileAttributes(new VoidOperation<File>() {
             @Override
-            public void execute(IFile file) {
+            public void execute(File file) {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
@@ -90,7 +90,7 @@ public class LocalUnixFileTest extends AbstractFileTest {
 
     @Test
     public void setFileAttributes() {
-        Set<IAttribute> attributes = new HashSet<>();
+        Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(PosixFilePermission.OTHERS_EXECUTE);
         attributes.add(PosixFilePermission.GROUP_EXECUTE);
         super.setFileAttributes(attributes);

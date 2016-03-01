@@ -12,7 +12,6 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.client.SftpClient;
 import at.beris.virtualfile.config.FileConfig;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -46,7 +45,7 @@ public class TestFileHelper {
     public static String readSftpPassword() {
         List<String> stringList = null;
         try {
-            stringList = Files.readAllLines(new File(TEST_CREDENTIALS_DIRECTORY + File.separator + "sshlogin.txt").toPath());
+            stringList = Files.readAllLines(new java.io.File(TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "sshlogin.txt").toPath());
         } catch (IOException e) {
             return "";
         }
@@ -78,9 +77,9 @@ public class TestFileHelper {
         return otherInstant.compareTo(instantPlusSeconds) < 0;
     }
 
-    public static IFile createLocalSourceFile(URL url) {
+    public static File createLocalSourceFile(URL url) {
         try {
-            java.io.File file = new File(url.toURI());
+            java.io.File file = new java.io.File(url.toURI());
 
             StringBuilder dataString = new StringBuilder("t");
 
@@ -110,14 +109,14 @@ public class TestFileHelper {
         return fileList;
     }
 
-    public static List<IFile> createFileTreeData(List<String> fileUrlList) throws IOException {
+    public static List<File> createFileTreeData(List<String> fileUrlList) throws IOException {
         String testString = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttest";
         StringBuilder dataString = new StringBuilder(testString);
 
         int index = 0;
-        List<at.beris.virtualfile.IFile> fileList = new ArrayList<>();
+        List<File> fileList = new ArrayList<>();
         for (String fileUrl : fileUrlList) {
-            File file = new File(new URL(fileUrl).getPath());
+            java.io.File file = new java.io.File(new URL(fileUrl).getPath());
             if (fileUrl.indexOf('.') == -1) {
                 // directory
                 file.mkdirs();

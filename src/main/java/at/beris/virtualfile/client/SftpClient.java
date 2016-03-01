@@ -11,7 +11,7 @@ package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.config.AuthenticationType;
 import at.beris.virtualfile.config.FileConfig;
 import at.beris.virtualfile.exception.AccessDeniedException;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-public class SftpClient implements IClient {
+public class SftpClient implements Client {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SftpClient.class);
 
     private JSch jsch;
@@ -228,7 +228,7 @@ public class SftpClient implements IClient {
     }
 
     @Override
-    public IFileInfo getFileInfo(String path) {
+    public FileInfo getFileInfo(String path) {
         SftpFileInfo fileInfo = new SftpFileInfo();
         try {
             checkChannel();
@@ -242,8 +242,8 @@ public class SftpClient implements IClient {
     }
 
     @Override
-    public List<IFileInfo> list(String path) {
-        List<IFileInfo> IFileInfoList = new ArrayList<>();
+    public List<FileInfo> list(String path) {
+        List<FileInfo> IFileInfoList = new ArrayList<>();
 
         try {
             checkChannel();
@@ -271,13 +271,13 @@ public class SftpClient implements IClient {
     }
 
     @Override
-    public void setAttributes(String path, Set<IAttribute> attributes) {
+    public void setAttributes(String path, Set<FileAttribute> attributes) {
         try {
             checkChannel();
             SftpATTRS sftpATTRS = sftpChannel.stat(path);
 
             int permissions = 0;
-            for (IAttribute attribute : attributes) {
+            for (FileAttribute attribute : attributes) {
                 permissions = permissions | Sftp.getPermission(attribute);
             }
 

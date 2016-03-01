@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,7 +19,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
-public interface IClient {
+public interface Client {
     void init();
 
     String getHost();
@@ -56,13 +56,13 @@ public interface IClient {
 
     OutputStream getOutputStream(String path);
 
-    IFileInfo getFileInfo(String path);
+    FileInfo getFileInfo(String path);
 
-    List<IFileInfo> list(String path);
+    List<FileInfo> list(String path);
 
     void setLastModifiedTime(String path, FileTime time);
 
-    void setAttributes(String path, Set<IAttribute> attributes);
+    void setAttributes(String path, Set<FileAttribute> attributes);
 
     void setOwner(String path, UserPrincipal owner);
 

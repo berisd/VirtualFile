@@ -11,7 +11,7 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.client.Client;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -30,8 +30,8 @@ import static at.beris.virtualfile.TestFileHelper.*;
 @RunWith(Parameterized.class)
 public class FileOperationProviderTest {
 
-    private IFileOperationProvider provider;
-    private static IClient client;
+    private FileOperationProvider provider;
+    private static Client client;
     private URL testUrl;
 
     @Parameters
@@ -45,7 +45,7 @@ public class FileOperationProviderTest {
         );
     }
 
-    public FileOperationProviderTest(URL url, IFileOperationProvider fileOperationProvider, IClient client) {
+    public FileOperationProviderTest(URL url, FileOperationProvider fileOperationProvider, Client client) {
         this.provider = fileOperationProvider;
         this.client = client;
         this.testUrl = url;

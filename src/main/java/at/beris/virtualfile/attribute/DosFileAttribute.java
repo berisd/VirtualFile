@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.attribute;
 
-public enum DosFileAttribute implements IAttribute {
+public enum DosFileAttribute implements FileAttribute {
     ARCHIVE,
     HIDDEN,
     READ_ONLY,

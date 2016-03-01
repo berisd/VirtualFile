@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.util.FileUtils;
 
 import java.net.URL;
@@ -29,7 +29,7 @@ public class FileModel {
     private FileTime creationTime;
     private long size;
     private FileModel parent;
-    private Set<IAttribute> attributes;
+    private Set<FileAttribute> attributes;
     private boolean isSymbolicLink;
     private UserPrincipal owner;
     private GroupPrincipal group;
@@ -91,19 +91,19 @@ public class FileModel {
         this.parent = parent;
     }
 
-    public Set<IAttribute> getAttributes() {
+    public Set<FileAttribute> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Set<IAttribute> attributes) {
+    public void setAttributes(Set<FileAttribute> attributes) {
         this.attributes = attributes;
     }
 
-    public void addAttribute(IAttribute attribute) {
+    public void addAttribute(FileAttribute attribute) {
         attributes.add(attribute);
     }
 
-    public void removeAttribute(IAttribute attribute) {
+    public void removeAttribute(FileAttribute attribute) {
         attributes.remove(attribute);
     }
 

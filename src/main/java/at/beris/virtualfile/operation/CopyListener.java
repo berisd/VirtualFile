@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.operation;
 
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.File;
 
 public interface CopyListener {
     void startCopyFile(String fileName, long currentFileNumber);
@@ -18,5 +18,5 @@ public interface CopyListener {
 
     boolean interrupt();
 
-    void fileExists(IFile file);
+    void fileExists(File file);
 }

@@ -11,11 +11,11 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.IFile;
-import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.File;
+import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.filter.Filter;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -30,24 +30,24 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
 
-public class LocalArchiveOperationProvider extends LocalFileOperationProvider implements IArchiveOperationProvider {
+public class LocalArchiveOperationProvider extends LocalFileOperationProvider implements ArchiveOperationProvider {
 
     private final static String URL = "url";
     private final static String PARENT_URL = "parentUrl";
 
     @Override
-    public void create(IClient client, FileModel model) {
+    public void create(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void add(IFile parent, IFile child) {
+    public void add(File parent, File child) {
         throw new NotImplementedException();
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model, IFilter filter) {
-        List<IFile> fileList = new ArrayList<>();
+    public List<File> list(Client client, FileModel model, Filter filter) {
+        List<File> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
 
@@ -55,13 +55,13 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
         try {
             ArchiveStreamFactory factory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new File(model.getPath())));
+            fis = new BufferedInputStream(new FileInputStream(new java.io.File(model.getPath())));
             ais = factory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 
             while ((archiveEntry = ais.getNextEntry()) != null) {
                 Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
-                IFile file = FileManager.newFile(urlMap.get(PARENT_URL), urlMap.get(URL));
+                File file = FileManager.newFile(urlMap.get(PARENT_URL), urlMap.get(URL));
                 if (filter == null || filter.filter(file))
                     fileList.add(file);
             }
@@ -85,8 +85,8 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     }
 
     @Override
-    public List<IFile> extract(IClient client, FileModel model, IFile target) {
-        List<IFile> fileList = new ArrayList<>();
+    public List<File> extract(Client client, FileModel model, File target) {
+        List<File> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
 
@@ -94,7 +94,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
             target.create();
 
             ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new File(model.getPath())));
+            fis = new BufferedInputStream(new FileInputStream(new java.io.File(model.getPath())));
             ais = archiveStreamFactory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 
@@ -102,14 +102,14 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                 Map<String, URL> urlMap = getArchiveEntryURLMap(target.getUrl(), archiveEntry);
 
                 if (archiveEntry.isDirectory()) {
-                    Files.createDirectory(new File(urlMap.get(URL).toURI()).toPath());
+                    Files.createDirectory(new java.io.File(urlMap.get(URL).toURI()).toPath());
                 } else {
-                    OutputStream out = new FileOutputStream(new File(urlMap.get(URL).toURI()));
+                    OutputStream out = new FileOutputStream(new java.io.File(urlMap.get(URL).toURI()));
                     IOUtils.copy(ais, out);
                     out.close();
                 }
 
-                IFile file = FileManager.newFile(urlMap.get(URL));
+                File file = FileManager.newFile(urlMap.get(URL));
                 fileList.add(file);
             }
         } catch (FileNotFoundException e) {

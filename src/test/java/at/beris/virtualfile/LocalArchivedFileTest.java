@@ -53,14 +53,14 @@ public class LocalArchivedFileTest {
 
     @Test
     public void directoryInfo() {
-        IFile file = FileManager.newLocalFile(directoryPath);
+        File file = FileManager.newLocalFile(directoryPath);
         assertEquals(extractName(directoryPath), file.getName());
         assertTrue(file.isDirectory());
     }
 
     @Test
     public void fileInfo() {
-        IFile file = FileManager.newLocalFile(filePath);
+        File file = FileManager.newLocalFile(filePath);
         assertEquals(extractName(filePath), file.getName());
         assertEquals(fileSize, file.getSize());
         assertFalse(file.isDirectory());

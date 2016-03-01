@@ -15,7 +15,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -28,9 +27,9 @@ public class SamplesTest {
     @Test
     @Ignore
     public void addFilesToDirectory() {
-        IDirectory dir = FileManager.newLocalDirectory("testdir");
+        Directory dir = FileManager.newLocalDirectory("testdir");
         dir.create();
-        IFile file = FileManager.newLocalFile("abc.txt");
+        File file = FileManager.newLocalFile("abc.txt");
         dir.add(file);
         file.create();
         dir.delete();
@@ -38,18 +37,18 @@ public class SamplesTest {
 
     @Test
     public void extractArchive() {
-        IArchive archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + File.separator +
-                "resources" + File.separator + "testarchive.zip").asArchive();
-        IDirectory directory = FileManager.newLocalDirectory("extracted");
-        List<IFile> extractedFiles = archive.extract(directory);
+        Archive archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
+                "resources" + java.io.File.separator + "testarchive.zip").asArchive();
+        Directory directory = FileManager.newLocalDirectory("extracted");
+        List<File> extractedFiles = archive.extract(directory);
         Assert.assertEquals(33, extractedFiles.size());
         directory.delete();
     }
 
     @Test
     public void listArchive() {
-        IArchive archive = FileManager.newLocalArchive("src" + java.io.File.separator + "test" + File.separator +
-                "resources" + File.separator + "testarchive.zip");
+        Archive archive = FileManager.newLocalArchive("src" + java.io.File.separator + "test" + java.io.File.separator +
+                "resources" + java.io.File.separator + "testarchive.zip");
         Assert.assertEquals(33, archive.list().size());
     }
 
@@ -57,8 +56,8 @@ public class SamplesTest {
     public void AuthWithPublicKey() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         FileConfig config = new FileConfig().setClientAuthenticationType(AuthenticationType.PUBLIC_KEY)
-                .setPrivateKeyFile(TestFileHelper.TEST_CREDENTIALS_DIRECTORY + File.separator + "id_dsa");
-        IFile file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh", config);
+                .setPrivateKeyFile(TestFileHelper.TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "id_dsa");
+        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh", config);
         assertTrue(file.isDirectory());
     }
 
@@ -66,7 +65,7 @@ public class SamplesTest {
     public void AuthWithPasswordNoStrictHost() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         FileConfig config = new FileConfig().setClientStrictHostKeyChecking(false);
-        IFile file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh", config);
+        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh", config);
         assertTrue(file.isDirectory());
     }
 }

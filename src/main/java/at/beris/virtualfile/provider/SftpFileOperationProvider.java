@@ -9,25 +9,23 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileManager;
-import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.IFile;
-import at.beris.virtualfile.client.IClient;
-import at.beris.virtualfile.client.IFileInfo;
+import at.beris.virtualfile.*;
+import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.FileUtils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SftpFileOperationProvider implements IFileOperationProvider {
+public class SftpFileOperationProvider implements FileOperationProvider {
 
     @Override
-    public void create(IClient client, FileModel model) {
+    public void create(Client client, FileModel model) {
         if (model.isDirectory())
             client.createDirectory(model.getPath());
         else {
@@ -36,12 +34,12 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public boolean exists(IClient client, FileModel model) {
+    public boolean exists(Client client, FileModel model) {
         return client.exists(model.getPath());
     }
 
     @Override
-    public void delete(IClient client, FileModel model) {
+    public void delete(Client client, FileModel model) {
         if (model.isDirectory())
             client.deleteDirectory(model.getPath());
         else
@@ -49,25 +47,25 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public void add(IFile parent, IFile child) {
+    public void add(at.beris.virtualfile.File parent, at.beris.virtualfile.File child) {
         throw new NotImplementedException();
     }
 
     @Override
-    public byte[] checksum(IClient client, FileModel model) {
+    public byte[] checksum(Client client, FileModel model) {
         String tempDir = System.getProperty("java.io.tmpdir");
-        String tempFilePath = tempDir + File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
-        IFile tempFile = copyToLocalFile(client, model, tempFilePath);
+        String tempFilePath = tempDir + java.io.File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
+        at.beris.virtualfile.File tempFile = copyToLocalFile(client, model, tempFilePath);
         return tempFile.checksum();
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model, IFilter filter) {
-        List<IFileInfo> fileInfoList = client.list(model.getPath());
-        List<IFile> fileList = new ArrayList<>();
+    public List<at.beris.virtualfile.File> list(Client client, FileModel model, Filter filter) {
+        List<FileInfo> fileInfoList = client.list(model.getPath());
+        List<at.beris.virtualfile.File> fileList = new ArrayList<>();
 
-        for (IFileInfo fileInfo : fileInfoList) {
-            IFile file = FileManager.newFile(FileUtils.newUrl(model.getUrl(), fileInfo.getPath()));
+        for (FileInfo fileInfo : fileInfoList) {
+            at.beris.virtualfile.File file = FileManager.newFile(FileUtils.newUrl(model.getUrl(), fileInfo.getPath()));
             if (filter == null || filter.filter(file)) {
                 fileList.add(file);
             }
@@ -76,58 +74,58 @@ public class SftpFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public void updateModel(IClient client, FileModel model) {
+    public void updateModel(Client client, FileModel model) {
         model.setFileExists(false);
-        IFileInfo fileInfo = client.getFileInfo(model.getPath());
+        FileInfo fileInfo = client.getFileInfo(model.getPath());
         fileInfo.fillModel(model);
     }
 
     @Override
-    public void setAcl(IClient client, FileModel model) {
+    public void setAcl(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public InputStream getInputStream(IClient client, FileModel model) {
+    public InputStream getInputStream(Client client, FileModel model) {
         return client.getInputStream(model.getPath());
     }
 
     @Override
-    public OutputStream getOutputStream(IClient client, FileModel model) {
+    public OutputStream getOutputStream(Client client, FileModel model) {
         return client.getOutputStream(model.getPath());
     }
 
     @Override
-    public void setAttributes(IClient client, FileModel model) {
+    public void setAttributes(Client client, FileModel model) {
         client.setAttributes(model.getPath(), model.getAttributes());
     }
 
     @Override
-    public void setCreationTime(IClient client, FileModel model) {
+    public void setCreationTime(Client client, FileModel model) {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void setGroup(IClient client, FileModel model) {
+    public void setGroup(Client client, FileModel model) {
         client.setGroup(model.getPath(), model.getGroup());
     }
 
     @Override
-    public void setLastAccessTime(IClient client, FileModel model) {
+    public void setLastAccessTime(Client client, FileModel model) {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void setLastModifiedTime(IClient client, FileModel model) {
+    public void setLastModifiedTime(Client client, FileModel model) {
         client.setLastModifiedTime(model.getPath(), model.getLastModifiedTime());
     }
 
     @Override
-    public void setOwner(IClient client, FileModel model) {
+    public void setOwner(Client client, FileModel model) {
         client.setOwner(model.getPath(), model.getOwner());
     }
 
-    private IFile copyToLocalFile(IClient client, FileModel model, String path) {
+    private at.beris.virtualfile.File copyToLocalFile(Client client, FileModel model, String path) {
         byte[] buffer = new byte[1024];
         int length;
 

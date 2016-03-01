@@ -7,12 +7,8 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.client;
+package at.beris.virtualfile.attribute;
 
-import at.beris.virtualfile.FileModel;
-
-public interface IFileInfo {
-    String getPath();
-
-    void fillModel(FileModel model);
+public interface FileAttribute {
+    String toString();
 }

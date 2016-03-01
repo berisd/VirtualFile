@@ -13,14 +13,13 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class LocalArchiveTest extends AbstractFileTest {
-    private static final String ZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.zip";
+    private static final String ZIP_FILENAME = "src" + java.io.File.separator + "test" + java.io.File.separator + "resources" + java.io.File.separator + "testarchive.zip";
     private static final int NUMBER_OF_ARCHIVE_ENTRIES = 33;
 
     @BeforeClass
@@ -31,24 +30,24 @@ public class LocalArchiveTest extends AbstractFileTest {
     @Ignore
     public void createArchive() throws IOException {
 
-        IFile archiveFile = fileManager.newLocalFile(ZIP_FILENAME);
+        File archiveFile = fileManager.newLocalFile(ZIP_FILENAME);
 
         archiveFile.create();
 
-        assertTrue(new File(archiveFile.getPath()).exists());
+        assertTrue(new java.io.File(archiveFile.getPath()).exists());
         assertTrue(archiveFile.isArchive());
         assertFalse(archiveFile.isArchived());
 
         archiveFile.delete();
 
 //
-//        IFile archivedFile1 = fileManager.newFile(archive, "hallo.txt");
-//        IFile archivedFile2 = fileManager.newFile(archive, "hallo2.txt");
-//        IFile directory3 = fileManager.newDirectory("dir1");
+//        File archivedFile1 = fileManager.newFile(archive, "hallo.txt");
+//        File archivedFile2 = fileManager.newFile(archive, "hallo2.txt");
+//        File directory3 = fileManager.newDirectory("dir1");
 //        fileManager.newFile(directory3, "hallo3.txt");
 //        fileManager.newFile(directory3, "hallo4.txt");
 //        fileManager.newFile(directory3, "hallo5.txt");
-//        IFile directory34 = fileManager.newDirectory(directory3, "dir2");
+//        File directory34 = fileManager.newDirectory(directory3, "dir2");
 //        fileManager.newFile(directory34, "hallo6.txt");
 //
 //        archive.add(archivedFile1);
@@ -58,9 +57,9 @@ public class LocalArchiveTest extends AbstractFileTest {
 
     @Test
     public void listArchive() throws IOException {
-        IFile file = fileManager.newLocalFile(ZIP_FILENAME);
+        File file = fileManager.newLocalFile(ZIP_FILENAME);
         assertTrue(file.getSize() > 0);
-        List<IFile> list = file.list();
+        List<File> list = file.list();
         assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, list.size());
     }
 }

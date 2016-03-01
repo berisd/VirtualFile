@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.attribute;
 
-public enum BasicFilePermission implements IAttribute {
+public enum BasicFilePermission implements FileAttribute {
     READ,
     WRITE,
     EXECUTE,

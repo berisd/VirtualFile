@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile.filter;
 
+import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileManager;
-import at.beris.virtualfile.IFile;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -20,7 +20,7 @@ import java.util.List;
 
 public class DefaultFilterTest {
     private static final String TEST_DIRECTORY = "testdir/";
-    private static IFile testDirectory;
+    private static File testDirectory;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -35,7 +35,7 @@ public class DefaultFilterTest {
 
     @Test
     public void filterBetween() {
-        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().between(640L, 816L));
+        List<File> filteredList = testDirectory.find(new FileSizeFilter().between(640L, 816L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
@@ -44,7 +44,7 @@ public class DefaultFilterTest {
 
     @Test
     public void filterGreaterThan() {
-        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().greaterThan(640L));
+        List<File> filteredList = testDirectory.find(new FileSizeFilter().greaterThan(640L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile2.txt"));
@@ -53,7 +53,7 @@ public class DefaultFilterTest {
 
     @Test
     public void filterGreaterThanOrEqual() {
-        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().greaterThanOrEqualTo(640L));
+        List<File> filteredList = testDirectory.find(new FileSizeFilter().greaterThanOrEqualTo(640L));
         Assert.assertEquals(3, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
@@ -63,7 +63,7 @@ public class DefaultFilterTest {
 
     @Test
     public void filterIn() {
-        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().in(640L, 800L));
+        List<File> filteredList = testDirectory.find(new FileSizeFilter().in(640L, 800L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
@@ -72,14 +72,14 @@ public class DefaultFilterTest {
 
     @Test
     public void filterLessThan() {
-        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().lessThan(640L));
+        List<File> filteredList = testDirectory.find(new FileSizeFilter().lessThan(640L));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("subdir"));
     }
     @Test
     public void filterLessThanOrEqual() {
-        List<IFile> filteredList = testDirectory.find(new FileSizeFilter().lessThanOrEqualTo(640L));
+        List<File> filteredList = testDirectory.find(new FileSizeFilter().lessThanOrEqualTo(640L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));

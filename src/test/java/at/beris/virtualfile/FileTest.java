@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.IClient;
-import at.beris.virtualfile.provider.IFileOperationProvider;
+import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.provider.FileOperationProvider;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -20,20 +20,20 @@ import java.util.Collections;
 public class FileTest {
     @Test
     public void create() throws Exception {
-        IFileOperationProvider fileOperationProvider = Mockito.mock(IFileOperationProvider.class);
-        IClient client = Mockito.mock(IClient.class);
+        FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
+        Client client = Mockito.mock(Client.class);
         FileModel model = new FileModel();
-        File file = new File(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider), client);
+        UrlFile file = new UrlFile(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider), client);
         file.create();
         Mockito.verify(fileOperationProvider).create(client, model);
     }
 
     @Test
     public void delete() throws Exception {
-        IFileOperationProvider fileOperationProvider = Mockito.mock(IFileOperationProvider.class);
-        IClient client = Mockito.mock(IClient.class);
+        FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
+        Client client = Mockito.mock(Client.class);
         FileModel model = new FileModel();
-        File file = new File(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider), client);
+        UrlFile file = new UrlFile(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider), client);
         file.delete();
 
         Mockito.verify(fileOperationProvider).delete(client, model);
@@ -41,10 +41,10 @@ public class FileTest {
 
     @Test
     public void exists() throws Exception {
-        IFileOperationProvider fileOperationProvider = Mockito.mock(IFileOperationProvider.class);
-        IClient client = Mockito.mock(IClient.class);
+        FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
+        Client client = Mockito.mock(Client.class);
         FileModel model = new FileModel();
-        File file = new File(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider), client);
+        UrlFile file = new UrlFile(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider), client);
         file.exists();
 
         Mockito.verify(fileOperationProvider).exists(client, model);

@@ -11,16 +11,15 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.IFile;
 import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
-import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.PermissionDeniedException;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.filter.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +34,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LocalFileOperationProvider implements IFileOperationProvider {
+public class LocalFileOperationProvider implements FileOperationProvider {
     private final static Logger LOGGER = LoggerFactory.getLogger(LocalFileOperationProvider.class);
 
     @Override
-    public void create(IClient client, FileModel model) {
+    public void create(Client client, FileModel model) {
         String pathName = model.getPath();
-        File file = new File(pathName);
+        java.io.File file = new java.io.File(pathName);
         if (model.isDirectory()) {
             if (!file.mkdirs())
                 throw new at.beris.virtualfile.exception.FileAlreadyExistsException(pathName);
@@ -59,17 +58,17 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public boolean exists(IClient client, FileModel model) {
-        return new File(model.getPath()).exists();
+    public boolean exists(Client client, FileModel model) {
+        return new java.io.File(model.getPath()).exists();
     }
 
     @Override
-    public List<IFile> list(IClient client, FileModel model, IFilter filter) {
-        List<IFile> fileList = new ArrayList<>();
+    public List<at.beris.virtualfile.File> list(Client client, FileModel model, Filter filter) {
+        List<at.beris.virtualfile.File> fileList = new ArrayList<>();
         if (model.isDirectory()) {
-            for (File childFile : new File(model.getPath()).listFiles()) {
+            for (java.io.File childFile : new java.io.File(model.getPath()).listFiles()) {
                 try {
-                    IFile file = FileManager.newFile(childFile.toURI().toURL());
+                    at.beris.virtualfile.File file = FileManager.newFile(childFile.toURI().toURL());
                     if (filter == null || filter.filter(file))
                         fileList.add(file);
                 } catch (MalformedURLException e) {
@@ -82,11 +81,11 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public void delete(IClient client, FileModel model) {
-        File file = new File(model.getPath());
+    public void delete(Client client, FileModel model) {
+        java.io.File file = new java.io.File(model.getPath());
         try {
             if (file.exists()) {
-                Files.walkFileTree(new File(file.getPath()).toPath(), new LocalFileDeletingVisitor());
+                Files.walkFileTree(new java.io.File(file.getPath()).toPath(), new LocalFileDeletingVisitor());
             }
         } catch (IOException e) {
             throw new VirtualFileException(e);
@@ -94,12 +93,12 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public void add(IFile parent, IFile child) {
+    public void add(at.beris.virtualfile.File parent, at.beris.virtualfile.File child) {
         throw new NotImplementedException();
     }
 
     @Override
-    public byte[] checksum(IClient client, FileModel model) {
+    public byte[] checksum(Client client, FileModel model) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA1");
             FileInputStream fis = new FileInputStream(model.getPath());
@@ -118,9 +117,9 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public void updateModel(IClient client, FileModel model) {
+    public void updateModel(Client client, FileModel model) {
         try {
-            File file = new File(model.getPath());
+            java.io.File file = new java.io.File(model.getPath());
             model.setFileExists(file.exists());
 
             FileStore fileStore = Files.getFileStore(file.toPath());
@@ -163,18 +162,18 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public InputStream getInputStream(IClient client, FileModel model) throws IOException {
+    public InputStream getInputStream(Client client, FileModel model) throws IOException {
         return new FileInputStream(model.getPath());
     }
 
     @Override
-    public OutputStream getOutputStream(IClient client, FileModel model) throws IOException {
+    public OutputStream getOutputStream(Client client, FileModel model) throws IOException {
         return new FileOutputStream(model.getPath());
     }
 
     @Override
-    public void setAcl(IClient client, FileModel model) {
-        File file = new File(model.getPath());
+    public void setAcl(Client client, FileModel model) {
+        java.io.File file = new java.io.File(model.getPath());
         FileStore fileStore = null;
         try {
             fileStore = Files.getFileStore(file.toPath());
@@ -191,14 +190,14 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public void setAttributes(IClient client, FileModel model) {
-        File file = new File(model.getPath());
+    public void setAttributes(Client client, FileModel model) {
+        java.io.File file = new java.io.File(model.getPath());
 
         Set<BasicFilePermission> basicFilePermissionSet = new HashSet<>();
         Set<DosFileAttribute> dosAttributeSet = new HashSet<>();
         Set<PosixFilePermission> posixFilePermissionSet = new HashSet<>();
 
-        for (IAttribute attribute : model.getAttributes()) {
+        for (FileAttribute attribute : model.getAttributes()) {
             if (attribute instanceof BasicFilePermission)
                 basicFilePermissionSet.add((BasicFilePermission) attribute);
             else if (attribute instanceof DosFileAttribute)
@@ -226,13 +225,13 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public void setCreationTime(IClient client, FileModel model) {
+    public void setCreationTime(Client client, FileModel model) {
         setTimes(model.getPath(), null, null, model.getCreationTime());
     }
 
     @Override
-    public void setGroup(IClient client, FileModel model) {
-        File file = new File(model.getPath());
+    public void setGroup(Client client, FileModel model) {
+        java.io.File file = new java.io.File(model.getPath());
 
         try {
             FileStore fileStore = Files.getFileStore(file.toPath());
@@ -248,18 +247,18 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     @Override
-    public void setLastAccessTime(IClient client, FileModel model) {
+    public void setLastAccessTime(Client client, FileModel model) {
         setTimes(model.getPath(), null, model.getLastAccessTime(), null);
     }
 
     @Override
-    public void setLastModifiedTime(IClient client, FileModel model) {
+    public void setLastModifiedTime(Client client, FileModel model) {
         setTimes(model.getPath(), model.getLastModifiedTime(), null, null);
     }
 
     @Override
-    public void setOwner(IClient client, FileModel model) {
-        File file = new File(model.getPath());
+    public void setOwner(Client client, FileModel model) {
+        java.io.File file = new java.io.File(model.getPath());
         FileStore fileStore = null;
         try {
             fileStore = Files.getFileStore(file.toPath());
@@ -300,18 +299,18 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         }
     }
 
-    private void fillBasicFileAttributes(FileModel model, File file) throws IOException {
+    private void fillBasicFileAttributes(FileModel model, java.io.File file) throws IOException {
         BasicFileAttributes basicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         model.setLastModifiedTime(basicFileAttributes.lastModifiedTime());
         model.setLastAccessTime(basicFileAttributes.lastAccessTime());
         model.setCreationTime(basicFileAttributes.creationTime());
-        model.setSize(file.isDirectory() ? file.list().length : basicFileAttributes.size());
+        model.setSize(file.isDirectory() ? (file.list() != null ? file.list().length : 0) : basicFileAttributes.size());
         model.setDirectory(file.isDirectory());
         model.setSymbolicLink(basicFileAttributes.isSymbolicLink());
     }
 
-    private void fillDosFileAttributes(File file, FileModel model) throws IOException {
-        Set<IAttribute> attributes = model.getAttributes();
+    private void fillDosFileAttributes(java.io.File file, FileModel model) throws IOException {
+        Set<FileAttribute> attributes = model.getAttributes();
         DosFileAttributes dosFileAttributes = Files.readAttributes(file.toPath(), DosFileAttributes.class);
         if (dosFileAttributes.isArchive())
             attributes.add(DosFileAttribute.ARCHIVE);
@@ -323,8 +322,8 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
             attributes.add(DosFileAttribute.SYSTEM);
     }
 
-    private void fillDefaultFileAttributes(File file, FileModel model) {
-        Set<IAttribute> attributes = model.getAttributes();
+    private void fillDefaultFileAttributes(java.io.File file, FileModel model) {
+        Set<FileAttribute> attributes = model.getAttributes();
         if (file.canRead()) {
             attributes.add(BasicFilePermission.READ);
         }
@@ -336,8 +335,8 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         }
     }
 
-    private void fillPosixFileAttributes(File file, FileModel model) throws IOException {
-        Set<IAttribute> attributes = model.getAttributes();
+    private void fillPosixFileAttributes(java.io.File file, FileModel model) throws IOException {
+        Set<FileAttribute> attributes = model.getAttributes();
 
         PosixFileAttributeView fileAttributeView = Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
         PosixFileAttributes posixFileAttributes = fileAttributeView.readAttributes();
@@ -350,13 +349,13 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         }
     }
 
-    private void setBasicFileAttributes(File file, Set<BasicFilePermission> basicFilePermissionSet) {
+    private void setBasicFileAttributes(java.io.File file, Set<BasicFilePermission> basicFilePermissionSet) {
         file.setExecutable(basicFilePermissionSet.contains(BasicFilePermission.EXECUTE));
         file.setReadable(basicFilePermissionSet.contains(BasicFilePermission.READ));
         file.setWritable(basicFilePermissionSet.contains(BasicFilePermission.WRITE));
     }
 
-    private void setDosFileAttributes(File file, Set<DosFileAttribute> dosAttributeSet) throws IOException {
+    private void setDosFileAttributes(java.io.File file, Set<DosFileAttribute> dosAttributeSet) throws IOException {
         DosFileAttributeView dosFileAttributeView = Files.getFileAttributeView(file.toPath(), DosFileAttributeView.class);
         dosFileAttributeView.setArchive(dosAttributeSet.contains(DosFileAttribute.ARCHIVE));
         dosFileAttributeView.setHidden(dosAttributeSet.contains(DosFileAttribute.HIDDEN));
@@ -364,7 +363,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
         dosFileAttributeView.setSystem(dosAttributeSet.contains(DosFileAttribute.SYSTEM));
     }
 
-    private void setPosixFilePermissions(File file, Set<PosixFilePermission> posixFilePermissionSet) throws IOException {
+    private void setPosixFilePermissions(java.io.File file, Set<PosixFilePermission> posixFilePermissionSet) throws IOException {
         PosixFileAttributeView posixFileAttributeView = Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
         Set<java.nio.file.attribute.PosixFilePermission> newPermissions = new HashSet<>();
 
@@ -375,7 +374,7 @@ public class LocalFileOperationProvider implements IFileOperationProvider {
     }
 
     private void setTimes(String path, FileTime lastModifiedTime, FileTime lastAccessTime, FileTime createTime) {
-        File file = new File(path);
+        java.io.File file = new java.io.File(path);
         FileStore fileStore = null;
         try {
             fileStore = Files.getFileStore(file.toPath());

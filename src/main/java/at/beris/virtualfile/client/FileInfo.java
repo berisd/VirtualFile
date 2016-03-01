@@ -7,10 +7,12 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile;
+package at.beris.virtualfile.client;
 
-import java.util.List;
+import at.beris.virtualfile.FileModel;
 
-public interface IArchive extends IFileContainer {
-    List<IFile> extract(IFile target);
+public interface FileInfo {
+    String getPath();
+
+    void fillModel(FileModel model);
 }

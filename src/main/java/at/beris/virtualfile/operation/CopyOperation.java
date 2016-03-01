@@ -9,32 +9,31 @@
 
 package at.beris.virtualfile.operation;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.FileManager;
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.File;
 import at.beris.virtualfile.exception.VirtualFileException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Optional;
 
 public class CopyOperation {
     public final static int COPY_BUFFER_SIZE = 1024 * 16;
 
     private long filesProcessed;
 
-    public CopyOperation(IFile sourceFile, IFile targetFile, CopyListener listener) {
+    public CopyOperation(File sourceFile, File targetFile, CopyListener listener) {
         filesProcessed = 0L;
         try {
-            copyRecursive((File) sourceFile, (File) targetFile, listener);
+            copyRecursive((UrlFile) sourceFile, (UrlFile) targetFile, listener);
         } catch (IOException e) {
             throw new VirtualFileException(e);
         }
     }
 
-    private void copyRecursive(File sourceFile, File targetFile, CopyListener listener) throws IOException {
+    private void copyRecursive(UrlFile sourceFile, UrlFile targetFile, CopyListener listener) throws IOException {
         if (targetFile.exists()) {
             listener.fileExists(targetFile);
         }
@@ -43,12 +42,12 @@ public class CopyOperation {
             if (!targetFile.exists())
                 targetFile.create();
 
-            for (IFile sourceChildFile : sourceFile.getFileOperationProvider().list(sourceFile.getClient(), sourceFile.getModel(), null)) {
+            for (File sourceChildFile : sourceFile.getFileOperationProvider().list(sourceFile.getClient(), sourceFile.getModel(), null)) {
                 URL targetUrl = targetFile.getUrl();
                 URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
 
-                File targetChildFile = (File) FileManager.newFile(targetFile, targetChildUrl);
-                copyRecursive((File) sourceChildFile, targetChildFile, listener);
+                UrlFile targetChildFile = (UrlFile) FileManager.newFile(targetFile, targetChildUrl);
+                copyRecursive((UrlFile) sourceChildFile, targetChildFile, listener);
             }
         } else {
             listener.startCopyFile(sourceFile.getPath(), filesProcessed + 1);
@@ -58,7 +57,7 @@ public class CopyOperation {
         targetFile.refresh();
     }
 
-    private void copyFile(File sourceFile, File targetFile, CopyListener listener) throws IOException {
+    private void copyFile(UrlFile sourceFile, UrlFile targetFile, CopyListener listener) throws IOException {
         InputStream inputStream = sourceFile.getInputStream();
         OutputStream outputStream = targetFile.getOutputStream();
         byte[] buffer = new byte[COPY_BUFFER_SIZE];

@@ -9,11 +9,11 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.File;
 
 public class IsDirectoryFilter extends DefaultFilter<Boolean> {
     @Override
-    protected Boolean getValue(IFile file) {
+    protected Boolean getValue(File file) {
         return file.isDirectory();
     }
 }

@@ -10,11 +10,11 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.IFile;
-import at.beris.virtualfile.client.IClient;
+import at.beris.virtualfile.File;
+import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.FileUtils;
 import org.apache.commons.compress.archivers.*;
 import org.apache.commons.lang3.StringUtils;
@@ -24,15 +24,15 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalArchivedFileOperationProvider implements IFileOperationProvider {
+public class LocalArchivedFileOperationProvider implements FileOperationProvider {
     @Override
-    public List<IFile> list(IClient client, FileModel model, IFilter filter) {
-        List<IFile> files = new ArrayList<>();
-//        IFile backFile = add(this.archiveFile, createEmptyArchiveEntry());
+    public List<File> list(Client client, FileModel model, Filter filter) {
+        List<File> files = new ArrayList<>();
+//        File backFile = add(this.archiveFile, createEmptyArchiveEntry());
 //        backFile.setParent(this.parentFile);
 //
 //        files.add(backFile);
-//        for (IFile childFile : children) {
+//        for (File childFile : children) {
 //            files.add(childFile);
 //        }
 
@@ -41,9 +41,9 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
 
     @Override
-    public void create(IClient client, FileModel model) {
+    public void create(Client client, FileModel model) {
         try {
-            // if not exists create Archive
+            // if not exists create UrlArchive
             // insert or update ArchiveEntry
             FileOutputStream fileOutputStream = new FileOutputStream(model.getPath());
             ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
@@ -60,7 +60,7 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
     }
 
     @Override
-    public boolean exists(IClient client, FileModel model) {
+    public boolean exists(Client client, FileModel model) {
         String archivePath = getArchivePath(model);
         String targetArchiveEntryPath = model.getPath().substring(archivePath.length() + 1);
 
@@ -69,7 +69,7 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
 
         try {
             ArchiveStreamFactory factory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new File(archivePath)));
+            fis = new BufferedInputStream(new FileInputStream(new java.io.File(archivePath)));
             ais = factory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 
@@ -111,67 +111,67 @@ public class LocalArchivedFileOperationProvider implements IFileOperationProvide
     }
 
     @Override
-    public void delete(IClient client, FileModel file) {
+    public void delete(Client client, FileModel file) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void add(IFile parent, IFile child) {
+    public void add(File parent, File child) {
         throw new NotImplementedException();
     }
 
     @Override
-    public byte[] checksum(IClient client, FileModel model) {
+    public byte[] checksum(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void updateModel(IClient client, FileModel model) {
+    public void updateModel(Client client, FileModel model) {
         //TODO Call new class ArchiveClient here
     }
 
     @Override
-    public void setAcl(IClient client, FileModel model) {
+    public void setAcl(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public InputStream getInputStream(IClient client, FileModel model) throws IOException {
+    public InputStream getInputStream(Client client, FileModel model) throws IOException {
         throw new NotImplementedException();
     }
 
     @Override
-    public OutputStream getOutputStream(IClient client, FileModel model) throws IOException {
+    public OutputStream getOutputStream(Client client, FileModel model) throws IOException {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setAttributes(IClient client, FileModel model) {
+    public void setAttributes(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setCreationTime(IClient client, FileModel model) {
+    public void setCreationTime(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setGroup(IClient client, FileModel model) {
+    public void setGroup(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setLastAccessTime(IClient client, FileModel model) {
+    public void setLastAccessTime(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setLastModifiedTime(IClient client, FileModel model) {
+    public void setLastModifiedTime(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setOwner(IClient client, FileModel model) {
+    public void setOwner(Client client, FileModel model) {
         throw new NotImplementedException();
     }
 

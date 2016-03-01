@@ -3,7 +3,7 @@ package at.beris.virtualfile.client;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import com.jcraft.jsch.SftpATTRS;
 
 import java.nio.file.attribute.FileTime;
@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SftpFileInfo implements IFileInfo {
+public class SftpFileInfo implements FileInfo {
 
     private SftpATTRS sftpATTRS;
     private String path;
@@ -42,11 +42,11 @@ public class SftpFileInfo implements IFileInfo {
         this.path = path;
     }
 
-    private Set<IAttribute> createAttributes() {
-        Set<IAttribute> attributeSet = new HashSet<>();
+    private Set<FileAttribute> createAttributes() {
+        Set<FileAttribute> attributeSet = new HashSet<>();
         int permissions = sftpATTRS.getPermissions();
 
-        for (Map.Entry<Integer, IAttribute> entry : Sftp.permissionToAttributeMap.entrySet()) {
+        for (Map.Entry<Integer, FileAttribute> entry : Sftp.permissionToAttributeMap.entrySet()) {
             if ((permissions & entry.getKey()) != 0) {
                 attributeSet.add(entry.getValue());
             }

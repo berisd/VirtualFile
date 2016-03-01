@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
@@ -18,7 +18,6 @@ import at.beris.virtualfile.util.VoidOperation;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,8 +55,8 @@ public abstract class AbstractFileTest {
         createFile(null);
     }
 
-    protected void createFile(VoidOperation<IFile> assertHook) {
-        IFile file = FileManager.newFile(sourceFileUrl);
+    protected void createFile(VoidOperation<File> assertHook) {
+        File file = FileManager.newFile(sourceFileUrl);
         file.create();
 
         if (assertHook != null) {
@@ -75,7 +74,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void createDirectory() {
-        IFile file = FileManager.newFile(sourceDirectoryUrl);
+        File file = FileManager.newFile(sourceDirectoryUrl);
         file.create();
 
         assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
@@ -84,8 +83,8 @@ public abstract class AbstractFileTest {
     }
 
     protected void copyFile() {
-        IFile sourceFile = TestFileHelper.createLocalSourceFile(FileUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
-        IFile targetFile = FileManager.newFile(targetFileUrl);
+        File sourceFile = TestFileHelper.createLocalSourceFile(FileUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        File targetFile = FileManager.newFile(targetFileUrl);
         CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
         sourceFile.copy(targetFile, copyListenerMock);
         assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
@@ -96,13 +95,13 @@ public abstract class AbstractFileTest {
 
     protected void copyDirectory() {
         try {
-            List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+            List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
             List<String> targetFileUrlList = createFilenamesTree(targetDirectoryUrl.toString());
 
             TestFileHelper.createFileTreeData(sourceFileUrlList);
 
-            IFile sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
-            IFile targetDirectory = FileManager.newFile(targetDirectoryUrl);
+            File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+            File targetDirectory = FileManager.newFile(targetDirectoryUrl);
 
             CopyListener copyListener = Mockito.mock(CopyListener.class);
             Mockito.when(copyListener.interrupt()).thenReturn(false);
@@ -120,7 +119,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void deleteFile() {
-        IFile sourceFile = FileManager.newFile(sourceFileUrl);
+        File sourceFile = FileManager.newFile(sourceFileUrl);
         sourceFile.create();
         assertTrue(sourceFile.exists());
         sourceFile.delete();
@@ -129,11 +128,11 @@ public abstract class AbstractFileTest {
 
     protected void deleteDirectory() {
         try {
-            List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+            List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
             TestFileHelper.createFileTreeData(sourceFileUrlList);
 
-            IFile sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
-            IFile targetDirectory = FileManager.newFile(targetDirectoryUrl);
+            File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+            File targetDirectory = FileManager.newFile(targetDirectoryUrl);
 
             sourceDirectory.copy(targetDirectory, Mockito.mock(CopyListener.class));
 
@@ -151,20 +150,20 @@ public abstract class AbstractFileTest {
     }
 
     protected void getFileAttributes(VoidOperation assertHook) {
-        IFile file = FileManager.newFile(sourceFileUrl);
+        File file = FileManager.newFile(sourceFileUrl);
         file.create();
         assertHook.execute(file);
         file.delete();
     }
 
-    protected void setFileAttributes(Set<IAttribute> attributes) {
-        IFile file = FileManager.newFile(sourceFileUrl);
+    protected void setFileAttributes(Set<FileAttribute> attributes) {
+        File file = FileManager.newFile(sourceFileUrl);
         file.create();
-        file.setAttributes(attributes.toArray(new IAttribute[0]));
+        file.setAttributes(attributes.toArray(new FileAttribute[0]));
         FileManager.dispose(file);
 
         file = FileManager.newFile(sourceFileUrl);
-        Set<IAttribute> actualAttributes = file.getAttributes();
+        Set<FileAttribute> actualAttributes = file.getAttributes();
 
         assertTrue(attributes.containsAll(actualAttributes));
         assertEquals(attributes.size(), actualAttributes.size());
@@ -173,7 +172,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void setOwner(UserPrincipal owner) {
-        IFile file = FileManager.newFile(sourceFileUrl);
+        File file = FileManager.newFile(sourceFileUrl);
         file.create();
         file.setOwner(owner);
 
@@ -189,7 +188,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void setGroup(GroupPrincipal group) {
-        IFile file = FileManager.newFile(sourceFileUrl);
+        File file = FileManager.newFile(sourceFileUrl);
         file.create();
         if (group == null)
             group = file.getGroup();
@@ -203,42 +202,42 @@ public abstract class AbstractFileTest {
     }
 
     protected void setCreationTime() {
-        setTime(new SingleValueOperation<IFile, FileTime>() {
+        setTime(new SingleValueOperation<File, FileTime>() {
             @Override
-            public void setValue(IFile object, FileTime value) {
+            public void setValue(File object, FileTime value) {
                 object.setCreationTime(value);
             }
 
             @Override
-            public FileTime getValue(IFile object) {
+            public FileTime getValue(File object) {
                 return object.getCreationTime();
             }
         });
     }
 
     protected void setLastModifiedTime() {
-        setTime(new SingleValueOperation<IFile, FileTime>() {
+        setTime(new SingleValueOperation<File, FileTime>() {
             @Override
-            public void setValue(IFile object, FileTime value) {
+            public void setValue(File object, FileTime value) {
                 object.setLastModifiedTime(value);
             }
 
             @Override
-            public FileTime getValue(IFile object) {
+            public FileTime getValue(File object) {
                 return object.getLastModifiedTime();
             }
         });
     }
 
     protected void setLastAccessTime() {
-        setTime(new SingleValueOperation<IFile, FileTime>() {
+        setTime(new SingleValueOperation<File, FileTime>() {
             @Override
-            public void setValue(IFile object, FileTime value) {
+            public void setValue(File object, FileTime value) {
                 object.setLastAccessTime(value);
             }
 
             @Override
-            public FileTime getValue(IFile object) {
+            public FileTime getValue(File object) {
                 return object.getLastAccessTime();
             }
         });
@@ -263,8 +262,8 @@ public abstract class AbstractFileTest {
 
     protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) {
         for (int i = 0; i < sourceFileUrlList.size(); i++) {
-            IFile sourceFile = FileManager.newFile(sourceFileUrlList.get(i));
-            IFile targetFile = FileManager.newFile(targetFileUrlList.get(i));
+            File sourceFile = FileManager.newFile(sourceFileUrlList.get(i));
+            File targetFile = FileManager.newFile(targetFileUrlList.get(i));
 
             if (!sourceFile.isDirectory())
                 assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
@@ -274,14 +273,14 @@ public abstract class AbstractFileTest {
     protected static void tearDown() {
         for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
             if (url != null) {
-                IFile file = FileManager.newFile(url);
+                File file = FileManager.newFile(url);
                 if (file.exists())
                     file.delete();
             }
         }
     }
 
-    private void setTime(SingleValueOperation<IFile, FileTime> operation) {
+    private void setTime(SingleValueOperation<File, FileTime> operation) {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         calendar.roll(Calendar.YEAR, false);
@@ -290,7 +289,7 @@ public abstract class AbstractFileTest {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        IFile file = FileManager.newFile(sourceFileUrl);
+        File file = FileManager.newFile(sourceFileUrl);
         file.create();
         operation.setValue(file, fileTime);
 

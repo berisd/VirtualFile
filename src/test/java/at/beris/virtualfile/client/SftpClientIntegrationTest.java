@@ -69,7 +69,7 @@ public class SftpClientIntegrationTest {
 
         }
 
-        IFileInfo fileInfo = sftpClient.getFileInfo(TEST_FILE);
+        FileInfo fileInfo = sftpClient.getFileInfo(TEST_FILE);
         FileModel model = new FileModel();
         fileInfo.fillModel(model);
 

@@ -9,13 +9,13 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.File;
 import at.beris.virtualfile.exception.VirtualFileException;
 
 import java.util.*;
 
-public abstract class BasicFilter<T> implements IFilter<T>, Cloneable {
-    private Map<Operation, IFilter> combiningOperators;
+public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
+    private Map<Operation, Filter> combiningOperators;
     private Map<Operation, Collection<T>> operationValuesMap;
     private boolean inverseValue;
 
@@ -42,48 +42,48 @@ public abstract class BasicFilter<T> implements IFilter<T>, Cloneable {
         operationValuesMap.put(operation, values);
     }
 
-    protected void putCombiningOperator(Operation operation, IFilter filter) {
+    protected void putCombiningOperator(Operation operation, Filter filter) {
         combiningOperators.put(operation, filter);
     }
 
     @Override
-    public IFilter not() {
+    public Filter not() {
         inverseValue = true;
         return this;
     }
 
     @Override
-    public IFilter and(IFilter filter) {
+    public Filter and(Filter filter) {
         putCombiningOperator(Operation.AND, filter);
         return this;
     }
 
     @Override
-    public IFilter andNot(IFilter filter) {
+    public Filter andNot(Filter filter) {
         putCombiningOperator(Operation.AND_NOT, filter);
         return this;
     }
 
     @Override
-    public IFilter or(IFilter filter) {
+    public Filter or(Filter filter) {
         putCombiningOperator(Operation.OR, filter);
         return this;
     }
 
     @Override
-    public IFilter orNot(IFilter filter) {
+    public Filter orNot(Filter filter) {
         putCombiningOperator(Operation.OR_NOT, filter);
         return this;
     }
 
     @Override
-    public IFilter equalTo(T value) {
+    public Filter equalTo(T value) {
         operationValuesMap.put(Operation.EQUAL, Collections.singletonList(value));
         return this;
     }
 
     @Override
-    public boolean filter(IFile file) {
+    public boolean filter(File file) {
         boolean valid = true;
         T value = getValue(file);
 
@@ -98,14 +98,14 @@ public abstract class BasicFilter<T> implements IFilter<T>, Cloneable {
         if (inverseValue)
             valid = !valid;
 
-        for (Map.Entry<Operation, IFilter> entry : combiningOperators.entrySet()) {
+        for (Map.Entry<Operation, Filter> entry : combiningOperators.entrySet()) {
             valid = combineFilter(valid, file, entry.getKey(), entry.getValue());
         }
 
         return valid;
     }
 
-    private boolean combineFilter(boolean valid, IFile file, Operation operation, IFilter filter) {
+    private boolean combineFilter(boolean valid, File file, Operation operation, Filter filter) {
         switch (operation) {
             case NOT:
                 return valid && (!filter.filter(file));
@@ -165,5 +165,5 @@ public abstract class BasicFilter<T> implements IFilter<T>, Cloneable {
         return valid;
     }
 
-    abstract protected T getValue(IFile file);
+    abstract protected T getValue(File file);
 }

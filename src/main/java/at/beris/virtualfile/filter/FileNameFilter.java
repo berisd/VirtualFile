@@ -9,11 +9,11 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.File;
 
 public class FileNameFilter extends StringFilter {
     @Override
-    protected String getValue(IFile file) {
+    protected String getValue(File file) {
         return file.getName();
     }
 }

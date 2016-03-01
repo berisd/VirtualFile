@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.attribute.IAttribute;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.VoidOperation;
@@ -48,9 +48,9 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void createFile() {
-        super.createFile(new VoidOperation<IFile>() {
+        super.createFile(new VoidOperation<File>() {
             @Override
-            public void execute(IFile file) {
+            public void execute(File file) {
                 assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
@@ -90,9 +90,9 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() {
-        super.getFileAttributes(new VoidOperation<IFile>() {
+        super.getFileAttributes(new VoidOperation<File>() {
             @Override
-            public void execute(IFile file) {
+            public void execute(File file) {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
@@ -103,7 +103,7 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void setFileAttributes() {
-        Set<IAttribute> attributes = new HashSet<>();
+        Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(PosixFilePermission.OTHERS_EXECUTE);
         attributes.add(PosixFilePermission.GROUP_EXECUTE);
         super.setFileAttributes(attributes);

@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum PosixFilePermission implements IAttribute {
+public enum PosixFilePermission implements FileAttribute {
     GROUP_EXECUTE(java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE),
     GROUP_READ(java.nio.file.attribute.PosixFilePermission.GROUP_READ),
     GROUP_WRITE(java.nio.file.attribute.PosixFilePermission.GROUP_WRITE),

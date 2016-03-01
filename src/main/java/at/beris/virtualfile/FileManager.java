@@ -29,11 +29,11 @@ public class FileManager {
      * @param path
      * @return
      */
-    public static IFile newLocalFile(String path) {
+    public static File newLocalFile(String path) {
         return newLocalFile(path, null);
     }
 
-    public static IFile newLocalFile(String path, FileConfig fileConfig) {
+    public static File newLocalFile(String path, FileConfig fileConfig) {
         return getFileContext().newLocalFile(path, fileConfig);
     }
 
@@ -43,12 +43,12 @@ public class FileManager {
      * @param path
      * @return
      */
-    public static IDirectory newLocalDirectory(String path) {
+    public static Directory newLocalDirectory(String path) {
         return newLocalDirectory(path, null);
     }
 
-    public static IDirectory newLocalDirectory(String path, FileConfig fileConfig) {
-        return (IDirectory) getFileContext().newLocalFile(path +
+    public static Directory newLocalDirectory(String path, FileConfig fileConfig) {
+        return (Directory) getFileContext().newLocalFile(path +
                 (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator), fileConfig);
     }
 
@@ -59,65 +59,65 @@ public class FileManager {
      * @return
      */
 
-    public static IArchive newLocalArchive(String path) {
+    public static Archive newLocalArchive(String path) {
         return newLocalArchive(path, null);
     }
 
-    public static IArchive newLocalArchive(String path, FileConfig fileConfig) {
-        return (IArchive) getFileContext().newLocalFile(path, fileConfig);
+    public static Archive newLocalArchive(String path, FileConfig fileConfig) {
+        return (Archive) getFileContext().newLocalFile(path, fileConfig);
     }
 
 
-    public static IFile newFile(String url) {
+    public static File newFile(String url) {
         return getFileContext().newFile(url, null);
     }
 
-    public static IFile newFile(String url, FileConfig fileConfig) {
+    public static File newFile(String url, FileConfig fileConfig) {
         return getFileContext().newFile(url, fileConfig);
     }
 
-    public static IFile newFile(URL parentUrl, URL url) {
+    public static File newFile(URL parentUrl, URL url) {
         return newFile(parentUrl, url, null);
     }
 
-    public static IFile newFile(URL parentUrl, URL url, FileConfig fileConfig) {
+    public static File newFile(URL parentUrl, URL url, FileConfig fileConfig) {
         return getFileContext().newFile(parentUrl, url, fileConfig);
     }
 
-    public static IFile newFile(IFile parent, URL url) {
+    public static File newFile(File parent, URL url) {
         return newFile(parent, url, null);
     }
 
-    public static IFile newFile(IFile parent, URL url, FileConfig fileConfig) {
+    public static File newFile(File parent, URL url, FileConfig fileConfig) {
         return getFileContext().newFile(parent, url, fileConfig);
     }
 
-    public static IFile newFile(URL url) {
+    public static File newFile(URL url) {
         return newFile(url, (FileConfig) null);
     }
 
-    public static IFile newFile(URL url, FileConfig fileConfig) {
+    public static File newFile(URL url, FileConfig fileConfig) {
         return getFileContext().newFile(url, fileConfig);
     }
 
-    public static IDirectory newDirectory(URL url) {
+    public static Directory newDirectory(URL url) {
         return newDirectory(url, null);
     }
 
-    public static IDirectory newDirectory(URL url, FileConfig fileConfig) {
-        return (IDirectory) getFileContext().newFile(url, fileConfig);
+    public static Directory newDirectory(URL url, FileConfig fileConfig) {
+        return (Directory) getFileContext().newFile(url, fileConfig);
     }
 
-    public static IArchive newArchive(URL url) {
+    public static Archive newArchive(URL url) {
         return newArchive(url, null);
     }
 
-    public static IArchive newArchive(URL url, FileConfig fileConfig) {
-        return (IArchive) getFileContext().newFile(url, fileConfig);
+    public static Archive newArchive(URL url, FileConfig fileConfig) {
+        return (Archive) getFileContext().newFile(url, fileConfig);
     }
 
 
-    public static void dispose(IFile file) {
+    public static void dispose(File file) {
         file.dispose();
     }
 

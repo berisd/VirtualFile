@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.util;
 
-import at.beris.virtualfile.IFile;
+import at.beris.virtualfile.File;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.filter.IFilter;
+import at.beris.virtualfile.filter.Filter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -102,15 +102,15 @@ public class FileUtils {
         return stringBuilder.toString();
     }
 
-    public static Map<IFilter, List<IFile>> groupFileListByFilters(List<IFile> fileList, List<IFilter> filterList) {
-        Map<IFilter, List<IFile>> partitionedFileList = new HashMap<>();
+    public static Map<Filter, List<File>> groupFileListByFilters(List<File> fileList, List<Filter> filterList) {
+        Map<Filter, List<File>> partitionedFileList = new HashMap<>();
 
-        for (IFilter filter : filterList) {
-            partitionedFileList.put(filter, new ArrayList<IFile>());
+        for (Filter filter : filterList) {
+            partitionedFileList.put(filter, new ArrayList<File>());
         }
 
-        for (IFile file : fileList) {
-            for (IFilter filter : filterList) {
+        for (File file : fileList) {
+            for (Filter filter : filterList) {
                 if (filter.filter(file))
                     partitionedFileList.get(filter).add(file);
             }
