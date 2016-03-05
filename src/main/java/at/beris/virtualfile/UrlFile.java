@@ -39,6 +39,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     private FileModel model;
     private Map<FileType, FileOperationProvider> fileOperationProviderMap;
     private Client client;
+    private StringBuilder stringBuilder;
 
     public UrlFile(URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client) {
         this(null, url, model, fileOperationProviderMap, client);
@@ -54,70 +55,88 @@ public class UrlFile implements File, Comparable<UrlFile> {
         this.model.setUrl(url);
         this.fileOperationProviderMap = fileOperationProviderMap;
         this.client = client;
+        this.stringBuilder = new StringBuilder();
     }
 
     @Override
     public URL getUrl() {
-//        LOGGER.info("Get URL for " + this);
-        return model.getUrl();
+        LOGGER.debug("Get URL for " + this);
+        URL url = model.getUrl();
+        LOGGER.debug("Returns: " + url);
+        return url;
     }
 
     @Override
     public FileModel getModel() {
-//        LOGGER.info("Get model for " + this);
+        LOGGER.debug("Get model for " + this);
+        LOGGER.debug("Returns: " + model);
         return model;
     }
 
     @Override
     public Client getClient() {
-        LOGGER.info("Get client for " + this);
+        LOGGER.debug("Get client for " + this);
+        LOGGER.debug("Returns: " + client);
         return client;
     }
 
     @Override
     public FileOperationProvider getFileOperationProvider() {
-//        LOGGER.info("Get fileOperationProvider for " + this);
-        return fileOperationProviderMap.get(model.requiredFileOperationProviderType());
+        LOGGER.debug("Get fileOperationProvider for " + this);
+        FileOperationProvider fileOperationProvider = fileOperationProviderMap.get(model.requiredFileOperationProviderType());
+        LOGGER.debug("Returns: " + fileOperationProvider);
+        return fileOperationProvider;
     }
 
     @Override
     public String getName() {
-        LOGGER.info("Get name for " + this);
+        LOGGER.debug("Get name for " + this);
         String path = model.getPath();
 
         if (path.endsWith("/"))
             path = path.substring(0, path.lastIndexOf('/'));
 
-        return path.substring(path.lastIndexOf('/') + 1);
+        String name = path.substring(path.lastIndexOf('/') + 1);
+        LOGGER.debug("Returns: " + name);
+
+        return name;
     }
 
     @Override
     public FileTime getCreationTime() {
-        LOGGER.info("Get creationTime for " + this);
-        return model.getCreationTime();
+        LOGGER.debug("Get creationTime for " + this);
+        FileTime creationTime = model.getCreationTime();
+        LOGGER.debug("Returns: " + creationTime);
+        return creationTime;
     }
 
     @Override
     public FileTime getLastModifiedTime() {
-        LOGGER.info("Get lastModifiedTime for " + this);
-        return model.getLastModifiedTime();
+        LOGGER.debug("Get lastModifiedTime for " + this);
+        FileTime lastModifiedTime = model.getLastModifiedTime();
+        LOGGER.debug("Returns: " + lastModifiedTime);
+        return lastModifiedTime;
     }
 
     @Override
     public FileTime getLastAccessTime() {
-        LOGGER.info("Get lastAccessTime for " + this);
-        return model.getLastAccessTime();
+        LOGGER.debug("Get lastAccessTime for " + this);
+        FileTime lastAccessTime = model.getLastAccessTime();
+        LOGGER.debug("Returns: " + lastAccessTime);
+        return lastAccessTime;
     }
 
     @Override
     public long getSize() {
-        LOGGER.info("Get size for " + this);
+        LOGGER.debug("Get size for " + this);
+        LOGGER.debug("Returns: " + model.getSize());
         return model.getSize();
     }
 
     @Override
     public String getPath() {
-        LOGGER.info("Get path for " + this);
+        LOGGER.debug("Get path for " + this);
+        LOGGER.debug("Returns: " + model.getPath());
         return model.getPath();
     }
 
@@ -129,7 +148,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void dispose() {
-        LOGGER.info("Dispose " + this);
+        LOGGER.debug("Dispose " + this);
         model.clear();
         model = null;
         client = null;
@@ -140,54 +159,71 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public byte[] checksum() {
         LOGGER.info("Calculate checksum for " + this);
-        return getFileOperationProvider().checksum(client, model);
+        byte[] checksum = getFileOperationProvider().checksum(client, model);
+
+        stringBuilder.setLength(0);
+        stringBuilder.append("Returns: ");
+        for(byte b : checksum)
+            stringBuilder.append(String.format("%02x", b));
+        LOGGER.info(stringBuilder.toString());
+        return checksum;
     }
 
     @Override
     public boolean isDirectory() {
-        LOGGER.info("Check isDirectory for " + this);
+        LOGGER.debug("Check isDirectory for " + this);
+        LOGGER.debug("Returns: " + model.isDirectory());
         return model.isDirectory();
     }
 
     @Override
     public boolean isSymbolicLink() {
-        LOGGER.info("Check isSymbolicLink for " + this);
+        LOGGER.debug("Check isSymbolicLink for " + this);
+        LOGGER.debug("Returns: " + model.isSymbolicLink());
         return model.isSymbolicLink();
     }
 
     @Override
     public boolean isContainer() {
-        LOGGER.info("Check isContainer for " + this);
-        return this instanceof FileContainer;
+        LOGGER.debug("Check isContainer for " + this);
+        boolean isContainer = this instanceof FileContainer;
+        LOGGER.debug("Returns: " + isContainer);
+        return isContainer;
     }
 
     @Override
     public File getParent() {
-//        LOGGER.info("Get parent for " + this);
+        LOGGER.debug("Get parent for " + this);
+        LOGGER.debug("Returns: " + parent);
         return parent;
     }
 
     @Override
     public File getRoot() {
-        LOGGER.info("Get root for " + this);
-        File file = this;
+        LOGGER.debug("Get root for " + this);
+        File root = this;
 
-        while (file.getParent() != null)
-            file = file.getParent();
+        while (root.getParent() != null)
+            root = root.getParent();
 
-        return file;
+        LOGGER.debug("Returns: " + root);
+        return root;
     }
 
     @Override
     public boolean isRoot() {
-        LOGGER.info("Check isRoot for " + this);
-        return this.toString().equals(getRoot() != null ? getRoot().toString() : "");
+        LOGGER.debug("Check isRoot for " + this);
+        boolean isRoot = this.toString().equals(getRoot() != null ? getRoot().toString() : "");
+        LOGGER.debug("Returns: " + isRoot);
+        return isRoot;
     }
 
     @Override
     public boolean exists() {
-        LOGGER.info("Check exists for " + this);
-        return _exists();
+        LOGGER.debug("Check exists for " + this);
+        boolean exists = getFileOperationProvider().exists(client, model);
+        LOGGER.debug("Returns: " + exists);
+        return exists;
     }
 
     @Override
@@ -199,25 +235,27 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        LOGGER.info("Get Inputstream for " + this);
+        LOGGER.debug("Get Inputstream for " + this);
         return getFileOperationProvider().getInputStream(client, model);
     }
 
     @Override
     public OutputStream getOutputStream() throws IOException {
-        LOGGER.info("Get Outputstream for " + this);
+        LOGGER.debug("Get Outputstream for " + this);
         return getFileOperationProvider().getOutputStream(client, model);
     }
 
     @Override
     public List<AclEntry> getAcl() {
-        LOGGER.info("Get ACL for " + this);
-        return model.getAcl();
+        LOGGER.debug("Get ACL for " + this);
+        List<AclEntry> acl = model.getAcl();
+        LOGGER.debug("Returns: " + acl);
+        return acl;
     }
 
     @Override
     public void setAcl(List<AclEntry> acl) {
-        LOGGER.info("Set ACL for " + this);
+        LOGGER.debug("Set ACL to " + acl + " for " + this);
         model.setAcl(acl);
         getFileOperationProvider().setAcl(client, model);
         _updateModel();
@@ -225,13 +263,14 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public UserPrincipal getOwner() {
-        LOGGER.info("Get owner for " + this);
+        LOGGER.debug("Get owner for " + this);
+        LOGGER.debug("Returns: " + model.getOwner());
         return model.getOwner();
     }
 
     @Override
     public void setOwner(UserPrincipal owner) {
-        LOGGER.info("Set owner to " + owner + " for " + this);
+        LOGGER.debug("Set owner to " + owner + " for " + this);
         model.setOwner(owner);
         getFileOperationProvider().setOwner(client, model);
         _updateModel();
@@ -239,13 +278,14 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public GroupPrincipal getGroup() {
-        LOGGER.info("Get group for " + this);
+        LOGGER.debug("Get group for " + this);
+        LOGGER.debug("Returns: " + model.getGroup());
         return model.getGroup();
     }
 
     @Override
     public void setGroup(GroupPrincipal group) {
-        LOGGER.info("Set group to " + group + " for " + this);
+        LOGGER.debug("Set group to " + group + " for " + this);
         model.setGroup(group);
         getFileOperationProvider().setGroup(client, model);
         _updateModel();
@@ -253,7 +293,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setLastAccessTime(FileTime time) {
-        LOGGER.info("Set lastAccessTime to " + time + " for " + this);
+        LOGGER.debug("Set lastAccessTime to " + time + " for " + this);
         model.setLastAccessTime(time);
         getFileOperationProvider().setLastAccessTime(client, model);
         _updateModel();
@@ -261,7 +301,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setLastModifiedTime(FileTime time) {
-        LOGGER.info("Set lastModifiedTime to " + time + " for " + this);
+        LOGGER.debug("Set lastModifiedTime to " + time + " for " + this);
         model.setLastModifiedTime(time);
         getFileOperationProvider().setLastModifiedTime(client, model);
         _updateModel();
@@ -269,7 +309,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setAttributes(FileAttribute... attributes) {
-        LOGGER.info("Set attributes for " + this);
+        LOGGER.debug("Set attributes for " + this);
         model.setAttributes(new HashSet<>(Arrays.asList(attributes)));
         getFileOperationProvider().setAttributes(client, model);
         _updateModel();
@@ -277,7 +317,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setCreationTime(FileTime time) {
-        LOGGER.info("Set creationTime to " + time + " for " + this);
+        LOGGER.debug("Set creationTime to " + time + " for " + this);
         model.setCreationTime(time);
         getFileOperationProvider().setCreationTime(client, model);
         _updateModel();
@@ -285,7 +325,8 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public Set<FileAttribute> getAttributes() {
-        LOGGER.info("Get attributes for " + this);
+        LOGGER.debug("Get attributes for " + this);
+        LOGGER.debug("Returns: " + model.getAttributes());
         return model.getAttributes();
     }
 
@@ -342,30 +383,38 @@ public class UrlFile implements File, Comparable<UrlFile> {
         }
         directoryList.clear();
 
+        LOGGER.info("Returns: " + fileList.size() + " entries");
+
         return fileList;
     }
 
     @Override
     public List<File> list() {
         LOGGER.info("List children for " + this);
-        return getFileOperationProvider().list(client, model, null);
+        List<File> fileList = getFileOperationProvider().list(client, model, null);
+        LOGGER.info("Returns: " + fileList.size() + " entries");
+        return fileList;
     }
 
     @Override
     public List<File> list(Filter filter) {
         LOGGER.info("List children for " + this + " with filter " + filter);
-        return getFileOperationProvider().list(client, model, filter);
+        List<File> fileList = getFileOperationProvider().list(client, model, filter);
+        LOGGER.info("Returns: " + fileList.size() + " entries");
+        return fileList;
     }
 
     @Override
     public boolean isArchive() {
-//        LOGGER.info("Check isArchive for " + this);
-        return this instanceof Archive;
+        LOGGER.debug("Check isArchive for " + this);
+        boolean isArchive = this instanceof Archive;
+        LOGGER.debug("Returns: " + isArchive);
+        return isArchive;
     }
 
     @Override
     public boolean isArchived() {
-//        LOGGER.info("Check isArchived for " + this);
+        LOGGER.debug("Check isArchived for " + this);
         return model.isArchived();
     }
 
@@ -377,7 +426,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void copy(File targetFile, CopyListener listener) {
-        LOGGER.info("Copy " + this + " to " + targetFile);
+        LOGGER.info("Copy " + this + " to " + targetFile + " with Listener");
         new CopyOperation(this, targetFile, listener);
     }
 
@@ -389,7 +438,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ((model != null && model.getUrl() != null) ? " " + maskedUrlString(model.getUrl()) :
+        return this.getClass().getInterfaces()[0].getSimpleName() + ((model != null && model.getUrl() != null) ? " " + maskedUrlString(model.getUrl()) :
                 "@" + Integer.toHexString(System.identityHashCode(this)));
     }
 
@@ -413,11 +462,8 @@ public class UrlFile implements File, Comparable<UrlFile> {
         return model.getUrl().toString().compareTo(o.getUrl().toString());
     }
 
-    boolean _exists() {
-        return getFileOperationProvider().exists(client, model);
-    }
-
     void _updateModel() {
+        LOGGER.debug("UpdateModel for " + this);
         getFileOperationProvider().updateModel(client, model);
     }
 
