@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.cache.LRUMap;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.FileConfig;
 import at.beris.virtualfile.exception.FileNotFoundException;
@@ -21,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,12 +31,14 @@ public class FileContext {
 
     private Map<String, Client> siteToClientMap;
     private Map<URL, FileConfig> fileConfigMap;
+    private Map<String, File> fileCache;
 
     public FileContext(FileConfig fileConfig) {
         registerProtocolURLStreamHandlers();
         this.defaultFileConfig = fileConfig;
-        this.siteToClientMap = new HashMap<>();
+        this.siteToClientMap = Collections.synchronizedMap(new HashMap<String, Client>());
         this.fileConfigMap = new HashMap<>();
+        this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(2048));
     }
 
     /**
@@ -102,12 +106,25 @@ public class FileContext {
 
         UrlFile file = null;
         try {
-            Client client = createClientInstance(normalizedUrl, fileConfig.getClientClass(protocol), fileConfig);
+            String siteUrlString = getSiteUrlString(url);
+            Client client = siteToClientMap.get(siteUrlString);
+
+            if (client == null) {
+                client = createClientInstance(normalizedUrl, fileConfig.getClientClass(protocol), fileConfig);
+                siteToClientMap.put(siteUrlString, client);
+            }
+
             Map<FileType, FileOperationProvider> fileOperationProviderMap = new HashMap<>();
             for (FileType fileType : FileType.values()) {
                 fileOperationProviderMap.put(fileType, (FileOperationProvider) fileConfig.getFileOperationProviderClassMap(protocol).get(fileType).newInstance());
             }
-            file = createFileInstance(parent, normalizedUrl, client, fileOperationProviderMap);
+
+            String urlString = normalizedUrl.toString();
+            file = (UrlFile) fileCache.get(urlString);
+            if (file == null) {
+                file = createFileInstance(parent, normalizedUrl, client, fileOperationProviderMap);
+                fileCache.put(urlString, file);
+            }
         } catch (InstantiationException e) {
             throw new VirtualFileException(e);
         } catch (IllegalAccessException e) {
@@ -167,22 +184,17 @@ public class FileContext {
     private Client createClientInstance(URL url, Class clientClass, FileConfig fileConfig) throws InstantiationException, IllegalAccessException {
         Client client = null;
         if (clientClass != null) {
-            String siteUrl = getSiteUrlString(url);
-            client = siteToClientMap.get(siteUrl);
-            if (client == null) {
-                try {
-                    Constructor constructor = clientClass.getConstructor(FileConfig.class);
-                    client = (Client) constructor.newInstance(fileConfig);
-                } catch (ReflectiveOperationException e) {
-                    throw new VirtualFileException(e);
-                }
-                client.setHost(url.getHost());
-                client.setPort(url.getPort());
-                String userInfoParts[] = url.getUserInfo().split(":");
-                client.setUsername(userInfoParts[0]);
-                client.setPassword(userInfoParts[1]);
-                siteToClientMap.put(siteUrl, client);
+            try {
+                Constructor constructor = clientClass.getConstructor(FileConfig.class);
+                client = (Client) constructor.newInstance(fileConfig);
+            } catch (ReflectiveOperationException e) {
+                throw new VirtualFileException(e);
             }
+            client.setHost(url.getHost());
+            client.setPort(url.getPort());
+            String userInfoParts[] = url.getUserInfo().split(":");
+            client.setUsername(userInfoParts[0]);
+            client.setPassword(userInfoParts[1]);
         }
         return client;
     }
@@ -217,5 +229,9 @@ public class FileContext {
         }
 
         return instance;
+    }
+
+    public void removeFileFromCache(File file) {
+        fileCache.remove(file.getUrl().toString());
     }
 }

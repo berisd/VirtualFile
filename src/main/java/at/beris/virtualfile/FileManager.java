@@ -118,6 +118,7 @@ public class FileManager {
 
 
     public static void dispose(File file) {
+        getFileContext().removeFileFromCache(file);
         file.dispose();
     }
 
