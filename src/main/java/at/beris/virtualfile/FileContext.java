@@ -14,6 +14,9 @@ import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.FileConfig;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.operation.CopyOperation;
+import at.beris.virtualfile.operation.FileOperation;
+import at.beris.virtualfile.operation.FileOperationEnum;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.FileUtils;
@@ -106,6 +109,8 @@ public class FileContext {
 
         UrlFile file = null;
         try {
+            Map<FileOperationEnum, FileOperation> fileOperationMap = createFileOperationMap(protocol);
+
             String siteUrlString = getSiteUrlString(url);
             Client client = siteToClientMap.get(siteUrlString);
 
@@ -122,7 +127,7 @@ public class FileContext {
             String urlString = normalizedUrl.toString();
             file = (UrlFile) fileCache.get(urlString);
             if (file == null) {
-                file = createFileInstance(parent, normalizedUrl, client, fileOperationProviderMap);
+                file = createFileInstance(parent, normalizedUrl, client, fileOperationProviderMap, fileOperationMap);
                 fileCache.put(urlString, file);
             }
         } catch (InstantiationException e) {
@@ -181,6 +186,10 @@ public class FileContext {
         return urlString.substring(0, urlString.indexOf("/", urlString.indexOf("//") + 2));
     }
 
+    public void removeFileFromCache(File file) {
+        fileCache.remove(file.getUrl().toString());
+    }
+
     private Client createClientInstance(URL url, Class clientClass, FileConfig fileConfig) throws InstantiationException, IllegalAccessException {
         Client client = null;
         if (clientClass != null) {
@@ -199,7 +208,8 @@ public class FileContext {
         return client;
     }
 
-    private UrlFile createFileInstance(File parent, URL normalizedUrl, Client client, Map<FileType, FileOperationProvider> fileOperationProviderMap) {
+    private UrlFile createFileInstance(File parent, URL normalizedUrl, Client client, Map<FileType,
+            FileOperationProvider> fileOperationProviderMap, Map<FileOperationEnum, FileOperation> fileOperationMap) {
         Class instanceClass;
         UrlFile instance;
 
@@ -222,8 +232,8 @@ public class FileContext {
 
         Constructor constructor = null;
         try {
-            constructor = instanceClass.getConstructor(File.class, URL.class, FileModel.class, Map.class, Client.class);
-            instance = (UrlFile) constructor.newInstance(parent, normalizedUrl, fileModel, fileOperationProviderMap, client);
+            constructor = instanceClass.getConstructor(File.class, URL.class, FileModel.class, Map.class, Client.class, Map.class);
+            instance = (UrlFile) constructor.newInstance(parent, normalizedUrl, fileModel, fileOperationProviderMap, client, fileOperationMap);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
         }
@@ -231,7 +241,10 @@ public class FileContext {
         return instance;
     }
 
-    public void removeFileFromCache(File file) {
-        fileCache.remove(file.getUrl().toString());
+    private Map<FileOperationEnum, FileOperation> createFileOperationMap(Protocol protocol) {
+        //TODO Allow file operations dependend on the protocol
+        HashMap<FileOperationEnum, FileOperation> map = new HashMap<>();
+        map.put(FileOperationEnum.COPY, new CopyOperation());
+        return map;
     }
 }

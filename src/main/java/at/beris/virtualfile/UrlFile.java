@@ -11,10 +11,13 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.operation.CopyOperation;
+import at.beris.virtualfile.operation.FileOperation;
+import at.beris.virtualfile.operation.FileOperationEnum;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.FileUtils;
 import org.slf4j.Logger;
@@ -38,22 +41,24 @@ public class UrlFile implements File, Comparable<UrlFile> {
     private File parent;
     private FileModel model;
     private Map<FileType, FileOperationProvider> fileOperationProviderMap;
+    private Map<FileOperationEnum, FileOperation> fileOperationMap;
     private Client client;
     private StringBuilder stringBuilder;
 
-    public UrlFile(URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client) {
-        this(null, url, model, fileOperationProviderMap, client);
+    public UrlFile(URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client, Map<FileOperationEnum, FileOperation> fileOperationMap) {
+        this(null, url, model, fileOperationProviderMap, client, fileOperationMap);
     }
 
-    public UrlFile(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap) {
-        this(parent, url, model, fileOperationProviderMap, null);
+    public UrlFile(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Map<FileOperationEnum, FileOperation> fileOperationMap) {
+        this(parent, url, model, fileOperationProviderMap, null, fileOperationMap);
     }
 
-    public UrlFile(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client) {
+    public UrlFile(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client, Map<FileOperationEnum, FileOperation> fileOperationMap) {
         this.parent = parent;
         this.model = model;
         this.model.setUrl(url);
         this.fileOperationProviderMap = fileOperationProviderMap;
+        this.fileOperationMap = fileOperationMap;
         this.client = client;
         this.stringBuilder = new StringBuilder();
     }
@@ -421,13 +426,21 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public void copy(File targetFile) {
         LOGGER.info("Copy " + this + " to " + targetFile);
-        new CopyOperation(this, targetFile, null);
+        CopyOperation copyOperation = (CopyOperation) fileOperationMap.get(FileOperationEnum.COPY);
+        if (copyOperation == null)
+            throw new OperationNotSupportedException();
+
+        copyOperation.execute(this, targetFile);
     }
 
     @Override
     public void copy(File targetFile, CopyListener listener) {
         LOGGER.info("Copy " + this + " to " + targetFile + " with Listener");
-        new CopyOperation(this, targetFile, listener);
+        CopyOperation copyOperation = (CopyOperation) fileOperationMap.get(FileOperationEnum.COPY);
+        if (copyOperation == null)
+            throw new OperationNotSupportedException();
+
+        copyOperation.execute(this, targetFile, listener);
     }
 
     @Override

@@ -10,6 +10,8 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.operation.FileOperation;
+import at.beris.virtualfile.operation.FileOperationEnum;
 import at.beris.virtualfile.provider.ArchiveOperationProvider;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import org.slf4j.Logger;
@@ -22,16 +24,16 @@ import java.util.Map;
 public class UrlArchive extends UrlFileContainer implements Archive {
     private final static Logger LOGGER = LoggerFactory.getLogger(UrlArchive.class);
 
-    public UrlArchive(URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client) {
-        super(url, model, fileOperationProviderMap, client);
+    public UrlArchive(URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client, Map<FileOperationEnum, FileOperation> fileOperationMap) {
+        super(url, model, fileOperationProviderMap, client, fileOperationMap);
     }
 
-    public UrlArchive(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap) {
-        super(parent, url, model, fileOperationProviderMap);
+    public UrlArchive(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Map<FileOperationEnum, FileOperation> fileOperationMap) {
+        super(parent, url, model, fileOperationProviderMap, fileOperationMap);
     }
 
-    public UrlArchive(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client) {
-        super(parent, url, model, fileOperationProviderMap, client);
+    public UrlArchive(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client, Map<FileOperationEnum, FileOperation> fileOperationMap) {
+        super(parent, url, model, fileOperationProviderMap, client, fileOperationMap);
     }
 
     @Override

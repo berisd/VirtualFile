@@ -11,12 +11,9 @@ package at.beris.virtualfile.operation;
 
 import at.beris.virtualfile.File;
 
-public interface CopyListener extends Listener {
-    void startCopyFile(String fileName, long currentFileNumber);
-
-    void afterBlockCopied(long fileSize, long bytesCopiedBlock, long bytesCopiedTotal);
-
-    boolean interrupt();
-
-    void fileExists(File file);
+public interface FileOperation {
+    void execute(File source);
+    void execute(File source, Listener listener);
+    void execute(File source, File target);
+    void execute(File source, File target, Listener listener);
 }

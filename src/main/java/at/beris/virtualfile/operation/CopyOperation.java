@@ -12,6 +12,7 @@ package at.beris.virtualfile.operation;
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.UrlFile;
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.util.FileUtils;
@@ -21,53 +22,69 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
-public class CopyOperation {
+public class CopyOperation implements FileOperation {
     public final static int COPY_BUFFER_SIZE = 1024 * 16;
 
     private long filesProcessed;
 
-    public CopyOperation(File sourceFile, File targetFile, CopyListener listener) {
+    @Override
+    public void execute(File source) {
+        throw new NotImplementedException("Call with parameters source, target and listener");
+    }
+
+    @Override
+    public void execute(File source, Listener listener) {
+        throw new NotImplementedException("Call with parameters source, target and listener");
+    }
+
+    @Override
+    public void execute(File source, File target) {
+        execute(source, target, null);
+    }
+
+    @Override
+    public void execute(File source, File target, Listener listener) {
         filesProcessed = 0L;
         try {
-            if (sourceFile.isDirectory() && ! targetFile.isDirectory())
+            if (source.isDirectory() && !target.isDirectory())
                 throw new OperationNotSupportedException("Can't copy directory to a file!");
-            if (! sourceFile.isDirectory() && targetFile.isDirectory())
-                targetFile = FileManager.newFile(FileUtils.newUrl(targetFile.getUrl(), sourceFile.getName()));
-            copyRecursive((UrlFile) sourceFile, (UrlFile) targetFile, listener);
+            if (!source.isDirectory() && target.isDirectory())
+                target = FileManager.newFile(FileUtils.newUrl(target.getUrl(), source.getName()));
+            copyRecursive((UrlFile) source, (UrlFile) target, (CopyListener) listener);
         } catch (IOException e) {
             throw new VirtualFileException(e);
         }
     }
 
-    private void copyRecursive(UrlFile sourceFile, UrlFile targetFile, CopyListener listener) throws IOException {
-        if (targetFile.exists()) {
+    private void copyRecursive(UrlFile source, UrlFile target, CopyListener listener) throws IOException {
+        if (target.exists()) {
             if (listener != null)
-                listener.fileExists(targetFile);
+                listener.fileExists(target);
         }
 
-        if (sourceFile.isDirectory()) {
-            if (!targetFile.exists())
-                targetFile.create();
+        if (source.isDirectory()) {
+            if (!target.exists())
+                target.create();
 
-            for (File sourceChildFile : sourceFile.getFileOperationProvider().list(sourceFile.getClient(), sourceFile.getModel(), null)) {
-                URL targetUrl = targetFile.getUrl();
+            for (File sourceChildFile : source.getFileOperationProvider().list(source.getClient(), source.getModel(), null)) {
+                URL targetUrl = target.getUrl();
                 URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
 
-                UrlFile targetChildFile = (UrlFile) FileManager.newFile(targetFile, targetChildUrl);
+                UrlFile targetChildFile = (UrlFile) FileManager.newFile(target, targetChildUrl);
                 copyRecursive((UrlFile) sourceChildFile, targetChildFile, listener);
             }
         } else {
             if (listener != null)
-                listener.startCopyFile(sourceFile.getPath(), filesProcessed + 1);
-            copyFile(sourceFile, targetFile, listener);
+                listener.startCopyFile(source.getPath(), filesProcessed + 1);
+            copyFile(source, target, listener);
             filesProcessed++;
         }
-        targetFile.refresh();
+        target.refresh();
     }
 
-    private void copyFile(UrlFile sourceFile, UrlFile targetFile, CopyListener listener) throws IOException {
-        InputStream inputStream = sourceFile.getInputStream();
-        OutputStream outputStream = targetFile.getOutputStream();
+    private void copyFile(UrlFile source, UrlFile target, CopyListener listener) throws IOException {
+        InputStream inputStream = source.getInputStream();
+        OutputStream outputStream = target.getOutputStream();
         byte[] buffer = new byte[COPY_BUFFER_SIZE];
 
         long bytesWrittenTotal = 0;
@@ -78,9 +95,9 @@ public class CopyOperation {
                 outputStream.write(buffer, 0, length);
                 bytesWrittenBlock = length;
                 bytesWrittenTotal += bytesWrittenBlock;
-                if (listener!=null)
-                    listener.afterBlockCopied(sourceFile.getSize(), bytesWrittenBlock, bytesWrittenTotal);
-                if (listener!=null && listener.interrupt())
+                if (listener != null)
+                    listener.afterBlockCopied(source.getSize(), bytesWrittenBlock, bytesWrittenTotal);
+                if (listener != null && listener.interrupt())
                     break;
             }
         } finally {
