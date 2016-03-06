@@ -10,10 +10,8 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.operation.CopyListener;
-import at.beris.virtualfile.provider.FileOperationProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +31,7 @@ public interface File {
 
     Directory asDirectory();
 
-    byte[] checksum();
+    Byte[] checksum();
 
     void copy(File targetFile);
 
@@ -49,7 +47,7 @@ public interface File {
 
     void delete();
 
-    boolean exists();
+    Boolean exists();
 
     /**
      * Find files recursively matching a filter
@@ -64,15 +62,11 @@ public interface File {
     //TODO create a move method that combines copy and delete
     Set<FileAttribute> getAttributes();
 
-    Client getClient();
-
     FileTime getCreationTime();
-
-    FileOperationProvider getFileOperationProvider();
 
     GroupPrincipal getGroup();
 
-    InputStream getInputStream() throws IOException;
+    InputStream getInputStream();
 
     FileTime getLastAccessTime();
 
@@ -82,7 +76,7 @@ public interface File {
 
     String getName();
 
-    OutputStream getOutputStream() throws IOException;
+    OutputStream getOutputStream();
 
     UserPrincipal getOwner();
 

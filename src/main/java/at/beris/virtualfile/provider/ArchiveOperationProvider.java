@@ -9,12 +9,11 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.File;
-import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.FileModel;
 
 import java.util.List;
 
 public interface ArchiveOperationProvider {
-    List<File> extract(Client client, FileModel model, File target);
+    List<File> extract(FileModel model, File target);
 }

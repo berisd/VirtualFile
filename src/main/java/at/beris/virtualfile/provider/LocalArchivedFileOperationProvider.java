@@ -9,8 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.File;
+import at.beris.virtualfile.FileContext;
+import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -24,9 +25,14 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalArchivedFileOperationProvider implements FileOperationProvider {
+public class LocalArchivedFileOperationProvider extends AbstractFileOperationProvider {
+
+    public LocalArchivedFileOperationProvider(FileContext fileContext, Client client) {
+        super(fileContext, client);
+    }
+
     @Override
-    public List<File> list(Client client, FileModel model, Filter filter) {
+    public List<File> list(FileModel model, Filter filter) {
         List<File> files = new ArrayList<>();
 //        File backFile = add(this.archiveFile, createEmptyArchiveEntry());
 //        backFile.setParent(this.parentFile);
@@ -41,7 +47,7 @@ public class LocalArchivedFileOperationProvider implements FileOperationProvider
 
 
     @Override
-    public void create(Client client, FileModel model) {
+    public void create(FileModel model) {
         try {
             // if not exists create UrlArchive
             // insert or update ArchiveEntry
@@ -60,7 +66,7 @@ public class LocalArchivedFileOperationProvider implements FileOperationProvider
     }
 
     @Override
-    public boolean exists(Client client, FileModel model) {
+    public Boolean exists(FileModel model) {
         String archivePath = getArchivePath(model);
         String targetArchiveEntryPath = model.getPath().substring(archivePath.length() + 1);
 
@@ -111,67 +117,62 @@ public class LocalArchivedFileOperationProvider implements FileOperationProvider
     }
 
     @Override
-    public void delete(Client client, FileModel file) {
+    public void delete(FileModel file) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void add(File parent, File child) {
+    public Byte[] checksum(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public byte[] checksum(Client client, FileModel model) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public void updateModel(Client client, FileModel model) {
+    public void updateModel(FileModel model) {
         //TODO Call new class ArchiveClient here
     }
 
     @Override
-    public void setAcl(Client client, FileModel model) {
+    public void setAcl(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public InputStream getInputStream(Client client, FileModel model) throws IOException {
+    public InputStream getInputStream(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public OutputStream getOutputStream(Client client, FileModel model) throws IOException {
+    public OutputStream getOutputStream(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setAttributes(Client client, FileModel model) {
+    public void setAttributes(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setCreationTime(Client client, FileModel model) {
+    public void setCreationTime(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setGroup(Client client, FileModel model) {
+    public void setGroup(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setLastAccessTime(Client client, FileModel model) {
+    public void setLastAccessTime(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setLastModifiedTime(Client client, FileModel model) {
+    public void setLastModifiedTime(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void setOwner(Client client, FileModel model) {
+    public void setOwner(FileModel model) {
         throw new NotImplementedException();
     }
 

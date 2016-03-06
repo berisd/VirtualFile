@@ -9,9 +9,10 @@
 
 package at.beris.virtualfile.provider;
 
+import at.beris.virtualfile.File;
+import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.File;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -28,25 +29,27 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class LocalArchiveOperationProvider extends LocalFileOperationProvider implements ArchiveOperationProvider {
 
     private final static String URL = "url";
     private final static String PARENT_URL = "parentUrl";
 
+    public LocalArchiveOperationProvider(FileContext fileContext, Client client) {
+        super(fileContext, client);
+    }
+
     @Override
-    public void create(Client client, FileModel model) {
+    public void create(FileModel model) {
         throw new NotImplementedException();
     }
 
     @Override
-    public void add(File parent, File child) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public List<File> list(Client client, FileModel model, Filter filter) {
+    public List<File> list(FileModel model, Filter filter) {
         List<File> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
@@ -85,7 +88,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     }
 
     @Override
-    public List<File> extract(Client client, FileModel model, File target) {
+    public List<File> extract(FileModel model, File target) {
         List<File> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;

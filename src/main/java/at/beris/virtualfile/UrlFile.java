@@ -10,20 +10,17 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.operation.CopyListener;
-import at.beris.virtualfile.operation.CopyOperation;
 import at.beris.virtualfile.operation.FileOperation;
 import at.beris.virtualfile.operation.FileOperationEnum;
-import at.beris.virtualfile.provider.FileOperationProvider;
+import at.beris.virtualfile.operation.Listener;
 import at.beris.virtualfile.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -38,28 +35,16 @@ import static at.beris.virtualfile.util.FileUtils.maskedUrlString;
 public class UrlFile implements File, Comparable<UrlFile> {
     private final static Logger LOGGER = LoggerFactory.getLogger(UrlFile.class);
 
-    private File parent;
-    private FileModel model;
-    private Map<FileType, FileOperationProvider> fileOperationProviderMap;
-    private Map<FileOperationEnum, FileOperation> fileOperationMap;
-    private Client client;
-    private StringBuilder stringBuilder;
+    protected File parent;
+    protected FileModel model;
+    protected Map<FileOperationEnum, FileOperation> fileOperationMap;
+    protected StringBuilder stringBuilder;
 
-    public UrlFile(URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client, Map<FileOperationEnum, FileOperation> fileOperationMap) {
-        this(null, url, model, fileOperationProviderMap, client, fileOperationMap);
-    }
-
-    public UrlFile(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Map<FileOperationEnum, FileOperation> fileOperationMap) {
-        this(parent, url, model, fileOperationProviderMap, null, fileOperationMap);
-    }
-
-    public UrlFile(File parent, URL url, FileModel model, Map<FileType, FileOperationProvider> fileOperationProviderMap, Client client, Map<FileOperationEnum, FileOperation> fileOperationMap) {
+    public UrlFile(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap) {
         this.parent = parent;
         this.model = model;
         this.model.setUrl(url);
-        this.fileOperationProviderMap = fileOperationProviderMap;
         this.fileOperationMap = fileOperationMap;
-        this.client = client;
         this.stringBuilder = new StringBuilder();
     }
 
@@ -76,21 +61,6 @@ public class UrlFile implements File, Comparable<UrlFile> {
         LOGGER.debug("Get model for " + this);
         LOGGER.debug("Returns: " + model);
         return model;
-    }
-
-    @Override
-    public Client getClient() {
-        LOGGER.debug("Get client for " + this);
-        LOGGER.debug("Returns: " + client);
-        return client;
-    }
-
-    @Override
-    public FileOperationProvider getFileOperationProvider() {
-        LOGGER.debug("Get fileOperationProvider for " + this);
-        FileOperationProvider fileOperationProvider = fileOperationProviderMap.get(model.requiredFileOperationProviderType());
-        LOGGER.debug("Returns: " + fileOperationProvider);
-        return fileOperationProvider;
     }
 
     @Override
@@ -148,7 +118,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public void delete() {
         LOGGER.info("Delete " + this);
-        getFileOperationProvider().delete(client, model);
+        executeOperation(FileOperationEnum.DELETE, null, null, (Void) null);
     }
 
     @Override
@@ -156,19 +126,19 @@ public class UrlFile implements File, Comparable<UrlFile> {
         LOGGER.debug("Dispose " + this);
         model.clear();
         model = null;
-        client = null;
         parent = null;
-        fileOperationProviderMap = null;
+        fileOperationMap = null;
     }
 
     @Override
-    public byte[] checksum() {
+    public Byte[] checksum() {
         LOGGER.info("Calculate checksum for " + this);
-        byte[] checksum = getFileOperationProvider().checksum(client, model);
+
+        Byte[] checksum = executeOperation(FileOperationEnum.CHECKSUM, null, null, (Void) null);
 
         stringBuilder.setLength(0);
         stringBuilder.append("Returns: ");
-        for(byte b : checksum)
+        for (byte b : checksum)
             stringBuilder.append(String.format("%02x", b));
         LOGGER.info(stringBuilder.toString());
         return checksum;
@@ -224,9 +194,9 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean exists() {
+    public Boolean exists() {
         LOGGER.debug("Check exists for " + this);
-        boolean exists = getFileOperationProvider().exists(client, model);
+        Boolean exists = executeOperation(FileOperationEnum.EXISTS, null, null, (Void) null);
         LOGGER.debug("Returns: " + exists);
         return exists;
     }
@@ -234,20 +204,20 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public void create() {
         LOGGER.info("Create " + this);
-        getFileOperationProvider().create(this.client, this.model);
+        executeOperation(FileOperationEnum.CREATE, null, null, (Void) null);
         _updateModel();
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         LOGGER.debug("Get Inputstream for " + this);
-        return getFileOperationProvider().getInputStream(client, model);
+        return executeOperation(FileOperationEnum.GET_INPUT_STREAM, null, null, (Void) null);
     }
 
     @Override
-    public OutputStream getOutputStream() throws IOException {
+    public OutputStream getOutputStream() {
         LOGGER.debug("Get Outputstream for " + this);
-        return getFileOperationProvider().getOutputStream(client, model);
+        return executeOperation(FileOperationEnum.GET_OUTPUT_STREAM, null, null, (Void) null);
     }
 
     @Override
@@ -262,7 +232,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     public void setAcl(List<AclEntry> acl) {
         LOGGER.debug("Set ACL to " + acl + " for " + this);
         model.setAcl(acl);
-        getFileOperationProvider().setAcl(client, model);
+        executeOperation(FileOperationEnum.SET_ACL, null, null, (Void) null);
         _updateModel();
     }
 
@@ -277,7 +247,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     public void setOwner(UserPrincipal owner) {
         LOGGER.debug("Set owner to " + owner + " for " + this);
         model.setOwner(owner);
-        getFileOperationProvider().setOwner(client, model);
+        executeOperation(FileOperationEnum.SET_OWNER, null, null, (Void) null);
         _updateModel();
     }
 
@@ -292,7 +262,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     public void setGroup(GroupPrincipal group) {
         LOGGER.debug("Set group to " + group + " for " + this);
         model.setGroup(group);
-        getFileOperationProvider().setGroup(client, model);
+        executeOperation(FileOperationEnum.SET_GROUP, null, null, (Void) null);
         _updateModel();
     }
 
@@ -300,7 +270,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     public void setLastAccessTime(FileTime time) {
         LOGGER.debug("Set lastAccessTime to " + time + " for " + this);
         model.setLastAccessTime(time);
-        getFileOperationProvider().setLastAccessTime(client, model);
+        executeOperation(FileOperationEnum.SET_LAST_ACCESS_TIME, null, null, (Void) null);
         _updateModel();
     }
 
@@ -308,7 +278,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     public void setLastModifiedTime(FileTime time) {
         LOGGER.debug("Set lastModifiedTime to " + time + " for " + this);
         model.setLastModifiedTime(time);
-        getFileOperationProvider().setLastModifiedTime(client, model);
+        executeOperation(FileOperationEnum.SET_LAST_MODIFIED_TIME, null, null, (Void) null);
         _updateModel();
     }
 
@@ -316,7 +286,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     public void setAttributes(FileAttribute... attributes) {
         LOGGER.debug("Set attributes for " + this);
         model.setAttributes(new HashSet<>(Arrays.asList(attributes)));
-        getFileOperationProvider().setAttributes(client, model);
+        executeOperation(FileOperationEnum.SET_ATTRIBUTES, null, null, (Void) null);
         _updateModel();
     }
 
@@ -324,7 +294,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     public void setCreationTime(FileTime time) {
         LOGGER.debug("Set creationTime to " + time + " for " + this);
         model.setCreationTime(time);
-        getFileOperationProvider().setCreationTime(client, model);
+        executeOperation(FileOperationEnum.SET_CREATION_TIME, null, null, (Void) null);
         _updateModel();
     }
 
@@ -344,6 +314,8 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
         for (FileAttribute attribute : attributes)
             model.addAttribute(attribute);
+
+        executeOperation(FileOperationEnum.ADD_ATTRIBUTES, null, null, (Void) null);
 
         _updateModel();
     }
@@ -367,6 +339,8 @@ public class UrlFile implements File, Comparable<UrlFile> {
         for (FileAttribute attribute : attributes)
             model.removeAttribute(attribute);
 
+        executeOperation(FileOperationEnum.REMOVE_ATTRIBUTES, null, null, (Void) null);
+
         _updateModel();
     }
 
@@ -376,7 +350,8 @@ public class UrlFile implements File, Comparable<UrlFile> {
         Filter directoriesFilter = new IsDirectoryFilter().equalTo(true);
         Filter withDirectoriesFilter = ((Filter) filter.clone()).or(new IsDirectoryFilter().equalTo(true));
 
-        List<File> fileList = getFileOperationProvider().list(client, model, withDirectoriesFilter);
+        List<File> fileList = executeOperation(FileOperationEnum.LIST, null, null, withDirectoriesFilter);
+
         Map<Filter, List<File>> partitionedFileList = FileUtils.groupFileListByFilters(fileList, Arrays.asList(filter, directoriesFilter));
 
         fileList.clear();
@@ -396,7 +371,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public List<File> list() {
         LOGGER.info("List children for " + this);
-        List<File> fileList = getFileOperationProvider().list(client, model, null);
+        List<File> fileList = executeOperation(FileOperationEnum.LIST, null, null, (Filter) null);
         LOGGER.info("Returns: " + fileList.size() + " entries");
         return fileList;
     }
@@ -404,7 +379,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public List<File> list(Filter filter) {
         LOGGER.info("List children for " + this + " with filter " + filter);
-        List<File> fileList = getFileOperationProvider().list(client, model, filter);
+        List<File> fileList = executeOperation(FileOperationEnum.LIST, null, null, filter);
         LOGGER.info("Returns: " + fileList.size() + " entries");
         return fileList;
     }
@@ -426,21 +401,21 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public void copy(File targetFile) {
         LOGGER.info("Copy " + this + " to " + targetFile);
-        CopyOperation copyOperation = (CopyOperation) fileOperationMap.get(FileOperationEnum.COPY);
-        if (copyOperation == null)
+        executeOperation(FileOperationEnum.COPY, targetFile, null, (Void) null);
+    }
+
+    protected <T, P> T executeOperation(FileOperationEnum fileOperationEnum, File targetFile, Listener listener, P... params) {
+        FileOperation<T, P> fileOperation = fileOperationMap.get(fileOperationEnum);
+        if (fileOperation == null)
             throw new OperationNotSupportedException();
 
-        copyOperation.execute(this, targetFile);
+        return fileOperation.execute(this, targetFile, listener, params);
     }
 
     @Override
     public void copy(File targetFile, CopyListener listener) {
         LOGGER.info("Copy " + this + " to " + targetFile + " with Listener");
-        CopyOperation copyOperation = (CopyOperation) fileOperationMap.get(FileOperationEnum.COPY);
-        if (copyOperation == null)
-            throw new OperationNotSupportedException();
-
-        copyOperation.execute(this, targetFile, listener);
+        executeOperation(FileOperationEnum.COPY, targetFile, listener, (Void) null);
     }
 
     @Override
@@ -477,7 +452,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     void _updateModel() {
         LOGGER.debug("UpdateModel for " + this);
-        getFileOperationProvider().updateModel(client, model);
+        executeOperation(FileOperationEnum.UPDATE_MODEL, null, null, (Void) null);
     }
 
     private String getAttributesString(FileAttribute[] attributes) {

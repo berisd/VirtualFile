@@ -11,24 +11,14 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.filter.Filter;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
 public interface FileOperationProvider {
-    /**
-     * Convenience method calling copy
-     *
-     * @param parent
-     * @param child
-     */
-    void add(File parent, File child);
-
-    byte[] checksum(Client client, FileModel model);
+    Byte[] checksum(FileModel model);
 
     /**
      * Creates a new  physical representation
@@ -36,45 +26,43 @@ public interface FileOperationProvider {
      * @param model
      * @return
      */
-    void create(Client client, FileModel model);
+    void create(FileModel model);
 
-    void delete(Client client, FileModel model);
+    void delete(FileModel model);
 
-    boolean exists(Client client, FileModel model);
+    Boolean exists(FileModel model);
 
-    InputStream getInputStream(Client client, FileModel model) throws IOException;
+    InputStream getInputStream(FileModel model);
 
-    OutputStream getOutputStream(Client client, FileModel model) throws IOException;
+    OutputStream getOutputStream(FileModel model);
 
     /**
      * List files in this file
      *
-     * @param client
      * @param model
      * @param filter
      * @return
      */
-    List<File> list(Client client, FileModel model, Filter filter);
+    List<File> list(FileModel model, Filter filter);
 
     /**
      * Updates the Model with information from the physical file.
      *
-     * @param client
      * @param model
      */
-    void updateModel(Client client, FileModel model);
+    void updateModel(FileModel model);
 
-    void setAcl(Client client, FileModel model);
+    void setAcl(FileModel model);
 
-    void setAttributes(Client client, FileModel model);
+    void setAttributes(FileModel model);
 
-    void setCreationTime(Client client, FileModel model);
+    void setCreationTime(FileModel model);
 
-    void setGroup(Client client, FileModel model);
+    void setGroup(FileModel model);
 
-    void setLastAccessTime(Client client, FileModel model);
+    void setLastAccessTime(FileModel model);
 
-    void setLastModifiedTime(Client client, FileModel model);
+    void setLastModifiedTime(FileModel model);
 
-    void setOwner(Client client, FileModel model);
+    void setOwner(FileModel model);
 }

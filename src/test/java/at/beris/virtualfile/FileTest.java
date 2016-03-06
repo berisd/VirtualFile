@@ -9,52 +9,56 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.operation.FileOperation;
 import at.beris.virtualfile.operation.FileOperationEnum;
-import at.beris.virtualfile.provider.FileOperationProvider;
+import at.beris.virtualfile.operation.Listener;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.net.URL;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FileTest {
     @Test
     public void create() throws Exception {
-        FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
-        FileOperation fileOperation = Mockito.mock(FileOperation.class);
-        Client client = Mockito.mock(Client.class);
         FileModel model = new FileModel();
-        UrlFile file = new UrlFile(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider),
-                client, Collections.singletonMap(FileOperationEnum.COPY, fileOperation));
+        Map<FileOperationEnum, FileOperation> fileOperationMap = new HashMap<>();
+        FileOperation fileOperation = Mockito.mock(FileOperation.class);
+        fileOperationMap.put(FileOperationEnum.CREATE, fileOperation);
+        fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
+
+        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap);
         file.create();
-        Mockito.verify(fileOperationProvider).create(client, model);
+        Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
     }
 
     @Test
     public void delete() throws Exception {
-        FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
+        Map<FileOperationEnum, FileOperation> fileOperationMap = new HashMap<>();
         FileOperation fileOperation = Mockito.mock(FileOperation.class);
-        Client client = Mockito.mock(Client.class);
+        fileOperationMap.put(FileOperationEnum.DELETE, fileOperation);
+        fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
+
         FileModel model = new FileModel();
-        UrlFile file = new UrlFile(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider),
-                client, Collections.singletonMap(FileOperationEnum.COPY, fileOperation));
+        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap);
         file.delete();
 
-        Mockito.verify(fileOperationProvider).delete(client, model);
+        Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
     }
 
     @Test
     public void exists() throws Exception {
-        FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
+        Map<FileOperationEnum, FileOperation> fileOperationMap = new HashMap<>();
         FileOperation fileOperation = Mockito.mock(FileOperation.class);
-        Client client = Mockito.mock(Client.class);
+        fileOperationMap.put(FileOperationEnum.EXISTS, fileOperation);
+        fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
+
         FileModel model = new FileModel();
-        UrlFile file = new UrlFile(new URL("file:/home/testdir/test.txt"), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider),
-                client, Collections.singletonMap(FileOperationEnum.COPY, fileOperation));
+        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap);
         file.exists();
 
-        Mockito.verify(fileOperationProvider).exists(client, model);
+        Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
     }
 }

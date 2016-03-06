@@ -56,11 +56,8 @@ public class FileUtilsTest {
     }
 
     private File createFile(String urlString) throws MalformedURLException {
-        FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
         FileOperation fileOperation = Mockito.mock(FileOperation.class);
-        Client client = Mockito.mock(Client.class);
         FileModel model = new FileModel();
-        return new UrlFile(new URL(urlString), model, Collections.singletonMap(FileType.DEFAULT, fileOperationProvider),
-                client, Collections.singletonMap(FileOperationEnum.COPY, fileOperation));
+        return new UrlFile(null, new URL(urlString), model, Collections.singletonMap(FileOperationEnum.COPY, fileOperation));
     }
 }

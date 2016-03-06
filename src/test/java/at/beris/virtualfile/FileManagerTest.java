@@ -30,7 +30,12 @@ public class FileManagerTest {
     @Test
     public void createLocalFile() throws Exception {
         java.io.File sourceFile = createFile();
-        byte[] expectedCheckSum = generate_checksum(sourceFile);
+        byte[] checkSumBytes = generate_checksum(sourceFile);
+
+
+        Byte[] expectedChecksum = new Byte[checkSumBytes.length];
+        for (int i = 0; i < checkSumBytes.length; i++)
+            expectedChecksum[i] = checkSumBytes[i];
 
         File file = FileManager.newFile(new java.io.File(TEST_SOURCE_FILE_NAME).toURI().toURL());
         assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
@@ -39,7 +44,7 @@ public class FileManagerTest {
         assertEquals(sourceFile.getAbsolutePath(), file.getPath());
         assertTrue(TestFileHelper.isInstantClose(TEST_SOURCE_FILE_LAST_MODIFIED, file.getLastModifiedTime().toInstant(), 2));
         assertNotNull(file.getParent());
-        Assert.assertArrayEquals(expectedCheckSum, file.checksum());
+        Assert.assertArrayEquals(expectedChecksum, file.checksum());
         Assert.assertFalse(file.isArchive());
         Assert.assertFalse(file.isArchived());
         file.delete();

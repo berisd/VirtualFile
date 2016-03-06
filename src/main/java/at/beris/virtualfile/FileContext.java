@@ -14,9 +14,7 @@ import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.FileConfig;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.operation.CopyOperation;
-import at.beris.virtualfile.operation.FileOperation;
-import at.beris.virtualfile.operation.FileOperationEnum;
+import at.beris.virtualfile.operation.*;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.FileUtils;
@@ -25,22 +23,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class FileContext {
     private FileConfig defaultFileConfig;
 
     private Map<String, Client> siteToClientMap;
+    private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
+    private Map<FileOperationProvider, Map<FileOperationEnum, FileOperation>> fileOperationProviderToOperationMap;
     private Map<URL, FileConfig> fileConfigMap;
     private Map<String, File> fileCache;
 
     public FileContext(FileConfig fileConfig) {
         registerProtocolURLStreamHandlers();
+
         this.defaultFileConfig = fileConfig;
-        this.siteToClientMap = Collections.synchronizedMap(new HashMap<String, Client>());
         this.fileConfigMap = new HashMap<>();
+        this.siteToClientMap = Collections.synchronizedMap(new HashMap<String, Client>());
+        this.clientToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Client, Map<FileType, FileOperationProvider>>());
+        this.fileOperationProviderToOperationMap = Collections.synchronizedMap(new HashMap<FileOperationProvider, Map<FileOperationEnum, FileOperation>>());
         this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(2048));
     }
 
@@ -79,6 +80,14 @@ public class FileContext {
         return newFile(newFile(parentUrl, fileConfig), url, fileConfig);
     }
 
+    public File newFile(URL parent, URL url) {
+        return newFile(parent, url, null);
+    }
+
+    public File newFile(URL url) {
+        return newFile(url, (FileConfig) null);
+    }
+
     /**
      * Creates a file instance for the corresponding url
      *
@@ -96,38 +105,20 @@ public class FileContext {
         }
 
         URL normalizedUrl = FileUtils.normalizeUrl(url);
-        String protocolString = normalizedUrl.getProtocol();
-        Protocol protocol = null;
-        try {
-            protocol = Protocol.valueOf(normalizedUrl.getProtocol().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new VirtualFileException("Unknown protocol: " + protocolString);
-        }
-
-        if (fileConfig.getFileOperationProviderClassMap(protocol) == null)
-            throw new VirtualFileException("No configuration found for protocol: " + protocolString);
+        Protocol protocol = getProtocol(normalizedUrl, fileConfig);
 
         UrlFile file = null;
         try {
-            Map<FileOperationEnum, FileOperation> fileOperationMap = createFileOperationMap(protocol);
-
-            String siteUrlString = getSiteUrlString(url);
-            Client client = siteToClientMap.get(siteUrlString);
-
-            if (client == null) {
-                client = createClientInstance(normalizedUrl, fileConfig.getClientClass(protocol), fileConfig);
-                siteToClientMap.put(siteUrlString, client);
-            }
-
-            Map<FileType, FileOperationProvider> fileOperationProviderMap = new HashMap<>();
-            for (FileType fileType : FileType.values()) {
-                fileOperationProviderMap.put(fileType, (FileOperationProvider) fileConfig.getFileOperationProviderClassMap(protocol).get(fileType).newInstance());
-            }
+            FileType fileType = getFileTypeForUrl(normalizedUrl);
+            Client client = getClientInstance(url, protocol, fileConfig);
+            FileOperationProvider fileOperationProvider = getFileOperationProviderInstance(fileConfig, protocol, fileType, client);
+            Map<FileOperationEnum, FileOperation> fileOperationMap = getFileOperationMapInstance(protocol, fileOperationProvider);
 
             String urlString = normalizedUrl.toString();
             file = (UrlFile) fileCache.get(urlString);
             if (file == null) {
-                file = createFileInstance(parent, normalizedUrl, client, fileOperationProviderMap, fileOperationMap);
+                FileModel fileModel = createModelInstance(parent, normalizedUrl, client, fileOperationProvider);
+                file = createFileInstance(parent, normalizedUrl, fileModel, fileOperationMap);
                 fileCache.put(urlString, file);
             }
         } catch (InstantiationException e) {
@@ -136,6 +127,42 @@ public class FileContext {
             throw new VirtualFileException(e);
         }
         return file;
+    }
+
+    private Map<FileOperationEnum, FileOperation> getFileOperationMapInstance(Protocol protocol, FileOperationProvider fileOperationProvider) {
+        Map<FileOperationEnum, FileOperation> fileOperationMap = fileOperationProviderToOperationMap.get(fileOperationProvider);
+        if (fileOperationMap == null) {
+            fileOperationMap = createFileOperationMap(protocol, fileOperationProvider);
+            fileOperationProviderToOperationMap.put(fileOperationProvider, fileOperationMap);
+        }
+        return fileOperationMap;
+    }
+
+    private FileOperationProvider getFileOperationProviderInstance(FileConfig fileConfig, Protocol protocol, FileType fileType, Client client) throws InstantiationException, IllegalAccessException {
+        Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
+        if (fileOperationProviderMap == null) {
+            fileOperationProviderMap = new HashMap<>();
+            clientToFileOperationProvidersMap.put(client, fileOperationProviderMap);
+        }
+
+        FileOperationProvider fileOperationProvider = fileOperationProviderMap.get(fileType);
+
+        if (fileOperationProvider == null) {
+            fileOperationProvider = createFileOperationProvider(fileConfig, protocol, client, fileType);
+            fileOperationProviderMap.put(fileType, fileOperationProvider);
+        }
+        return fileOperationProvider;
+    }
+
+    private FileType getFileTypeForUrl(URL url) {
+        FileType fileType = FileType.DEFAULT;
+        String[] pathParts = url.toString().split("/");
+
+        if (FileUtils.isArchive(pathParts[pathParts.length - 1]))
+            fileType = FileType.ARCHIVE;
+        else if (FileUtils.isArchived(url))
+            fileType = FileType.ARCHIVED;
+        return fileType;
     }
 
     public File newFile(URL url, FileConfig fileConfig) {
@@ -190,8 +217,14 @@ public class FileContext {
         fileCache.remove(file.getUrl().toString());
     }
 
-    private Client createClientInstance(URL url, Class clientClass, FileConfig fileConfig) throws InstantiationException, IllegalAccessException {
+    public Set<Protocol> enabledProtocols() {
+        //TODO Only return enabled protocols
+        return EnumSet.allOf(Protocol.class);
+    }
+
+    private Client createClientInstance(URL url, Protocol protocol, FileConfig fileConfig) {
         Client client = null;
+        Class clientClass = fileConfig.getClientClass(protocol);
         if (clientClass != null) {
             try {
                 Constructor constructor = clientClass.getConstructor(FileConfig.class);
@@ -208,20 +241,9 @@ public class FileContext {
         return client;
     }
 
-    private UrlFile createFileInstance(File parent, URL normalizedUrl, Client client, Map<FileType,
-            FileOperationProvider> fileOperationProviderMap, Map<FileOperationEnum, FileOperation> fileOperationMap) {
+    private UrlFile createFileInstance(File parent, URL normalizedUrl, FileModel fileModel, Map<FileOperationEnum, FileOperation> fileOperationMap) {
         Class instanceClass;
         UrlFile instance;
-
-        FileModel fileModel = new FileModel();
-        if (parent != null)
-            fileModel.setParent(parent.getModel());
-        fileModel.setUrl(normalizedUrl);
-
-        try {
-            fileOperationProviderMap.get(fileModel.requiredFileOperationProviderType()).updateModel(client, fileModel);
-        } catch (FileNotFoundException e) {
-        }
 
         if (fileModel.isDirectory()) {
             instanceClass = UrlDirectory.class;
@@ -232,8 +254,8 @@ public class FileContext {
 
         Constructor constructor = null;
         try {
-            constructor = instanceClass.getConstructor(File.class, URL.class, FileModel.class, Map.class, Client.class, Map.class);
-            instance = (UrlFile) constructor.newInstance(parent, normalizedUrl, fileModel, fileOperationProviderMap, client, fileOperationMap);
+            constructor = instanceClass.getConstructor(File.class, URL.class, FileModel.class, Map.class);
+            instance = (UrlFile) constructor.newInstance(parent, normalizedUrl, fileModel, fileOperationMap);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
         }
@@ -241,10 +263,86 @@ public class FileContext {
         return instance;
     }
 
-    private Map<FileOperationEnum, FileOperation> createFileOperationMap(Protocol protocol) {
-        //TODO Allow file operations dependend on the protocol
+    private FileModel createModelInstance(File parent, URL normalizedUrl, Client client, FileOperationProvider fileOperationProvider) {
+        FileModel fileModel = new FileModel();
+        if (parent != null)
+            fileModel.setParent(parent.getModel());
+        fileModel.setUrl(normalizedUrl);
+
+        try {
+            fileOperationProvider.updateModel(fileModel);
+        } catch (FileNotFoundException e) {
+        }
+        return fileModel;
+    }
+
+    private Map<FileOperationEnum, FileOperation> createFileOperationMap(Protocol protocol, FileOperationProvider fileOperationProvider) {
+        //TODO Allow file operations supported by the protocol only
         HashMap<FileOperationEnum, FileOperation> map = new HashMap<>();
-        map.put(FileOperationEnum.COPY, new CopyOperation());
+        map.put(FileOperationEnum.ADD_ATTRIBUTES, new AddAttributesOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.CHECKSUM, new ChecksumOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.COPY, new CopyOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.CREATE, new CreateOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.DELETE, new DeleteOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.EXISTS, new ExistsOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.EXTRACT, new ExtractOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.GET_INPUT_STREAM, new GetInputStreamOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.GET_OUTPUT_STREAM, new GetOutputStreamOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.LIST, new ListOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.REMOVE_ATTRIBUTES, new RemoveAttributesOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.SET_ACL, new SetAclOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.SET_ATTRIBUTES, new SetAttributesOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.SET_CREATION_TIME, new SetCreationTimeOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.SET_GROUP, new SetGroupOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.SET_LAST_ACCESS_TIME, new SetLastAccessTimeOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.SET_LAST_MODIFIED_TIME, new SetLastModifiedTimeOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.SET_OWNER, new SetOwnerOperation(this, fileOperationProvider));
+        map.put(FileOperationEnum.UPDATE_MODEL, new UpdateModelOperation(this, fileOperationProvider));
+
         return map;
+    }
+
+    private FileOperationProvider createFileOperationProvider(FileConfig fileConfig, Protocol protocol, Client client, FileType fileType) throws InstantiationException, IllegalAccessException {
+        Class instanceClass = fileConfig.getFileOperationProviderClassMap(protocol).get(fileType);
+        FileOperationProvider instance = null;
+
+        Constructor constructor = null;
+        try {
+            constructor = instanceClass.getConstructor(this.getClass(), Client.class);
+            instance = (FileOperationProvider) constructor.newInstance(this, client);
+        } catch (ReflectiveOperationException e) {
+            throw new VirtualFileException(e);
+        }
+
+        return instance;
+    }
+
+    private Client getClientInstance(URL url, Protocol protocol, FileConfig fileConfig) {
+        if (protocol==Protocol.FILE)
+            return null;
+
+        String siteUrlString = getSiteUrlString(url);
+        Client client = siteToClientMap.get(siteUrlString);
+
+        if (client == null) {
+            client = createClientInstance(url, protocol, fileConfig);
+            siteToClientMap.put(siteUrlString, client);
+        }
+        return client;
+    }
+
+    private Protocol getProtocol(URL normalizedUrl, FileConfig fileConfig) {
+        Protocol protocol = null;
+        String protocolString = normalizedUrl.getProtocol();
+
+        try {
+            protocol = Protocol.valueOf(normalizedUrl.getProtocol().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new VirtualFileException("Unknown protocol: " + protocolString);
+        }
+
+        if (fileConfig.getFileOperationProviderClassMap(protocol) == null)
+            throw new VirtualFileException("No configuration found for protocol: " + protocolString);
+        return protocol;
     }
 }

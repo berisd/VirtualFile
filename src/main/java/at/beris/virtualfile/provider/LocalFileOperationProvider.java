@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.provider;
 
+import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.attribute.BasicFilePermission;
@@ -16,7 +17,6 @@ import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.client.Client;
-import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.PermissionDeniedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
@@ -34,11 +34,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LocalFileOperationProvider implements FileOperationProvider {
+public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     private final static Logger LOGGER = LoggerFactory.getLogger(LocalFileOperationProvider.class);
 
+    public LocalFileOperationProvider(FileContext fileContext, Client client) {
+        super(fileContext, client);
+    }
+
     @Override
-    public void create(Client client, FileModel model) {
+    public void create(FileModel model) {
         String pathName = model.getPath();
         java.io.File file = new java.io.File(pathName);
         if (model.isDirectory()) {
@@ -58,12 +62,12 @@ public class LocalFileOperationProvider implements FileOperationProvider {
     }
 
     @Override
-    public boolean exists(Client client, FileModel model) {
+    public Boolean exists(FileModel model) {
         return new java.io.File(model.getPath()).exists();
     }
 
     @Override
-    public List<at.beris.virtualfile.File> list(Client client, FileModel model, Filter filter) {
+    public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) {
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
         if (model.isDirectory()) {
             for (java.io.File childFile : new java.io.File(model.getPath()).listFiles()) {
@@ -81,7 +85,7 @@ public class LocalFileOperationProvider implements FileOperationProvider {
     }
 
     @Override
-    public void delete(Client client, FileModel model) {
+    public void delete(FileModel model) {
         java.io.File file = new java.io.File(model.getPath());
         try {
             if (file.exists()) {
@@ -93,12 +97,7 @@ public class LocalFileOperationProvider implements FileOperationProvider {
     }
 
     @Override
-    public void add(at.beris.virtualfile.File parent, at.beris.virtualfile.File child) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public byte[] checksum(Client client, FileModel model) {
+    public Byte[] checksum(FileModel model) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA1");
             FileInputStream fis = new FileInputStream(model.getPath());
@@ -108,7 +107,13 @@ public class LocalFileOperationProvider implements FileOperationProvider {
             while ((nread = fis.read(dataBytes)) != -1) {
                 md.update(dataBytes, 0, nread);
             }
-            return md.digest();
+
+            byte[] digest = md.digest();
+            Byte[] digestBytes = new Byte[digest.length];
+            for (int i = 0; i < digest.length; i++)
+                digestBytes[i] = digest[i];
+
+            return digestBytes;
         } catch (NoSuchAlgorithmException e) {
             throw new VirtualFileException(e);
         } catch (IOException e) {
@@ -117,7 +122,7 @@ public class LocalFileOperationProvider implements FileOperationProvider {
     }
 
     @Override
-    public void updateModel(Client client, FileModel model) {
+    public void updateModel(FileModel model) {
         try {
             java.io.File file = new java.io.File(model.getPath());
             model.setFileExists(file.exists());
@@ -162,17 +167,25 @@ public class LocalFileOperationProvider implements FileOperationProvider {
     }
 
     @Override
-    public InputStream getInputStream(Client client, FileModel model) throws IOException {
-        return new FileInputStream(model.getPath());
+    public InputStream getInputStream(FileModel model) {
+        try {
+            return new FileInputStream(model.getPath());
+        } catch (FileNotFoundException e) {
+            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
+        }
     }
 
     @Override
-    public OutputStream getOutputStream(Client client, FileModel model) throws IOException {
-        return new FileOutputStream(model.getPath());
+    public OutputStream getOutputStream(FileModel model) {
+        try {
+            return new FileOutputStream(model.getPath());
+        } catch (FileNotFoundException e) {
+            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
+        }
     }
 
     @Override
-    public void setAcl(Client client, FileModel model) {
+    public void setAcl(FileModel model) {
         java.io.File file = new java.io.File(model.getPath());
         FileStore fileStore = null;
         try {
@@ -190,7 +203,7 @@ public class LocalFileOperationProvider implements FileOperationProvider {
     }
 
     @Override
-    public void setAttributes(Client client, FileModel model) {
+    public void setAttributes(FileModel model) {
         java.io.File file = new java.io.File(model.getPath());
 
         Set<BasicFilePermission> basicFilePermissionSet = new HashSet<>();
@@ -225,12 +238,12 @@ public class LocalFileOperationProvider implements FileOperationProvider {
     }
 
     @Override
-    public void setCreationTime(Client client, FileModel model) {
+    public void setCreationTime(FileModel model) {
         setTimes(model.getPath(), null, null, model.getCreationTime());
     }
 
     @Override
-    public void setGroup(Client client, FileModel model) {
+    public void setGroup(FileModel model) {
         java.io.File file = new java.io.File(model.getPath());
 
         try {
@@ -247,17 +260,17 @@ public class LocalFileOperationProvider implements FileOperationProvider {
     }
 
     @Override
-    public void setLastAccessTime(Client client, FileModel model) {
+    public void setLastAccessTime(FileModel model) {
         setTimes(model.getPath(), null, model.getLastAccessTime(), null);
     }
 
     @Override
-    public void setLastModifiedTime(Client client, FileModel model) {
+    public void setLastModifiedTime(FileModel model) {
         setTimes(model.getPath(), model.getLastModifiedTime(), null, null);
     }
 
     @Override
-    public void setOwner(Client client, FileModel model) {
+    public void setOwner(FileModel model) {
         java.io.File file = new java.io.File(model.getPath());
         FileStore fileStore = null;
         try {

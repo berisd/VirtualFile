@@ -10,11 +10,11 @@
 package at.beris.virtualfile.operation;
 
 import at.beris.virtualfile.File;
-import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.UrlFile;
-import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.FileUtils;
 
 import java.io.IOException;
@@ -22,38 +22,29 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
-public class CopyOperation implements FileOperation {
+public class CopyOperation extends AbstractFileOperation<Void, Void> {
     public final static int COPY_BUFFER_SIZE = 1024 * 16;
 
     private long filesProcessed;
 
-    @Override
-    public void execute(File source) {
-        throw new NotImplementedException("Call with parameters source, target and listener");
+    public CopyOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
+        super(fileContext, fileOperationProvider);
     }
 
     @Override
-    public void execute(File source, Listener listener) {
-        throw new NotImplementedException("Call with parameters source, target and listener");
-    }
-
-    @Override
-    public void execute(File source, File target) {
-        execute(source, target, null);
-    }
-
-    @Override
-    public void execute(File source, File target, Listener listener) {
+    public Void execute(File source, File target, Listener listener, Void... params) {
         filesProcessed = 0L;
         try {
             if (source.isDirectory() && !target.isDirectory())
                 throw new OperationNotSupportedException("Can't copy directory to a file!");
             if (!source.isDirectory() && target.isDirectory())
-                target = FileManager.newFile(FileUtils.newUrl(target.getUrl(), source.getName()));
+
+                target = fileContext.newFile(FileUtils.newUrl(target.getUrl(), source.getName()));
             copyRecursive((UrlFile) source, (UrlFile) target, (CopyListener) listener);
         } catch (IOException e) {
             throw new VirtualFileException(e);
         }
+        return null;
     }
 
     private void copyRecursive(UrlFile source, UrlFile target, CopyListener listener) throws IOException {
@@ -66,11 +57,11 @@ public class CopyOperation implements FileOperation {
             if (!target.exists())
                 target.create();
 
-            for (File sourceChildFile : source.getFileOperationProvider().list(source.getClient(), source.getModel(), null)) {
+            for (File sourceChildFile : source.list()) {
                 URL targetUrl = target.getUrl();
                 URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
 
-                UrlFile targetChildFile = (UrlFile) FileManager.newFile(target, targetChildUrl);
+                UrlFile targetChildFile = (UrlFile) fileContext.newFile(target.getUrl(), targetChildUrl);
                 copyRecursive((UrlFile) sourceChildFile, targetChildFile, listener);
             }
         } else {

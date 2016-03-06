@@ -10,6 +10,23 @@
 package at.beris.virtualfile.operation;
 
 public enum FileOperationEnum {
+    ADD_ATTRIBUTES,
+    CHECKSUM,
     COPY,
-    DELETE
+    CREATE,
+    DELETE,
+    EXISTS,
+    EXTRACT,
+    GET_INPUT_STREAM,
+    GET_OUTPUT_STREAM,
+    LIST,
+    REMOVE_ATTRIBUTES,
+    SET_ACL,
+    SET_ATTRIBUTES,
+    SET_CREATION_TIME,
+    SET_GROUP,
+    SET_LAST_ACCESS_TIME,
+    SET_LAST_MODIFIED_TIME,
+    SET_OWNER,
+    UPDATE_MODEL
 }

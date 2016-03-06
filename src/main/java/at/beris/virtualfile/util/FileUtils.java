@@ -29,6 +29,16 @@ public class FileUtils {
         return false;
     }
 
+    public static boolean isArchived(URL url) {
+        String[] pathParts = url.toString().split("/");
+
+        for (int i = 0; i < pathParts.length - 1; i++) {
+            if (isArchive(pathParts[i]))
+                return true;
+        }
+        return false;
+    }
+
     public static boolean isDirectory(String urlString) {
         return urlString.endsWith("/");
     }

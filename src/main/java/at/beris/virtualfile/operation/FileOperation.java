@@ -11,9 +11,6 @@ package at.beris.virtualfile.operation;
 
 import at.beris.virtualfile.File;
 
-public interface FileOperation {
-    void execute(File source);
-    void execute(File source, Listener listener);
-    void execute(File source, File target);
-    void execute(File source, File target, Listener listener);
+public interface FileOperation<T, P> {
+    T execute(File source, File target, Listener listener, P... params);
 }

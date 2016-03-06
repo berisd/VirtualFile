@@ -77,7 +77,7 @@ public class FileManager {
     }
 
     public static File newFile(URL parentUrl, URL url) {
-        return newFile(parentUrl, url, null);
+        return getFileContext().newFile(parentUrl, url);
     }
 
     public static File newFile(URL parentUrl, URL url, FileConfig fileConfig) {
@@ -93,7 +93,7 @@ public class FileManager {
     }
 
     public static File newFile(URL url) {
-        return newFile(url, (FileConfig) null);
+        return getFileContext().newFile(url, (FileConfig) null);
     }
 
     public static File newFile(URL url, FileConfig fileConfig) {
