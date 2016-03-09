@@ -11,6 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.operation.CopyListener;
@@ -117,7 +118,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void delete() {
-        LOGGER.info("Delete " + this);
+        logOperation("Delete " + this);
         executeOperation(FileOperationEnum.DELETE, null, null, (Void) null);
     }
 
@@ -132,7 +133,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public Byte[] checksum() {
-        LOGGER.info("Calculate checksum for " + this);
+        logOperation("Calculate checksum for " + this);
 
         Byte[] checksum = executeOperation(FileOperationEnum.CHECKSUM, null, null, (Void) null);
 
@@ -195,15 +196,15 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public Boolean exists() {
-        LOGGER.debug("Check exists for " + this);
+        logOperation("Check exists for " + this);
         Boolean exists = executeOperation(FileOperationEnum.EXISTS, null, null, (Void) null);
-        LOGGER.debug("Returns: " + exists);
+        logOperation("Returns: " + exists);
         return exists;
     }
 
     @Override
     public void create() {
-        LOGGER.info("Create " + this);
+        logOperation("Create " + this);
         executeOperation(FileOperationEnum.CREATE, null, null, (Void) null);
         _updateModel();
     }
@@ -230,7 +231,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setAcl(List<AclEntry> acl) {
-        LOGGER.debug("Set ACL to " + acl + " for " + this);
+        logOperation("Set ACL to " + acl + " for " + this);
         model.setAcl(acl);
         executeOperation(FileOperationEnum.SET_ACL, null, null, (Void) null);
         _updateModel();
@@ -245,7 +246,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setOwner(UserPrincipal owner) {
-        LOGGER.debug("Set owner to " + owner + " for " + this);
+        logOperation("Set owner to " + owner + " for " + this);
         model.setOwner(owner);
         executeOperation(FileOperationEnum.SET_OWNER, null, null, (Void) null);
         _updateModel();
@@ -260,7 +261,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setGroup(GroupPrincipal group) {
-        LOGGER.debug("Set group to " + group + " for " + this);
+        logOperation("Set group to " + group + " for " + this);
         model.setGroup(group);
         executeOperation(FileOperationEnum.SET_GROUP, null, null, (Void) null);
         _updateModel();
@@ -268,7 +269,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setLastAccessTime(FileTime time) {
-        LOGGER.debug("Set lastAccessTime to " + time + " for " + this);
+        logOperation("Set lastAccessTime to " + time + " for " + this);
         model.setLastAccessTime(time);
         executeOperation(FileOperationEnum.SET_LAST_ACCESS_TIME, null, null, (Void) null);
         _updateModel();
@@ -276,7 +277,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setLastModifiedTime(FileTime time) {
-        LOGGER.debug("Set lastModifiedTime to " + time + " for " + this);
+        logOperation("Set lastModifiedTime to " + time + " for " + this);
         model.setLastModifiedTime(time);
         executeOperation(FileOperationEnum.SET_LAST_MODIFIED_TIME, null, null, (Void) null);
         _updateModel();
@@ -284,7 +285,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setAttributes(FileAttribute... attributes) {
-        LOGGER.debug("Set attributes for " + this);
+        logOperation("Set attributes for " + this);
         model.setAttributes(new HashSet<>(Arrays.asList(attributes)));
         executeOperation(FileOperationEnum.SET_ATTRIBUTES, null, null, (Void) null);
         _updateModel();
@@ -292,7 +293,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setCreationTime(FileTime time) {
-        LOGGER.debug("Set creationTime to " + time + " for " + this);
+        logOperation("Set creationTime to " + time + " for " + this);
         model.setCreationTime(time);
         executeOperation(FileOperationEnum.SET_CREATION_TIME, null, null, (Void) null);
         _updateModel();
@@ -307,7 +308,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void addAttributes(FileAttribute... attributes) {
-        LOGGER.info("Add attributes " + getAttributesString(attributes) + " to " + this);
+        logOperation("Add attributes " + getAttributesString(attributes) + " to " + this);
 
         if (attributes.length < 1)
             return;
@@ -332,7 +333,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void removeAttributes(FileAttribute... attributes) {
-        LOGGER.info("Remove attributes " + getAttributesString(attributes) + " from " + this);
+        logOperation("Remove attributes " + getAttributesString(attributes) + " from " + this);
         if (attributes.length < 1)
             return;
 
@@ -346,7 +347,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public List<File> find(Filter filter) {
-        LOGGER.info("Find children for " + this + " with filter " + filter);
+        logOperation("Find children for " + this + " with filter " + filter);
         Filter directoriesFilter = new IsDirectoryFilter().equalTo(true);
         Filter withDirectoriesFilter = ((Filter) filter.clone()).or(new IsDirectoryFilter().equalTo(true));
 
@@ -363,24 +364,24 @@ public class UrlFile implements File, Comparable<UrlFile> {
         }
         directoryList.clear();
 
-        LOGGER.info("Returns: " + fileList.size() + " entries");
+        logOperation("Returns: " + fileList.size() + " entries");
 
         return fileList;
     }
 
     @Override
     public List<File> list() {
-        LOGGER.info("List children for " + this);
+        logOperation("List children for " + this);
         List<File> fileList = executeOperation(FileOperationEnum.LIST, null, null, (Filter) null);
-        LOGGER.info("Returns: " + fileList.size() + " entries");
+        logOperation("Returns: " + fileList.size() + " entries");
         return fileList;
     }
 
     @Override
     public List<File> list(Filter filter) {
-        LOGGER.info("List children for " + this + " with filter " + filter);
+        logOperation("List children for " + this + " with filter " + filter);
         List<File> fileList = executeOperation(FileOperationEnum.LIST, null, null, filter);
-        LOGGER.info("Returns: " + fileList.size() + " entries");
+        logOperation("Returns: " + fileList.size() + " entries");
         return fileList;
     }
 
@@ -400,7 +401,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void copy(File targetFile) {
-        LOGGER.info("Copy " + this + " to " + targetFile);
+        logOperation("Copy " + this + " to " + targetFile);
         executeOperation(FileOperationEnum.COPY, targetFile, null, (Void) null);
     }
 
@@ -414,13 +415,13 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void copy(File targetFile, CopyListener listener) {
-        LOGGER.info("Copy " + this + " to " + targetFile + " with Listener");
+        logOperation("Copy " + this + " to " + targetFile + " with Listener");
         executeOperation(FileOperationEnum.COPY, targetFile, listener, (Void) null);
     }
 
     @Override
     public void refresh() {
-        LOGGER.info("Refresh " + this);
+        logOperation("Refresh " + this);
         _updateModel();
     }
 
@@ -464,5 +465,28 @@ public class UrlFile implements File, Comparable<UrlFile> {
                 attributesString = (attributesString != "" ? ", " : "") + attribute.toString();
         }
         return attributesString;
+    }
+
+    protected boolean isInternalCall() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        StackTraceElement calleeStackTraceElement = stackTrace[4];
+        Package thisPackage = this.getClass().getPackage();
+
+        String calleeClassName = calleeStackTraceElement.getClassName();
+        if (! calleeClassName.startsWith(thisPackage.getName()))
+            return false;
+
+        if (calleeClassName.startsWith(thisPackage.getName()) && calleeClassName.endsWith("Test"))
+            return false;
+
+        return true;
+    }
+
+    protected void logOperation(String message) {
+        if (isInternalCall()) {
+            LOGGER.debug(message);
+        }
+        else
+            LOGGER.info(message);
     }
 }

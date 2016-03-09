@@ -28,9 +28,9 @@ public class UrlArchive extends UrlFileContainer implements Archive {
 
     @Override
     public List<File> extract(File target) {
-        LOGGER.info("Extract " + this + " to " + target);
+        logOperation("Extract " + this + " to " + target);
         List<File> fileList = executeOperation(FileOperationEnum.EXTRACT, target, null, (Void) null);
-        LOGGER.info("Returns: " + fileList.size() + " entries");
+        logOperation("Returns: " + fileList.size() + " entries");
         return fileList;
     }
 }
