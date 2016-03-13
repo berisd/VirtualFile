@@ -11,7 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.SftpClient;
-import at.beris.virtualfile.config.FileConfig;
+import at.beris.virtualfile.config.ClientConfig;
 import at.beris.virtualfile.operation.FileOperation;
 import at.beris.virtualfile.operation.FileOperationEnum;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -59,11 +59,11 @@ public class TestFileHelper {
     }
 
     public static SftpClient createSftpClient(URL url) throws IOException {
-        SftpClient sftpClient = new SftpClient(new FileConfig());
+        SftpClient sftpClient = new SftpClient(new ClientConfig());
         sftpClient.setHost(url.getHost());
         sftpClient.setPort(url.getPort());
         sftpClient.setUsername(url.getUserInfo().split(":")[0]);
-        sftpClient.setPassword(readSftpPassword());
+        sftpClient.setPassword(readSftpPassword().toCharArray());
 
         sftpClient.init();
         sftpClient.connect();
@@ -143,6 +143,6 @@ public class TestFileHelper {
 
     public static File createFile(URL url, FileModel model, FileOperationProvider fileOperationProvider,
                                   Client client, Map<FileOperationEnum, FileOperation> fileOperationMap) throws MalformedURLException {
-        return new UrlFile(null, url, model, fileOperationMap);
+        return new UrlFile(null, url, model, fileOperationMap, null);
     }
 }

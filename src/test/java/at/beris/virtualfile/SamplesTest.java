@@ -10,7 +10,6 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.AuthenticationType;
-import at.beris.virtualfile.config.FileConfig;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -55,7 +54,7 @@ public class SamplesTest {
     @Test
     public void copyFileToDirectory() {
         File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
-        file.copy(FileManager.newLocalFile ("."));
+        file.copy(FileManager.newLocalFile("."));
         File copiedFile = FileManager.newLocalFile("dokuwiki-stable.tgz");
         Assert.assertArrayEquals(file.checksum(), copiedFile.checksum());
         copiedFile.delete();
@@ -64,17 +63,17 @@ public class SamplesTest {
     @Test
     public void AuthWithPublicKey() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
-        FileConfig config = new FileConfig().setClientAuthenticationType(AuthenticationType.PUBLIC_KEY)
+        FileManager.getConfig().getClientConfig().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
                 .setPrivateKeyFile(TestFileHelper.TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "id_dsa");
-        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh", config);
+        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
         assertTrue(file.isDirectory());
     }
 
     @Test
     public void AuthWithPasswordNoStrictHost() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
-        FileConfig config = new FileConfig().setClientStrictHostKeyChecking(false);
-        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh", config);
+        FileManager.getConfig().getClientConfig().setStrictHostKeyChecking(false);
+        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
         assertTrue(file.isDirectory());
     }
 }

@@ -13,7 +13,7 @@ import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.config.AuthenticationType;
-import at.beris.virtualfile.config.FileConfig;
+import at.beris.virtualfile.config.ClientConfig;
 import at.beris.virtualfile.exception.AccessDeniedException;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -39,35 +39,35 @@ public class SftpClient implements Client {
     private Session session;
     private ChannelSftp sftpChannel;
     private String username;
-    private String password;
+    private char[] password;
     private String host;
     private int port;
-    private FileConfig config;
+    private ClientConfig config;
 
-    public SftpClient(FileConfig config) {
+    public SftpClient(ClientConfig config) {
         this.config = config;
     }
 
     @Override
     public void init() {
         java.util.Properties sessionConfig = new java.util.Properties();
-        sessionConfig.put("StrictHostKeyChecking", config.isClientStrictHostKeyChecking() ? "yes" : "no");
-        sessionConfig.put("PreferredAuthentications", config.getClientAuthenticationType().getJschConfigValue());
+        sessionConfig.put("StrictHostKeyChecking", config.isStrictHostKeyChecking() ? "yes" : "no");
+        sessionConfig.put("PreferredAuthentications", config.getAuthenticationType().getJschConfigValue());
 
         jsch = new JSch();
 
         try {
-            if (config.isClientStrictHostKeyChecking() && !StringUtils.isBlank(config.getKnownHostsFile()))
+            if (config.isStrictHostKeyChecking() && !StringUtils.isBlank(config.getKnownHostsFile()))
                 jsch.setKnownHosts(config.getKnownHostsFile());
 
-            if (config.getClientAuthenticationType() == AuthenticationType.PUBLIC_KEY && !StringUtils.isBlank(config.getPrivateKeyFile()))
-                jsch.addIdentity(config.getPrivateKeyFile());
+            if (config.getAuthenticationType() == AuthenticationType.PUBLIC_KEY && !StringUtils.isBlank(String.valueOf(config.getPrivateKeyFile())))
+                jsch.addIdentity(String.valueOf(config.getPrivateKeyFile()));
 
             session = jsch.getSession(username, host, port);
             session.setConfig(sessionConfig);
-            if (config.getClientAuthenticationType() == AuthenticationType.PASSWORD)
-                session.setPassword(password);
-            session.setTimeout(config.getClientTimeOut() * 1000);
+            if (config.getAuthenticationType() == AuthenticationType.PASSWORD)
+                session.setPassword(String.valueOf(password));
+            session.setTimeout(config.getTimeOut() * 1000);
         } catch (JSchException e) {
             throw new VirtualFileException(e);
         }
@@ -104,12 +104,12 @@ public class SftpClient implements Client {
     }
 
     @Override
-    public String getPassword() {
+    public char[] getPassword() {
         return password;
     }
 
     @Override
-    public void setPassword(String password) {
+    public void setPassword(char[] password) {
         this.password = password;
     }
 

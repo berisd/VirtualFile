@@ -11,7 +11,6 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.operation.CopyListener;
@@ -38,13 +37,15 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     protected File parent;
     protected FileModel model;
+    protected Site site;
     protected Map<FileOperationEnum, FileOperation> fileOperationMap;
     protected StringBuilder stringBuilder;
 
-    public UrlFile(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap) {
+    public UrlFile(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap, Site site) {
         this.parent = parent;
         this.model = model;
         this.model.setUrl(url);
+        this.site = site;
         this.fileOperationMap = fileOperationMap;
         this.stringBuilder = new StringBuilder();
     }
@@ -62,6 +63,13 @@ public class UrlFile implements File, Comparable<UrlFile> {
         LOGGER.debug("Get model for " + this);
         LOGGER.debug("Returns: " + model);
         return model;
+    }
+
+    @Override
+    public Site getSite() {
+        LOGGER.debug("Get site for " + this);
+        LOGGER.debug("Returns: " + site);
+        return site;
     }
 
     @Override
@@ -473,7 +481,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
         Package thisPackage = this.getClass().getPackage();
 
         String calleeClassName = calleeStackTraceElement.getClassName();
-        if (! calleeClassName.startsWith(thisPackage.getName()))
+        if (!calleeClassName.startsWith(thisPackage.getName()))
             return false;
 
         if (calleeClassName.startsWith(thisPackage.getName()) && calleeClassName.endsWith("Test"))
@@ -485,8 +493,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     protected void logOperation(String message) {
         if (isInternalCall()) {
             LOGGER.debug(message);
-        }
-        else
+        } else
             LOGGER.info(message);
     }
 }

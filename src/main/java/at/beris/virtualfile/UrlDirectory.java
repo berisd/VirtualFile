@@ -16,7 +16,7 @@ import java.net.URL;
 import java.util.Map;
 
 public class UrlDirectory extends UrlFileContainer implements Directory {
-    public UrlDirectory(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap) {
-        super(parent, url, model, fileOperationMap);
+    public UrlDirectory(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap, Site site) {
+        super(parent, url, model, fileOperationMap, site);
     }
 }

@@ -86,6 +86,8 @@ public interface File {
 
     File getRoot();
 
+    Site getSite();
+
     /**
      * Returns the size in bytes for a file and the number of contained items for a directory
      *

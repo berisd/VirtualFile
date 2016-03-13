@@ -9,10 +9,8 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.operation.FileOperation;
 import at.beris.virtualfile.operation.FileOperationEnum;
-import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -58,6 +56,6 @@ public class FileUtilsTest {
     private File createFile(String urlString) throws MalformedURLException {
         FileOperation fileOperation = Mockito.mock(FileOperation.class);
         FileModel model = new FileModel();
-        return new UrlFile(null, new URL(urlString), model, Collections.singletonMap(FileOperationEnum.COPY, fileOperation));
+        return new UrlFile(null, new URL(urlString), model, Collections.singletonMap(FileOperationEnum.COPY, fileOperation), null);
     }
 }

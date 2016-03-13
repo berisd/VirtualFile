@@ -29,7 +29,7 @@ public class FileTest {
         fileOperationMap.put(FileOperationEnum.CREATE, fileOperation);
         fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
 
-        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap);
+        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap, null);
         file.create();
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
     }
@@ -42,7 +42,7 @@ public class FileTest {
         fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
 
         FileModel model = new FileModel();
-        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap);
+        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap, null);
         file.delete();
 
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
@@ -56,7 +56,7 @@ public class FileTest {
         fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
 
         FileModel model = new FileModel();
-        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap);
+        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap, null);
         file.exists();
 
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());

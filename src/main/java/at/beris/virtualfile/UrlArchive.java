@@ -9,7 +9,6 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.operation.FileOperation;
 import at.beris.virtualfile.operation.FileOperationEnum;
 import org.slf4j.Logger;
@@ -22,8 +21,8 @@ import java.util.Map;
 public class UrlArchive extends UrlFileContainer implements Archive {
     private final static Logger LOGGER = LoggerFactory.getLogger(UrlArchive.class);
 
-    public UrlArchive(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap) {
-        super(parent, url, model, fileOperationMap);
+    public UrlArchive(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap, Site site) {
+        super(parent, url, model, fileOperationMap, site);
     }
 
     @Override

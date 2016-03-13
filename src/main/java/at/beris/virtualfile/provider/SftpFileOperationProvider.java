@@ -9,10 +9,7 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileContext;
-import at.beris.virtualfile.FileManager;
-import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.*;
 import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
@@ -25,31 +22,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SftpFileOperationProvider extends AbstractFileOperationProvider {
+    protected RemoteSite site;
 
-    public SftpFileOperationProvider(FileContext fileContext, Client client) {
-        super(fileContext, client);
+
+    public SftpFileOperationProvider(FileContext fileContext, Site site) {
+        super(fileContext);
+        this.site = (RemoteSite) site;
     }
 
     @Override
     public void create(FileModel model) {
         if (model.isDirectory())
-            client.createDirectory(model.getPath());
+            site.getClient().createDirectory(model.getPath());
         else {
-            client.createFile(model.getPath());
+            site.getClient().createFile(model.getPath());
         }
     }
 
     @Override
     public Boolean exists(FileModel model) {
-        return client.exists(model.getPath());
+        return site.getClient().exists(model.getPath());
     }
 
     @Override
     public void delete(FileModel model) {
         if (model.isDirectory())
-            client.deleteDirectory(model.getPath());
+            site.getClient().deleteDirectory(model.getPath());
         else
-            client.deleteFile(model.getPath());
+            site.getClient().deleteFile(model.getPath());
     }
 
     @Override
@@ -62,7 +62,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) {
-        List<FileInfo> fileInfoList = client.list(model.getPath());
+        List<FileInfo> fileInfoList = site.getClient().list(model.getPath());
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
 
         for (FileInfo fileInfo : fileInfoList) {
@@ -77,7 +77,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
     @Override
     public void updateModel(FileModel model) {
         model.setFileExists(false);
-        FileInfo fileInfo = client.getFileInfo(model.getPath());
+        FileInfo fileInfo = site.getClient().getFileInfo(model.getPath());
         fileInfo.fillModel(model);
     }
 
@@ -88,17 +88,17 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public InputStream getInputStream(FileModel model) {
-        return client.getInputStream(model.getPath());
+        return site.getClient().getInputStream(model.getPath());
     }
 
     @Override
     public OutputStream getOutputStream(FileModel model) {
-        return client.getOutputStream(model.getPath());
+        return site.getClient().getOutputStream(model.getPath());
     }
 
     @Override
     public void setAttributes(FileModel model) {
-        client.setAttributes(model.getPath(), model.getAttributes());
+        site.getClient().setAttributes(model.getPath(), model.getAttributes());
     }
 
     @Override
@@ -108,7 +108,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public void setGroup(FileModel model) {
-        client.setGroup(model.getPath(), model.getGroup());
+        site.getClient().setGroup(model.getPath(), model.getGroup());
     }
 
     @Override
@@ -118,12 +118,12 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public void setLastModifiedTime(FileModel model) {
-        client.setLastModifiedTime(model.getPath(), model.getLastModifiedTime());
+        site.getClient().setLastModifiedTime(model.getPath(), model.getLastModifiedTime());
     }
 
     @Override
     public void setOwner(FileModel model) {
-        client.setOwner(model.getPath(), model.getOwner());
+        site.getClient().setOwner(model.getPath(), model.getOwner());
     }
 
     private at.beris.virtualfile.File copyToLocalFile(FileModel model, String path) {
@@ -131,7 +131,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
         int length;
 
         try (
-                InputStream inputStream = client.getInputStream(model.getPath());
+                InputStream inputStream = site.getClient().getInputStream(model.getPath());
                 OutputStream outputStream = new FileOutputStream(path)
         ) {
             while ((length = inputStream.read(buffer)) > 0) {

@@ -7,12 +7,7 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile;
 
-public enum ConfigKey {
-    KNOWN_HOSTS_FILE,
-    CLIENT_TIMEOUT,
-    CLIENT_STRICT_HOSTKEY_CHECKING,
-    CLIENT_AUTHENTICATION_TYPE,
-    PRIVATE_KEY_FILE
+public interface Site {
 }

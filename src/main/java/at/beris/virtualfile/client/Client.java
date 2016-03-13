@@ -34,9 +34,9 @@ public interface Client {
 
     void setUsername(String username);
 
-    String getPassword();
+    char[] getPassword();
 
-    void setPassword(String password);
+    void setPassword(char[] password);
 
     void connect();
 

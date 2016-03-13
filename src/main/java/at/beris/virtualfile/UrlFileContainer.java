@@ -18,8 +18,8 @@ import java.net.URL;
 import java.util.Map;
 
 public class UrlFileContainer extends UrlFile implements FileContainer {
-    public UrlFileContainer(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap) {
-        super(parent, url, model, fileOperationMap);
+    public UrlFileContainer(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap, Site site) {
+        super(parent, url, model, fileOperationMap, site);
     }
 
     @Override
