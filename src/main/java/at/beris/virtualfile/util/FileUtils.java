@@ -10,6 +10,7 @@
 package at.beris.virtualfile.util;
 
 import at.beris.virtualfile.File;
+import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import org.apache.commons.lang3.StringUtils;
@@ -127,5 +128,16 @@ public class FileUtils {
         }
 
         return partitionedFileList;
+    }
+
+    public static String getAttributesString(FileAttribute[] attributes) {
+        String attributesString = "";
+        if (attributes.length < 1)
+            attributesString = "<none>";
+        else {
+            for (FileAttribute attribute : attributes)
+                attributesString = (attributesString != "" ? ", " : "") + attribute.toString();
+        }
+        return attributesString;
     }
 }

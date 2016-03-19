@@ -11,14 +11,11 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.operation.FileOperationEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.List;
 
 public class UrlArchive extends UrlFile implements Archive {
-    private final static Logger LOGGER = LoggerFactory.getLogger(UrlArchive.class);
 
     public UrlArchive(File parent, URL url, FileModel model, FileContext context) {
         super(parent, url, model, context);
@@ -26,10 +23,7 @@ public class UrlArchive extends UrlFile implements Archive {
 
     @Override
     public List<File> extract(File target) {
-        logOperation("Extract " + this + " to " + target);
-        List<File> fileList = executeOperation(FileOperationEnum.EXTRACT, target, null, (Void) null);
-        logOperation("Returns: " + fileList.size() + " entries");
-        return fileList;
+        return executeOperation(FileOperationEnum.EXTRACT, target, null, (Void) null);
     }
 
     @Override

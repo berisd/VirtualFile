@@ -15,6 +15,7 @@ import at.beris.virtualfile.config.ClientConfig;
 import at.beris.virtualfile.config.FileContextConfig;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.logging.FileLoggingWrapper;
 import at.beris.virtualfile.operation.*;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -92,32 +93,7 @@ public class FileContext {
      * @return
      */
     public File newFile(File parent, URL url) {
-        URL normalizedUrl = FileUtils.normalizeUrl(url);
-        Protocol protocol = UrlUtils.getProtocol(normalizedUrl);
-        if (config.getFileOperationProviderClassMap(protocol) == null)
-            throw new VirtualFileException("No configuration found for protocol: " + protocol);
-
-        UrlFile file = null;
-        try {
-            FileType fileType = UrlUtils.getFileTypeForUrl(normalizedUrl);
-            initSite(normalizedUrl);
-            initFileOperationProvider(normalizedUrl, protocol, fileType, getSite(normalizedUrl));
-            FileOperationProvider fileOperationProvider = this.getFileOperationProvider(url);
-            initFileOperationMap(protocol, fileOperationProvider);
-
-            String urlString = normalizedUrl.toString();
-            file = (UrlFile) fileCache.get(urlString);
-            if (file == null) {
-                FileModel fileModel = createModelInstance(parent, normalizedUrl, fileOperationProvider);
-                file = createFileInstance(parent, normalizedUrl, fileModel);
-                fileCache.put(urlString, file);
-            }
-        } catch (InstantiationException e) {
-            throw new VirtualFileException(e);
-        } catch (IllegalAccessException e) {
-            throw new VirtualFileException(e);
-        }
-        return file;
+        return createFile(parent, url);
     }
 
     public File newFile(URL url) {
@@ -167,6 +143,11 @@ public class FileContext {
         fileCache.remove(file.getUrl().toString());
     }
 
+    public void dispose(File file) {
+        removeFileFromCache(file);
+        file.dispose();
+    }
+
     public Set<Protocol> enabledProtocols() {
         //TODO Only return enabled protocols
         return EnumSet.allOf(Protocol.class);
@@ -194,6 +175,35 @@ public class FileContext {
                 return this.siteToFileOperationProvidersMap.get(site).get(fileType);
         }
         return null;
+    }
+
+    private File createFile(File parent, URL url) {
+        URL normalizedUrl = FileUtils.normalizeUrl(url);
+        Protocol protocol = UrlUtils.getProtocol(normalizedUrl);
+        if (config.getFileOperationProviderClassMap(protocol) == null)
+            throw new VirtualFileException("No configuration found for protocol: " + protocol);
+
+        File file = null;
+        try {
+            FileType fileType = UrlUtils.getFileTypeForUrl(normalizedUrl);
+            initSite(normalizedUrl);
+            initFileOperationProvider(normalizedUrl, protocol, fileType, getSite(normalizedUrl));
+            FileOperationProvider fileOperationProvider = this.getFileOperationProvider(url);
+            initFileOperationMap(protocol, fileOperationProvider);
+
+            String urlString = normalizedUrl.toString();
+            file = fileCache.get(urlString);
+            if (file == null) {
+                FileModel fileModel = createModelInstance(parent, normalizedUrl, fileOperationProvider);
+                file = createFileInstance(parent, normalizedUrl, fileModel);
+                fileCache.put(urlString, file);
+            }
+        } catch (InstantiationException e) {
+            throw new VirtualFileException(e);
+        } catch (IllegalAccessException e) {
+            throw new VirtualFileException(e);
+        }
+        return file;
     }
 
     private Client createClientInstance(Class clientClass, ClientConfig clientConfig) {
@@ -240,7 +250,7 @@ public class FileContext {
         }
     }
 
-    private UrlFile createFileInstance(File parent, URL normalizedUrl, FileModel fileModel) {
+    private File createFileInstance(File parent, URL normalizedUrl, FileModel fileModel) {
         Class instanceClass;
         UrlFile instance;
 
@@ -259,7 +269,7 @@ public class FileContext {
             throw new VirtualFileException(e);
         }
 
-        return instance;
+        return new FileLoggingWrapper(instance);
     }
 
     private FileModel createModelInstance(File parent, URL normalizedUrl, FileOperationProvider fileOperationProvider) {

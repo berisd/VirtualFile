@@ -9,6 +9,8 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.exception.NotImplementedException;
+
 import java.net.URL;
 
 public class UrlDirectory extends UrlFile implements Directory {
@@ -18,11 +20,11 @@ public class UrlDirectory extends UrlFile implements Directory {
 
     @Override
     public void add(File file) {
-
+        throw new NotImplementedException();
     }
 
     @Override
     public void delete(File file) {
-
+        throw new NotImplementedException();
     }
 }

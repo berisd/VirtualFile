@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.FileContextConfig;
+import at.beris.virtualfile.logging.FileManagerLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
 
 import java.net.URL;
@@ -34,7 +35,7 @@ public class FileManager {
      * @return
      */
     public static File newLocalFile(String path) {
-        return getFileContext().newLocalFile(path);
+        return new FileManagerLoggingWrapper(getFileContext().newLocalFile(path));
     }
 
     /**
@@ -44,8 +45,8 @@ public class FileManager {
      * @return
      */
     public static Directory newLocalDirectory(String path) {
-        return (Directory) getFileContext().newLocalFile(path +
-                (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator));
+        return (Directory) new FileManagerLoggingWrapper(getFileContext().newLocalFile(path +
+                (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator)));
     }
 
     /**
@@ -55,37 +56,36 @@ public class FileManager {
      * @return
      */
     public static Archive newLocalArchive(String path) {
-        return (Archive) getFileContext().newLocalFile(path);
+        return (Archive) new FileManagerLoggingWrapper(getFileContext().newLocalFile(path));
     }
 
     public static File newFile(String url) {
-        return getFileContext().newFile(url);
+        return new FileManagerLoggingWrapper(getFileContext().newFile(url));
     }
 
     public static File newFile(URL parentUrl, URL url) {
-        return getFileContext().newFile(parentUrl, url);
+        return new FileManagerLoggingWrapper(getFileContext().newFile(parentUrl, url));
     }
 
     public static File newFile(File parent, URL url) {
-        return getFileContext().newFile(parent, url);
+        return new FileManagerLoggingWrapper(getFileContext().newFile(parent, url));
     }
 
     public static File newFile(URL url) {
-        return getFileContext().newFile(url);
+        return new FileManagerLoggingWrapper(getFileContext().newFile(url));
     }
 
     public static Directory newDirectory(URL url) {
-        return (Directory) getFileContext().newFile(url);
+        return (Directory) new FileManagerLoggingWrapper(getFileContext().newFile(url));
     }
 
     public static Archive newArchive(URL url) {
-        return (Archive) getFileContext().newFile(url);
+        return (Archive) new FileManagerLoggingWrapper(getFileContext().newFile(url));
     }
 
 
     public static void dispose(File file) {
-        getFileContext().removeFileFromCache(file);
-        file.dispose();
+        getFileContext().dispose(file);
     }
 
     public static Set<Protocol> enabledProtocols() {
