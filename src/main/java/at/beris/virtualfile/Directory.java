@@ -9,5 +9,5 @@
 
 package at.beris.virtualfile;
 
-public interface Directory extends FileContainer {
+public interface Directory extends File, FileContainer {
 }

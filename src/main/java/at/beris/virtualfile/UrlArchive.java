@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.operation.FileOperationEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.List;
 
-public class UrlArchive extends UrlFileContainer implements Archive {
+public class UrlArchive extends UrlFile implements Archive {
     private final static Logger LOGGER = LoggerFactory.getLogger(UrlArchive.class);
 
     public UrlArchive(File parent, URL url, FileModel model, FileContext context) {
@@ -29,5 +30,15 @@ public class UrlArchive extends UrlFileContainer implements Archive {
         List<File> fileList = executeOperation(FileOperationEnum.EXTRACT, target, null, (Void) null);
         logOperation("Returns: " + fileList.size() + " entries");
         return fileList;
+    }
+
+    @Override
+    public void add(File file) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void delete(File file) {
+        throw new NotImplementedException();
     }
 }

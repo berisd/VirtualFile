@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-public interface FileContainer extends File {
+public interface FileContainer {
     void add(File file);
     void delete(File file);
 }

@@ -11,6 +11,6 @@ package at.beris.virtualfile;
 
 import java.util.List;
 
-public interface Archive extends FileContainer {
+public interface Archive extends File, FileContainer {
     List<File> extract(File target);
 }

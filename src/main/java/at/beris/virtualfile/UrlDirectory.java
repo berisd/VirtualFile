@@ -11,8 +11,18 @@ package at.beris.virtualfile;
 
 import java.net.URL;
 
-public class UrlDirectory extends UrlFileContainer implements Directory {
+public class UrlDirectory extends UrlFile implements Directory {
     public UrlDirectory(File parent, URL url, FileModel model, FileContext context) {
         super(parent, url, model, context);
+    }
+
+    @Override
+    public void add(File file) {
+
+    }
+
+    @Override
+    public void delete(File file) {
+
     }
 }
