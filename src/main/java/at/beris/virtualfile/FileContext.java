@@ -42,7 +42,7 @@ public class FileContext {
         this.siteMap = new HashMap<>();
         this.siteToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Site, Map<FileType, FileOperationProvider>>());
         this.fileOperationProviderToOperationMap = Collections.synchronizedMap(new HashMap<FileOperationProvider, Map<FileOperationEnum, FileOperation>>());
-        this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(2048));
+        this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(config.getBaseConfig().getFileCacheSize()));
     }
 
     public FileContextConfig getConfig() {

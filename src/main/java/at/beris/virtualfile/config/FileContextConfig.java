@@ -25,6 +25,8 @@ public class FileContextConfig {
     private Map<Protocol, Map<FileType, Class>> fileOperationProviderClassMap;
     private Map<Protocol, Class> clientClassMap;
 
+    private BaseConfig baseConfig;
+
     private ClientConfig defaultClientConfig;
     private Map<Protocol, ClientConfig> clientConfigPerProtocolMap;
     private Map<RemoteSite, ClientConfig> clientConfigPerSiteMap;
@@ -34,6 +36,9 @@ public class FileContextConfig {
         clientClassMap = new HashMap<>();
         clientConfigPerProtocolMap = new HashMap<>();
         clientConfigPerSiteMap = new HashMap<>();
+
+        baseConfig = new BaseConfig();
+        baseConfig.initValues();
 
         defaultClientConfig = new ClientConfig();
         defaultClientConfig.initValues();
@@ -119,5 +124,9 @@ public class FileContextConfig {
 
     public ClientConfig getClientConfig(RemoteSite site) {
         return clientConfigPerSiteMap.get(site);
+    }
+
+    public BaseConfig getBaseConfig() {
+        return baseConfig;
     }
 }
