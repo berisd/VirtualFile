@@ -29,7 +29,11 @@ public class FileTest {
         fileOperationMap.put(FileOperationEnum.CREATE, fileOperation);
         fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
 
-        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap, null);
+        URL fileUrl = new URL("file:/home/testdir/test.txt");
+        FileContext context = Mockito.mock(FileContext.class);
+        Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
+
+        UrlFile file = new UrlFile(null, fileUrl, model, context);
         file.create();
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
     }
@@ -41,8 +45,12 @@ public class FileTest {
         fileOperationMap.put(FileOperationEnum.DELETE, fileOperation);
         fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
 
+        URL fileUrl = new URL("file:/home/testdir/test.txt");
+        FileContext context = Mockito.mock(FileContext.class);
+        Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
+
         FileModel model = new FileModel();
-        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap, null);
+        UrlFile file = new UrlFile(null, fileUrl, model, context);
         file.delete();
 
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
@@ -55,8 +63,12 @@ public class FileTest {
         fileOperationMap.put(FileOperationEnum.EXISTS, fileOperation);
         fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
 
+        URL fileUrl = new URL("file:/home/testdir/test.txt");
+        FileContext context = Mockito.mock(FileContext.class);
+        Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
+
         FileModel model = new FileModel();
-        UrlFile file = new UrlFile(null, new URL("file:/home/testdir/test.txt"), model, fileOperationMap, null);
+        UrlFile file = new UrlFile(null, fileUrl, model, context);
         file.exists();
 
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());

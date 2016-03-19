@@ -9,15 +9,10 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.SftpClient;
 import at.beris.virtualfile.config.ClientConfig;
-import at.beris.virtualfile.operation.FileOperation;
-import at.beris.virtualfile.operation.FileOperationEnum;
-import at.beris.virtualfile.provider.FileOperationProvider;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -26,7 +21,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
 
@@ -139,10 +133,5 @@ public class TestFileHelper {
             }
         }
         return fileList;
-    }
-
-    public static File createFile(URL url, FileModel model, FileOperationProvider fileOperationProvider,
-                                  Client client, Map<FileOperationEnum, FileOperation> fileOperationMap) throws MalformedURLException {
-        return new UrlFile(null, url, model, fileOperationMap, null);
     }
 }

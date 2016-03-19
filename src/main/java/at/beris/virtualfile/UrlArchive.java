@@ -9,20 +9,18 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.operation.FileOperation;
 import at.beris.virtualfile.operation.FileOperationEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 public class UrlArchive extends UrlFileContainer implements Archive {
     private final static Logger LOGGER = LoggerFactory.getLogger(UrlArchive.class);
 
-    public UrlArchive(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap, Site site) {
-        super(parent, url, model, fileOperationMap, site);
+    public UrlArchive(File parent, URL url, FileModel model, FileContext context) {
+        super(parent, url, model, context);
     }
 
     @Override

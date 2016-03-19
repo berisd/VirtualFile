@@ -37,16 +37,19 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     protected File parent;
     protected FileModel model;
-    protected Site site;
-    protected Map<FileOperationEnum, FileOperation> fileOperationMap;
+    protected FileContext context;
     protected StringBuilder stringBuilder;
 
-    public UrlFile(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap, Site site) {
+    private Site site;
+    private Map<FileOperationEnum, FileOperation> fileOperationMap;
+
+    public UrlFile(File parent, URL url, FileModel model, FileContext context) {
         this.parent = parent;
         this.model = model;
         this.model.setUrl(url);
-        this.site = site;
-        this.fileOperationMap = fileOperationMap;
+        this.context = context;
+        this.site = context.getSite(url);
+        this.fileOperationMap = context.getFileOperationMap(url);
         this.stringBuilder = new StringBuilder();
     }
 

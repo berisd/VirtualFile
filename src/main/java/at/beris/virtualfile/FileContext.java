@@ -99,17 +99,17 @@ public class FileContext {
 
         UrlFile file = null;
         try {
-            FileType fileType = getFileTypeForUrl(normalizedUrl);
-            String siteUrlString = getSiteUrlString(url);
-            Site site = getSiteInstance(siteUrlString);
-            FileOperationProvider fileOperationProvider = getFileOperationProviderInstance(protocol, fileType, site);
-            Map<FileOperationEnum, FileOperation> fileOperationMap = getFileOperationMapInstance(protocol, fileOperationProvider);
+            FileType fileType = UrlUtils.getFileTypeForUrl(normalizedUrl);
+            initSite(normalizedUrl);
+            initFileOperationProvider(normalizedUrl, protocol, fileType, getSite(normalizedUrl));
+            FileOperationProvider fileOperationProvider = this.getFileOperationProvider(url);
+            initFileOperationMap(protocol, fileOperationProvider);
 
             String urlString = normalizedUrl.toString();
             file = (UrlFile) fileCache.get(urlString);
             if (file == null) {
                 FileModel fileModel = createModelInstance(parent, normalizedUrl, fileOperationProvider);
-                file = createFileInstance(parent, normalizedUrl, fileModel, fileOperationMap, site);
+                file = createFileInstance(parent, normalizedUrl, fileModel);
                 fileCache.put(urlString, file);
             }
         } catch (InstantiationException e) {
@@ -138,7 +138,7 @@ public class FileContext {
                     path += "/";
 
                 try {
-                    String pathUrlString = getSiteUrlString(normalizedUrl) + path;
+                    String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl) + path;
                     URL pathUrl = new URL(pathUrlString);
                     parentFile = newFile(parentFile, pathUrl);
                 } catch (MalformedURLException e) {
@@ -163,11 +163,6 @@ public class FileContext {
         System.getProperties().setProperty(propertyKey, propertyValue);
     }
 
-    public String getSiteUrlString(URL url) {
-        String urlString = url.toString();
-        return urlString.substring(0, urlString.indexOf("/", urlString.indexOf("//") + 2));
-    }
-
     public void removeFileFromCache(File file) {
         fileCache.remove(file.getUrl().toString());
     }
@@ -177,41 +172,28 @@ public class FileContext {
         return EnumSet.allOf(Protocol.class);
     }
 
-    private Map<FileOperationEnum, FileOperation> getFileOperationMapInstance(Protocol protocol, FileOperationProvider fileOperationProvider) {
-        Map<FileOperationEnum, FileOperation> fileOperationMap = fileOperationProviderToOperationMap.get(fileOperationProvider);
-        if (fileOperationMap == null) {
-            fileOperationMap = createFileOperationMap(protocol, fileOperationProvider);
-            fileOperationProviderToOperationMap.put(fileOperationProvider, fileOperationMap);
-        }
-        return fileOperationMap;
+    Site getSite(URL url) {
+        return siteMap.get(UrlUtils.getSiteUrlString(url));
     }
 
-    private FileOperationProvider getFileOperationProviderInstance(Protocol protocol, FileType fileType, Site site) throws InstantiationException, IllegalAccessException {
-        Map<FileType, FileOperationProvider> fileOperationProviderMap = siteToFileOperationProvidersMap.get(site);
-        if (fileOperationProviderMap == null) {
-            fileOperationProviderMap = new HashMap<>();
-            siteToFileOperationProvidersMap.put(site, fileOperationProviderMap);
-        }
+    Map<FileOperationEnum, FileOperation> getFileOperationMap(URL url) {
+        FileOperationProvider fileOperationProvider = getFileOperationProvider(url);
 
-        FileOperationProvider fileOperationProvider = fileOperationProviderMap.get(fileType);
-
-        if (fileOperationProvider == null) {
-            Class instanceClass = config.getFileOperationProviderClassMap(protocol).get(fileType);
-            fileOperationProvider = createFileOperationProviderInstance(instanceClass, site, fileType);
-            fileOperationProviderMap.put(fileType, fileOperationProvider);
-        }
-        return fileOperationProvider;
+        if (fileOperationProvider != null)
+            return fileOperationProviderToOperationMap.get(fileOperationProvider);
+        return null;
     }
 
-    private FileType getFileTypeForUrl(URL url) {
-        FileType fileType = FileType.DEFAULT;
-        String[] pathParts = url.toString().split("/");
+    FileOperationProvider getFileOperationProvider(URL url) {
+        Site site = getSite(url);
+        FileType fileType = UrlUtils.getFileTypeForUrl(url);
 
-        if (FileUtils.isArchive(pathParts[pathParts.length - 1]))
-            fileType = FileType.ARCHIVE;
-        else if (FileUtils.isArchived(url))
-            fileType = FileType.ARCHIVED;
-        return fileType;
+        if (site != null && fileType != null) {
+            Map<FileType, FileOperationProvider> fileOperationProviderMap = siteToFileOperationProvidersMap.get(site);
+            if (fileOperationProviderMap != null)
+                return this.siteToFileOperationProvidersMap.get(site).get(fileType);
+        }
+        return null;
     }
 
     private Client createClientInstance(Class clientClass, ClientConfig clientConfig) {
@@ -228,25 +210,37 @@ public class FileContext {
         return client;
     }
 
-    private Site createSiteInstance(URL url) {
-        Protocol protocol = UrlUtils.getProtocol(url);
-
-        Site site = null;
+    private Site createSiteInstance(String siteUrlString) {
         try {
+            URL url = new URL(siteUrlString);
+            Protocol protocol = UrlUtils.getProtocol(url);
+
             if (protocol == Protocol.FILE)
-                site = new LocalSite();
+                return new LocalSite();
             else {
                 Constructor constructor = UrlSite.class.getConstructor(URL.class);
-                site = (RemoteSite) constructor.newInstance(url);
+                RemoteSite site = (RemoteSite) constructor.newInstance(url);
+
+                Class clientClass = config.getClientClass(protocol);
+
+                ClientConfig siteConfig = config.getClientConfig(site);
+                if (siteConfig == null) {
+                    siteConfig = config.createClientConfig(site);
+                    config.setClientConfig(siteConfig, site);
+                }
+
+                Client client = createClientInstance(clientClass, siteConfig);
+                site.setClient(client);
+                return site;
             }
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
         }
-        return site;
     }
 
-    private UrlFile createFileInstance(File parent, URL normalizedUrl, FileModel fileModel, Map<FileOperationEnum,
-            FileOperation> fileOperationMap, Site site) {
+    private UrlFile createFileInstance(File parent, URL normalizedUrl, FileModel fileModel) {
         Class instanceClass;
         UrlFile instance;
 
@@ -259,8 +253,8 @@ public class FileContext {
 
         Constructor constructor = null;
         try {
-            constructor = instanceClass.getConstructor(File.class, URL.class, FileModel.class, Map.class, Site.class);
-            instance = (UrlFile) constructor.newInstance(parent, normalizedUrl, fileModel, fileOperationMap, site);
+            constructor = instanceClass.getConstructor(File.class, URL.class, FileModel.class, FileContext.class);
+            instance = (UrlFile) constructor.newInstance(parent, normalizedUrl, fileModel, this);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
         }
@@ -321,36 +315,35 @@ public class FileContext {
         return instance;
     }
 
-    private Site getSiteInstance(String siteUrlString) {
-        URL siteUrl = null;
-        try {
-            siteUrl = new URL(siteUrlString);
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
+    private void initFileOperationMap(Protocol protocol, FileOperationProvider fileOperationProvider) {
+        Map<FileOperationEnum, FileOperation> fileOperationMap = fileOperationProviderToOperationMap.get(fileOperationProvider);
+        if (fileOperationMap == null) {
+            fileOperationMap = createFileOperationMap(protocol, fileOperationProvider);
+            fileOperationProviderToOperationMap.put(fileOperationProvider, fileOperationMap);
         }
-        Protocol protocol = UrlUtils.getProtocol(siteUrl);
+    }
 
-        Site site = siteMap.get(siteUrlString);
-
+    private void initSite(URL url) {
+        Site site = getSite(url);
         if (site == null) {
-            site = createSiteInstance(siteUrl);
-
-            if (site instanceof RemoteSite) {
-                RemoteSite remoteSite = (RemoteSite) site;
-                Class clientClass = config.getClientClass(protocol);
-
-                ClientConfig siteConfig = config.getClientConfig(remoteSite);
-                if (siteConfig == null) {
-                    siteConfig = config.createClientConfig(remoteSite);
-                    config.setClientConfig(siteConfig, remoteSite);
-                }
-
-                Client client = createClientInstance(clientClass, siteConfig);
-                remoteSite.setClient(client);
-            }
-
+            String siteUrlString = UrlUtils.getSiteUrlString(url);
+            site = createSiteInstance(siteUrlString);
             siteMap.put(siteUrlString, site);
         }
-        return site;
+    }
+
+    private void initFileOperationProvider(URL normalizedUrl, Protocol protocol, FileType fileType, Site site) throws InstantiationException, IllegalAccessException {
+        FileOperationProvider fileOperationProvider = getFileOperationProvider(normalizedUrl);
+        if (fileOperationProvider == null) {
+            Map<FileType, FileOperationProvider> fileOperationProviderMap = siteToFileOperationProvidersMap.get(site);
+            if (fileOperationProviderMap == null) {
+                fileOperationProviderMap = new HashMap<>();
+                siteToFileOperationProvidersMap.put(site, fileOperationProviderMap);
+            }
+
+            Class instanceClass = config.getFileOperationProviderClassMap(protocol).get(fileType);
+            fileOperationProvider = createFileOperationProviderInstance(instanceClass, site, fileType);
+            fileOperationProviderMap.put(fileType, fileOperationProvider);
+        }
     }
 }

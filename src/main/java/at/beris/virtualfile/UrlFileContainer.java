@@ -11,15 +11,12 @@ package at.beris.virtualfile;
 
 
 import at.beris.virtualfile.exception.NotImplementedException;
-import at.beris.virtualfile.operation.FileOperation;
-import at.beris.virtualfile.operation.FileOperationEnum;
 
 import java.net.URL;
-import java.util.Map;
 
 public class UrlFileContainer extends UrlFile implements FileContainer {
-    public UrlFileContainer(File parent, URL url, FileModel model, Map<FileOperationEnum, FileOperation> fileOperationMap, Site site) {
-        super(parent, url, model, fileOperationMap, site);
+    public UrlFileContainer(File parent, URL url, FileModel model, FileContext context) {
+        super(parent, url, model, context);
     }
 
     @Override

@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.util;
 
+import at.beris.virtualfile.FileType;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 
@@ -16,15 +17,28 @@ import java.net.URL;
 
 public class UrlUtils {
     public static Protocol getProtocol(URL url) {
-        Protocol protocol = null;
         String protocolString = url.getProtocol();
 
         try {
-            protocol = Protocol.valueOf(url.getProtocol().toUpperCase());
+            return Protocol.valueOf(url.getProtocol().toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new VirtualFileException("Unknown protocol: " + protocolString);
         }
+    }
 
-        return protocol;
+    public static String getSiteUrlString(URL url) {
+        String urlString = url.toString();
+        return urlString.substring(0, urlString.indexOf("/", urlString.indexOf("//") + 2));
+    }
+
+    public static FileType getFileTypeForUrl(URL url) {
+        FileType fileType = FileType.DEFAULT;
+        String[] pathParts = url.toString().split("/");
+
+        if (FileUtils.isArchive(pathParts[pathParts.length - 1]))
+            fileType = FileType.ARCHIVE;
+        else if (FileUtils.isArchived(url))
+            fileType = FileType.ARCHIVED;
+        return fileType;
     }
 }
