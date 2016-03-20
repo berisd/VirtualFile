@@ -33,15 +33,15 @@ List<File> fileList = file.list(new FileNameFilter().endsWith(".txt").and(new Fi
 
 5) Transfer a file with the sftp protocol and public key authentication (stricthostchecking is on by default, so there must be an entry for the host in the known_hosts file (Under Linux that's usually ~/.ssh/known_hosts). You can set the location of the known_hosts file with FileConfig.setKnownHostsFile().
 ```java
-FileConfig config = new FileConfig().setClientAuthenticationType(AuthenticationType.PUBLIC_KEY)
+FileManager.getConfig().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
   .setPrivateKeyFile("/home/myuser/.ssh/id_dsa");
-File file = FileManager.newFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip", config);
+File file = FileManager.newFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip");
 file.copy(FileMananger.newLocalDirectory("."));
 ```
 
 6) Transfer a file with the sftp protocol without stricthostchecking and password authentication.
 ```java
-FileConfig config = new FileConfig().setClientStrictHostKeyChecking(false);
+FileManager.getConfig().setStrictHostKeyChecking(false);
 File file = FileManager.newFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip", config);
 file.copy(FileMananger.newLocalDirectory("."));
 ```
