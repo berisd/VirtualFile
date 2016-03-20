@@ -12,7 +12,7 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.cache.LRUMap;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.ClientConfig;
-import at.beris.virtualfile.config.FileContextConfig;
+import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.logging.FileLoggingWrapper;
@@ -29,14 +29,14 @@ import java.net.URL;
 import java.util.*;
 
 public class FileContext {
-    private FileContextConfig config;
+    private Configurator config;
 
     private Map<String, Site> siteMap;
     private Map<Site, Map<FileType, FileOperationProvider>> siteToFileOperationProvidersMap;
     private Map<FileOperationProvider, Map<FileOperationEnum, FileOperation>> fileOperationProviderToOperationMap;
     private Map<String, File> fileCache;
 
-    public FileContext(FileContextConfig config) {
+    public FileContext(Configurator config) {
         registerProtocolURLStreamHandlers();
 
         this.config = config;
@@ -46,7 +46,7 @@ public class FileContext {
         this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(config.getBaseConfig().getFileCacheSize()));
     }
 
-    public FileContextConfig getConfig() {
+    public Configurator getConfig() {
         return config;
     }
 

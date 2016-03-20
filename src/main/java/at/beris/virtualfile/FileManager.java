@@ -9,7 +9,8 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.FileContextConfig;
+import at.beris.virtualfile.config.Configurator;
+import at.beris.virtualfile.config.SimpleConfigurator;
 import at.beris.virtualfile.logging.FileManagerLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
 
@@ -18,14 +19,21 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class FileManager {
-    private static FileContext fileContext;
+    private static final FileContext fileContext;
+    private static final SimpleConfigurator configurator;
+
+    static {
+        fileContext = new FileContext(new Configurator());
+        fileContext.registerProtocolURLStreamHandlers();
+        configurator = new SimpleConfigurator(fileContext.getConfig());
+    }
 
     private FileManager() {
         super();
     }
 
-    public static FileContextConfig getConfig() {
-        return getFileContext().getConfig();
+    public static SimpleConfigurator getConfig() {
+        return configurator;
     }
 
     /**
@@ -35,7 +43,7 @@ public class FileManager {
      * @return
      */
     public static File newLocalFile(String path) {
-        return new FileManagerLoggingWrapper(getFileContext().newLocalFile(path));
+        return new FileManagerLoggingWrapper(fileContext.newLocalFile(path));
     }
 
     /**
@@ -45,7 +53,7 @@ public class FileManager {
      * @return
      */
     public static Directory newLocalDirectory(String path) {
-        return (Directory) new FileManagerLoggingWrapper(getFileContext().newLocalFile(path +
+        return new FileManagerLoggingWrapper(fileContext.newLocalFile(path +
                 (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator)));
     }
 
@@ -56,57 +64,46 @@ public class FileManager {
      * @return
      */
     public static Archive newLocalArchive(String path) {
-        return (Archive) new FileManagerLoggingWrapper(getFileContext().newLocalFile(path));
+        return new FileManagerLoggingWrapper(fileContext.newLocalFile(path));
     }
 
     public static File newFile(String url) {
-        return new FileManagerLoggingWrapper(getFileContext().newFile(url));
+        return new FileManagerLoggingWrapper(fileContext.newFile(url));
     }
 
     public static File newFile(URL parentUrl, URL url) {
-        return new FileManagerLoggingWrapper(getFileContext().newFile(parentUrl, url));
+        return new FileManagerLoggingWrapper(fileContext.newFile(parentUrl, url));
     }
 
     public static File newFile(File parent, URL url) {
-        return new FileManagerLoggingWrapper(getFileContext().newFile(parent, url));
+        return new FileManagerLoggingWrapper(fileContext.newFile(parent, url));
     }
 
     public static File newFile(URL url) {
-        return new FileManagerLoggingWrapper(getFileContext().newFile(url));
+        return new FileManagerLoggingWrapper(fileContext.newFile(url));
     }
 
     public static Directory newDirectory(URL url) {
-        return (Directory) new FileManagerLoggingWrapper(getFileContext().newFile(url));
+        return new FileManagerLoggingWrapper(fileContext.newFile(url));
     }
 
     public static Archive newArchive(URL url) {
-        return (Archive) new FileManagerLoggingWrapper(getFileContext().newFile(url));
+        return new FileManagerLoggingWrapper(fileContext.newFile(url));
     }
 
-
     public static void dispose(File file) {
-        getFileContext().dispose(file);
+        fileContext.dispose(file);
     }
 
     public static Set<Protocol> enabledProtocols() {
-        //TODO only return enabled Protocols
-        return EnumSet.allOf(Protocol.class);
+        return fileContext.enabledProtocols();
     }
 
     public static Set<Protocol> allProtocols() {
         return EnumSet.allOf(Protocol.class);
     }
 
-    private static FileContext getFileContext() {
-        if (fileContext == null) {
-            fileContext = new FileContext(new FileContextConfig());
-            fileContext.registerProtocolURLStreamHandlers();
-        }
-        return fileContext;
-    }
-
     public static void registerProtocolURLStreamHandlers() {
-        //implicitly calls registerProtocolURLStreamHandlers
-        getFileContext();
+        fileContext.registerProtocolURLStreamHandlers();
     }
 }

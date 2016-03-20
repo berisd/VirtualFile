@@ -21,7 +21,7 @@ import at.beris.virtualfile.provider.SftpFileOperationProvider;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FileContextConfig {
+public class Configurator {
     private Map<Protocol, Map<FileType, Class>> fileOperationProviderClassMap;
     private Map<Protocol, Class> clientClassMap;
 
@@ -31,7 +31,7 @@ public class FileContextConfig {
     private Map<Protocol, ClientConfig> clientConfigPerProtocolMap;
     private Map<RemoteSite, ClientConfig> clientConfigPerSiteMap;
 
-    public FileContextConfig() {
+    public Configurator() {
         fileOperationProviderClassMap = new HashMap<>();
         clientClassMap = new HashMap<>();
         clientConfigPerProtocolMap = new HashMap<>();

@@ -63,7 +63,7 @@ public class SamplesTest {
     @Test
     public void AuthWithPublicKey() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
-        FileManager.getConfig().getClientConfig().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
+        FileManager.getConfig().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
                 .setPrivateKeyFile(TestFileHelper.TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "id_dsa");
         File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
         assertTrue(file.isDirectory());
@@ -72,7 +72,7 @@ public class SamplesTest {
     @Test
     public void AuthWithPasswordNoStrictHost() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
-        FileManager.getConfig().getClientConfig().setStrictHostKeyChecking(false);
+        FileManager.getConfig().setStrictHostKeyChecking(false);
         File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
         assertTrue(file.isDirectory());
     }

@@ -22,12 +22,12 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
-public class FileContextConfigTest {
-    private FileContextConfig config;
+public class ConfiguratorTest {
+    private Configurator config;
 
     @Before
     public void setUp() {
-        config = new FileContextConfig();
+        config = new Configurator();
         new FileContext(config).registerProtocolURLStreamHandlers();
     }
 
