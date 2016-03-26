@@ -10,7 +10,9 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.File;
-import at.beris.virtualfile.*;
+import at.beris.virtualfile.FileContext;
+import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
@@ -25,11 +27,8 @@ import java.util.List;
 
 public class LocalArchivedFileOperationProvider extends AbstractFileOperationProvider {
 
-    private LocalSite site;
-
-    public LocalArchivedFileOperationProvider(FileContext fileContext, Site site) {
-        super(fileContext);
-        this.site = (LocalSite) site;
+    public LocalArchivedFileOperationProvider(FileContext fileContext, Client client) {
+        super(fileContext, client);
     }
 
     @Override

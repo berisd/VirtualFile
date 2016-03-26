@@ -9,14 +9,12 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.UrlUtils;
 
 import java.net.URL;
 
 public class UrlSite implements RemoteSite {
-    private Client client;
     private Protocol protocol;
     private String host;
     private int port;
@@ -27,20 +25,15 @@ public class UrlSite implements RemoteSite {
         protocol = UrlUtils.getProtocol(url);
         host = url.getHost();
         port = url.getPort();
-        String userInfoParts[] = url.getUserInfo().split(":");
-        username = userInfoParts[0];
-        password = userInfoParts[1].toCharArray();
-    }
 
-    @Override
-    public Client getClient() {
-        return client;
-    }
-
-    @Override
-    public void setClient(Client client) {
-        this.client = client;
-        initClient(client);
+        String userInfo = url.getUserInfo();
+        if (userInfo != null) {
+            String userInfoParts[] = url.getUserInfo().split(":");
+            username = userInfoParts[0];
+            if (userInfoParts.length > 1) {
+                password = userInfoParts[1].toCharArray();
+            }
+        }
     }
 
     @Override
@@ -91,12 +84,5 @@ public class UrlSite implements RemoteSite {
     @Override
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
-    }
-
-    private void initClient(Client client) {
-        client.setHost(host);
-        client.setPort(port);
-        client.setUsername(username);
-        client.setPassword(password);
     }
 }

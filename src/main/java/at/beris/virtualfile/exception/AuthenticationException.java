@@ -7,14 +7,10 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile.exception;
 
-public enum ClientConfigOption {
-    KNOWN_HOSTS_FILE,
-    TIMEOUT,
-    STRICT_HOSTKEY_CHECKING,
-    AUTHENTICATION_TYPE,
-    PRIVATE_KEY_FILE,
-    USERNAME,
-    PASSWORD
+public class AuthenticationException extends VirtualFileException {
+    public AuthenticationException(String message) {
+        super(message);
+    }
 }

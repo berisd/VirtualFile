@@ -9,12 +9,14 @@
 
 package at.beris.virtualfile.client;
 
+import at.beris.virtualfile.RemoteSite;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.config.AuthenticationType;
 import at.beris.virtualfile.config.ClientConfig;
 import at.beris.virtualfile.exception.AccessDeniedException;
+import at.beris.virtualfile.exception.AuthenticationException;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import com.jcraft.jsch.*;
@@ -38,13 +40,11 @@ public class SftpClient implements Client {
     private JSch jsch;
     private Session session;
     private ChannelSftp sftpChannel;
-    private String username;
-    private char[] password;
-    private String host;
-    private int port;
     private ClientConfig config;
+    private RemoteSite site;
 
-    public SftpClient(ClientConfig config) {
+    public SftpClient(RemoteSite site, ClientConfig config) {
+        this.site = site;
         this.config = config;
     }
 
@@ -63,10 +63,10 @@ public class SftpClient implements Client {
             if (config.getAuthenticationType() == AuthenticationType.PUBLIC_KEY && !StringUtils.isBlank(String.valueOf(config.getPrivateKeyFile())))
                 jsch.addIdentity(String.valueOf(config.getPrivateKeyFile()));
 
-            session = jsch.getSession(username, host, port);
+            session = jsch.getSession(username(), host(), port());
             session.setConfig(sessionConfig);
             if (config.getAuthenticationType() == AuthenticationType.PASSWORD)
-                session.setPassword(String.valueOf(password));
+                session.setPassword(String.valueOf(password()));
             session.setTimeout(config.getTimeOut() * 1000);
         } catch (JSchException e) {
             throw new VirtualFileException(e);
@@ -74,48 +74,18 @@ public class SftpClient implements Client {
     }
 
     @Override
-    public String getHost() {
-        return host;
+    public RemoteSite getSite() {
+        return site;
     }
 
     @Override
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Override
-    public char[] getPassword() {
-        return password;
-    }
-
-    @Override
-    public void setPassword(char[] password) {
-        this.password = password;
+    public void setSite(RemoteSite site) {
+        this.site = site;
     }
 
     @Override
     public void connect() {
-        LOGGER.info("Connect to " + username + "@" + host + ":" + String.valueOf(port));
+        LOGGER.info("Connect to " + username() + "@" + host() + ":" + String.valueOf(port()));
         try {
             session.connect();
             HostKey hostkey = session.getHostKey();
@@ -129,7 +99,7 @@ public class SftpClient implements Client {
 
     @Override
     public void disconnect() {
-        LOGGER.info("Disconnect from " + username + "@" + host + ":" + String.valueOf(port));
+        LOGGER.info("Disconnect from " + username() + "@" + host() + ":" + String.valueOf(port()));
         if (sftpChannel != null)
             sftpChannel.disconnect();
         if (session != null)
@@ -338,5 +308,32 @@ public class SftpClient implements Client {
 
     private boolean isDir(String path) throws SftpException {
         return sftpChannel.stat(path).isDir();
+    }
+
+    private String username() {
+        if (site.getUsername() != null)
+            return site.getUsername();
+        else if (config.getUsername() != null)
+            return config.getUsername();
+        else
+            throw new AuthenticationException("Username not found.");
+    }
+
+    private char[] password() {
+        if (site.getPassword() != null)
+            return site.getPassword();
+        else if (config.getPassword() != null)
+            return config.getPassword();
+        else
+            throw new AuthenticationException("Password not found.");
+    }
+
+    private String host() {
+        return site.getHost();
+    }
+
+    private int port() {
+        int port = site.getPort();
+        return port != -1 ? port : 22;
     }
 }

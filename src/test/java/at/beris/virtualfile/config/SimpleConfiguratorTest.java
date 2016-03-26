@@ -28,6 +28,10 @@ public class SimpleConfiguratorTest {
     public static final String PRIVATE_KEY_FILE = "privatekeyfile";
     public static final String PRIVATE_KEY_FILE2 = "privatekeyfile2";
     public static final String PRIVATE_KEY_FILE3 = "privatekeyfile3";
+    public static final String USERNAME1 = "user1";
+    public static final String USERNAME2 = "user2";
+    public static final String PASSWORD1 = "pwd1";
+    public static final String PASSWORD2 = "pwd2";
     public static final Integer TIME_OUT = 111;
     public static final Integer TIME_OUT2 = 112;
     public static final Integer TIME_OUT3 = 113;
@@ -61,6 +65,10 @@ public class SimpleConfiguratorTest {
         assertEquals(TIME_OUT, config.getTimeOut());
         assertEquals(TIME_OUT2, config.getTimeOut(Protocol.SFTP));
         assertEquals(TIME_OUT3, config.getTimeOut(site));
+        assertEquals(USERNAME1, config.getUsername());
+        assertEquals(USERNAME2, config.getUsername(site));
+        assertEquals(PASSWORD1, String.valueOf(config.getPassword()));
+        assertEquals(PASSWORD2, String.valueOf(config.getPassword(site)));
     }
 
     @Test
@@ -99,5 +107,9 @@ public class SimpleConfiguratorTest {
         config.setTimeOut(TIME_OUT);
         config.setTimeOut(TIME_OUT2, Protocol.SFTP);
         config.setTimeOut(TIME_OUT3, site);
+        config.setUsername(USERNAME1);
+        config.setUsername(USERNAME2, site);
+        config.setPassword(PASSWORD1);
+        config.setPassword(PASSWORD2, site);
     }
 }

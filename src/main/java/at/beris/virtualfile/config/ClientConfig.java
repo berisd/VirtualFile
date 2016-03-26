@@ -26,6 +26,8 @@ public class ClientConfig {
         settings.put(ClientConfigOption.TIMEOUT, new IntegerConfigValue(10));
         settings.put(ClientConfigOption.AUTHENTICATION_TYPE, new EnumConfigValue(AuthenticationType.PASSWORD));
         settings.put(ClientConfigOption.PRIVATE_KEY_FILE, new StringConfigValue(""));
+        settings.put(ClientConfigOption.USERNAME, new StringConfigValue(""));
+        settings.put(ClientConfigOption.PASSWORD, new CharArrayConfigValue(new char[]{}));
     }
 
     public void remove(ClientConfigOption key) {
@@ -87,6 +89,26 @@ public class ClientConfig {
 
     public ClientConfig setPrivateKeyFile(String privateKeyFile) {
         settings.put(ClientConfigOption.PRIVATE_KEY_FILE, new StringConfigValue(privateKeyFile));
+        return this;
+    }
+
+    public String getUsername() {
+        ConfigValue configValue = settings.get(ClientConfigOption.USERNAME);
+        return configValue != null ? (String) configValue.getValue() : null;
+    }
+
+    public ClientConfig setUsername(String username) {
+        settings.put(ClientConfigOption.USERNAME, new StringConfigValue(username));
+        return this;
+    }
+
+    public char[] getPassword() {
+        ConfigValue configValue = settings.get(ClientConfigOption.PASSWORD);
+        return configValue != null ? (char[]) configValue.getValue() : null;
+    }
+
+    public ClientConfig setPassword(char[] password) {
+        settings.put(ClientConfigOption.PASSWORD, new CharArrayConfigValue(password));
         return this;
     }
 }

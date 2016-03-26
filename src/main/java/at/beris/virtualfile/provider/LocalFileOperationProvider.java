@@ -9,11 +9,14 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.*;
+import at.beris.virtualfile.FileContext;
+import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
+import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.PermissionDeniedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
@@ -34,11 +37,8 @@ import java.util.Set;
 public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     private final static Logger LOGGER = LoggerFactory.getLogger(LocalFileOperationProvider.class);
 
-    protected LocalSite site;
-
-    public LocalFileOperationProvider(FileContext fileContext, Site site) {
-        super(fileContext);
-        this.site = (LocalSite) site;
+    public LocalFileOperationProvider(FileContext fileContext, Client client) {
+        super(fileContext, client);
     }
 
     @Override

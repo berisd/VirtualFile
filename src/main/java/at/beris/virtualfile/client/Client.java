@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.client;
 
+import at.beris.virtualfile.RemoteSite;
 import at.beris.virtualfile.attribute.FileAttribute;
 
 import java.io.InputStream;
@@ -22,21 +23,9 @@ import java.util.Set;
 public interface Client {
     void init();
 
-    String getHost();
+    RemoteSite getSite();
 
-    void setHost(String host);
-
-    int getPort();
-
-    void setPort(int port);
-
-    String getUsername();
-
-    void setUsername(String username);
-
-    char[] getPassword();
-
-    void setPassword(char[] password);
+    void setSite(RemoteSite site);
 
     void connect();
 

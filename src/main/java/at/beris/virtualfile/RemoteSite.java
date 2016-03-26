@@ -9,14 +9,9 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.protocol.Protocol;
 
 public interface RemoteSite extends Site {
-    Client getClient();
-
-    void setClient(Client client);
-
     String getHost();
 
     void setHost(String host);

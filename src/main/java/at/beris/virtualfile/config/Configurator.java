@@ -108,7 +108,10 @@ public class Configurator {
             if (value == null)
                 value = defaultClientConfig.get(configKey);
 
-            config.set(configKey, value.clone());
+            if (value != null)
+                config.set(configKey, value.clone());
+            else
+                config.set(configKey, null);
         }
 
         return config;

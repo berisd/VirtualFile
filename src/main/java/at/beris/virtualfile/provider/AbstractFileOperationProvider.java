@@ -12,6 +12,7 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.filter.Filter;
 
 import java.io.InputStream;
@@ -20,10 +21,12 @@ import java.util.List;
 
 public abstract class AbstractFileOperationProvider implements FileOperationProvider {
     protected FileContext fileContext;
+    protected Client client;
 
-    public AbstractFileOperationProvider(FileContext fileContext) {
+    public AbstractFileOperationProvider(FileContext fileContext, Client client) {
         super();
         this.fileContext = fileContext;
+        this.client = client;
     }
 
     @Override

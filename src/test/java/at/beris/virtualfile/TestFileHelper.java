@@ -53,12 +53,9 @@ public class TestFileHelper {
     }
 
     public static SftpClient createSftpClient(URL url) throws IOException {
-        SftpClient sftpClient = new SftpClient(new ClientConfig());
-        sftpClient.setHost(url.getHost());
-        sftpClient.setPort(url.getPort());
-        sftpClient.setUsername(url.getUserInfo().split(":")[0]);
-        sftpClient.setPassword(readSftpPassword().toCharArray());
+        RemoteSite site = new UrlSite(url);
 
+        SftpClient sftpClient = new SftpClient(site, new ClientConfig());
         sftpClient.init();
         sftpClient.connect();
 

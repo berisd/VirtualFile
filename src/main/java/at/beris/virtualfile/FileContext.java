@@ -32,7 +32,8 @@ public class FileContext {
     private Configurator config;
 
     private Map<String, Site> siteMap;
-    private Map<Site, Map<FileType, FileOperationProvider>> siteToFileOperationProvidersMap;
+    private Map<Site, Client> siteToClientMap;
+    private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
     private Map<FileOperationProvider, Map<FileOperationEnum, FileOperation>> fileOperationProviderToOperationMap;
     private Map<String, File> fileCache;
 
@@ -41,7 +42,8 @@ public class FileContext {
 
         this.config = config;
         this.siteMap = new HashMap<>();
-        this.siteToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Site, Map<FileType, FileOperationProvider>>());
+        this.siteToClientMap = new HashMap<>();
+        this.clientToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Client, Map<FileType, FileOperationProvider>>());
         this.fileOperationProviderToOperationMap = Collections.synchronizedMap(new HashMap<FileOperationProvider, Map<FileOperationEnum, FileOperation>>());
         this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(config.getBaseConfig().getFileCacheSize()));
     }
@@ -157,6 +159,10 @@ public class FileContext {
         return siteMap.get(UrlUtils.getSiteUrlString(url));
     }
 
+    Client getClient(Site site) {
+        return siteToClientMap.get(site);
+    }
+
     Map<FileOperationEnum, FileOperation> getFileOperationMap(URL url) {
         FileOperationProvider fileOperationProvider = getFileOperationProvider(url);
 
@@ -166,14 +172,12 @@ public class FileContext {
     }
 
     FileOperationProvider getFileOperationProvider(URL url) {
-        Site site = getSite(url);
+        Client client = getClient(getSite(url));
         FileType fileType = UrlUtils.getFileTypeForUrl(url);
 
-        if (site != null && fileType != null) {
-            Map<FileType, FileOperationProvider> fileOperationProviderMap = siteToFileOperationProvidersMap.get(site);
-            if (fileOperationProviderMap != null)
-                return this.siteToFileOperationProvidersMap.get(site).get(fileType);
-        }
+        Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
+        if (fileOperationProviderMap != null)
+            return this.clientToFileOperationProvidersMap.get(client).get(fileType);
         return null;
     }
 
@@ -187,7 +191,8 @@ public class FileContext {
         try {
             FileType fileType = UrlUtils.getFileTypeForUrl(normalizedUrl);
             initSite(normalizedUrl);
-            initFileOperationProvider(normalizedUrl, protocol, fileType, getSite(normalizedUrl));
+            initClient(getSite(normalizedUrl));
+            initFileOperationProvider(normalizedUrl, protocol, fileType, getClient(getSite(normalizedUrl)));
             FileOperationProvider fileOperationProvider = this.getFileOperationProvider(url);
             initFileOperationMap(protocol, fileOperationProvider);
 
@@ -206,13 +211,16 @@ public class FileContext {
         return file;
     }
 
-    private Client createClientInstance(Class clientClass, ClientConfig clientConfig) {
+    private Client createClientInstance(RemoteSite site) {
         Client client = null;
+
+        Class clientClass = config.getClientClass(site.getProtocol());
 
         if (clientClass != null) {
             try {
-                Constructor constructor = clientClass.getConstructor(ClientConfig.class);
-                client = (Client) constructor.newInstance(clientConfig);
+                ClientConfig clientConfig = config.getClientConfig(site);
+                Constructor constructor = clientClass.getConstructor(RemoteSite.class, ClientConfig.class);
+                client = (Client) constructor.newInstance(site, clientConfig);
             } catch (ReflectiveOperationException e) {
                 throw new VirtualFileException(e);
             }
@@ -230,17 +238,6 @@ public class FileContext {
             else {
                 Constructor constructor = UrlSite.class.getConstructor(URL.class);
                 RemoteSite site = (RemoteSite) constructor.newInstance(url);
-
-                Class clientClass = config.getClientClass(protocol);
-
-                ClientConfig siteConfig = config.getClientConfig(site);
-                if (siteConfig == null) {
-                    siteConfig = config.createClientConfig(site);
-                    config.setClientConfig(siteConfig, site);
-                }
-
-                Client client = createClientInstance(clientClass, siteConfig);
-                site.setClient(client);
                 return site;
             }
         } catch (ReflectiveOperationException e) {
@@ -311,13 +308,13 @@ public class FileContext {
         return map;
     }
 
-    private FileOperationProvider createFileOperationProviderInstance(Class instanceClass, Site site, FileType fileType) throws InstantiationException, IllegalAccessException {
+    private FileOperationProvider createFileOperationProviderInstance(Class instanceClass, Client client) throws InstantiationException, IllegalAccessException {
         FileOperationProvider instance = null;
 
         Constructor constructor = null;
         try {
-            constructor = instanceClass.getConstructor(this.getClass(), Site.class);
-            instance = (FileOperationProvider) constructor.newInstance(this, site);
+            constructor = instanceClass.getConstructor(this.getClass(), Client.class);
+            instance = (FileOperationProvider) constructor.newInstance(this, client);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
         }
@@ -333,26 +330,43 @@ public class FileContext {
         }
     }
 
+    private void initClient(Site site) {
+        Client client = getClient(site);
+        if (client == null && site instanceof RemoteSite) {
+            client = createClientInstance((RemoteSite) site);
+            siteToClientMap.put(site, client);
+        }
+    }
+
     private void initSite(URL url) {
         Site site = getSite(url);
         if (site == null) {
             String siteUrlString = UrlUtils.getSiteUrlString(url);
             site = createSiteInstance(siteUrlString);
             siteMap.put(siteUrlString, site);
+
+            if (site instanceof RemoteSite) {
+                RemoteSite remoteSite = (RemoteSite) site;
+                ClientConfig siteConfig = config.getClientConfig(remoteSite);
+                if (siteConfig == null) {
+                    siteConfig = config.createClientConfig(remoteSite);
+                    config.setClientConfig(siteConfig, remoteSite);
+                }
+            }
         }
     }
 
-    private void initFileOperationProvider(URL normalizedUrl, Protocol protocol, FileType fileType, Site site) throws InstantiationException, IllegalAccessException {
+    private void initFileOperationProvider(URL normalizedUrl, Protocol protocol, FileType fileType, Client client) throws InstantiationException, IllegalAccessException {
         FileOperationProvider fileOperationProvider = getFileOperationProvider(normalizedUrl);
         if (fileOperationProvider == null) {
-            Map<FileType, FileOperationProvider> fileOperationProviderMap = siteToFileOperationProvidersMap.get(site);
+            Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
             if (fileOperationProviderMap == null) {
                 fileOperationProviderMap = new HashMap<>();
-                siteToFileOperationProvidersMap.put(site, fileOperationProviderMap);
+                clientToFileOperationProvidersMap.put(client, fileOperationProviderMap);
             }
 
             Class instanceClass = config.getFileOperationProviderClassMap(protocol).get(fileType);
-            fileOperationProvider = createFileOperationProviderInstance(instanceClass, site, fileType);
+            fileOperationProvider = createFileOperationProviderInstance(instanceClass, client);
             fileOperationProviderMap.put(fileType, fileOperationProvider);
         }
     }

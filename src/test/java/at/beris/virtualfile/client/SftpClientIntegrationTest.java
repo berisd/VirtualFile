@@ -10,16 +10,18 @@
 package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.RemoteSite;
 import at.beris.virtualfile.TestFileHelper;
+import at.beris.virtualfile.UrlSite;
 import at.beris.virtualfile.config.ClientConfig;
 import at.beris.virtualfile.exception.AccessDeniedException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 
 import static org.junit.Assert.*;
 
@@ -107,15 +109,12 @@ public class SftpClientIntegrationTest {
         sftpClient.createFile("../abc.txt");
     }
 
-    private static SftpClient createSftpClient() throws IOException {
+    private static SftpClient createSftpClient() throws Exception {
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.initValues();
-        sftpClient = new SftpClient(clientConfig);
-        sftpClient.setHost("www.beris.at");
-        sftpClient.setPort(22);
-        sftpClient.setUsername("sshtest");
-        sftpClient.setPassword(TestFileHelper.readSftpPassword().toCharArray());
-        return sftpClient;
+        char[] password = TestFileHelper.readSftpPassword().toCharArray();
+        RemoteSite site = new UrlSite(new URL("sftp://sshtest:" + String.valueOf(password) + "@www.beris.at:22"));
+        return new SftpClient(site, clientConfig);
     }
 
     private static void cleanUp() {

@@ -163,6 +163,54 @@ public class SimpleConfigurator {
         return this;
     }
 
+    public String getUsername() {
+        return configurator.getClientConfig().getUsername();
+    }
+
+
+    public String getUsername(RemoteSite site) {
+        return getClientConfigForSite(site).getUsername();
+    }
+
+    public SimpleConfigurator setUsername(String username) {
+        configurator.getClientConfig().setUsername(username);
+        return this;
+    }
+
+    public SimpleConfigurator setUsername(String username, RemoteSite site) {
+        getClientConfigForSite(site).setUsername(username);
+        return this;
+    }
+
+    public char[] getPassword() {
+        return configurator.getClientConfig().getPassword();
+    }
+
+
+    public char[] getPassword(RemoteSite site) {
+        return getClientConfigForSite(site).getPassword();
+    }
+
+    public SimpleConfigurator setPassword(char[] password) {
+        configurator.getClientConfig().setPassword(password);
+        return this;
+    }
+
+    public SimpleConfigurator setPassword(char[] password, RemoteSite site) {
+        getClientConfigForSite(site).setPassword(password);
+        return this;
+    }
+
+    public SimpleConfigurator setPassword(String password) {
+        configurator.getClientConfig().setPassword(password.toCharArray());
+        return this;
+    }
+
+    public SimpleConfigurator setPassword(String password, RemoteSite site) {
+        getClientConfigForSite(site).setPassword(password.toCharArray());
+        return this;
+    }
+
     private ClientConfig getClientConfigForSite(RemoteSite site) {
         ClientConfig clientConfig = configurator.getClientConfig(site);
         if (clientConfig == null) {
