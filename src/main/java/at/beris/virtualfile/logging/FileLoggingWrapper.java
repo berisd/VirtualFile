@@ -236,14 +236,6 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File, Directory,
     }
 
     @Override
-    public Site getSite() {
-        logger.debug("Get site for {}", rootFile);
-        Site site = wrappedFile.getSite();
-        logger.debug("Returns: {}", site);
-        return site;
-    }
-
-    @Override
     public long getSize() {
         logger.debug("Get size for {}", rootFile);
         long size = wrappedFile.getSize();

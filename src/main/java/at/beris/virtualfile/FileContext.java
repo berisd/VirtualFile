@@ -31,8 +31,7 @@ import java.util.*;
 public class FileContext {
     private Configurator config;
 
-    private Map<String, Site> siteMap;
-    private Map<Site, Client> siteToClientMap;
+    private Map<String, Client> urlToClientMap;
     private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
     private Map<FileOperationProvider, Map<FileOperationEnum, FileOperation>> fileOperationProviderToOperationMap;
     private Map<String, File> fileCache;
@@ -41,8 +40,7 @@ public class FileContext {
         registerProtocolURLStreamHandlers();
 
         this.config = config;
-        this.siteMap = new HashMap<>();
-        this.siteToClientMap = new HashMap<>();
+        this.urlToClientMap = new HashMap<>();
         this.clientToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Client, Map<FileType, FileOperationProvider>>());
         this.fileOperationProviderToOperationMap = Collections.synchronizedMap(new HashMap<FileOperationProvider, Map<FileOperationEnum, FileOperation>>());
         this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(config.getBaseConfig().getFileCacheSize()));
@@ -155,12 +153,8 @@ public class FileContext {
         return EnumSet.allOf(Protocol.class);
     }
 
-    Site getSite(URL url) {
-        return siteMap.get(UrlUtils.getSiteUrlString(url));
-    }
-
-    Client getClient(Site site) {
-        return siteToClientMap.get(site);
+    Client getClient(URL url) {
+        return urlToClientMap.get(url.toString());
     }
 
     Map<FileOperationEnum, FileOperation> getFileOperationMap(URL url) {
@@ -172,7 +166,7 @@ public class FileContext {
     }
 
     FileOperationProvider getFileOperationProvider(URL url) {
-        Client client = getClient(getSite(url));
+        Client client = urlToClientMap.get(url.toString());
         FileType fileType = UrlUtils.getFileTypeForUrl(url);
 
         Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
@@ -190,9 +184,8 @@ public class FileContext {
         File file = null;
         try {
             FileType fileType = UrlUtils.getFileTypeForUrl(normalizedUrl);
-            initSite(normalizedUrl);
-            initClient(getSite(normalizedUrl));
-            initFileOperationProvider(normalizedUrl, protocol, fileType, getClient(getSite(normalizedUrl)));
+            initClient(normalizedUrl);
+            initFileOperationProvider(normalizedUrl, protocol, fileType, getClient(normalizedUrl));
             FileOperationProvider fileOperationProvider = this.getFileOperationProvider(url);
             initFileOperationMap(protocol, fileOperationProvider);
 
@@ -211,40 +204,21 @@ public class FileContext {
         return file;
     }
 
-    private Client createClientInstance(RemoteSite site) {
+    private Client createClientInstance(URL url) {
         Client client = null;
 
-        Class clientClass = config.getClientClass(site.getProtocol());
+        Class clientClass = config.getClientClass(UrlUtils.getProtocol(url));
 
         if (clientClass != null) {
             try {
-                ClientConfig clientConfig = config.getClientConfig(site);
-                Constructor constructor = clientClass.getConstructor(RemoteSite.class, ClientConfig.class);
-                client = (Client) constructor.newInstance(site, clientConfig);
+                ClientConfig clientConfig = config.createClientConfig(url);
+                Constructor constructor = clientClass.getConstructor(URL.class, ClientConfig.class);
+                client = (Client) constructor.newInstance(url, clientConfig);
             } catch (ReflectiveOperationException e) {
                 throw new VirtualFileException(e);
             }
         }
         return client;
-    }
-
-    private Site createSiteInstance(String siteUrlString) {
-        try {
-            URL url = new URL(siteUrlString);
-            Protocol protocol = UrlUtils.getProtocol(url);
-
-            if (protocol == Protocol.FILE)
-                return new LocalSite();
-            else {
-                Constructor constructor = UrlSite.class.getConstructor(URL.class);
-                RemoteSite site = (RemoteSite) constructor.newInstance(url);
-                return site;
-            }
-        } catch (ReflectiveOperationException e) {
-            throw new VirtualFileException(e);
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
-        }
     }
 
     private File createFileInstance(File parent, URL normalizedUrl, FileModel fileModel) {
@@ -330,29 +304,11 @@ public class FileContext {
         }
     }
 
-    private void initClient(Site site) {
-        Client client = getClient(site);
-        if (client == null && site instanceof RemoteSite) {
-            client = createClientInstance((RemoteSite) site);
-            siteToClientMap.put(site, client);
-        }
-    }
-
-    private void initSite(URL url) {
-        Site site = getSite(url);
-        if (site == null) {
-            String siteUrlString = UrlUtils.getSiteUrlString(url);
-            site = createSiteInstance(siteUrlString);
-            siteMap.put(siteUrlString, site);
-
-            if (site instanceof RemoteSite) {
-                RemoteSite remoteSite = (RemoteSite) site;
-                ClientConfig siteConfig = config.getClientConfig(remoteSite);
-                if (siteConfig == null) {
-                    siteConfig = config.createClientConfig(remoteSite);
-                    config.setClientConfig(siteConfig, remoteSite);
-                }
-            }
+    private void initClient(URL url) {
+        Client client = getClient(url);
+        if (client == null) {
+            client = createClientInstance(url);
+            urlToClientMap.put(url.toString(), client);
         }
     }
 

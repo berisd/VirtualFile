@@ -9,8 +9,9 @@
 
 package at.beris.virtualfile.config;
 
-import at.beris.virtualfile.RemoteSite;
 import at.beris.virtualfile.protocol.Protocol;
+
+import java.net.URL;
 
 public class SimpleConfigurator {
     private Configurator configurator;
@@ -46,12 +47,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public AuthenticationType getAuthenticationType(RemoteSite site) {
-        return getClientConfigForSite(site).getAuthenticationType();
+    public AuthenticationType getAuthenticationType(URL url) {
+        return getClientConfigForUrl(url).getAuthenticationType();
     }
 
-    public SimpleConfigurator setAuthenticationType(AuthenticationType authenticationType, RemoteSite site) {
-        getClientConfigForSite(site).setAuthenticationType(authenticationType);
+    public SimpleConfigurator setAuthenticationType(AuthenticationType authenticationType, URL url) {
+        getClientConfigForUrl(url).setAuthenticationType(authenticationType);
         return this;
     }
 
@@ -73,12 +74,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public String getKnownHostsFile(RemoteSite site) {
-        return getClientConfigForSite(site).getKnownHostsFile();
+    public String getKnownHostsFile(URL url) {
+        return getClientConfigForUrl(url).getKnownHostsFile();
     }
 
-    public SimpleConfigurator setKnownHostsFile(String knownHostsFile, RemoteSite site) {
-        getClientConfigForSite(site).setKnownHostsFile(knownHostsFile);
+    public SimpleConfigurator setKnownHostsFile(String knownHostsFile, URL url) {
+        getClientConfigForUrl(url).setKnownHostsFile(knownHostsFile);
         return this;
     }
 
@@ -100,12 +101,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public String getPrivateKeyFile(RemoteSite site) {
-        return getClientConfigForSite(site).getPrivateKeyFile();
+    public String getPrivateKeyFile(URL url) {
+        return getClientConfigForUrl(url).getPrivateKeyFile();
     }
 
-    public SimpleConfigurator setPrivateKeyFile(String privateKeyFile, RemoteSite site) {
-        getClientConfigForSite(site).setPrivateKeyFile(privateKeyFile);
+    public SimpleConfigurator setPrivateKeyFile(String privateKeyFile, URL url) {
+        getClientConfigForUrl(url).setPrivateKeyFile(privateKeyFile);
         return this;
     }
 
@@ -127,12 +128,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public Boolean isStrictHostKeyChecking(RemoteSite site) {
-        return getClientConfigForSite(site).isStrictHostKeyChecking();
+    public Boolean isStrictHostKeyChecking(URL url) {
+        return getClientConfigForUrl(url).isStrictHostKeyChecking();
     }
 
-    public SimpleConfigurator setStrictHostKeyChecking(boolean strictHostKeyChecking, RemoteSite site) {
-        getClientConfigForSite(site).setStrictHostKeyChecking(strictHostKeyChecking);
+    public SimpleConfigurator setStrictHostKeyChecking(boolean strictHostKeyChecking, URL url) {
+        getClientConfigForUrl(url).setStrictHostKeyChecking(strictHostKeyChecking);
         return this;
     }
 
@@ -154,12 +155,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public Integer getTimeOut(RemoteSite site) {
-        return getClientConfigForSite(site).getTimeOut();
+    public Integer getTimeOut(URL url) {
+        return getClientConfigForUrl(url).getTimeOut();
     }
 
-    public SimpleConfigurator setTimeOut(int timeout, RemoteSite site) {
-        getClientConfigForSite(site).setTimeOut(timeout);
+    public SimpleConfigurator setTimeOut(int timeout, URL url) {
+        getClientConfigForUrl(url).setTimeOut(timeout);
         return this;
     }
 
@@ -168,8 +169,8 @@ public class SimpleConfigurator {
     }
 
 
-    public String getUsername(RemoteSite site) {
-        return getClientConfigForSite(site).getUsername();
+    public String getUsername(URL url) {
+        return getClientConfigForUrl(url).getUsername();
     }
 
     public SimpleConfigurator setUsername(String username) {
@@ -177,8 +178,8 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public SimpleConfigurator setUsername(String username, RemoteSite site) {
-        getClientConfigForSite(site).setUsername(username);
+    public SimpleConfigurator setUsername(String username, URL url) {
+        getClientConfigForUrl(url).setUsername(username);
         return this;
     }
 
@@ -187,8 +188,8 @@ public class SimpleConfigurator {
     }
 
 
-    public char[] getPassword(RemoteSite site) {
-        return getClientConfigForSite(site).getPassword();
+    public char[] getPassword(URL url) {
+        return getClientConfigForUrl(url).getPassword();
     }
 
     public SimpleConfigurator setPassword(char[] password) {
@@ -196,8 +197,8 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public SimpleConfigurator setPassword(char[] password, RemoteSite site) {
-        getClientConfigForSite(site).setPassword(password);
+    public SimpleConfigurator setPassword(char[] password, URL url) {
+        getClientConfigForUrl(url).setPassword(password);
         return this;
     }
 
@@ -206,16 +207,16 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public SimpleConfigurator setPassword(String password, RemoteSite site) {
-        getClientConfigForSite(site).setPassword(password.toCharArray());
+    public SimpleConfigurator setPassword(String password, URL url) {
+        getClientConfigForUrl(url).setPassword(password.toCharArray());
         return this;
     }
 
-    private ClientConfig getClientConfigForSite(RemoteSite site) {
-        ClientConfig clientConfig = configurator.getClientConfig(site);
+    private ClientConfig getClientConfigForUrl(URL url) {
+        ClientConfig clientConfig = configurator.getClientConfig(url);
         if (clientConfig == null) {
-            clientConfig = configurator.createClientConfig(site);
-            configurator.setClientConfig(clientConfig, site);
+            clientConfig = configurator.createClientConfig(url);
+            configurator.setClientConfig(clientConfig, url);
         }
         return clientConfig;
     }

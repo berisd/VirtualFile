@@ -9,7 +9,6 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.RemoteSite;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
@@ -26,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
@@ -41,10 +41,10 @@ public class SftpClient implements Client {
     private Session session;
     private ChannelSftp sftpChannel;
     private ClientConfig config;
-    private RemoteSite site;
+    private URL url;
 
-    public SftpClient(RemoteSite site, ClientConfig config) {
-        this.site = site;
+    public SftpClient(URL url, ClientConfig config) {
+        this.url = url;
         this.config = config;
     }
 
@@ -74,13 +74,13 @@ public class SftpClient implements Client {
     }
 
     @Override
-    public RemoteSite getSite() {
-        return site;
+    public URL getUrl() {
+        return url;
     }
 
     @Override
-    public void setSite(RemoteSite site) {
-        this.site = site;
+    public void setUrl(URL url) {
+        this.url = url;
     }
 
     @Override
@@ -311,8 +311,9 @@ public class SftpClient implements Client {
     }
 
     private String username() {
-        if (site.getUsername() != null)
-            return site.getUsername();
+        String usernameFromUrl = getUsernameFromUrl();
+        if (usernameFromUrl != null)
+            return usernameFromUrl;
         else if (config.getUsername() != null)
             return config.getUsername();
         else
@@ -320,8 +321,9 @@ public class SftpClient implements Client {
     }
 
     private char[] password() {
-        if (site.getPassword() != null)
-            return site.getPassword();
+        String passwordFromUrl = getPasswordFromUrl();
+        if (passwordFromUrl != null)
+            return passwordFromUrl.toCharArray();
         else if (config.getPassword() != null)
             return config.getPassword();
         else
@@ -329,11 +331,31 @@ public class SftpClient implements Client {
     }
 
     private String host() {
-        return site.getHost();
+        return url.getHost();
     }
 
     private int port() {
-        int port = site.getPort();
+        int port = url.getPort();
         return port != -1 ? port : 22;
+    }
+
+    private String getUsernameFromUrl() {
+        String userInfo = url.getUserInfo();
+        if (userInfo != null) {
+            String userInfoParts[] = url.getUserInfo().split(":");
+            return userInfoParts[0];
+        }
+        return null;
+    }
+
+    private String getPasswordFromUrl() {
+        String userInfo = url.getUserInfo();
+        if (userInfo != null) {
+            String userInfoParts[] = url.getUserInfo().split(":");
+            if (userInfoParts.length > 1) {
+                return userInfoParts[1];
+            }
+        }
+        return null;
     }
 }

@@ -10,14 +10,15 @@
 package at.beris.virtualfile.config;
 
 import at.beris.virtualfile.FileType;
-import at.beris.virtualfile.RemoteSite;
 import at.beris.virtualfile.client.SftpClient;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.LocalArchiveOperationProvider;
 import at.beris.virtualfile.provider.LocalArchivedFileOperationProvider;
 import at.beris.virtualfile.provider.LocalFileOperationProvider;
 import at.beris.virtualfile.provider.SftpFileOperationProvider;
+import at.beris.virtualfile.util.UrlUtils;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,13 +30,13 @@ public class Configurator {
 
     private ClientConfig defaultClientConfig;
     private Map<Protocol, ClientConfig> clientConfigPerProtocolMap;
-    private Map<RemoteSite, ClientConfig> clientConfigPerSiteMap;
+    private Map<URL, ClientConfig> clientConfigPerUrlMap;
 
     public Configurator() {
         fileOperationProviderClassMap = new HashMap<>();
         clientClassMap = new HashMap<>();
         clientConfigPerProtocolMap = new HashMap<>();
-        clientConfigPerSiteMap = new HashMap<>();
+        clientConfigPerUrlMap = new HashMap<>();
 
         baseConfig = new BaseConfig();
         baseConfig.initValues();
@@ -49,8 +50,8 @@ public class Configurator {
         clientConfigPerProtocolMap.put(Protocol.SFTP, new ClientConfig());
     }
 
-    public ClientConfig setClientConfig(ClientConfig config, RemoteSite site) {
-        return clientConfigPerSiteMap.put(site, config);
+    public ClientConfig setClientConfig(ClientConfig config, URL url) {
+        return clientConfigPerUrlMap.put(url, config);
     }
 
     public Map<FileType, Class> getFileOperationProviderClassMap(Protocol protocol) {
@@ -82,10 +83,10 @@ public class Configurator {
         return localFileProviderForExtMap;
     }
 
-    public ClientConfig createClientConfig(RemoteSite site) {
+    public ClientConfig createClientConfig(URL url) {
         ClientConfig config = new ClientConfig();
 
-        Protocol protocol = site.getProtocol();
+        Protocol protocol = UrlUtils.getProtocol(url);
 
         ClientConfig protocolConfig = clientConfigPerProtocolMap.get(protocol);
         if (protocolConfig == null) {
@@ -93,14 +94,14 @@ public class Configurator {
             clientConfigPerProtocolMap.put(protocol, protocolConfig);
         }
 
-        ClientConfig siteConfig = clientConfigPerSiteMap.get(site);
-        if (siteConfig == null) {
-            siteConfig = new ClientConfig();
-            clientConfigPerSiteMap.put(site, siteConfig);
+        ClientConfig urlConfig = clientConfigPerUrlMap.get(url);
+        if (urlConfig == null) {
+            urlConfig = new ClientConfig();
+            clientConfigPerUrlMap.put(url, urlConfig);
         }
 
         for (ClientConfigOption configKey : ClientConfigOption.values()) {
-            ConfigValue value = siteConfig.get(configKey);
+            ConfigValue value = urlConfig.get(configKey);
 
             if (value == null)
                 value = protocolConfig.get(configKey);
@@ -125,8 +126,8 @@ public class Configurator {
         return clientConfigPerProtocolMap.get(protocol);
     }
 
-    public ClientConfig getClientConfig(RemoteSite site) {
-        return clientConfigPerSiteMap.get(site);
+    public ClientConfig getClientConfig(URL url) {
+        return clientConfigPerUrlMap.get(url);
     }
 
     public BaseConfig getBaseConfig() {

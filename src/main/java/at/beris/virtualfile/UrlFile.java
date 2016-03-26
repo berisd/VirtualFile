@@ -36,7 +36,6 @@ public class UrlFile implements File, Comparable<UrlFile> {
     protected FileModel model;
     protected FileContext context;
 
-    private Site site;
     private Map<FileOperationEnum, FileOperation> fileOperationMap;
 
     public UrlFile(File parent, URL url, FileModel model, FileContext context) {
@@ -44,7 +43,6 @@ public class UrlFile implements File, Comparable<UrlFile> {
         this.model = model;
         this.model.setUrl(url);
         this.context = context;
-        this.site = context.getSite(url);
         this.fileOperationMap = context.getFileOperationMap(url);
     }
 
@@ -56,11 +54,6 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public FileModel getModel() {
         return model;
-    }
-
-    @Override
-    public Site getSite() {
-        return site;
     }
 
     @Override

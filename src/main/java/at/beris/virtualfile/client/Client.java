@@ -9,11 +9,11 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.RemoteSite;
 import at.beris.virtualfile.attribute.FileAttribute;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
@@ -23,9 +23,9 @@ import java.util.Set;
 public interface Client {
     void init();
 
-    RemoteSite getSite();
+    URL getUrl();
 
-    void setSite(RemoteSite site);
+    void setUrl(URL url);
 
     void connect();
 
