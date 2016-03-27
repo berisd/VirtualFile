@@ -9,10 +9,9 @@
 
 package at.beris.virtualfile.config;
 
+import at.beris.virtualfile.File;
 import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.protocol.Protocol;
-
-import java.net.URL;
 
 public class SimpleConfigurator {
     private Configurator configurator;
@@ -48,12 +47,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public AuthenticationType getAuthenticationType(URL url) {
-        return getClientConfigForUrl(url).getAuthenticationType();
+    public AuthenticationType getAuthenticationType(File file) {
+        return getClientConfigForFile(file).getAuthenticationType();
     }
 
-    public SimpleConfigurator setAuthenticationType(AuthenticationType authenticationType, URL url) {
-        getClientConfigForUrl(url).setAuthenticationType(authenticationType);
+    public SimpleConfigurator setAuthenticationType(AuthenticationType authenticationType, File file) {
+        getClientConfigForFile(file).setAuthenticationType(authenticationType);
         return this;
     }
 
@@ -75,12 +74,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public String getKnownHostsFile(URL url) {
-        return getClientConfigForUrl(url).getKnownHostsFile();
+    public String getKnownHostsFile(File file) {
+        return getClientConfigForFile(file).getKnownHostsFile();
     }
 
-    public SimpleConfigurator setKnownHostsFile(String knownHostsFile, URL url) {
-        getClientConfigForUrl(url).setKnownHostsFile(knownHostsFile);
+    public SimpleConfigurator setKnownHostsFile(String knownHostsFile, File file) {
+        getClientConfigForFile(file).setKnownHostsFile(knownHostsFile);
         return this;
     }
 
@@ -102,12 +101,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public String getPrivateKeyFile(URL url) {
-        return getClientConfigForUrl(url).getPrivateKeyFile();
+    public String getPrivateKeyFile(File file) {
+        return getClientConfigForFile(file).getPrivateKeyFile();
     }
 
-    public SimpleConfigurator setPrivateKeyFile(String privateKeyFile, URL url) {
-        getClientConfigForUrl(url).setPrivateKeyFile(privateKeyFile);
+    public SimpleConfigurator setPrivateKeyFile(String privateKeyFile, File file) {
+        getClientConfigForFile(file).setPrivateKeyFile(privateKeyFile);
         return this;
     }
 
@@ -129,12 +128,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public Boolean isStrictHostKeyChecking(URL url) {
-        return getClientConfigForUrl(url).isStrictHostKeyChecking();
+    public Boolean isStrictHostKeyChecking(File file) {
+        return getClientConfigForFile(file).isStrictHostKeyChecking();
     }
 
-    public SimpleConfigurator setStrictHostKeyChecking(boolean strictHostKeyChecking, URL url) {
-        getClientConfigForUrl(url).setStrictHostKeyChecking(strictHostKeyChecking);
+    public SimpleConfigurator setStrictHostKeyChecking(boolean strictHostKeyChecking, File file) {
+        getClientConfigForFile(file).setStrictHostKeyChecking(strictHostKeyChecking);
         return this;
     }
 
@@ -156,12 +155,12 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public Integer getTimeOut(URL url) {
-        return getClientConfigForUrl(url).getTimeOut();
+    public Integer getTimeOut(File file) {
+        return getClientConfigForFile(file).getTimeOut();
     }
 
-    public SimpleConfigurator setTimeOut(int timeout, URL url) {
-        getClientConfigForUrl(url).setTimeOut(timeout);
+    public SimpleConfigurator setTimeOut(int timeout, File file) {
+        getClientConfigForFile(file).setTimeOut(timeout);
         return this;
     }
 
@@ -170,8 +169,8 @@ public class SimpleConfigurator {
     }
 
 
-    public String getUsername(URL url) {
-        return getClientConfigForUrl(url).getUsername();
+    public String getUsername(File file) {
+        return getClientConfigForFile(file).getUsername();
     }
 
     public SimpleConfigurator setUsername(String username) {
@@ -179,8 +178,8 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public SimpleConfigurator setUsername(String username, URL url) {
-        getClientConfigForUrl(url).setUsername(username);
+    public SimpleConfigurator setUsername(String username, File file) {
+        getClientConfigForFile(file).setUsername(username);
         return this;
     }
 
@@ -189,8 +188,8 @@ public class SimpleConfigurator {
     }
 
 
-    public char[] getPassword(URL url) {
-        return getClientConfigForUrl(url).getPassword();
+    public char[] getPassword(File file) {
+        return getClientConfigForFile(file).getPassword();
     }
 
     public SimpleConfigurator setPassword(char[] password) {
@@ -198,8 +197,8 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public SimpleConfigurator setPassword(char[] password, URL url) {
-        getClientConfigForUrl(url).setPassword(password);
+    public SimpleConfigurator setPassword(char[] password, File file) {
+        getClientConfigForFile(file).setPassword(password);
         return this;
     }
 
@@ -208,15 +207,15 @@ public class SimpleConfigurator {
         return this;
     }
 
-    public SimpleConfigurator setPassword(String password, URL url) {
-        getClientConfigForUrl(url).setPassword(password.toCharArray());
+    public SimpleConfigurator setPassword(String password, File file) {
+        getClientConfigForFile(file).setPassword(password.toCharArray());
         return this;
     }
 
-    private ClientConfig getClientConfigForUrl(URL url) {
-        ClientConfig clientConfig = configurator.getClientConfig(url);
+    private ClientConfig getClientConfigForFile(File file) {
+        ClientConfig clientConfig = configurator.getClientConfig(file.getUrl());
         if (clientConfig == null) {
-            clientConfig = configurator.createClientConfig(url);
+            clientConfig = configurator.createClientConfig(file.getUrl());
         }
         return clientConfig;
     }

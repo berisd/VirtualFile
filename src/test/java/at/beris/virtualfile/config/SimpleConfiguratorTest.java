@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.config;
 
+import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.protocol.Protocol;
@@ -45,29 +46,29 @@ public class SimpleConfiguratorTest {
 
     @Test
     public void setAndGetValues() throws Exception {
-        URL url = new URL("file://test:pwd@site1.example.com:22/test.txt");
-        setValues(url);
+        File file = FileManager.newFile("file://test:pwd@site1.example.com:22/test.txt");
+        setValues(file);
 
         assertEquals(FILE_CACHE_SIZE, config.getFileCacheSize());
         assertEquals(AuthenticationType.PASSWORD, config.getAuthenticationType());
         assertEquals(AuthenticationType.PUBLIC_KEY, config.getAuthenticationType(Protocol.SFTP));
-        assertEquals(AuthenticationType.PUBLIC_KEY, config.getAuthenticationType(url));
+        assertEquals(AuthenticationType.PUBLIC_KEY, config.getAuthenticationType(file));
         assertEquals(KNOWN_HOSTS_FILE, config.getKnownHostsFile());
         assertEquals(KNOWN_HOSTS_FILE2, config.getKnownHostsFile(Protocol.SFTP));
-        assertEquals(KNOWN_HOSTS_FILE3, config.getKnownHostsFile(url));
+        assertEquals(KNOWN_HOSTS_FILE3, config.getKnownHostsFile(file));
         assertEquals(PRIVATE_KEY_FILE, config.getPrivateKeyFile());
         assertEquals(PRIVATE_KEY_FILE2, config.getPrivateKeyFile(Protocol.SFTP));
-        assertEquals(PRIVATE_KEY_FILE3, config.getPrivateKeyFile(url));
+        assertEquals(PRIVATE_KEY_FILE3, config.getPrivateKeyFile(file));
         assertTrue(config.isStrictHostKeyChecking());
         assertFalse(config.isStrictHostKeyChecking(Protocol.SFTP));
-        assertTrue(config.isStrictHostKeyChecking(url));
+        assertTrue(config.isStrictHostKeyChecking(file));
         assertEquals(TIME_OUT, config.getTimeOut());
         assertEquals(TIME_OUT2, config.getTimeOut(Protocol.SFTP));
-        assertEquals(TIME_OUT3, config.getTimeOut(url));
+        assertEquals(TIME_OUT3, config.getTimeOut(file));
         assertEquals(USERNAME1, config.getUsername());
-        assertEquals(USERNAME2, config.getUsername(url));
+        assertEquals(USERNAME2, config.getUsername(file));
         assertEquals(PASSWORD1, String.valueOf(config.getPassword()));
-        assertEquals(PASSWORD2, String.valueOf(config.getPassword(url)));
+        assertEquals(PASSWORD2, String.valueOf(config.getPassword(file)));
     }
 
     @Test
@@ -80,35 +81,35 @@ public class SimpleConfiguratorTest {
 
     @Test
     public void setAndGetValuesForDifferentSites() throws Exception {
-        URL url = new URL("file://test:pwd@site1.example.com:22/test.txt");
-        URL url2 = new URL("file://test:pwd@site2.example.com:22/test.txt");
+        File file = FileManager.newFile("file://test:pwd@site1.example.com:22/test.txt");
+        File file2 = FileManager.newFile("file://test:pwd@site2.example.com:22/test.txt");
 
-        config.setTimeOut(TIME_OUT, url);
-        config.setTimeOut(TIME_OUT2, url2);
-        assertEquals(TIME_OUT, config.getTimeOut(url));
-        assertEquals(TIME_OUT2, config.getTimeOut(url2));
+        config.setTimeOut(TIME_OUT, file);
+        config.setTimeOut(TIME_OUT2, file2);
+        assertEquals(TIME_OUT, config.getTimeOut(file));
+        assertEquals(TIME_OUT2, config.getTimeOut(file2));
     }
 
-    private void setValues(URL url) {
+    private void setValues(File file) {
         config.setFileCacheSize(FILE_CACHE_SIZE);
         config.setAuthenticationType(AuthenticationType.PASSWORD);
         config.setAuthenticationType(AuthenticationType.PUBLIC_KEY, Protocol.SFTP);
-        config.setAuthenticationType(AuthenticationType.PUBLIC_KEY, url);
+        config.setAuthenticationType(AuthenticationType.PUBLIC_KEY, file);
         config.setKnownHostsFile(KNOWN_HOSTS_FILE);
         config.setKnownHostsFile(KNOWN_HOSTS_FILE2, Protocol.SFTP);
-        config.setKnownHostsFile(KNOWN_HOSTS_FILE3, url);
+        config.setKnownHostsFile(KNOWN_HOSTS_FILE3, file);
         config.setPrivateKeyFile(PRIVATE_KEY_FILE);
         config.setPrivateKeyFile(PRIVATE_KEY_FILE2, Protocol.SFTP);
-        config.setPrivateKeyFile(PRIVATE_KEY_FILE3, url);
+        config.setPrivateKeyFile(PRIVATE_KEY_FILE3, file);
         config.setStrictHostKeyChecking(true);
         config.setStrictHostKeyChecking(false, Protocol.SFTP);
-        config.setStrictHostKeyChecking(true, url);
+        config.setStrictHostKeyChecking(true, file);
         config.setTimeOut(TIME_OUT);
         config.setTimeOut(TIME_OUT2, Protocol.SFTP);
-        config.setTimeOut(TIME_OUT3, url);
+        config.setTimeOut(TIME_OUT3, file);
         config.setUsername(USERNAME1);
-        config.setUsername(USERNAME2, url);
+        config.setUsername(USERNAME2, file);
         config.setPassword(PASSWORD1);
-        config.setPassword(PASSWORD2, url);
+        config.setPassword(PASSWORD2, file);
     }
 }
