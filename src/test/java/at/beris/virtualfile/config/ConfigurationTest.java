@@ -15,18 +15,18 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class ClientConfigTest {
+public class ConfigurationTest {
 
     private static final String KNOWN_HOSTS_FILE = "knownhosts";
     private static final String PRIVATE_KEY_FILE = "privkey";
     private static final String USERNAME = "user1";
     private static final String PASSWORD = "password1";
 
-    private ClientConfig config;
+    private Configuration config;
 
     @Before
     public void setUp() {
-        config = new ClientConfig();
+        config = new Configuration();
     }
 
     @Test
@@ -45,19 +45,19 @@ public class ClientConfigTest {
     @Test
     public void removeValues() {
         _setValues();
-        config.remove(ClientConfigOption.AUTHENTICATION_TYPE);
+        config.remove(ConfigurationOption.AUTHENTICATION_TYPE);
         assertNull(config.getAuthenticationType());
-        config.remove(ClientConfigOption.STRICT_HOSTKEY_CHECKING);
+        config.remove(ConfigurationOption.STRICT_HOSTKEY_CHECKING);
         assertNull(config.isStrictHostKeyChecking());
-        config.remove(ClientConfigOption.TIMEOUT);
+        config.remove(ConfigurationOption.TIMEOUT);
         assertNull(config.getTimeOut());
-        config.remove(ClientConfigOption.KNOWN_HOSTS_FILE);
+        config.remove(ConfigurationOption.KNOWN_HOSTS_FILE);
         assertNull(config.getKnownHostsFile());
-        config.remove(ClientConfigOption.PRIVATE_KEY_FILE);
+        config.remove(ConfigurationOption.PRIVATE_KEY_FILE);
         assertNull(config.getPrivateKeyFile());
-        config.remove(ClientConfigOption.USERNAME);
+        config.remove(ConfigurationOption.USERNAME);
         assertNull(config.getUsername());
-        config.remove(ClientConfigOption.PASSWORD);
+        config.remove(ConfigurationOption.PASSWORD);
         assertNull(config.getPassword());
     }
 

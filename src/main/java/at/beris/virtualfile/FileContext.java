@@ -11,7 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.cache.LRUMap;
 import at.beris.virtualfile.client.Client;
-import at.beris.virtualfile.config.ClientConfig;
+import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -28,25 +28,25 @@ import java.net.URL;
 import java.util.*;
 
 public class FileContext {
-    private Configurator config;
+    private Configurator configurator;
 
     private Map<String, Client> siteUrlToClientMap;
     private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
     private Map<FileOperationProvider, Map<FileOperationEnum, FileOperation>> fileOperationProviderToOperationMap;
     private Map<String, File> fileCache;
 
-    public FileContext(Configurator config) {
+    public FileContext(Configurator configurator) {
         registerProtocolURLStreamHandlers();
 
-        this.config = config;
+        this.configurator = configurator;
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Client, Map<FileType, FileOperationProvider>>());
         this.fileOperationProviderToOperationMap = Collections.synchronizedMap(new HashMap<FileOperationProvider, Map<FileOperationEnum, FileOperation>>());
-        this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(config.getBaseConfig().getFileCacheSize()));
+        this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(configurator.getContextConfiguration().getFileCacheSize()));
     }
 
-    public Configurator getConfig() {
-        return config;
+    public Configurator getConfigurator() {
+        return configurator;
     }
 
     /**
@@ -177,7 +177,7 @@ public class FileContext {
     private File createFile(File parent, URL url) {
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         Protocol protocol = UrlUtils.getProtocol(normalizedUrl);
-        if (config.getFileOperationProviderClassMap(protocol) == null)
+        if (configurator.getFileOperationProviderClassMap(protocol) == null)
             throw new VirtualFileException("No configuration found for protocol: " + protocol);
 
         File file = null;
@@ -206,13 +206,13 @@ public class FileContext {
     private Client createClientInstance(URL url) {
         Client client = null;
 
-        Class clientClass = config.getClientClass(UrlUtils.getProtocol(url));
+        Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
 
         if (clientClass != null) {
             try {
-                ClientConfig clientConfig = config.createClientConfig(url);
-                Constructor constructor = clientClass.getConstructor(URL.class, ClientConfig.class);
-                client = (Client) constructor.newInstance(url, clientConfig);
+                Configuration configuration = configurator.createConfiguration(url);
+                Constructor constructor = clientClass.getConstructor(URL.class, Configuration.class);
+                client = (Client) constructor.newInstance(url, configuration);
             } catch (ReflectiveOperationException e) {
                 throw new VirtualFileException(e);
             }
@@ -311,7 +311,7 @@ public class FileContext {
                 clientToFileOperationProvidersMap.put(client, fileOperationProviderMap);
             }
 
-            Class instanceClass = config.getFileOperationProviderClassMap(protocol).get(fileType);
+            Class instanceClass = configurator.getFileOperationProviderClassMap(protocol).get(fileType);
             fileOperationProvider = createFileOperationProviderInstance(instanceClass, client);
             fileOperationProviderMap.put(fileType, fileOperationProvider);
         }

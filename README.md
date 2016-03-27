@@ -42,6 +42,6 @@ file.copy(FileMananger.newLocalDirectory("."));
 6) Transfer a file with the sftp protocol without stricthostchecking and password authentication.
 ```java
 FileManager.getConfig().setStrictHostKeyChecking(false);
-File file = FileManager.newFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip", config);
+File file = FileManager.newFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip", configurator);
 file.copy(FileMananger.newLocalDirectory("."));
 ```

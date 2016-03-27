@@ -9,8 +9,9 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.config.SimpleConfigurator;
+import at.beris.virtualfile.config.ContextConfiguration;
 import at.beris.virtualfile.logging.FileManagerLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.UrlUtils;
@@ -21,20 +22,30 @@ import java.util.Set;
 
 public class FileManager {
     private static final FileContext fileContext;
-    private static final SimpleConfigurator configurator;
 
     static {
         fileContext = new FileContext(new Configurator());
         fileContext.registerProtocolURLStreamHandlers();
-        configurator = new SimpleConfigurator(fileContext.getConfig());
     }
 
     private FileManager() {
         super();
     }
 
-    public static SimpleConfigurator getConfig() {
-        return configurator;
+    public static ContextConfiguration getContextConfiguration() {
+        return fileContext.getConfigurator().getContextConfiguration();
+    }
+
+    public static Configuration getConfiguration() {
+        return fileContext.getConfigurator().getConfiguration();
+    }
+
+    public static Configuration getConfiguration(Protocol protocol) {
+        return fileContext.getConfigurator().getConfiguration(protocol);
+    }
+
+    public static Configuration getConfiguration(File file) {
+        return fileContext.getConfigurator().getConfiguration(file);
     }
 
     /**

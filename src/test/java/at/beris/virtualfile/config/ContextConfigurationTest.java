@@ -14,15 +14,15 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class BaseConfigTest {
+public class ContextConfigurationTest {
 
     public static final String KNOWN_HOSTS_FILE = "knownhosts";
     public static final String PRIVATE_KEY_FILE = "privkey";
-    private BaseConfig config;
+    private ContextConfiguration config;
 
     @Before
     public void setUp() {
-        config = new BaseConfig();
+        config = new ContextConfiguration();
     }
 
     @Test

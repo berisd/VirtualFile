@@ -11,7 +11,7 @@ package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
-import at.beris.virtualfile.config.ClientConfig;
+import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.AccessDeniedException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -108,11 +108,11 @@ public class SftpClientIntegrationTest {
     }
 
     private static SftpClient createSftpClient() throws Exception {
-        ClientConfig clientConfig = new ClientConfig();
-        clientConfig.initValues();
+        Configuration configuration = new Configuration();
+        configuration.initValues();
         char[] password = TestFileHelper.readSftpPassword().toCharArray();
         URL url = new URL("sftp://sshtest:" + String.valueOf(password) + "@www.beris.at:22");
-        return new SftpClient(url, clientConfig);
+        return new SftpClient(url, configuration);
     }
 
     private static void cleanUp() {

@@ -15,24 +15,24 @@ import at.beris.virtualfile.config.value.IntegerConfigValue;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BaseConfig {
-    private Map<BaseConfigOption, ConfigValue> settings;
+public class ContextConfiguration {
+    private Map<ContextConfigurationOption, ConfigValue> settings;
 
-    public BaseConfig() {
+    public ContextConfiguration() {
         settings = new HashMap<>();
     }
 
     public void initValues() {
-        settings.put(BaseConfigOption.FILE_CACHE_SIZE, new IntegerConfigValue(4096));
+        settings.put(ContextConfigurationOption.FILE_CACHE_SIZE, new IntegerConfigValue(4096));
     }
 
     public Integer getFileCacheSize() {
-        ConfigValue configValue = settings.get(BaseConfigOption.FILE_CACHE_SIZE);
+        ConfigValue configValue = settings.get(ContextConfigurationOption.FILE_CACHE_SIZE);
         return configValue != null ? (Integer) configValue.getValue() : null;
     }
 
-    public BaseConfig setFileCacheSize(int fileCacheSize) {
-        settings.put(BaseConfigOption.FILE_CACHE_SIZE, new IntegerConfigValue(fileCacheSize));
+    public ContextConfiguration setFileCacheSize(int fileCacheSize) {
+        settings.put(ContextConfigurationOption.FILE_CACHE_SIZE, new IntegerConfigValue(fileCacheSize));
         return this;
     }
 }

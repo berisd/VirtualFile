@@ -9,6 +9,6 @@
 
 package at.beris.virtualfile.config;
 
-public enum BaseConfigOption {
+public enum ContextConfigurationOption {
     FILE_CACHE_SIZE
 }

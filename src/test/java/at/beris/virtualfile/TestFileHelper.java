@@ -10,7 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.SftpClient;
-import at.beris.virtualfile.config.ClientConfig;
+import at.beris.virtualfile.config.Configuration;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -53,7 +53,7 @@ public class TestFileHelper {
     }
 
     public static SftpClient createSftpClient(URL url) throws IOException {
-        SftpClient sftpClient = new SftpClient(url, new ClientConfig());
+        SftpClient sftpClient = new SftpClient(url, new Configuration());
         sftpClient.init();
         sftpClient.connect();
 

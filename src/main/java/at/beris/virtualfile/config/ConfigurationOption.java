@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.config;
 
-public enum ClientConfigOption {
+public enum ConfigurationOption {
     KNOWN_HOSTS_FILE,
     TIMEOUT,
     STRICT_HOSTKEY_CHECKING,

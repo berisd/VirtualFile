@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.config;
 
+import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileType;
 import at.beris.virtualfile.client.SftpClient;
 import at.beris.virtualfile.protocol.Protocol;
@@ -26,28 +27,28 @@ public class Configurator {
     private Map<Protocol, Map<FileType, Class>> fileOperationProviderClassMap;
     private Map<Protocol, Class> clientClassMap;
 
-    private BaseConfig baseConfig;
+    private ContextConfiguration contextConfiguration;
 
-    private ClientConfig defaultClientConfig;
-    private Map<Protocol, ClientConfig> clientConfigPerProtocolMap;
-    private Map<URL, ClientConfig> clientConfigPerUrlMap;
+    private Configuration defaultConfiguration;
+    private Map<Protocol, Configuration> configurationPerProtocolMap;
+    private Map<URL, Configuration> configurationPerUrlMap;
 
     public Configurator() {
         fileOperationProviderClassMap = new HashMap<>();
         clientClassMap = new HashMap<>();
-        clientConfigPerProtocolMap = new HashMap<>();
-        clientConfigPerUrlMap = new HashMap<>();
+        configurationPerProtocolMap = new HashMap<>();
+        configurationPerUrlMap = new HashMap<>();
 
-        baseConfig = new BaseConfig();
-        baseConfig.initValues();
+        contextConfiguration = new ContextConfiguration();
+        contextConfiguration.initValues();
 
-        defaultClientConfig = new ClientConfig();
-        defaultClientConfig.initValues();
+        defaultConfiguration = new Configuration();
+        defaultConfiguration.initValues();
 
         put(Protocol.FILE, createLocalFileOperationProviderClassMap(), null);
-        clientConfigPerProtocolMap.put(Protocol.FILE, new ClientConfig(defaultClientConfig));
+        configurationPerProtocolMap.put(Protocol.FILE, new Configuration(defaultConfiguration));
         put(Protocol.SFTP, createSftpFileOperationProviderClassMap(), SftpClient.class);
-        clientConfigPerProtocolMap.put(Protocol.SFTP, new ClientConfig(defaultClientConfig));
+        configurationPerProtocolMap.put(Protocol.SFTP, new Configuration(defaultConfiguration));
     }
 
     public Map<FileType, Class> getFileOperationProviderClassMap(Protocol protocol) {
@@ -79,37 +80,37 @@ public class Configurator {
         return localFileProviderForExtMap;
     }
 
-    public ClientConfig createClientConfig(URL url) {
+    public Configuration createConfiguration(URL url) {
         Protocol protocol = UrlUtils.getProtocol(url);
 
-        ClientConfig protocolConfig = clientConfigPerProtocolMap.get(protocol);
+        Configuration protocolConfig = configurationPerProtocolMap.get(protocol);
         if (protocolConfig == null) {
-            protocolConfig = new ClientConfig(defaultClientConfig);
-            clientConfigPerProtocolMap.put(protocol, protocolConfig);
+            protocolConfig = new Configuration(defaultConfiguration);
+            configurationPerProtocolMap.put(protocol, protocolConfig);
         }
 
-        ClientConfig urlConfig = clientConfigPerUrlMap.get(url);
+        Configuration urlConfig = configurationPerUrlMap.get(url);
         if (urlConfig == null) {
-            urlConfig = new ClientConfig(protocolConfig);
-            clientConfigPerUrlMap.put(url, urlConfig);
+            urlConfig = new Configuration(protocolConfig);
+            configurationPerUrlMap.put(url, urlConfig);
         }
 
         return urlConfig;
     }
 
-    public ClientConfig getClientConfig() {
-        return defaultClientConfig;
+    public Configuration getConfiguration() {
+        return defaultConfiguration;
     }
 
-    public ClientConfig getClientConfig(Protocol protocol) {
-        return clientConfigPerProtocolMap.get(protocol);
+    public Configuration getConfiguration(Protocol protocol) {
+        return configurationPerProtocolMap.get(protocol);
     }
 
-    public ClientConfig getClientConfig(URL url) {
-        return clientConfigPerUrlMap.get(url);
+    public Configuration getConfiguration(File file) {
+        return configurationPerUrlMap.get(file.getUrl());
     }
 
-    public BaseConfig getBaseConfig() {
-        return baseConfig;
+    public ContextConfiguration getContextConfiguration() {
+        return contextConfiguration;
     }
 }
