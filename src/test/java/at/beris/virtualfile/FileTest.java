@@ -23,7 +23,6 @@ import java.util.Map;
 public class FileTest {
     @Test
     public void create() throws Exception {
-        FileModel model = new FileModel();
         Map<FileOperationEnum, FileOperation> fileOperationMap = new HashMap<>();
         FileOperation fileOperation = Mockito.mock(FileOperation.class);
         fileOperationMap.put(FileOperationEnum.CREATE, fileOperation);
@@ -33,7 +32,7 @@ public class FileTest {
         FileContext context = Mockito.mock(FileContext.class);
         Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
 
-        UrlFile file = new UrlFile(null, fileUrl, model, context);
+        UrlFile file = new UrlFile(null, fileUrl, context);
         file.create();
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
     }
@@ -49,8 +48,7 @@ public class FileTest {
         FileContext context = Mockito.mock(FileContext.class);
         Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
 
-        FileModel model = new FileModel();
-        UrlFile file = new UrlFile(null, fileUrl, model, context);
+        UrlFile file = new UrlFile(null, fileUrl, context);
         file.delete();
 
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
@@ -67,8 +65,7 @@ public class FileTest {
         FileContext context = Mockito.mock(FileContext.class);
         Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
 
-        FileModel model = new FileModel();
-        UrlFile file = new UrlFile(null, fileUrl, model, context);
+        UrlFile file = new UrlFile(null, fileUrl, context);
         file.exists();
 
         Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());

@@ -76,7 +76,10 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public void updateModel(FileModel model) {
-        model.setFileExists(false);
+        model.setFileExists(client.exists(model.getPath()));
+        if (!model.isFileExists())
+            return;
+
         FileInfo fileInfo = client.getFileInfo(model.getPath());
         fileInfo.fillModel(model);
     }

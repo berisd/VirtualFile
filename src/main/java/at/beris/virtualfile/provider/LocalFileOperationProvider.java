@@ -127,6 +127,9 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
             java.io.File file = new java.io.File(model.getPath());
             model.setFileExists(file.exists());
 
+            if (!model.isFileExists())
+                return;
+
             FileStore fileStore = Files.getFileStore(file.toPath());
             boolean basicFileAttributeViewSupported = fileStore.supportsFileAttributeView(BasicFileAttributeView.class);
             boolean fileOwnerAttributeViewSupported = fileStore.supportsFileAttributeView(FileOwnerAttributeView.class);

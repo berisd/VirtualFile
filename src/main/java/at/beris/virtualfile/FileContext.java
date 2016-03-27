@@ -13,7 +13,6 @@ import at.beris.virtualfile.cache.LRUMap;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.logging.FileLoggingWrapper;
 import at.beris.virtualfile.operation.*;
@@ -191,8 +190,7 @@ public class FileContext {
             String urlString = normalizedUrl.toString();
             file = fileCache.get(urlString);
             if (file == null) {
-                FileModel fileModel = createModelInstance(parent, normalizedUrl, fileOperationProvider);
-                file = createFileInstance(parent, normalizedUrl, fileModel);
+                file = createFileInstance(parent, normalizedUrl);
                 fileCache.put(urlString, file);
             }
         } catch (InstantiationException e) {
@@ -220,30 +218,17 @@ public class FileContext {
         return client;
     }
 
-    private File createFileInstance(File parent, URL normalizedUrl, FileModel fileModel) {
+    private File createFileInstance(File parent, URL url) {
         UrlFile instance;
 
         try {
-            Constructor constructor = UrlFile.class.getConstructor(File.class, URL.class, FileModel.class, FileContext.class);
-            instance = (UrlFile) constructor.newInstance(parent, normalizedUrl, fileModel, this);
+            Constructor constructor = UrlFile.class.getConstructor(File.class, URL.class, FileContext.class);
+            instance = (UrlFile) constructor.newInstance(parent, url, this);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
         }
 
         return new FileLoggingWrapper(instance);
-    }
-
-    private FileModel createModelInstance(File parent, URL normalizedUrl, FileOperationProvider fileOperationProvider) {
-        FileModel fileModel = new FileModel();
-        if (parent != null)
-            fileModel.setParent(parent.getModel());
-        fileModel.setUrl(normalizedUrl);
-
-        try {
-            fileOperationProvider.updateModel(fileModel);
-        } catch (FileNotFoundException e) {
-        }
-        return fileModel;
     }
 
     private Map<FileOperationEnum, FileOperation> createFileOperationMap(Protocol protocol, FileOperationProvider fileOperationProvider) {
