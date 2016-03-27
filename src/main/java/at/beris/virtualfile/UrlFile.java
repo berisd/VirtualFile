@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
@@ -96,6 +97,11 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
+    public void delete(File file) {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public void dispose() {
         model.clear();
         model = null;
@@ -120,7 +126,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public boolean isContainer() {
-        return this instanceof FileContainer;
+        return isArchive() || isDirectory();
     }
 
     @Override
@@ -144,6 +150,11 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public Boolean exists() {
         return executeOperation(FileOperationEnum.EXISTS, null, null, (Void) null);
+    }
+
+    @Override
+    public List<File> extract(File target) {
+        return executeOperation(FileOperationEnum.EXTRACT, target, null, (Void) null);
     }
 
     @Override
@@ -232,6 +243,11 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
+    public void add(File file) {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public void addAttributes(FileAttribute... attributes) {
         if (attributes.length < 1)
             return;
@@ -241,16 +257,6 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
         executeOperation(FileOperationEnum.ADD_ATTRIBUTES, null, null, (Void) null);
         updateModel();
-    }
-
-    @Override
-    public Archive asArchive() {
-        return (Archive) this;
-    }
-
-    @Override
-    public Directory asDirectory() {
-        return (Directory) this;
     }
 
     @Override
@@ -298,7 +304,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public boolean isArchive() {
-        return this instanceof Archive;
+        return model.isArchive();
     }
 
     @Override

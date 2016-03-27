@@ -48,6 +48,34 @@ public class FileUtils {
         return Arrays.asList(new String[]{"ZIP", "JAR", "TAR", "7Z", "ARJ"});
     }
 
+    public static Map<Filter, List<File>> groupFileListByFilters(List<File> fileList, List<Filter> filterList) {
+        Map<Filter, List<File>> partitionedFileList = new HashMap<>();
+
+        for (Filter filter : filterList) {
+            partitionedFileList.put(filter, new ArrayList<File>());
+        }
+
+        for (File file : fileList) {
+            for (Filter filter : filterList) {
+                if (filter.filter(file))
+                    partitionedFileList.get(filter).add(file);
+            }
+        }
+
+        return partitionedFileList;
+    }
+
+    public static String getAttributesString(FileAttribute[] attributes) {
+        String attributesString = "";
+        if (attributes.length < 1)
+            attributesString = "<none>";
+        else {
+            for (FileAttribute attribute : attributes)
+                attributesString = (attributesString != "" ? ", " : "") + attribute.toString();
+        }
+        return attributesString;
+    }
+
     public static URL normalizeUrl(URL url) {
         try {
             URI uri = URI.create(url.toString());
@@ -111,33 +139,5 @@ public class FileUtils {
         stringBuilder.append(url.getPath());
 
         return stringBuilder.toString();
-    }
-
-    public static Map<Filter, List<File>> groupFileListByFilters(List<File> fileList, List<Filter> filterList) {
-        Map<Filter, List<File>> partitionedFileList = new HashMap<>();
-
-        for (Filter filter : filterList) {
-            partitionedFileList.put(filter, new ArrayList<File>());
-        }
-
-        for (File file : fileList) {
-            for (Filter filter : filterList) {
-                if (filter.filter(file))
-                    partitionedFileList.get(filter).add(file);
-            }
-        }
-
-        return partitionedFileList;
-    }
-
-    public static String getAttributesString(FileAttribute[] attributes) {
-        String attributesString = "";
-        if (attributes.length < 1)
-            attributesString = "<none>";
-        else {
-            for (FileAttribute attribute : attributes)
-                attributesString = (attributesString != "" ? ", " : "") + attribute.toString();
-        }
-        return attributesString;
     }
 }

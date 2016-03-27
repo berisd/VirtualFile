@@ -13,6 +13,7 @@ import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.config.SimpleConfigurator;
 import at.beris.virtualfile.logging.FileManagerLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
+import at.beris.virtualfile.util.FileUtils;
 
 import java.net.URL;
 import java.util.EnumSet;
@@ -52,19 +53,9 @@ public class FileManager {
      * @param path
      * @return
      */
-    public static Directory newLocalDirectory(String path) {
+    public static File newLocalDirectory(String path) {
         return new FileManagerLoggingWrapper(fileContext.newLocalFile(path +
                 (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator)));
-    }
-
-    /**
-     * Creates a local archive with with the given path. (Convenience method)
-     *
-     * @param path
-     * @return
-     */
-    public static Archive newLocalArchive(String path) {
-        return new FileManagerLoggingWrapper(fileContext.newLocalFile(path));
     }
 
     public static File newFile(String url) {
@@ -83,12 +74,11 @@ public class FileManager {
         return new FileManagerLoggingWrapper(fileContext.newFile(url));
     }
 
-    public static Directory newDirectory(URL url) {
-        return new FileManagerLoggingWrapper(fileContext.newFile(url));
-    }
-
-    public static Archive newArchive(URL url) {
-        return new FileManagerLoggingWrapper(fileContext.newFile(url));
+    public static File newDirectory(URL url) {
+        URL normalizedUrl = url;
+        if (!url.getPath().endsWith("/"))
+            normalizedUrl = FileUtils.newUrl(url, url.getPath() + "/");
+        return new FileManagerLoggingWrapper(fileContext.newFile(normalizedUrl));
     }
 
     public static void dispose(File file) {

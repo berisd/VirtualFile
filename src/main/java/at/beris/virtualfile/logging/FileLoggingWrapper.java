@@ -9,7 +9,8 @@
 
 package at.beris.virtualfile.logging;
 
-import at.beris.virtualfile.*;
+import at.beris.virtualfile.File;
+import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.operation.CopyListener;
@@ -28,7 +29,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
-public class FileLoggingWrapper implements ObjectWrapper<File>, File, Directory, Archive {
+public class FileLoggingWrapper implements ObjectWrapper<File>, File {
 
     private File wrappedFile;
     private File rootFile;
@@ -61,18 +62,6 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File, Directory,
     public void addAttributes(FileAttribute... attributes) {
         logger.info("Add attributes {} to {}", FileUtils.getAttributesString(attributes), rootFile);
         wrappedFile.addAttributes(attributes);
-    }
-
-    @Override
-    public Archive asArchive() {
-        logger.info("Call asArchive() on {}", rootFile);
-        return wrappedFile.asArchive();
-    }
-
-    @Override
-    public Directory asDirectory() {
-        logger.info("Call asDirectory() on {}", rootFile);
-        return wrappedFile.asDirectory();
     }
 
     @Override
@@ -378,18 +367,18 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File, Directory,
     @Override
     public List<File> extract(File target) {
         logger.info("Extract {} to {}", rootFile, target);
-        return ((Archive) wrappedFile).extract(target);
+        return wrappedFile.extract(target);
     }
 
     @Override
     public void add(File file) {
         logger.info("Add {} to {}", rootFile, file);
-        ((FileContainer) wrappedFile).add(file);
+        wrappedFile.add(file);
     }
 
     @Override
     public void delete(File file) {
         logger.info("Delete {} from {}", file, rootFile);
-        ((FileContainer) wrappedFile).delete(file);
+        wrappedFile.delete(file);
     }
 }

@@ -25,11 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface File {
+    void add(File file);
+
     void addAttributes(FileAttribute... attributes);
-
-    Archive asArchive();
-
-    Directory asDirectory();
 
     Byte[] checksum();
 
@@ -47,7 +45,11 @@ public interface File {
 
     void delete();
 
+    void delete(File file);
+
     Boolean exists();
+
+    List<File> extract(File target);
 
     /**
      * Find files recursively matching a filter

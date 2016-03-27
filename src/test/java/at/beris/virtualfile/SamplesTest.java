@@ -26,7 +26,7 @@ public class SamplesTest {
     @Test
     @Ignore
     public void addFilesToDirectory() {
-        Directory dir = FileManager.newLocalDirectory("testdir");
+        File dir = FileManager.newLocalDirectory("testdir");
         dir.create();
         File file = FileManager.newLocalFile("abc.txt");
         dir.add(file);
@@ -36,9 +36,9 @@ public class SamplesTest {
 
     @Test
     public void extractArchive() {
-        Archive archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
-                "resources" + java.io.File.separator + "testarchive.zip").asArchive();
-        Directory directory = FileManager.newLocalDirectory("extracted");
+        File archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
+                "resources" + java.io.File.separator + "testarchive.zip");
+        File directory = FileManager.newLocalDirectory("extracted");
         List<File> extractedFiles = archive.extract(directory);
         Assert.assertEquals(33, extractedFiles.size());
         directory.delete();
@@ -46,7 +46,7 @@ public class SamplesTest {
 
     @Test
     public void listArchive() {
-        Archive archive = FileManager.newLocalArchive("src" + java.io.File.separator + "test" + java.io.File.separator +
+        File archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
                 "resources" + java.io.File.separator + "testarchive.zip");
         Assert.assertEquals(33, archive.list().size());
     }

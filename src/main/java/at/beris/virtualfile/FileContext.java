@@ -222,19 +222,10 @@ public class FileContext {
     }
 
     private File createFileInstance(File parent, URL normalizedUrl, FileModel fileModel) {
-        Class instanceClass;
         UrlFile instance;
 
-        if (fileModel.isDirectory()) {
-            instanceClass = UrlDirectory.class;
-        } else if (fileModel.isArchive())
-            instanceClass = UrlArchive.class;
-        else
-            instanceClass = UrlFile.class;
-
-        Constructor constructor = null;
         try {
-            constructor = instanceClass.getConstructor(File.class, URL.class, FileModel.class, FileContext.class);
+            Constructor constructor = UrlFile.class.getConstructor(File.class, URL.class, FileModel.class, FileContext.class);
             instance = (UrlFile) constructor.newInstance(parent, normalizedUrl, fileModel, this);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
