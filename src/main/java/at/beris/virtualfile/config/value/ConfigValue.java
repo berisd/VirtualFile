@@ -7,9 +7,9 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile.config.value;
 
-public abstract class ConfigValue<T> implements Cloneable {
+public abstract class ConfigValue<T> {
     protected T value;
 
     public ConfigValue(T value) {
@@ -22,18 +22,5 @@ public abstract class ConfigValue<T> implements Cloneable {
 
     public void setValue(T value) {
         this.value = value;
-    }
-
-    @Override
-    public abstract ConfigValue clone();
-
-    protected ConfigValue clone(T newValue) {
-        ConfigValue clone = null;
-        try {
-            clone = (ConfigValue) super.clone();
-            clone.setValue(newValue);
-        } catch (CloneNotSupportedException e) {
-        }
-        return clone;
     }
 }

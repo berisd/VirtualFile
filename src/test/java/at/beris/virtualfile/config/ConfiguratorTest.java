@@ -10,6 +10,7 @@
 package at.beris.virtualfile.config;
 
 import at.beris.virtualfile.FileContext;
+import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.protocol.Protocol;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,7 +71,7 @@ public class ConfiguratorTest {
     @Test
     public void createClientConfigCheckRemoval() throws Exception {
         URL url = new URL("sftp://test:pwd@site.example.com:22/test.txt");
-        config.setClientConfig(new ClientConfig(), url);
+        config.createClientConfig(url);
 
         config.getClientConfig().setTimeOut(111);
         config.getClientConfig(Protocol.SFTP).setTimeOut(222);
@@ -90,7 +91,7 @@ public class ConfiguratorTest {
     @Test
     public void setClientConfigValue() throws Exception {
         URL url = new URL("sftp://test:pwd@site.example.com:22/test.txt");
-        config.setClientConfig(new ClientConfig(), url);
+        config.createClientConfig(url);
         config.getClientConfig().setTimeOut(10);
         config.getClientConfig(Protocol.SFTP).setTimeOut(20);
         config.getClientConfig(url).setTimeOut(30);
@@ -103,7 +104,7 @@ public class ConfiguratorTest {
     @Test
     public void removeClientConfigValues() throws Exception {
         URL url = new URL("sftp://test:pwd@site.example.com:22/test.txt");
-        config.setClientConfig(new ClientConfig(), url);
+        config.createClientConfig(url);
         config.getClientConfig().setTimeOut(10);
         config.getClientConfig(Protocol.SFTP).setTimeOut(20);
         config.getClientConfig(url).setTimeOut(30);
@@ -112,11 +113,12 @@ public class ConfiguratorTest {
         assertEquals(20, (int) config.getClientConfig(Protocol.SFTP).getTimeOut());
         assertEquals(30, (int) config.getClientConfig(url).getTimeOut());
 
+        assertEquals(Integer.valueOf(30), config.getClientConfig(url).getTimeOut());
         config.getClientConfig(url).remove(ClientConfigOption.TIMEOUT);
-        assertNull(config.getClientConfig(url).getTimeOut());
+        assertEquals(Integer.valueOf(20), config.getClientConfig(url).getTimeOut());
         config.getClientConfig(Protocol.SFTP).remove(ClientConfigOption.TIMEOUT);
-        assertNull(config.getClientConfig(Protocol.SFTP).getTimeOut());
-        config.getClientConfig(url).remove(ClientConfigOption.TIMEOUT);
+        assertEquals(Integer.valueOf(10), config.getClientConfig(url).getTimeOut());
+        config.getClientConfig().remove(ClientConfigOption.TIMEOUT);
         assertNull(config.getClientConfig(url).getTimeOut());
     }
 }

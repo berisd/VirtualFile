@@ -9,15 +9,23 @@
 
 package at.beris.virtualfile.config;
 
+import at.beris.virtualfile.config.value.*;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClientConfig {
     private Map<ClientConfigOption, ConfigValue> settings;
+    private ClientConfig parentConfig;
 
     public ClientConfig() {
         settings = new HashMap<>();
+    }
+
+    public ClientConfig(ClientConfig parentConfig) {
+        this();
+        this.parentConfig = parentConfig;
     }
 
     public void initValues() {
@@ -44,7 +52,13 @@ public class ClientConfig {
 
     public Boolean isStrictHostKeyChecking() {
         ConfigValue configValue = settings.get(ClientConfigOption.STRICT_HOSTKEY_CHECKING);
-        return (configValue != null) ? (Boolean) configValue.getValue() : null;
+        Boolean value = configValue != null ? (Boolean) configValue.getValue() : null;
+
+        if (value == null) {
+            value = parentConfig != null ? parentConfig.isStrictHostKeyChecking() : null;
+        }
+
+        return value;
     }
 
     public ClientConfig setStrictHostKeyChecking(boolean strictHostKeyChecking) {
@@ -54,7 +68,13 @@ public class ClientConfig {
 
     public String getKnownHostsFile() {
         ConfigValue configValue = settings.get(ClientConfigOption.KNOWN_HOSTS_FILE);
-        return configValue != null ? (String) configValue.getValue() : null;
+        String value = configValue != null ? (String) configValue.getValue() : null;
+
+        if (value == null) {
+            value = parentConfig != null ? parentConfig.getKnownHostsFile() : null;
+        }
+
+        return value;
     }
 
     public ClientConfig setKnownHostsFile(String knownHostsFile) {
@@ -64,7 +84,13 @@ public class ClientConfig {
 
     public Integer getTimeOut() {
         ConfigValue configValue = settings.get(ClientConfigOption.TIMEOUT);
-        return configValue != null ? (Integer) configValue.getValue() : null;
+        Integer value = configValue != null ? (Integer) configValue.getValue() : null;
+
+        if (value == null) {
+            value = parentConfig != null ? parentConfig.getTimeOut() : null;
+        }
+
+        return value;
     }
 
     public ClientConfig setTimeOut(int timeout) {
@@ -74,7 +100,13 @@ public class ClientConfig {
 
     public AuthenticationType getAuthenticationType() {
         ConfigValue configValue = settings.get(ClientConfigOption.AUTHENTICATION_TYPE);
-        return configValue != null ? (AuthenticationType) configValue.getValue() : null;
+        AuthenticationType value = configValue != null ? (AuthenticationType) configValue.getValue() : null;
+
+        if (value == null) {
+            value = parentConfig != null ? parentConfig.getAuthenticationType() : null;
+        }
+
+        return value;
     }
 
     public ClientConfig setAuthenticationType(AuthenticationType authenticationType) {
@@ -84,7 +116,13 @@ public class ClientConfig {
 
     public String getPrivateKeyFile() {
         ConfigValue configValue = settings.get(ClientConfigOption.PRIVATE_KEY_FILE);
-        return configValue != null ? (String) configValue.getValue() : null;
+        String value = configValue != null ? (String) configValue.getValue() : null;
+
+        if (value == null) {
+            value = parentConfig != null ? parentConfig.getPrivateKeyFile() : null;
+        }
+
+        return value;
     }
 
     public ClientConfig setPrivateKeyFile(String privateKeyFile) {
@@ -94,7 +132,13 @@ public class ClientConfig {
 
     public String getUsername() {
         ConfigValue configValue = settings.get(ClientConfigOption.USERNAME);
-        return configValue != null ? (String) configValue.getValue() : null;
+        String value = configValue != null ? (String) configValue.getValue() : null;
+
+        if (value == null) {
+            value = parentConfig != null ? parentConfig.getUsername() : null;
+        }
+
+        return value;
     }
 
     public ClientConfig setUsername(String username) {
@@ -104,7 +148,13 @@ public class ClientConfig {
 
     public char[] getPassword() {
         ConfigValue configValue = settings.get(ClientConfigOption.PASSWORD);
-        return configValue != null ? (char[]) configValue.getValue() : null;
+        char[] value = configValue != null ? (char[]) configValue.getValue() : null;
+
+        if (value == null) {
+            value = parentConfig != null ? parentConfig.getPassword() : null;
+        }
+
+        return value;
     }
 
     public ClientConfig setPassword(char[] password) {

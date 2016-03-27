@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.AuthenticationType;
+import at.beris.virtualfile.config.value.AuthenticationType;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

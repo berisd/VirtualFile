@@ -7,16 +7,11 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile.config.value;
 
 public class IntegerConfigValue extends ConfigValue<Integer> {
 
     public IntegerConfigValue(Integer value) {
         super(value);
-    }
-
-    @Override
-    public ConfigValue clone() {
-        return super.clone(new Integer(value));
     }
 }

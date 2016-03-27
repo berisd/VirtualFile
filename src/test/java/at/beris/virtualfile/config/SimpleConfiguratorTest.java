@@ -10,6 +10,7 @@
 package at.beris.virtualfile.config;
 
 import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.protocol.Protocol;
 import org.junit.Before;
 import org.junit.Test;

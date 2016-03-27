@@ -7,7 +7,7 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile.config.value;
 
 public enum AuthenticationType {
     PASSWORD("password"),

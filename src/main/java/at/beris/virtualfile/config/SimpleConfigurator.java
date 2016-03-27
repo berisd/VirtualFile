@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.config;
 
+import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.protocol.Protocol;
 
 import java.net.URL;
@@ -216,7 +217,6 @@ public class SimpleConfigurator {
         ClientConfig clientConfig = configurator.getClientConfig(url);
         if (clientConfig == null) {
             clientConfig = configurator.createClientConfig(url);
-            configurator.setClientConfig(clientConfig, url);
         }
         return clientConfig;
     }

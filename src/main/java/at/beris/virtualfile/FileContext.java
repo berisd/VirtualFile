@@ -30,7 +30,7 @@ import java.util.*;
 public class FileContext {
     private Configurator config;
 
-    private Map<String, Client> urlToClientMap;
+    private Map<String, Client> siteUrlToClientMap;
     private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
     private Map<FileOperationProvider, Map<FileOperationEnum, FileOperation>> fileOperationProviderToOperationMap;
     private Map<String, File> fileCache;
@@ -39,7 +39,7 @@ public class FileContext {
         registerProtocolURLStreamHandlers();
 
         this.config = config;
-        this.urlToClientMap = new HashMap<>();
+        this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Client, Map<FileType, FileOperationProvider>>());
         this.fileOperationProviderToOperationMap = Collections.synchronizedMap(new HashMap<FileOperationProvider, Map<FileOperationEnum, FileOperation>>());
         this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(config.getBaseConfig().getFileCacheSize()));
@@ -153,7 +153,7 @@ public class FileContext {
     }
 
     Client getClient(URL url) {
-        return urlToClientMap.get(url.toString());
+        return siteUrlToClientMap.get(UrlUtils.getSiteUrlString(url));
     }
 
     Map<FileOperationEnum, FileOperation> getFileOperationMap(URL url) {
@@ -165,7 +165,7 @@ public class FileContext {
     }
 
     FileOperationProvider getFileOperationProvider(URL url) {
-        Client client = urlToClientMap.get(url.toString());
+        Client client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(url));
         FileType fileType = UrlUtils.getFileTypeForUrl(url);
 
         Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
@@ -298,7 +298,7 @@ public class FileContext {
         Client client = getClient(url);
         if (client == null) {
             client = createClientInstance(url);
-            urlToClientMap.put(url.toString(), client);
+            siteUrlToClientMap.put(UrlUtils.getSiteUrlString(url), client);
         }
     }
 

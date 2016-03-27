@@ -7,17 +7,11 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
-
-import java.util.Arrays;
+package at.beris.virtualfile.config.value;
 
 public class CharArrayConfigValue extends ConfigValue<char[]> {
+
     public CharArrayConfigValue(char[] value) {
         super(value);
-    }
-
-    @Override
-    public ConfigValue clone() {
-        return super.clone(Arrays.copyOf(value, value.length));
     }
 }

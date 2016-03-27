@@ -9,6 +9,9 @@
 
 package at.beris.virtualfile.config;
 
+import at.beris.virtualfile.config.value.ConfigValue;
+import at.beris.virtualfile.config.value.IntegerConfigValue;
+
 import java.util.HashMap;
 import java.util.Map;
 

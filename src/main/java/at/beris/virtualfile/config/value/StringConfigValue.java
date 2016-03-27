@@ -7,15 +7,11 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile.config.value;
 
 public class StringConfigValue extends ConfigValue<String> {
+
     public StringConfigValue(String value) {
         super(value);
-    }
-
-    @Override
-    public ConfigValue clone() {
-        return super.clone(value);
     }
 }

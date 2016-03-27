@@ -12,7 +12,7 @@ package at.beris.virtualfile.client;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.config.AuthenticationType;
+import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.config.ClientConfig;
 import at.beris.virtualfile.exception.AccessDeniedException;
 import at.beris.virtualfile.exception.AuthenticationException;

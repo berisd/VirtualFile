@@ -45,13 +45,9 @@ public class Configurator {
         defaultClientConfig.initValues();
 
         put(Protocol.FILE, createLocalFileOperationProviderClassMap(), null);
-        clientConfigPerProtocolMap.put(Protocol.FILE, new ClientConfig());
+        clientConfigPerProtocolMap.put(Protocol.FILE, new ClientConfig(defaultClientConfig));
         put(Protocol.SFTP, createSftpFileOperationProviderClassMap(), SftpClient.class);
-        clientConfigPerProtocolMap.put(Protocol.SFTP, new ClientConfig());
-    }
-
-    public ClientConfig setClientConfig(ClientConfig config, URL url) {
-        return clientConfigPerUrlMap.put(url, config);
+        clientConfigPerProtocolMap.put(Protocol.SFTP, new ClientConfig(defaultClientConfig));
     }
 
     public Map<FileType, Class> getFileOperationProviderClassMap(Protocol protocol) {
@@ -84,38 +80,21 @@ public class Configurator {
     }
 
     public ClientConfig createClientConfig(URL url) {
-        ClientConfig config = new ClientConfig();
-
         Protocol protocol = UrlUtils.getProtocol(url);
 
         ClientConfig protocolConfig = clientConfigPerProtocolMap.get(protocol);
         if (protocolConfig == null) {
-            protocolConfig = new ClientConfig();
+            protocolConfig = new ClientConfig(defaultClientConfig);
             clientConfigPerProtocolMap.put(protocol, protocolConfig);
         }
 
         ClientConfig urlConfig = clientConfigPerUrlMap.get(url);
         if (urlConfig == null) {
-            urlConfig = new ClientConfig();
+            urlConfig = new ClientConfig(protocolConfig);
             clientConfigPerUrlMap.put(url, urlConfig);
         }
 
-        for (ClientConfigOption configKey : ClientConfigOption.values()) {
-            ConfigValue value = urlConfig.get(configKey);
-
-            if (value == null)
-                value = protocolConfig.get(configKey);
-
-            if (value == null)
-                value = defaultClientConfig.get(configKey);
-
-            if (value != null)
-                config.set(configKey, value.clone());
-            else
-                config.set(configKey, null);
-        }
-
-        return config;
+        return urlConfig;
     }
 
     public ClientConfig getClientConfig() {

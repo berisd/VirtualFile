@@ -7,16 +7,11 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile.config.value;
 
 public class BooleanConfigValue extends ConfigValue<Boolean> {
 
     public BooleanConfigValue(Boolean value) {
         super(value);
-    }
-
-    @Override
-    public ConfigValue clone() {
-        return super.clone(new Boolean(value));
     }
 }
