@@ -12,8 +12,8 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.operation.CopyListener;
-import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.SingleValueOperation;
+import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -83,7 +83,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void copyFile() {
-        File sourceFile = TestFileHelper.createLocalSourceFile(FileUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        File sourceFile = TestFileHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
         File targetFile = FileManager.newFile(targetFileUrl);
         CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
         sourceFile.copy(targetFile, copyListenerMock);

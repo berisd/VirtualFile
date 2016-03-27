@@ -14,7 +14,7 @@ import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
-import at.beris.virtualfile.util.FileUtils;
+import at.beris.virtualfile.util.UrlUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +38,7 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
                 throw new OperationNotSupportedException("Can't copy directory to a file!");
             if (!source.isDirectory() && target.isDirectory())
 
-                target = fileContext.newFile(FileUtils.newUrl(target.getUrl(), source.getName()));
+                target = fileContext.newFile(UrlUtils.newUrl(target.getUrl(), source.getName()));
             copyRecursive(source, target, (CopyListener) listener);
         } catch (IOException e) {
             throw new VirtualFileException(e);

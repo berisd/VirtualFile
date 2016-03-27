@@ -17,6 +17,7 @@ import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.FileUtils;
+import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.compress.archivers.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -88,10 +89,10 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
 
                     if (model.getUrl().toString().endsWith("/") && (!archiveEntry.isDirectory())) {
                         String urlString = model.getUrl().toString();
-                        model.setUrl(FileUtils.newUrl(urlString.substring(0, urlString.length() - 1)));
+                        model.setUrl(UrlUtils.newUrl(urlString.substring(0, urlString.length() - 1)));
                     } else if (!model.getUrl().toString().endsWith("/") && (archiveEntry.isDirectory())) {
                         String urlString = model.getUrl().toString() + "/";
-                        model.setUrl(FileUtils.newUrl(urlString));
+                        model.setUrl(UrlUtils.newUrl(urlString));
                     }
                     break;
                 }

@@ -11,7 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
-import at.beris.virtualfile.util.FileUtils;
+import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -34,11 +34,11 @@ public class SftpFileTest extends AbstractFileTest {
         initIntegrationTest();
         FileManager.registerProtocolURLStreamHandlers();
 
-        URL siteUrl = FileUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestFileHelper.SSH_HOME_DIRECTORY);
-        sourceFileUrl = FileUtils.newUrl(siteUrl, TEST_SOURCE_FILE_NAME);
-        targetFileUrl = FileUtils.newUrl(siteUrl, TEST_TARGET_FILE_NAME);
-        sourceDirectoryUrl = FileUtils.newUrl(siteUrl, TEST_SOURCE_DIRECTORY_NAME + "/");
-        targetDirectoryUrl = FileUtils.newUrl(siteUrl, TEST_TARGET_DIRECTORY_NAME + "/");
+        URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestFileHelper.SSH_HOME_DIRECTORY);
+        sourceFileUrl = UrlUtils.newUrl(siteUrl, TEST_SOURCE_FILE_NAME);
+        targetFileUrl = UrlUtils.newUrl(siteUrl, TEST_TARGET_FILE_NAME);
+        sourceDirectoryUrl = UrlUtils.newUrl(siteUrl, TEST_SOURCE_DIRECTORY_NAME + "/");
+        targetDirectoryUrl = UrlUtils.newUrl(siteUrl, TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
     @AfterClass

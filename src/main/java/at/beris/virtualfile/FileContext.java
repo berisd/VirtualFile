@@ -19,7 +19,6 @@ import at.beris.virtualfile.logging.FileLoggingWrapper;
 import at.beris.virtualfile.operation.*;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
-import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -97,7 +96,7 @@ public class FileContext {
     }
 
     public File newFile(URL url) {
-        URL normalizedUrl = FileUtils.normalizeUrl(url);
+        URL normalizedUrl = UrlUtils.normalizeUrl(url);
         String fullPath = normalizedUrl.getPath();
         File parentFile = null;
 
@@ -176,7 +175,7 @@ public class FileContext {
     }
 
     private File createFile(File parent, URL url) {
-        URL normalizedUrl = FileUtils.normalizeUrl(url);
+        URL normalizedUrl = UrlUtils.normalizeUrl(url);
         Protocol protocol = UrlUtils.getProtocol(normalizedUrl);
         if (config.getFileOperationProviderClassMap(protocol) == null)
             throw new VirtualFileException("No configuration found for protocol: " + protocol);

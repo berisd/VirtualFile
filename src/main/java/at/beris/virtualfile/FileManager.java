@@ -13,7 +13,7 @@ import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.config.SimpleConfigurator;
 import at.beris.virtualfile.logging.FileManagerLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
-import at.beris.virtualfile.util.FileUtils;
+import at.beris.virtualfile.util.UrlUtils;
 
 import java.net.URL;
 import java.util.EnumSet;
@@ -77,7 +77,7 @@ public class FileManager {
     public static File newDirectory(URL url) {
         URL normalizedUrl = url;
         if (!url.getPath().endsWith("/"))
-            normalizedUrl = FileUtils.newUrl(url, url.getPath() + "/");
+            normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
         return new FileManagerLoggingWrapper(fileContext.newFile(normalizedUrl));
     }
 

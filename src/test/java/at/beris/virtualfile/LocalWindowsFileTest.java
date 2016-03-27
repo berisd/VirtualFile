@@ -12,8 +12,8 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.OsUtils;
+import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -34,10 +34,10 @@ public class LocalWindowsFileTest extends AbstractFileTest {
     public static void setUp() throws Exception {
         org.junit.Assume.assumeTrue("Host operating system isn't Windows. Skipping test..", OsUtils.isWindows());
 
-        sourceFileUrl = FileUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
-        targetFileUrl = FileUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);
-        sourceDirectoryUrl = FileUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/");
-        targetDirectoryUrl = FileUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/");
+        sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
+        targetFileUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);
+        sourceDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/");
+        targetDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
     @AfterClass

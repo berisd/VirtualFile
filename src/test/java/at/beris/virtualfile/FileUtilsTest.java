@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.util.FileUtils;
+import at.beris.virtualfile.util.UrlUtils;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class FileUtilsTest {
     public void maskLocalUnixFileString() throws Exception {
         String urlString = "file:/home/bernd/IdeaProjects/VirtualFile/testfile1.txt";
         File file = createFile(urlString);
-        assertEquals(urlString, FileUtils.maskedUrlString(file.getUrl()));
+        assertEquals(urlString, UrlUtils.maskedUrlString(file.getUrl()));
     }
 
     @Test
@@ -39,7 +39,7 @@ public class FileUtilsTest {
         //TODO urls with Windows style Filename not working
         String urlString = "file:///C:/Documents%20and%20Settings/davris/FileSchemeURIs.doc";
         File file = createFile(urlString);
-        assertEquals(urlString, FileUtils.maskedUrlString(file.getUrl()));
+        assertEquals(urlString, UrlUtils.maskedUrlString(file.getUrl()));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class FileUtilsTest {
         String urlString = "sftp://sshtest:mypassword@www.example.com:22/home/sshtest/targetfile1.txt";
         String expectedString = "sftp://sshtest:***@www.example.com:22/home/sshtest/targetfile1.txt";
         File file = createFile(urlString);
-        assertEquals(expectedString, FileUtils.maskedUrlString(file.getUrl()));
+        assertEquals(expectedString, UrlUtils.maskedUrlString(file.getUrl()));
     }
 
     private File createFile(String urlString) throws MalformedURLException {

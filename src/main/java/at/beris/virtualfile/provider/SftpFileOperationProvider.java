@@ -18,7 +18,7 @@ import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.util.FileUtils;
+import at.beris.virtualfile.util.UrlUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
 
         for (FileInfo fileInfo : fileInfoList) {
-            at.beris.virtualfile.File file = FileManager.newFile(FileUtils.newUrl(model.getUrl(), fileInfo.getPath()));
+            at.beris.virtualfile.File file = FileManager.newFile(UrlUtils.newUrl(model.getUrl(), fileInfo.getPath()));
             if (filter == null || filter.filter(file)) {
                 fileList.add(file);
             }

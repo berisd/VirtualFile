@@ -29,7 +29,7 @@ import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.util.*;
 
-import static at.beris.virtualfile.util.FileUtils.maskedUrlString;
+import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
 public class UrlFile implements File, Comparable<UrlFile> {
 
