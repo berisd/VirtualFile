@@ -12,11 +12,12 @@ package at.beris.virtualfile.filter;
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.attribute.FileAttribute;
 
+import java.io.IOException;
 import java.util.Set;
 
 public class FileAttributesFilter extends CollectionFilter<Set<FileAttribute>, FileAttribute> {
     @Override
-    protected Set<FileAttribute> getValue(File file) {
+    protected Set<FileAttribute> getValue(File file) throws IOException {
         return file.getAttributes();
     }
 }

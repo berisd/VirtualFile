@@ -11,9 +11,11 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.File;
 
+import java.io.IOException;
+
 public class FileNameFilter extends StringFilter {
     @Override
-    protected String getValue(File file) {
+    protected String getValue(File file) throws IOException {
         return file.getName();
     }
 }

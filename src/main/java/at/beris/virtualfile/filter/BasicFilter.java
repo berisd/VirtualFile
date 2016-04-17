@@ -10,8 +10,8 @@
 package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.File;
-import at.beris.virtualfile.exception.VirtualFileException;
 
+import java.io.IOException;
 import java.util.*;
 
 public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
@@ -31,7 +31,7 @@ public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
         try {
             cloned = (BasicFilter) super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new VirtualFileException(e);
+            throw new RuntimeException(e);
         }
         cloned.combiningOperators = new HashMap<>(combiningOperators);
         cloned.operationValuesMap = new HashMap<>(operationValuesMap);
@@ -83,7 +83,7 @@ public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
     }
 
     @Override
-    public boolean filter(File file) {
+    public boolean filter(File file) throws IOException {
         boolean valid = true;
         T value = getValue(file);
 
@@ -105,7 +105,7 @@ public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
         return valid;
     }
 
-    private boolean combineFilter(boolean valid, File file, Operation operation, Filter filter) {
+    private boolean combineFilter(boolean valid, File file, Operation operation, Filter filter) throws IOException {
         switch (operation) {
             case NOT:
                 return valid && (!filter.filter(file));
@@ -165,5 +165,5 @@ public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
         return valid;
     }
 
-    abstract protected T getValue(File file);
+    abstract protected T getValue(File file) throws IOException;
 }

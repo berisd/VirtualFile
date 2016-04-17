@@ -17,14 +17,11 @@ import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.client.Client;
-import at.beris.virtualfile.exception.PermissionDeniedException;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.security.MessageDigest;
@@ -42,22 +39,15 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public void create(FileModel model) {
+    public void create(FileModel model) throws IOException {
         String pathName = model.getPath();
         java.io.File file = new java.io.File(pathName);
         if (model.isDirectory()) {
             if (!file.mkdirs())
-                throw new at.beris.virtualfile.exception.FileAlreadyExistsException(pathName);
+                throw new FileAlreadyExistsException(pathName);
         } else {
-            try {
-                if (!file.createNewFile())
-                    throw new at.beris.virtualfile.exception.FileAlreadyExistsException(pathName);
-            } catch (IOException e) {
-                if ("Permission denied".equals(e.getMessage()))
-                    throw new PermissionDeniedException(e);
-                else
-                    throw new VirtualFileException(e);
-            }
+            if (!file.createNewFile())
+                throw new FileAlreadyExistsException(pathName);
         }
     }
 
@@ -67,17 +57,13 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) {
+    public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) throws IOException {
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
         if (model.isDirectory()) {
             for (java.io.File childFile : new java.io.File(model.getPath()).listFiles()) {
-                try {
-                    at.beris.virtualfile.File file = FileManager.newFile(childFile.toURI().toURL());
-                    if (filter == null || filter.filter(file))
-                        fileList.add(file);
-                } catch (MalformedURLException e) {
-                    throw new VirtualFileException(e);
-                }
+                at.beris.virtualfile.File file = FileManager.newFile(childFile.toURI().toURL());
+                if (filter == null || filter.filter(file))
+                    fileList.add(file);
             }
         }
 
@@ -85,19 +71,15 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public void delete(FileModel model) {
+    public void delete(FileModel model) throws IOException {
         java.io.File file = new java.io.File(model.getPath());
-        try {
-            if (file.exists()) {
-                Files.walkFileTree(new java.io.File(file.getPath()).toPath(), new LocalFileDeletingVisitor());
-            }
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
+        if (file.exists()) {
+            Files.walkFileTree(new java.io.File(file.getPath()).toPath(), new LocalFileDeletingVisitor());
         }
     }
 
     @Override
-    public Byte[] checksum(FileModel model) {
+    public Byte[] checksum(FileModel model) throws IOException {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA1");
             FileInputStream fis = new FileInputStream(model.getPath());
@@ -115,98 +97,77 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
             return digestBytes;
         } catch (NoSuchAlgorithmException e) {
-            throw new VirtualFileException(e);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void updateModel(FileModel model) {
-        try {
-            java.io.File file = new java.io.File(model.getPath());
-            model.setFileExists(file.exists());
+    public void updateModel(FileModel model) throws IOException {
+        java.io.File file = new java.io.File(model.getPath());
+        model.setFileExists(file.exists());
 
-            if (!model.isFileExists())
-                return;
+        if (!model.isFileExists())
+            return;
 
-            FileStore fileStore = Files.getFileStore(file.toPath());
-            boolean basicFileAttributeViewSupported = fileStore.supportsFileAttributeView(BasicFileAttributeView.class);
-            boolean fileOwnerAttributeViewSupported = fileStore.supportsFileAttributeView(FileOwnerAttributeView.class);
-            boolean aclFileAttributeViewSupported = fileStore.supportsFileAttributeView(AclFileAttributeView.class);
-            boolean posixFileAttributeViewSupported = fileStore.supportsFileAttributeView(PosixFileAttributeView.class);
-            boolean dosFileAttributeViewSupported = fileStore.supportsFileAttributeView(DosFileAttributeView.class);
+        FileStore fileStore = Files.getFileStore(file.toPath());
+        boolean basicFileAttributeViewSupported = fileStore.supportsFileAttributeView(BasicFileAttributeView.class);
+        boolean fileOwnerAttributeViewSupported = fileStore.supportsFileAttributeView(FileOwnerAttributeView.class);
+        boolean aclFileAttributeViewSupported = fileStore.supportsFileAttributeView(AclFileAttributeView.class);
+        boolean posixFileAttributeViewSupported = fileStore.supportsFileAttributeView(PosixFileAttributeView.class);
+        boolean dosFileAttributeViewSupported = fileStore.supportsFileAttributeView(DosFileAttributeView.class);
 
-            if (basicFileAttributeViewSupported) {
-                fillBasicFileAttributes(model, file);
-            }
+        if (basicFileAttributeViewSupported) {
+            fillBasicFileAttributes(model, file);
+        }
 
-            if (fileOwnerAttributeViewSupported) {
-                FileOwnerAttributeView fileAttributeView = Files.getFileAttributeView(file.toPath(), FileOwnerAttributeView.class);
-                model.setOwner(fileAttributeView.getOwner());
-            }
+        if (fileOwnerAttributeViewSupported) {
+            FileOwnerAttributeView fileAttributeView = Files.getFileAttributeView(file.toPath(), FileOwnerAttributeView.class);
+            model.setOwner(fileAttributeView.getOwner());
+        }
 
-            if (aclFileAttributeViewSupported) {
-                AclFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
-                model.setOwner(attributeView.getOwner());
-                model.setAcl(attributeView.getAcl());
-            }
+        if (aclFileAttributeViewSupported) {
+            AclFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
+            model.setOwner(attributeView.getOwner());
+            model.setAcl(attributeView.getAcl());
+        }
 
-            if (dosFileAttributeViewSupported) {
-                fillDosFileAttributes(file, model);
-            }
+        if (dosFileAttributeViewSupported) {
+            fillDosFileAttributes(file, model);
+        }
 
-            if (posixFileAttributeViewSupported) {
-                fillPosixFileAttributes(file, model);
-            } else {
-                fillDefaultFileAttributes(file, model);
-            }
-        } catch (IOException e) {
-            if (e instanceof NoSuchFileException)
-                throw new at.beris.virtualfile.exception.FileNotFoundException(e);
-            else
-                throw new VirtualFileException(e);
+        if (posixFileAttributeViewSupported) {
+            fillPosixFileAttributes(file, model);
+        } else {
+            fillDefaultFileAttributes(file, model);
         }
     }
 
     @Override
-    public InputStream getInputStream(FileModel model) {
-        try {
-            return new FileInputStream(model.getPath());
-        } catch (FileNotFoundException e) {
-            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
-        }
+    public InputStream getInputStream(FileModel model) throws IOException {
+        return new FileInputStream(model.getPath());
     }
 
     @Override
-    public OutputStream getOutputStream(FileModel model) {
-        try {
-            return new FileOutputStream(model.getPath());
-        } catch (FileNotFoundException e) {
-            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
-        }
+    public OutputStream getOutputStream(FileModel model) throws IOException {
+        return new FileOutputStream(model.getPath());
     }
 
     @Override
-    public void setAcl(FileModel model) {
+    public void setAcl(FileModel model) throws IOException {
         java.io.File file = new java.io.File(model.getPath());
         FileStore fileStore = null;
-        try {
-            fileStore = Files.getFileStore(file.toPath());
+        fileStore = Files.getFileStore(file.toPath());
 
-            if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
-                AclFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
-                attributeView.setAcl(model.getAcl());
-            } else
-                LOGGER.warn("ACL couldn't be set on file " + model.getUrl());
+        if (fileStore.supportsFileAttributeView(AclFileAttributeView.class)) {
+            AclFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
+            attributeView.setAcl(model.getAcl());
+        } else
+            LOGGER.warn("ACL couldn't be set on file " + model.getUrl());
 
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
     }
 
     @Override
-    public void setAttributes(FileModel model) {
+    public void setAttributes(FileModel model) throws IOException {
         java.io.File file = new java.io.File(model.getPath());
 
         Set<BasicFilePermission> basicFilePermissionSet = new HashSet<>();
@@ -222,72 +183,59 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
                 posixFilePermissionSet.add((PosixFilePermission) attribute);
         }
 
-        try {
-            FileStore fileStore = Files.getFileStore(file.toPath());
-            setBasicFileAttributes(file, basicFilePermissionSet);
+        FileStore fileStore = Files.getFileStore(file.toPath());
+        setBasicFileAttributes(file, basicFilePermissionSet);
 
-            if (fileStore.supportsFileAttributeView(DosFileAttributeView.class)) {
-                setDosFileAttributes(file, dosAttributeSet);
-            } else if (dosAttributeSet.size() > 0)
-                LOGGER.warn("DosAttributes specified but not supported by file " + model.getUrl());
+        if (fileStore.supportsFileAttributeView(DosFileAttributeView.class)) {
+            setDosFileAttributes(file, dosAttributeSet);
+        } else if (dosAttributeSet.size() > 0)
+            LOGGER.warn("DosAttributes specified but not supported by file " + model.getUrl());
 
-            if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
-                setPosixFilePermissions(file, posixFilePermissionSet);
-            } else if (posixFilePermissionSet.size() > 0)
-                LOGGER.warn("PosixFilePermissions specified but not supported by file " + model.getUrl());
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+        if (fileStore.supportsFileAttributeView(PosixFileAttributeView.class)) {
+            setPosixFilePermissions(file, posixFilePermissionSet);
+        } else if (posixFilePermissionSet.size() > 0)
+            LOGGER.warn("PosixFilePermissions specified but not supported by file " + model.getUrl());
     }
 
     @Override
-    public void setCreationTime(FileModel model) {
+    public void setCreationTime(FileModel model) throws IOException {
         setTimes(model.getPath(), null, null, model.getCreationTime());
     }
 
     @Override
-    public void setGroup(FileModel model) {
+    public void setGroup(FileModel model) throws IOException {
         java.io.File file = new java.io.File(model.getPath());
 
-        try {
-            FileStore fileStore = Files.getFileStore(file.toPath());
-            boolean posixFileAttributeViewSupported = fileStore.supportsFileAttributeView(PosixFileAttributeView.class);
+        FileStore fileStore = Files.getFileStore(file.toPath());
+        boolean posixFileAttributeViewSupported = fileStore.supportsFileAttributeView(PosixFileAttributeView.class);
 
-            if (posixFileAttributeViewSupported) {
-                PosixFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
-                attributeView.setGroup(model.getGroup());
-            }
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
+        if (posixFileAttributeViewSupported) {
+            PosixFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
+            attributeView.setGroup(model.getGroup());
         }
     }
 
     @Override
-    public void setLastAccessTime(FileModel model) {
+    public void setLastAccessTime(FileModel model) throws IOException {
         setTimes(model.getPath(), null, model.getLastAccessTime(), null);
     }
 
     @Override
-    public void setLastModifiedTime(FileModel model) {
+    public void setLastModifiedTime(FileModel model) throws IOException {
         setTimes(model.getPath(), model.getLastModifiedTime(), null, null);
     }
 
     @Override
-    public void setOwner(FileModel model) {
+    public void setOwner(FileModel model) throws IOException {
         java.io.File file = new java.io.File(model.getPath());
         FileStore fileStore = null;
-        try {
-            fileStore = Files.getFileStore(file.toPath());
+        fileStore = Files.getFileStore(file.toPath());
 
-            if (fileStore.supportsFileAttributeView(FileOwnerAttributeView.class)) {
-                FileOwnerAttributeView fileOwnerAttributeView = Files.getFileAttributeView(file.toPath(), FileOwnerAttributeView.class);
-                fileOwnerAttributeView.setOwner(model.getOwner());
-            } else
-                LOGGER.warn("Owner " + model.getOwner().getName() + " couldn't be set on file " + model.getUrl());
-
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+        if (fileStore.supportsFileAttributeView(FileOwnerAttributeView.class)) {
+            FileOwnerAttributeView fileOwnerAttributeView = Files.getFileAttributeView(file.toPath(), FileOwnerAttributeView.class);
+            fileOwnerAttributeView.setOwner(model.getOwner());
+        } else
+            LOGGER.warn("Owner " + model.getOwner().getName() + " couldn't be set on file " + model.getUrl());
     }
 
     private class LocalFileDeletingVisitor extends SimpleFileVisitor<Path> {
@@ -389,24 +337,19 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         posixFileAttributeView.setPermissions(newPermissions);
     }
 
-    private void setTimes(String path, FileTime lastModifiedTime, FileTime lastAccessTime, FileTime createTime) {
+    private void setTimes(String path, FileTime lastModifiedTime, FileTime lastAccessTime, FileTime createTime) throws IOException {
         java.io.File file = new java.io.File(path);
         FileStore fileStore = null;
-        try {
-            fileStore = Files.getFileStore(file.toPath());
+        fileStore = Files.getFileStore(file.toPath());
 
-            if (fileStore.supportsFileAttributeView(BasicFileAttributeView.class)) {
-                BasicFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), BasicFileAttributeView.class);
-                attributeView.readAttributes();
-                attributeView.setTimes(lastModifiedTime, lastAccessTime, createTime);
-            } else {
-                String timeType = lastModifiedTime != null ? "LastModifiedTime" :
-                        (lastAccessTime != null ? "LastAccessTime" : "CreateTime");
-                LOGGER.warn(timeType + " couldn't be set on file " + path);
-            }
-
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
+        if (fileStore.supportsFileAttributeView(BasicFileAttributeView.class)) {
+            BasicFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), BasicFileAttributeView.class);
+            attributeView.readAttributes();
+            attributeView.setTimes(lastModifiedTime, lastAccessTime, createTime);
+        } else {
+            String timeType = lastModifiedTime != null ? "LastModifiedTime" :
+                    (lastAccessTime != null ? "LastAccessTime" : "CreateTime");
+            LOGGER.warn(timeType + " couldn't be set on file " + path);
         }
     }
 }

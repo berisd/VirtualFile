@@ -13,11 +13,12 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
-import at.beris.virtualfile.exception.PermissionDeniedException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class TestFilterHelper {
                 }
                 file.refresh();
                 fileList.add(file);
-            } catch (PermissionDeniedException e) {
+            } catch (AccessDeniedException e) {
                 LOGGER.warn("Permission denied - " + file.toString());
             }
         }
@@ -55,7 +56,7 @@ public class TestFilterHelper {
         return fileList;
     }
 
-    public static List<String> getNameListFromFileList(List<File> fileList) {
+    public static List<String> getNameListFromFileList(List<File> fileList) throws IOException {
         List<String> nameList = new ArrayList<>();
         for (File file : fileList)
             nameList.add(file.getName());

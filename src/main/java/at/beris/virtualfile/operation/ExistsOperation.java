@@ -13,6 +13,8 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
+
 public class ExistsOperation extends AbstractFileOperation<Boolean, Void> {
 
     public ExistsOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
@@ -20,7 +22,7 @@ public class ExistsOperation extends AbstractFileOperation<Boolean, Void> {
     }
 
     @Override
-    public Boolean execute(File source, File target, Listener listener, Void... params) {
+    public Boolean execute(File source, File target, Listener listener, Void... params) throws IOException {
         return fileOperationProvider.exists(source.getModel());
     }
 }

@@ -13,7 +13,6 @@ import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.AbstractClient;
 import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.config.Configuration;
-import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPCmd;
@@ -49,111 +48,75 @@ public class FtpClient extends AbstractClient {
     }
 
     @Override
-    public void connect() {
-        try {
-            ftpClient.connect(host(), port());
-            if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
-                disconnect();
-                return;
-            }
+    public void connect() throws IOException {
+        ftpClient.connect(host(), port());
+        if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
+            disconnect();
+            return;
+        }
 
-            ftpClient.login(username(), String.valueOf(password()));
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
+        ftpClient.login(username(), String.valueOf(password()));
+    }
+
+    @Override
+    public void disconnect() throws IOException {
+        if (ftpClient.isConnected()) {
+            ftpClient.logout();
+            ftpClient.disconnect();
         }
     }
 
     @Override
-    public void disconnect() {
-        try {
-            if (ftpClient.isConnected()) {
-                ftpClient.logout();
-                ftpClient.disconnect();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void deleteFile(String path) throws IOException {
+        checkConnection();
+        ftpClient.deleteFile(path);
     }
 
     @Override
-    public void deleteFile(String path) {
-        try {
-            checkConnection();
-            ftpClient.deleteFile(path);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
-    }
-
-    @Override
-    public void createFile(String path) {
+    public void createFile(String path) throws IOException {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[]{})) {
             checkConnection();
             ftpClient.storeFile(path, inputStream);
         } catch (IOException e) {
-            throw new VirtualFileException(e);
+            throw e;
         }
     }
 
     @Override
-    public boolean exists(String path) {
-        try {
-            checkConnection();
-            String status = ftpClient.getStatus(path);
-            return status != null;
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+    public boolean exists(String path) throws IOException {
+        checkConnection();
+        String status = ftpClient.getStatus(path);
+        return status != null;
     }
 
     @Override
-    public void createDirectory(String path) {
-        try {
-            checkConnection();
-            ftpClient.makeDirectory(path);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+    public void createDirectory(String path) throws IOException {
+        checkConnection();
+        ftpClient.makeDirectory(path);
     }
 
     @Override
-    public void deleteDirectory(String path) {
-        try {
-            checkConnection();
-            ftpClient.removeDirectory(path);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+    public void deleteDirectory(String path) throws IOException {
+        checkConnection();
+        ftpClient.removeDirectory(path);
     }
 
     @Override
-    public InputStream getInputStream(String path) {
-        try {
-            checkConnection();
-            return ftpClient.retrieveFileStream(path);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+    public InputStream getInputStream(String path) throws IOException {
+        checkConnection();
+        return ftpClient.retrieveFileStream(path);
     }
 
     @Override
-    public OutputStream getOutputStream(String path) {
-        try {
-            checkConnection();
-            return ftpClient.storeFileStream(path);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+    public OutputStream getOutputStream(String path) throws IOException {
+        checkConnection();
+        return ftpClient.storeFileStream(path);
     }
 
     @Override
-    public FileInfo getFileInfo(String path) {
-        try {
-            checkConnection();
-            return new FtpFileInfo(path, mlistFile(path));
-        } catch (IOException e) {
-            throw new VirtualFileException();
-        }
+    public FileInfo getFileInfo(String path) throws IOException {
+        checkConnection();
+        return new FtpFileInfo(path, mlistFile(path));
     }
 
     protected String username() {
@@ -166,18 +129,15 @@ public class FtpClient extends AbstractClient {
         return 21;
     }
 
-    public List<FileInfo> list(String path) {
+    public List<FileInfo> list(String path) throws IOException {
         List<FileInfo> fileList = new ArrayList<>();
-        try {
-            checkConnection();
-            ftpClient.changeWorkingDirectory(path);
-            for (FTPFile ftpFile : ftpClient.listFiles()) {
-                FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory(), ftpFile);
-                fileList.add(ftpFileInfo);
-            }
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
+        checkConnection();
+        ftpClient.changeWorkingDirectory(path);
+        for (FTPFile ftpFile : ftpClient.listFiles()) {
+            FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory(), ftpFile);
+            fileList.add(ftpFileInfo);
         }
+
         return fileList;
     }
 
@@ -201,15 +161,11 @@ public class FtpClient extends AbstractClient {
 
     }
 
-    public boolean completePendingCommand() {
-        try {
-            return ftpClient.completePendingCommand();
-        } catch (IOException e) {
-            throw new VirtualFileException();
-        }
+    public boolean completePendingCommand() throws IOException {
+        return ftpClient.completePendingCommand();
     }
 
-    private void checkConnection() {
+    private void checkConnection() throws IOException {
         if (!ftpClient.isConnected())
             connect();
     }

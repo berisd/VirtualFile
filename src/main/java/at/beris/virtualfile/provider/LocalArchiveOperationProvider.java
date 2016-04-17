@@ -15,7 +15,6 @@ import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -49,7 +48,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     }
 
     @Override
-    public List<File> list(FileModel model, Filter filter) {
+    public List<File> list(FileModel model, Filter filter) throws IOException {
         List<File> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
@@ -68,27 +67,19 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                 if (filter == null || filter.filter(file))
                     fileList.add(file);
             }
-        } catch (FileNotFoundException e) {
-            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
         } catch (ArchiveException e) {
-            throw new VirtualFileException(e);
+            throw new IOException(e);
         } finally {
-            try {
                 if (ais != null)
                     ais.close();
                 if (fis != null)
                     fis.close();
-            } catch (IOException e) {
-                throw new VirtualFileException(e);
-            }
         }
         return fileList;
     }
 
     @Override
-    public List<File> extract(FileModel model, File target) {
+    public List<File> extract(FileModel model, File target) throws IOException {
         List<File> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
@@ -115,23 +106,15 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                 File file = FileManager.newFile(urlMap.get(URL));
                 fileList.add(file);
             }
-        } catch (FileNotFoundException e) {
-            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
         } catch (ArchiveException e) {
-            throw new VirtualFileException(e);
+            throw new IOException(e);
         } catch (URISyntaxException e) {
-            throw new VirtualFileException(e);
+            throw new IOException(e);
         } finally {
-            try {
                 if (ais != null)
                     ais.close();
                 if (fis != null)
                     fis.close();
-            } catch (IOException e) {
-                throw new VirtualFileException(e);
-            }
         }
         return fileList;
     }

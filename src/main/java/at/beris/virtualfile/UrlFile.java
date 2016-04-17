@@ -20,6 +20,7 @@ import at.beris.virtualfile.operation.FileOperationEnum;
 import at.beris.virtualfile.operation.Listener;
 import at.beris.virtualfile.util.FileUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -50,13 +51,13 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public FileModel getModel() {
+    public FileModel getModel() throws IOException {
         checkModel();
         return model;
     }
 
     @Override
-    public String getName() {
+    public String getName() throws IOException {
         checkModel();
         String path = model.getPath();
         if (path.endsWith("/"))
@@ -66,43 +67,43 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public FileTime getCreationTime() {
+    public FileTime getCreationTime() throws IOException {
         checkModel();
         return model.getCreationTime();
     }
 
     @Override
-    public FileTime getLastModifiedTime() {
+    public FileTime getLastModifiedTime() throws IOException {
         checkModel();
         return model.getLastModifiedTime();
     }
 
     @Override
-    public FileTime getLastAccessTime() {
+    public FileTime getLastAccessTime() throws IOException {
         checkModel();
         return model.getLastAccessTime();
     }
 
     @Override
-    public long getSize() {
+    public long getSize() throws IOException {
         checkModel();
         return model.getSize();
     }
 
     @Override
-    public String getPath() {
+    public String getPath() throws IOException {
         checkModel();
         return model.getPath();
     }
 
     @Override
-    public void delete() {
+    public void delete() throws IOException {
         checkModel();
         executeOperation(FileOperationEnum.DELETE, null, null, (Void) null);
     }
 
     @Override
-    public void delete(File file) {
+    public void delete(File file) throws IOException {
         checkModel();
         throw new NotImplementedException();
     }
@@ -116,25 +117,25 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public Byte[] checksum() {
+    public Byte[] checksum() throws IOException {
         checkModel();
         return executeOperation(FileOperationEnum.CHECKSUM, null, null, (Void) null);
     }
 
     @Override
-    public boolean isDirectory() {
+    public boolean isDirectory() throws IOException {
         checkModel();
         return model.isDirectory();
     }
 
     @Override
-    public boolean isSymbolicLink() {
+    public boolean isSymbolicLink() throws IOException {
         checkModel();
         return model.isSymbolicLink();
     }
 
     @Override
-    public boolean isContainer() {
+    public boolean isContainer() throws IOException {
         checkModel();
         return isArchive() || isDirectory();
     }
@@ -145,7 +146,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public File getRoot() {
+    public File getRoot() throws IOException {
         checkModel();
         File root = this;
         while (root.getParent() != null)
@@ -154,50 +155,50 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isRoot() {
+    public boolean isRoot() throws IOException {
         checkModel();
         return this.toString().equals(getRoot() != null ? getRoot().toString() : "");
     }
 
     @Override
-    public Boolean exists() {
+    public Boolean exists() throws IOException {
         checkModel();
         return executeOperation(FileOperationEnum.EXISTS, null, null, (Void) null);
     }
 
     @Override
-    public List<File> extract(File target) {
+    public List<File> extract(File target) throws IOException {
         checkModel();
         return executeOperation(FileOperationEnum.EXTRACT, target, null, (Void) null);
     }
 
     @Override
-    public void create() {
+    public void create() throws IOException {
         checkModel();
         executeOperation(FileOperationEnum.CREATE, null, null, (Void) null);
         updateModel();
     }
 
     @Override
-    public InputStream getInputStream() {
+    public InputStream getInputStream() throws IOException {
         checkModel();
         return executeOperation(FileOperationEnum.GET_INPUT_STREAM, null, null, (Void) null);
     }
 
     @Override
-    public OutputStream getOutputStream() {
+    public OutputStream getOutputStream() throws IOException {
         checkModel();
         return executeOperation(FileOperationEnum.GET_OUTPUT_STREAM, null, null, (Void) null);
     }
 
     @Override
-    public List<AclEntry> getAcl() {
+    public List<AclEntry> getAcl() throws IOException {
         checkModel();
         return model.getAcl();
     }
 
     @Override
-    public void setAcl(List<AclEntry> acl) {
+    public void setAcl(List<AclEntry> acl) throws IOException {
         checkModel();
         model.setAcl(acl);
         executeOperation(FileOperationEnum.SET_ACL, null, null, (Void) null);
@@ -205,13 +206,13 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public UserPrincipal getOwner() {
+    public UserPrincipal getOwner() throws IOException {
         checkModel();
         return model.getOwner();
     }
 
     @Override
-    public void setOwner(UserPrincipal owner) {
+    public void setOwner(UserPrincipal owner) throws IOException {
         checkModel();
         model.setOwner(owner);
         executeOperation(FileOperationEnum.SET_OWNER, null, null, (Void) null);
@@ -219,13 +220,13 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public GroupPrincipal getGroup() {
+    public GroupPrincipal getGroup() throws IOException {
         checkModel();
         return model.getGroup();
     }
 
     @Override
-    public void setGroup(GroupPrincipal group) {
+    public void setGroup(GroupPrincipal group) throws IOException {
         checkModel();
         model.setGroup(group);
         executeOperation(FileOperationEnum.SET_GROUP, null, null, (Void) null);
@@ -233,7 +234,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public void setLastAccessTime(FileTime time) {
+    public void setLastAccessTime(FileTime time) throws IOException {
         checkModel();
         model.setLastAccessTime(time);
         executeOperation(FileOperationEnum.SET_LAST_ACCESS_TIME, null, null, (Void) null);
@@ -241,7 +242,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public void setLastModifiedTime(FileTime time) {
+    public void setLastModifiedTime(FileTime time) throws IOException {
         checkModel();
         model.setLastModifiedTime(time);
         executeOperation(FileOperationEnum.SET_LAST_MODIFIED_TIME, null, null, (Void) null);
@@ -249,7 +250,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public void setAttributes(FileAttribute... attributes) {
+    public void setAttributes(FileAttribute... attributes) throws IOException {
         checkModel();
         model.setAttributes(new HashSet<>(Arrays.asList(attributes)));
         executeOperation(FileOperationEnum.SET_ATTRIBUTES, null, null, (Void) null);
@@ -257,7 +258,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public void setCreationTime(FileTime time) {
+    public void setCreationTime(FileTime time) throws IOException {
         checkModel();
         model.setCreationTime(time);
         executeOperation(FileOperationEnum.SET_CREATION_TIME, null, null, (Void) null);
@@ -265,19 +266,19 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public Set<FileAttribute> getAttributes() {
+    public Set<FileAttribute> getAttributes() throws IOException {
         checkModel();
         return model.getAttributes();
     }
 
     @Override
-    public void add(File file) {
+    public void add(File file) throws IOException {
         checkModel();
         throw new NotImplementedException();
     }
 
     @Override
-    public void addAttributes(FileAttribute... attributes) {
+    public void addAttributes(FileAttribute... attributes) throws IOException {
         checkModel();
         if (attributes.length < 1)
             return;
@@ -290,7 +291,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public void removeAttributes(FileAttribute... attributes) {
+    public void removeAttributes(FileAttribute... attributes) throws IOException {
         checkModel();
         if (attributes.length < 1)
             return;
@@ -303,7 +304,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public List<File> find(Filter filter) {
+    public List<File> find(Filter filter) throws IOException {
         checkModel();
         Filter directoriesFilter = new IsDirectoryFilter().equalTo(true);
         Filter withDirectoriesFilter = ((Filter) filter.clone()).or(new IsDirectoryFilter().equalTo(true));
@@ -325,43 +326,43 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public List<File> list() {
+    public List<File> list() throws IOException {
         checkModel();
         return executeOperation(FileOperationEnum.LIST, null, null, (Filter) null);
     }
 
     @Override
-    public List<File> list(Filter filter) {
+    public List<File> list(Filter filter) throws IOException {
         checkModel();
         return executeOperation(FileOperationEnum.LIST, null, null, filter);
     }
 
     @Override
-    public boolean isArchive() {
+    public boolean isArchive() throws IOException {
         checkModel();
         return model.isArchive();
     }
 
     @Override
-    public boolean isArchived() {
+    public boolean isArchived() throws IOException {
         checkModel();
         return model.isArchived();
     }
 
     @Override
-    public void copy(File targetFile) {
+    public void copy(File targetFile) throws IOException {
         checkModel();
         executeOperation(FileOperationEnum.COPY, targetFile, null, (Void) null);
     }
 
     @Override
-    public void copy(File targetFile, CopyListener listener) {
+    public void copy(File targetFile, CopyListener listener) throws IOException {
         checkModel();
         executeOperation(FileOperationEnum.COPY, targetFile, listener, (Void) null);
     }
 
     @Override
-    public void refresh() {
+    public void refresh() throws IOException {
         checkModel();
         updateModel();
     }
@@ -392,7 +393,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
         return model.getUrl().toString().compareTo(o.getUrl().toString());
     }
 
-    private <T, P> T executeOperation(FileOperationEnum fileOperationEnum, File targetFile, Listener listener, P... params) {
+    private <T, P> T executeOperation(FileOperationEnum fileOperationEnum, File targetFile, Listener listener, P... params) throws IOException {
         FileOperation<T, P> fileOperation = fileOperationMap.get(fileOperationEnum);
         if (fileOperation == null)
             throw new OperationNotSupportedException();
@@ -400,16 +401,16 @@ public class UrlFile implements File, Comparable<UrlFile> {
         return fileOperation.execute(this, targetFile, listener, params);
     }
 
-    void updateModel() {
+    void updateModel() throws IOException {
         executeOperation(FileOperationEnum.UPDATE_MODEL, null, null, (Void) null);
     }
 
-    private void checkModel() {
+    private void checkModel() throws IOException {
         if (model == null)
             createModel();
     }
 
-    private void createModel() {
+    private void createModel() throws IOException {
         model = new FileModel();
         if (parent != null)
             model.setParent(parent.getModel());

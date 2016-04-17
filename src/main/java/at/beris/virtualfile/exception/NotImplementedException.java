@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.exception;
 
-public class NotImplementedException extends VirtualFileException {
+public class NotImplementedException extends RuntimeException {
     public NotImplementedException() {
         super();
     }

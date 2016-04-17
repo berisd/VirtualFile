@@ -9,8 +9,10 @@
 
 package at.beris.virtualfile.util;
 
-public interface SingleValueOperation<O, T> {
-    void setValue(O object, T value);
+import java.io.IOException;
 
-    T getValue(O object);
+public interface SingleValueOperation<O, T> {
+    void setValue(O object, T value) throws IOException;
+
+    T getValue(O object) throws IOException;
 }

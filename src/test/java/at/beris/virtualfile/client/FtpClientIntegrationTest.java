@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -55,7 +56,7 @@ public class FtpClientIntegrationTest {
         user.setHomeDirectory("/tmp");
 
         List<Authority> authorities = new ArrayList<>();
-        authorities.add( new WritePermission() );
+        authorities.add(new WritePermission());
 
         user.setAuthorities(authorities);
         userManager.save(user);
@@ -76,7 +77,7 @@ public class FtpClientIntegrationTest {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws IOException {
         if (ftpClient.exists(TEST_FILE))
             ftpClient.deleteFile(TEST_FILE);
         if (ftpClient != null)
@@ -85,7 +86,7 @@ public class FtpClientIntegrationTest {
     }
 
     @Test
-    public void createFile() {
+    public void createFile() throws IOException {
         ftpClient.createFile(TEST_FILE);
         Assert.assertTrue(ftpClient.exists(TEST_FILE));
         ftpClient.deleteFile(TEST_FILE);
@@ -93,7 +94,7 @@ public class FtpClientIntegrationTest {
     }
 
     @Test
-    public void makeDirectory() {
+    public void makeDirectory() throws IOException {
         ftpClient.createDirectory(TEST_DIRECTORY);
         assertTrue(ftpClient.exists(TEST_DIRECTORY));
         ftpClient.deleteDirectory(TEST_DIRECTORY);
@@ -101,7 +102,7 @@ public class FtpClientIntegrationTest {
     }
 
     @Test
-    public void writeToFile() throws Exception {
+    public void writeToFile() throws IOException {
         ftpClient.createFile(TEST_FILE);
         try (OutputStream outputstream = ftpClient.getOutputStream(TEST_FILE)) {
             outputstream.write(TEST_STRING.getBytes());
@@ -118,7 +119,7 @@ public class FtpClientIntegrationTest {
     }
 
     @Test
-    public void readFromFile() throws Exception {
+    public void readFromFile() throws IOException {
         ftpClient.createFile(TEST_FILE);
         try (OutputStream outputstream = ftpClient.getOutputStream(TEST_FILE)) {
             outputstream.write(TEST_STRING.getBytes());
@@ -138,7 +139,7 @@ public class FtpClientIntegrationTest {
     }
 
     @Test
-    public void list() throws Exception {
+    public void list() throws IOException {
         List<FileInfo> fileInfoList = ftpClient.list("/");
         Assert.assertTrue(fileInfoList.size() > 0);
     }

@@ -19,6 +19,7 @@ import at.beris.virtualfile.provider.LocalFileOperationProvider;
 import at.beris.virtualfile.provider.SftpFileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class Configurator {
         return configurationPerProtocolMap.get(protocol);
     }
 
-    public Configuration getConfiguration(File file) {
+    public Configuration getConfiguration(File file) throws IOException {
         return configurationPerUrlMap.get(file.getUrl());
     }
 

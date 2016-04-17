@@ -13,6 +13,8 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
+
 public class ChecksumOperation extends AbstractFileOperation<Byte[], Void> {
 
     public ChecksumOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
@@ -20,7 +22,7 @@ public class ChecksumOperation extends AbstractFileOperation<Byte[], Void> {
     }
 
     @Override
-    public Byte[] execute(File source, File target, Listener listener, Void... params) {
+    public Byte[] execute(File source, File target, Listener listener, Void... params) throws IOException {
         return fileOperationProvider.checksum(source.getModel());
     }
 }

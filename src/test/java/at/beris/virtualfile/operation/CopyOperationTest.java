@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -90,7 +91,7 @@ public class CopyOperationTest {
         return targetFile;
     }
 
-    private File createFileMock(URL url, boolean isDirectory) {
+    private File createFileMock(URL url, boolean isDirectory) throws IOException {
         String[] pathParts = url.toString().split("/");
         File sourceFile = Mockito.mock(UrlFile.class);
         Mockito.when(sourceFile.getUrl()).thenReturn(url);

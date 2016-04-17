@@ -14,6 +14,7 @@ import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.ArchiveOperationProvider;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ExtractOperation extends AbstractFileOperation<List<File>, Void> {
@@ -23,7 +24,7 @@ public class ExtractOperation extends AbstractFileOperation<List<File>, Void> {
     }
 
     @Override
-    public List<File> execute(File source, File target, Listener listener, Void... params) {
+    public List<File> execute(File source, File target, Listener listener, Void... params) throws IOException {
         return ((ArchiveOperationProvider) fileOperationProvider).extract(source.getModel(), target);
     }
 }

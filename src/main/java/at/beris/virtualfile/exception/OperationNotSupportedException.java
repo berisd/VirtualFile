@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.exception;
 
-public class OperationNotSupportedException extends VirtualFileException {
+public class OperationNotSupportedException extends RuntimeException {
     public OperationNotSupportedException() {
         super();
     }

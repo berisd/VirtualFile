@@ -13,6 +13,8 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
+
 public class UpdateModelOperation extends AbstractFileOperation<Void, Void> {
 
     public UpdateModelOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
@@ -20,7 +22,7 @@ public class UpdateModelOperation extends AbstractFileOperation<Void, Void> {
     }
 
     @Override
-    public Void execute(File source, File target, Listener listener, Void... params) {
+    public Void execute(File source, File target, Listener listener, Void... params) throws IOException {
         fileOperationProvider.updateModel(source.getModel());
         return null;
     }

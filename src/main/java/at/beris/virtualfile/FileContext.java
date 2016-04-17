@@ -13,7 +13,6 @@ import at.beris.virtualfile.cache.LRUMap;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.logging.FileLoggingWrapper;
 import at.beris.virtualfile.operation.*;
 import at.beris.virtualfile.protocol.Protocol;
@@ -21,8 +20,8 @@ import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -54,15 +53,11 @@ public class FileContext {
      * @param path
      * @return
      */
-    public File newLocalFile(String path) {
-        try {
-            URL url = new java.io.File(path).toURI().toURL();
-            if (path.endsWith(java.io.File.separator))
-                url = new URL(url.toString() + "/");
-            return newFile(url);
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
-        }
+    public File newLocalFile(String path) throws IOException {
+        URL url = new java.io.File(path).toURI().toURL();
+        if (path.endsWith(java.io.File.separator))
+            url = new URL(url.toString() + "/");
+        return newFile(url);
     }
 
     /**
@@ -71,15 +66,11 @@ public class FileContext {
      * @param url
      * @return
      */
-    public File newFile(String url) {
-        try {
-            return newFile((File) null, new URL(url));
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
-        }
+    public File newFile(String url) throws IOException {
+        return newFile((File) null, new URL(url));
     }
 
-    public File newFile(URL parentUrl, URL url) {
+    public File newFile(URL parentUrl, URL url) throws IOException {
         return newFile(newFile(parentUrl), url);
     }
 
@@ -90,11 +81,11 @@ public class FileContext {
      * @param url
      * @return
      */
-    public File newFile(File parent, URL url) {
+    public File newFile(File parent, URL url) throws IOException {
         return createFile(parent, url);
     }
 
-    public File newFile(URL url) {
+    public File newFile(URL url) throws IOException {
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         String fullPath = normalizedUrl.getPath();
         File parentFile = null;
@@ -111,13 +102,9 @@ public class FileContext {
                 if ((i < pathParts.length - 1) || fullPath.endsWith("/"))
                     path += "/";
 
-                try {
-                    String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl) + path;
-                    URL pathUrl = new URL(pathUrlString);
-                    parentFile = newFile(parentFile, pathUrl);
-                } catch (MalformedURLException e) {
-                    throw new VirtualFileException(e);
-                }
+                String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl) + path;
+                URL pathUrl = new URL(pathUrlString);
+                parentFile = newFile(parentFile, pathUrl);
             }
         }
         return parentFile;
@@ -137,11 +124,11 @@ public class FileContext {
         System.getProperties().setProperty(propertyKey, propertyValue);
     }
 
-    public void removeFileFromCache(File file) {
+    public void removeFileFromCache(File file) throws IOException {
         fileCache.remove(file.getUrl().toString());
     }
 
-    public void dispose(File file) {
+    public void dispose(File file) throws IOException {
         removeFileFromCache(file);
         file.dispose();
     }
@@ -173,11 +160,11 @@ public class FileContext {
         return null;
     }
 
-    private File createFile(File parent, URL url) {
+    private File createFile(File parent, URL url) throws IOException {
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         Protocol protocol = UrlUtils.getProtocol(normalizedUrl);
         if (configurator.getFileOperationProviderClassMap(protocol) == null)
-            throw new VirtualFileException("No configuration found for protocol: " + protocol);
+            throw new IOException("No configuration found for protocol: " + protocol);
 
         File file = null;
         try {
@@ -194,9 +181,9 @@ public class FileContext {
                 fileCache.put(urlString, file);
             }
         } catch (InstantiationException e) {
-            throw new VirtualFileException(e);
+            throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
-            throw new VirtualFileException(e);
+            throw new RuntimeException(e);
         }
         return file;
     }
@@ -212,7 +199,7 @@ public class FileContext {
                 Constructor constructor = clientClass.getConstructor(URL.class, Configuration.class);
                 client = (Client) constructor.newInstance(url, configuration);
             } catch (ReflectiveOperationException e) {
-                throw new VirtualFileException(e);
+                throw new RuntimeException(e);
             }
         }
         return client;
@@ -225,7 +212,7 @@ public class FileContext {
             Constructor constructor = UrlFile.class.getConstructor(File.class, URL.class, FileContext.class);
             instance = (UrlFile) constructor.newInstance(parent, url, this);
         } catch (ReflectiveOperationException e) {
-            throw new VirtualFileException(e);
+            throw new RuntimeException(e);
         }
 
         return new FileLoggingWrapper(instance);
@@ -265,7 +252,7 @@ public class FileContext {
             constructor = instanceClass.getConstructor(this.getClass(), Client.class);
             instance = (FileOperationProvider) constructor.newInstance(this, client);
         } catch (ReflectiveOperationException e) {
-            throw new VirtualFileException(e);
+            throw new RuntimeException(e);
         }
 
         return instance;

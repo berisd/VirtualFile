@@ -13,12 +13,13 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.filter.Filter;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
 public interface FileOperationProvider {
-    Byte[] checksum(FileModel model);
+    Byte[] checksum(FileModel model) throws IOException;
 
     /**
      * Creates a new  physical representation
@@ -26,15 +27,15 @@ public interface FileOperationProvider {
      * @param model
      * @return
      */
-    void create(FileModel model);
+    void create(FileModel model) throws IOException;
 
-    void delete(FileModel model);
+    void delete(FileModel model) throws IOException;
 
-    Boolean exists(FileModel model);
+    Boolean exists(FileModel model) throws IOException;
 
-    InputStream getInputStream(FileModel model);
+    InputStream getInputStream(FileModel model) throws IOException;
 
-    OutputStream getOutputStream(FileModel model);
+    OutputStream getOutputStream(FileModel model) throws IOException;
 
     /**
      * List files in this file
@@ -43,26 +44,26 @@ public interface FileOperationProvider {
      * @param filter
      * @return
      */
-    List<File> list(FileModel model, Filter filter);
+    List<File> list(FileModel model, Filter filter) throws IOException;
 
     /**
      * Updates the Model with information from the physical file.
      *
      * @param model
      */
-    void updateModel(FileModel model);
+    void updateModel(FileModel model) throws IOException;
 
-    void setAcl(FileModel model);
+    void setAcl(FileModel model) throws IOException;
 
-    void setAttributes(FileModel model);
+    void setAttributes(FileModel model) throws IOException;
 
-    void setCreationTime(FileModel model);
+    void setCreationTime(FileModel model) throws IOException;
 
-    void setGroup(FileModel model);
+    void setGroup(FileModel model) throws IOException;
 
-    void setLastAccessTime(FileModel model);
+    void setLastAccessTime(FileModel model) throws IOException;
 
-    void setLastModifiedTime(FileModel model);
+    void setLastModifiedTime(FileModel model) throws IOException;
 
-    void setOwner(FileModel model);
+    void setOwner(FileModel model) throws IOException;
 }

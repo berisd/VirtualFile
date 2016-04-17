@@ -14,14 +14,15 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.config.Configuration;
-import at.beris.virtualfile.exception.AccessDeniedException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.AccessDeniedException;
 
 import static org.junit.Assert.*;
 
@@ -41,7 +42,7 @@ public class SftpClientIntegrationTest {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws IOException {
         cleanUp();
         if (sftpClient != null)
             sftpClient.disconnect();
@@ -56,7 +57,7 @@ public class SftpClientIntegrationTest {
     }
 
     @Test
-    public void makeDirectory() {
+    public void makeDirectory() throws IOException {
         sftpClient.createDirectory(TEST_DIRECTORY);
         assertTrue(sftpClient.exists(TEST_DIRECTORY));
         sftpClient.deleteDirectory(TEST_DIRECTORY);
@@ -100,7 +101,7 @@ public class SftpClientIntegrationTest {
     }
 
     @Test
-    public void fileNotExists() {
+    public void fileNotExists() throws IOException {
         assertFalse(sftpClient.exists(TestFileHelper.SSH_HOME_DIRECTORY + "abcdef.txt"));
     }
 
@@ -117,7 +118,7 @@ public class SftpClientIntegrationTest {
         return new SftpClient(url, configuration);
     }
 
-    private static void cleanUp() {
+    private static void cleanUp() throws IOException {
         if (sftpClient != null && sftpClient.exists(TEST_FILE))
             sftpClient.deleteFile(TEST_FILE);
         if (sftpClient != null && sftpClient.exists(TEST_DIRECTORY))

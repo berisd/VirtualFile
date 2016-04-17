@@ -16,11 +16,13 @@ import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.UrlUtils;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public void create(FileModel model) {
+    public void create(FileModel model) throws IOException {
         if (model.isDirectory())
             client.createDirectory(model.getPath());
         else {
@@ -40,12 +42,12 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public Boolean exists(FileModel model) {
+    public Boolean exists(FileModel model) throws IOException {
         return client.exists(model.getPath());
     }
 
     @Override
-    public void delete(FileModel model) {
+    public void delete(FileModel model) throws IOException {
         if (model.isDirectory())
             client.deleteDirectory(model.getPath());
         else
@@ -53,7 +55,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public Byte[] checksum(FileModel model) {
+    public Byte[] checksum(FileModel model) throws IOException {
         String tempDir = System.getProperty("java.io.tmpdir");
         String tempFilePath = tempDir + java.io.File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
         at.beris.virtualfile.File tempFile = copyToLocalFile(model, tempFilePath);
@@ -61,7 +63,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) {
+    public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) throws IOException {
         List<FileInfo> fileInfoList = client.list(model.getPath());
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
 
@@ -75,7 +77,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public void updateModel(FileModel model) {
+    public void updateModel(FileModel model) throws IOException {
         model.setFileExists(client.exists(model.getPath()));
         if (!model.isFileExists())
             return;
@@ -90,46 +92,46 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public InputStream getInputStream(FileModel model) {
+    public InputStream getInputStream(FileModel model) throws IOException {
         return client.getInputStream(model.getPath());
     }
 
     @Override
-    public OutputStream getOutputStream(FileModel model) {
+    public OutputStream getOutputStream(FileModel model) throws IOException {
         return client.getOutputStream(model.getPath());
     }
 
     @Override
-    public void setAttributes(FileModel model) {
+    public void setAttributes(FileModel model) throws IOException {
         client.setAttributes(model.getPath(), model.getAttributes());
     }
 
     @Override
-    public void setCreationTime(FileModel model) {
+    public void setCreationTime(FileModel model) throws IOException {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void setGroup(FileModel model) {
+    public void setGroup(FileModel model) throws IOException {
         client.setGroup(model.getPath(), model.getGroup());
     }
 
     @Override
-    public void setLastAccessTime(FileModel model) {
+    public void setLastAccessTime(FileModel model) throws IOException {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void setLastModifiedTime(FileModel model) {
+    public void setLastModifiedTime(FileModel model) throws IOException {
         client.setLastModifiedTime(model.getPath(), model.getLastModifiedTime());
     }
 
     @Override
-    public void setOwner(FileModel model) {
+    public void setOwner(FileModel model) throws IOException {
         client.setOwner(model.getPath(), model.getOwner());
     }
 
-    private at.beris.virtualfile.File copyToLocalFile(FileModel model, String path) {
+    private at.beris.virtualfile.File copyToLocalFile(FileModel model, String path) throws IOException {
         byte[] buffer = new byte[1024];
         int length;
 
@@ -140,10 +142,8 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
             while ((length = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, length);
             }
-        } catch (FileNotFoundException e) {
-            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
         } catch (IOException e) {
-            new VirtualFileException(e);
+            throw e;
         }
 
         return FileManager.newLocalFile(path);

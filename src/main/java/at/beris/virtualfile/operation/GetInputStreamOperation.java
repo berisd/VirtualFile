@@ -13,6 +13,7 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public class GetInputStreamOperation extends AbstractFileOperation<InputStream, Void> {
@@ -22,7 +23,7 @@ public class GetInputStreamOperation extends AbstractFileOperation<InputStream, 
     }
 
     @Override
-    public InputStream execute(File source, File target, Listener listener, Void... params) {
+    public InputStream execute(File source, File target, Listener listener, Void... params) throws IOException {
         return fileOperationProvider.getInputStream(source.getModel());
     }
 }

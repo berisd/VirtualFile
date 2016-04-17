@@ -11,9 +11,11 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.File;
 
+import java.io.IOException;
+
 public class FileSizeFilter extends DefaultFilter<Long> {
     @Override
-    protected Long getValue(File file) {
+    protected Long getValue(File file) throws IOException {
         return file.getSize();
     }
 }

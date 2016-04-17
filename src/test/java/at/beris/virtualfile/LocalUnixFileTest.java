@@ -41,45 +41,45 @@ public class LocalUnixFileTest extends AbstractFileTest {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws IOException {
         AbstractFileTest.tearDown();
     }
 
     @Test
-    public void createFile() {
+    public void createFile() throws IOException {
         super.createFile();
     }
 
     @Test
-    public void createDirectory() {
+    public void createDirectory() throws IOException {
         super.createDirectory();
     }
 
     @Test
-    public void copyFile() {
+    public void copyFile() throws IOException {
         super.copyFile();
     }
 
     @Test
-    public void copyDirectory() {
+    public void copyDirectory() throws IOException {
         super.copyDirectory();
     }
 
     @Test
-    public void deleteFile() {
+    public void deleteFile() throws IOException {
         super.deleteFile();
     }
 
     @Test
-    public void deleteDirectory() {
+    public void deleteDirectory() throws IOException {
         super.deleteDirectory();
     }
 
     @Test
-    public void getFileAttributes() {
+    public void getFileAttributes() throws IOException {
         super.getFileAttributes(new VoidOperation<File>() {
             @Override
-            public void execute(File file) {
+            public void execute(File file) throws IOException {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
@@ -89,7 +89,7 @@ public class LocalUnixFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void setFileAttributes() {
+    public void setFileAttributes() throws IOException {
         Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(PosixFilePermission.OTHERS_EXECUTE);
         attributes.add(PosixFilePermission.GROUP_EXECUTE);
@@ -104,23 +104,23 @@ public class LocalUnixFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void setGroup() {
+    public void setGroup() throws IOException {
         super.setGroup();
     }
 
     @Test
     @Ignore("IgnoreTest: On Linux creationTime doesn't seem to be set")
-    public void setCreationTime() {
+    public void setCreationTime() throws IOException {
         super.setCreationTime();
     }
 
     @Test
-    public void setLastModifiedTime() {
+    public void setLastModifiedTime() throws IOException {
         super.setLastModifiedTime();
     }
 
     @Test
-    public void setLastAccessTime() {
+    public void setLastAccessTime() throws IOException {
         super.setLastAccessTime();
     }
 }

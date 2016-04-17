@@ -11,6 +11,7 @@ package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -25,33 +26,33 @@ public interface Client {
 
     void setUrl(URL url);
 
-    void connect();
+    void connect() throws IOException;
 
-    void disconnect();
+    void disconnect() throws IOException;
 
-    void deleteFile(String path);
+    void deleteFile(String path) throws IOException;
 
-    void createFile(String path);
+    void createFile(String path) throws IOException;
 
-    boolean exists(String path);
+    boolean exists(String path) throws IOException;
 
-    void createDirectory(String path);
+    void createDirectory(String path) throws IOException;
 
-    void deleteDirectory(String path);
+    void deleteDirectory(String path) throws IOException;
 
-    InputStream getInputStream(String path);
+    InputStream getInputStream(String path) throws IOException;
 
-    OutputStream getOutputStream(String path);
+    OutputStream getOutputStream(String path) throws IOException;
 
-    FileInfo getFileInfo(String path);
+    FileInfo getFileInfo(String path) throws IOException;
 
-    List<FileInfo> list(String path);
+    List<FileInfo> list(String path) throws IOException;
 
-    void setLastModifiedTime(String path, FileTime time);
+    void setLastModifiedTime(String path, FileTime time) throws IOException;
 
-    void setAttributes(String path, Set<FileAttribute> attributes);
+    void setAttributes(String path, Set<FileAttribute> attributes) throws IOException;
 
-    void setOwner(String path, UserPrincipal owner);
+    void setOwner(String path, UserPrincipal owner) throws IOException;
 
-    void setGroup(String path, GroupPrincipal group);
+    void setGroup(String path, GroupPrincipal group) throws IOException;
 }

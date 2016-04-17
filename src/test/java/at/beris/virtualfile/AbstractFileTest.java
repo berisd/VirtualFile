@@ -10,7 +10,6 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.operation.CopyListener;
 import at.beris.virtualfile.util.SingleValueOperation;
 import at.beris.virtualfile.util.UrlUtils;
@@ -19,7 +18,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
@@ -51,11 +49,11 @@ public abstract class AbstractFileTest {
     protected static URL sourceDirectoryUrl;
     protected static URL targetDirectoryUrl;
 
-    protected void createFile() {
+    protected void createFile() throws IOException {
         createFile(null);
     }
 
-    protected void createFile(VoidOperation<File> assertHook) {
+    protected void createFile(VoidOperation<File> assertHook) throws IOException {
         File file = FileManager.newFile(sourceFileUrl);
         file.create();
 
@@ -73,7 +71,7 @@ public abstract class AbstractFileTest {
         file.delete();
     }
 
-    protected void createDirectory() {
+    protected void createDirectory() throws IOException {
         File file = FileManager.newFile(sourceDirectoryUrl);
         file.create();
 
@@ -82,7 +80,7 @@ public abstract class AbstractFileTest {
         assertTrue(file.isDirectory());
     }
 
-    protected void copyFile() {
+    protected void copyFile() throws IOException {
         File sourceFile = TestFileHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
         File targetFile = FileManager.newFile(targetFileUrl);
         CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
@@ -93,32 +91,26 @@ public abstract class AbstractFileTest {
         targetFile.delete();
     }
 
-    protected void copyDirectory() {
-        try {
-            List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
-            List<String> targetFileUrlList = createFilenamesTree(targetDirectoryUrl.toString());
+    protected void copyDirectory() throws IOException {
+        List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+        List<String> targetFileUrlList = createFilenamesTree(targetDirectoryUrl.toString());
 
-            TestFileHelper.createFileTreeData(sourceFileUrlList);
+        TestFileHelper.createFileTreeData(sourceFileUrlList);
 
-            File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
-            File targetDirectory = FileManager.newFile(targetDirectoryUrl);
+        File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+        File targetDirectory = FileManager.newFile(targetDirectoryUrl);
 
-            CopyListener copyListener = Mockito.mock(CopyListener.class);
-            Mockito.when(copyListener.interrupt()).thenReturn(false);
+        CopyListener copyListener = Mockito.mock(CopyListener.class);
+        Mockito.when(copyListener.interrupt()).thenReturn(false);
 
-            sourceDirectory.copy(targetDirectory, copyListener);
-            assertDirectory(sourceFileUrlList, targetFileUrlList);
+        sourceDirectory.copy(targetDirectory, copyListener);
+        assertDirectory(sourceFileUrlList, targetFileUrlList);
 
-            sourceDirectory.delete();
-            targetDirectory.delete();
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+        sourceDirectory.delete();
+        targetDirectory.delete();
     }
 
-    protected void deleteFile() {
+    protected void deleteFile() throws IOException {
         File sourceFile = FileManager.newFile(sourceFileUrl);
         sourceFile.create();
         assertTrue(sourceFile.exists());
@@ -126,37 +118,30 @@ public abstract class AbstractFileTest {
         assertFalse(sourceFile.exists());
     }
 
-    protected void deleteDirectory() {
-        try {
-            List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
-            TestFileHelper.createFileTreeData(sourceFileUrlList);
+    protected void deleteDirectory() throws IOException {
+        List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+        TestFileHelper.createFileTreeData(sourceFileUrlList);
 
-            File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
-            File targetDirectory = FileManager.newFile(targetDirectoryUrl);
+        File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+        File targetDirectory = FileManager.newFile(targetDirectoryUrl);
 
-            sourceDirectory.copy(targetDirectory, Mockito.mock(CopyListener.class));
+        sourceDirectory.copy(targetDirectory, Mockito.mock(CopyListener.class));
 
-            assertTrue(targetDirectory.exists());
-            targetDirectory.delete();
-            assertFalse(targetDirectory.exists());
+        assertTrue(targetDirectory.exists());
+        targetDirectory.delete();
+        assertFalse(targetDirectory.exists());
 
-            sourceDirectory.delete();
-
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        sourceDirectory.delete();
     }
 
-    protected void getFileAttributes(VoidOperation assertHook) {
+    protected void getFileAttributes(VoidOperation assertHook) throws IOException {
         File file = FileManager.newFile(sourceFileUrl);
         file.create();
         assertHook.execute(file);
         file.delete();
     }
 
-    protected void setFileAttributes(Set<FileAttribute> attributes) {
+    protected void setFileAttributes(Set<FileAttribute> attributes) throws IOException {
         File file = FileManager.newFile(sourceFileUrl);
         file.create();
         file.setAttributes(attributes.toArray(new FileAttribute[0]));
@@ -171,7 +156,7 @@ public abstract class AbstractFileTest {
         file.delete();
     }
 
-    protected void setOwner(UserPrincipal owner) {
+    protected void setOwner(UserPrincipal owner) throws IOException {
         File file = FileManager.newFile(sourceFileUrl);
         file.create();
         file.setOwner(owner);
@@ -183,11 +168,11 @@ public abstract class AbstractFileTest {
         file.delete();
     }
 
-    protected void setGroup() {
+    protected void setGroup() throws IOException {
         setGroup(null);
     }
 
-    protected void setGroup(GroupPrincipal group) {
+    protected void setGroup(GroupPrincipal group) throws IOException {
         File file = FileManager.newFile(sourceFileUrl);
         file.create();
         if (group == null)
@@ -201,43 +186,43 @@ public abstract class AbstractFileTest {
         file.delete();
     }
 
-    protected void setCreationTime() {
+    protected void setCreationTime() throws IOException {
         setTime(new SingleValueOperation<File, FileTime>() {
             @Override
-            public void setValue(File object, FileTime value) {
+            public void setValue(File object, FileTime value) throws IOException {
                 object.setCreationTime(value);
             }
 
             @Override
-            public FileTime getValue(File object) {
+            public FileTime getValue(File object) throws IOException {
                 return object.getCreationTime();
             }
         });
     }
 
-    protected void setLastModifiedTime() {
+    protected void setLastModifiedTime() throws IOException {
         setTime(new SingleValueOperation<File, FileTime>() {
             @Override
-            public void setValue(File object, FileTime value) {
+            public void setValue(File object, FileTime value) throws IOException {
                 object.setLastModifiedTime(value);
             }
 
             @Override
-            public FileTime getValue(File object) {
+            public FileTime getValue(File object) throws IOException {
                 return object.getLastModifiedTime();
             }
         });
     }
 
-    protected void setLastAccessTime() {
+    protected void setLastAccessTime() throws IOException {
         setTime(new SingleValueOperation<File, FileTime>() {
             @Override
-            public void setValue(File object, FileTime value) {
+            public void setValue(File object, FileTime value) throws IOException {
                 object.setLastAccessTime(value);
             }
 
             @Override
-            public FileTime getValue(File object) {
+            public FileTime getValue(File object) throws IOException {
                 return object.getLastAccessTime();
             }
         });
@@ -260,7 +245,7 @@ public abstract class AbstractFileTest {
         assertEquals(TEST_SOURCE_FILE_SIZE, bytesCopiedTotalList.get(1).intValue());
     }
 
-    protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) {
+    protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) throws IOException {
         for (int i = 0; i < sourceFileUrlList.size(); i++) {
             File sourceFile = FileManager.newFile(sourceFileUrlList.get(i));
             File targetFile = FileManager.newFile(targetFileUrlList.get(i));
@@ -270,7 +255,7 @@ public abstract class AbstractFileTest {
         }
     }
 
-    protected static void tearDown() {
+    protected static void tearDown() throws IOException {
         for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
             if (url != null) {
                 File file = FileManager.newFile(url);
@@ -280,7 +265,7 @@ public abstract class AbstractFileTest {
         }
     }
 
-    private void setTime(SingleValueOperation<File, FileTime> operation) {
+    private void setTime(SingleValueOperation<File, FileTime> operation) throws IOException {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         calendar.roll(Calendar.YEAR, false);

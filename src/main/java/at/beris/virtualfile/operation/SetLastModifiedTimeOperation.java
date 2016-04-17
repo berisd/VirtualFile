@@ -13,6 +13,8 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
+
 public class SetLastModifiedTimeOperation extends AbstractFileOperation<Void, Void> {
 
     public SetLastModifiedTimeOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
@@ -20,7 +22,7 @@ public class SetLastModifiedTimeOperation extends AbstractFileOperation<Void, Vo
     }
 
     @Override
-    public Void execute(File source, File target, Listener listener, Void... params) {
+    public Void execute(File source, File target, Listener listener, Void... params) throws IOException {
         fileOperationProvider.setLastModifiedTime(source.getModel());
         return null;
     }

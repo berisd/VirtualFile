@@ -13,6 +13,8 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
+
 public class SetOwnerOperation extends AbstractFileOperation<Void, Void> {
 
     public SetOwnerOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
@@ -20,7 +22,7 @@ public class SetOwnerOperation extends AbstractFileOperation<Void, Void> {
     }
 
     @Override
-    public Void execute(File source, File target, Listener listener, Void... params) {
+    public Void execute(File source, File target, Listener listener, Void... params) throws IOException {
         fileOperationProvider.setOwner(source.getModel());
         return null;
     }

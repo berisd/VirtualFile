@@ -13,6 +13,8 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
+
 public class SetCreationTimeOperation extends AbstractFileOperation<Void, Void> {
 
     public SetCreationTimeOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
@@ -20,7 +22,7 @@ public class SetCreationTimeOperation extends AbstractFileOperation<Void, Void> 
     }
 
     @Override
-    public Void execute(File source, File target, Listener listener, Void... params) {
+    public Void execute(File source, File target, Listener listener, Void... params) throws IOException {
         fileOperationProvider.setCreationTime(source.getModel());
         return null;
     }

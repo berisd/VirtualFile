@@ -10,24 +10,16 @@
 package at.beris.virtualfile.util;
 
 import at.beris.virtualfile.FileType;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
 public class UrlUtils {
     public static Protocol getProtocol(URL url) {
-        String protocolString = url.getProtocol();
-
-        try {
-            return Protocol.valueOf(url.getProtocol().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new VirtualFileException("Unknown protocol: " + protocolString);
-        }
+        return Protocol.valueOf(url.getProtocol().toUpperCase());
     }
 
     public static String getSiteUrlString(URL url) {
@@ -46,37 +38,21 @@ public class UrlUtils {
         return fileType;
     }
 
-    public static URL normalizeUrl(URL url) {
-        try {
-            URI uri = URI.create(url.toString());
-            return uri.normalize().toURL();
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
-        }
+    public static URL normalizeUrl(URL url) throws IOException {
+        URI uri = URI.create(url.toString());
+        return uri.normalize().toURL();
     }
 
-    public static URL newUrl(String url) {
-        try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
-        }
+    public static URL newUrl(String url) throws IOException {
+        return new URL(url);
     }
 
-    public static URL newUrl(URL context, String spec) {
-        try {
-            return new URL(context, spec);
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
-        }
+    public static URL newUrl(URL context, String spec) throws IOException {
+        return new URL(context, spec);
     }
 
-    public static URL getUrlForLocalPath(String path) {
-        try {
-            return new URL(new java.io.File(path).toURI().toURL().toString() + (path.endsWith(java.io.File.separator) ? "/" : ""));
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
-        }
+    public static URL getUrlForLocalPath(String path) throws IOException {
+        return new URL(new java.io.File(path).toURI().toURL().toString() + (path.endsWith(java.io.File.separator) ? "/" : ""));
     }
 
     /**

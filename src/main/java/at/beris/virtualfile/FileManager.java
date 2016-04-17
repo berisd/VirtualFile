@@ -16,6 +16,7 @@ import at.beris.virtualfile.logging.FileManagerLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.UrlUtils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.Set;
@@ -44,7 +45,7 @@ public class FileManager {
         return fileContext.getConfigurator().getConfiguration(protocol);
     }
 
-    public static Configuration getConfiguration(File file) {
+    public static Configuration getConfiguration(File file) throws IOException {
         return fileContext.getConfigurator().getConfiguration(file);
     }
 
@@ -54,7 +55,7 @@ public class FileManager {
      * @param path
      * @return
      */
-    public static File newLocalFile(String path) {
+    public static File newLocalFile(String path) throws IOException {
         return new FileManagerLoggingWrapper(fileContext.newLocalFile(path));
     }
 
@@ -64,35 +65,35 @@ public class FileManager {
      * @param path
      * @return
      */
-    public static File newLocalDirectory(String path) {
+    public static File newLocalDirectory(String path) throws IOException {
         return new FileManagerLoggingWrapper(fileContext.newLocalFile(path +
                 (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator)));
     }
 
-    public static File newFile(String url) {
+    public static File newFile(String url) throws IOException {
         return new FileManagerLoggingWrapper(fileContext.newFile(url));
     }
 
-    public static File newFile(URL parentUrl, URL url) {
+    public static File newFile(URL parentUrl, URL url) throws IOException {
         return new FileManagerLoggingWrapper(fileContext.newFile(parentUrl, url));
     }
 
-    public static File newFile(File parent, URL url) {
+    public static File newFile(File parent, URL url) throws IOException {
         return new FileManagerLoggingWrapper(fileContext.newFile(parent, url));
     }
 
-    public static File newFile(URL url) {
+    public static File newFile(URL url) throws IOException {
         return new FileManagerLoggingWrapper(fileContext.newFile(url));
     }
 
-    public static File newDirectory(URL url) {
+    public static File newDirectory(URL url) throws IOException {
         URL normalizedUrl = url;
         if (!url.getPath().endsWith("/"))
             normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
         return new FileManagerLoggingWrapper(fileContext.newFile(normalizedUrl));
     }
 
-    public static void dispose(File file) {
+    public static void dispose(File file) throws IOException {
         fileContext.dispose(file);
     }
 

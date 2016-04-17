@@ -13,6 +13,8 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
+
 public abstract class AbstractFileOperation<T, P> implements FileOperation<T, P> {
     protected FileContext fileContext;
     protected FileOperationProvider fileOperationProvider;
@@ -24,5 +26,5 @@ public abstract class AbstractFileOperation<T, P> implements FileOperation<T, P>
     }
 
     @Override
-    public abstract T execute(File source, File target, Listener listener, P... params);
+    public abstract T execute(File source, File target, Listener listener, P... params) throws IOException;
 }

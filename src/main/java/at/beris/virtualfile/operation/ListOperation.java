@@ -14,6 +14,7 @@ import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ListOperation extends AbstractFileOperation<List<File>, Filter> {
@@ -23,7 +24,7 @@ public class ListOperation extends AbstractFileOperation<List<File>, Filter> {
     }
 
     @Override
-    public List<File> execute(File source, File target, Listener listener, Filter... params) {
+    public List<File> execute(File source, File target, Listener listener, Filter... params) throws IOException {
         if (params.length == 1)
             return fileOperationProvider.list(source.getModel(), params[0]);
         else

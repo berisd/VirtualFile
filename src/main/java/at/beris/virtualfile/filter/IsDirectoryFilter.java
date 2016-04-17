@@ -11,9 +11,11 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.File;
 
+import java.io.IOException;
+
 public class IsDirectoryFilter extends DefaultFilter<Boolean> {
     @Override
-    protected Boolean getValue(File file) {
+    protected Boolean getValue(File file) throws IOException {
         return file.isDirectory();
     }
 }

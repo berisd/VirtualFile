@@ -17,7 +17,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.util.HashSet;
@@ -42,15 +44,15 @@ public class SftpFileTest extends AbstractFileTest {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws IOException {
         AbstractFileTest.tearDown();
     }
 
     @Test
-    public void createFile() {
+    public void createFile() throws IOException {
         super.createFile(new VoidOperation<File>() {
             @Override
-            public void execute(File file) {
+            public void execute(File file) throws IOException {
                 assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
@@ -64,35 +66,35 @@ public class SftpFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void createDirectory() {
+    public void createDirectory() throws IOException {
         super.createDirectory();
     }
 
     @Test
-    public void copyFile() {
+    public void copyFile() throws IOException {
         super.copyFile();
     }
 
     @Test
-    public void copyDirectory() {
+    public void copyDirectory() throws IOException {
         super.copyDirectory();
     }
 
     @Test
-    public void deleteFile() {
+    public void deleteFile() throws IOException {
         super.deleteFile();
     }
 
     @Test
-    public void deleteDirectory() {
+    public void deleteDirectory() throws IOException {
         super.deleteDirectory();
     }
 
     @Test
-    public void getFileAttributes() {
+    public void getFileAttributes() throws IOException {
         super.getFileAttributes(new VoidOperation<File>() {
             @Override
-            public void execute(File file) {
+            public void execute(File file) throws IOException {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
@@ -102,21 +104,21 @@ public class SftpFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void setFileAttributes() {
+    public void setFileAttributes() throws IOException {
         Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(PosixFilePermission.OTHERS_EXECUTE);
         attributes.add(PosixFilePermission.GROUP_EXECUTE);
         super.setFileAttributes(attributes);
     }
 
-    @Test(expected = at.beris.virtualfile.exception.AccessDeniedException.class)
-    public void setOwner() {
+    @Test(expected = AccessDeniedException.class)
+    public void setOwner() throws IOException {
         UnixUserPrincipal user = new UnixUserPrincipal(1002, 1002);
         super.setOwner(user);
     }
 
-    @Test(expected = at.beris.virtualfile.exception.AccessDeniedException.class)
-    public void setGroup() {
+    @Test(expected = AccessDeniedException.class)
+    public void setGroup() throws IOException {
         UnixGroupPrincipal group = new UnixGroupPrincipal(1002);
         super.setGroup(group);
     }

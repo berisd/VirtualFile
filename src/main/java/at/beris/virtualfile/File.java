@@ -25,15 +25,15 @@ import java.util.List;
 import java.util.Set;
 
 public interface File {
-    void add(File file);
+    void add(File file) throws IOException;
 
-    void addAttributes(FileAttribute... attributes);
+    void addAttributes(FileAttribute... attributes) throws IOException;
 
-    Byte[] checksum();
+    Byte[] checksum() throws IOException;
 
-    void copy(File targetFile);
+    void copy(File targetFile) throws IOException;
 
-    void copy(File targetFile, CopyListener listener);
+    void copy(File targetFile, CopyListener listener) throws IOException;
 
     /**
      * Creates an empty file
@@ -41,15 +41,15 @@ public interface File {
      * @return true if the named file does not exist and was successfully created; false if the named file already exists
      * @throws IOException
      */
-    void create();
+    void create() throws IOException;
 
-    void delete();
+    void delete() throws IOException;
 
-    void delete(File file);
+    void delete(File file) throws IOException;
 
-    Boolean exists();
+    Boolean exists() throws IOException;
 
-    List<File> extract(File target);
+    List<File> extract(File target) throws IOException;
 
     /**
      * Find files recursively matching a filter
@@ -57,101 +57,101 @@ public interface File {
      * @param filter A filter
      * @return A list of files
      */
-    List<File> find(Filter filter);
+    List<File> find(Filter filter) throws IOException;
 
-    List<AclEntry> getAcl();
+    List<AclEntry> getAcl() throws IOException;
 
     //TODO create a move method that combines copy and delete
-    Set<FileAttribute> getAttributes();
+    Set<FileAttribute> getAttributes() throws IOException;
 
-    FileTime getCreationTime();
+    FileTime getCreationTime() throws IOException;
 
-    GroupPrincipal getGroup();
+    GroupPrincipal getGroup() throws IOException;
 
-    InputStream getInputStream();
+    InputStream getInputStream() throws IOException;
 
-    FileTime getLastAccessTime();
+    FileTime getLastAccessTime() throws IOException;
 
-    FileTime getLastModifiedTime();
+    FileTime getLastModifiedTime() throws IOException;
 
-    FileModel getModel();
+    FileModel getModel() throws IOException;
 
-    String getName();
+    String getName() throws IOException;
 
-    OutputStream getOutputStream();
+    OutputStream getOutputStream() throws IOException;
 
-    UserPrincipal getOwner();
+    UserPrincipal getOwner() throws IOException;
 
-    File getParent();
+    File getParent() throws IOException;
 
-    String getPath();
+    String getPath() throws IOException;
 
-    File getRoot();
+    File getRoot() throws IOException;
 
     /**
      * Returns the size in bytes for a file and the number of contained items for a directory
      *
      * @return
      */
-    long getSize();
+    long getSize() throws IOException;
 
-    URL getUrl();
+    URL getUrl() throws IOException;
 
     /**
      * File is an archive
      */
-    boolean isArchive();
+    boolean isArchive() throws IOException;
 
     /**
      * File is archived within an archive
      */
-    boolean isArchived();
+    boolean isArchived() throws IOException;
 
-    boolean isContainer();
+    boolean isContainer() throws IOException;
 
-    boolean isDirectory();
+    boolean isDirectory() throws IOException;
 
-    boolean isRoot();
+    boolean isRoot() throws IOException;
 
-    boolean isSymbolicLink();
+    boolean isSymbolicLink() throws IOException;
 
     /**
      * List contained files non-recursively
      *
      * @return A list of files
      */
-    List<File> list();
+    List<File> list() throws IOException;
 
     /**
      * List contained files non-recursively filtered by a filter
      *
      * @return A list of files
      */
-    List<File> list(Filter filter);
+    List<File> list(Filter filter) throws IOException;
 
     /**
      * Updates the model with information from the physical file
      */
-    void refresh();
+    void refresh() throws IOException;
 
-    void removeAttributes(FileAttribute... attributes);
+    void removeAttributes(FileAttribute... attributes) throws IOException;
 
-    void setAcl(List<AclEntry> acl);
+    void setAcl(List<AclEntry> acl) throws IOException;
 
-    void setAttributes(FileAttribute... attributes);
+    void setAttributes(FileAttribute... attributes) throws IOException;
 
-    void setCreationTime(FileTime time);
+    void setCreationTime(FileTime time) throws IOException;
 
-    void setGroup(GroupPrincipal group);
+    void setGroup(GroupPrincipal group) throws IOException;
 
-    void setLastAccessTime(FileTime time);
+    void setLastAccessTime(FileTime time) throws IOException;
 
-    void setLastModifiedTime(FileTime time);
+    void setLastModifiedTime(FileTime time) throws IOException;
 
-    void setOwner(UserPrincipal owner);
+    void setOwner(UserPrincipal owner) throws IOException;
 
     /**
      * Free the file with all resources
      */
-    void dispose();
+    void dispose() throws IOException;
 }

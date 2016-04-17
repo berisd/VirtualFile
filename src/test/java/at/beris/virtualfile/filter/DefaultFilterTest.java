@@ -16,6 +16,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 public class DefaultFilterTest {
@@ -29,12 +30,12 @@ public class DefaultFilterTest {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws IOException {
         testDirectory.delete();
     }
 
     @Test
-    public void filterBetween() {
+    public void filterBetween() throws IOException {
         List<File> filteredList = testDirectory.find(new FileSizeFilter().between(640L, 816L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -43,7 +44,7 @@ public class DefaultFilterTest {
     }
 
     @Test
-    public void filterGreaterThan() {
+    public void filterGreaterThan() throws IOException {
         List<File> filteredList = testDirectory.find(new FileSizeFilter().greaterThan(640L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -52,7 +53,7 @@ public class DefaultFilterTest {
     }
 
     @Test
-    public void filterGreaterThanOrEqual() {
+    public void filterGreaterThanOrEqual() throws IOException {
         List<File> filteredList = testDirectory.find(new FileSizeFilter().greaterThanOrEqualTo(640L));
         Assert.assertEquals(3, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -62,7 +63,7 @@ public class DefaultFilterTest {
     }
 
     @Test
-    public void filterIn() {
+    public void filterIn() throws IOException {
         List<File> filteredList = testDirectory.find(new FileSizeFilter().in(640L, 800L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -71,14 +72,15 @@ public class DefaultFilterTest {
     }
 
     @Test
-    public void filterLessThan() {
+    public void filterLessThan() throws IOException {
         List<File> filteredList = testDirectory.find(new FileSizeFilter().lessThan(640L));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("subdir"));
     }
+
     @Test
-    public void filterLessThanOrEqual() {
+    public void filterLessThanOrEqual() throws IOException {
         List<File> filteredList = testDirectory.find(new FileSizeFilter().lessThanOrEqualTo(640L));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);

@@ -14,7 +14,6 @@ import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.UrlUtils;
@@ -48,7 +47,7 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
 
 
     @Override
-    public void create(FileModel model) {
+    public void create(FileModel model) throws IOException {
         try {
             // if not exists create UrlArchive
             // insert or update ArchiveEntry
@@ -58,16 +57,12 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
             archiveOutputStream.close();
 
         } catch (ArchiveException e) {
-            throw new VirtualFileException(e);
-        } catch (FileNotFoundException e) {
-            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
+            throw new IOException(e);
         }
     }
 
     @Override
-    public Boolean exists(FileModel model) {
+    public Boolean exists(FileModel model) throws IOException {
         String archivePath = getArchivePath(model);
         String targetArchiveEntryPath = model.getPath().substring(archivePath.length() + 1);
 
@@ -97,22 +92,13 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
                     break;
                 }
             }
-
-        } catch (FileNotFoundException e) {
-            throw new at.beris.virtualfile.exception.FileNotFoundException(e);
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
         } catch (ArchiveException e) {
-            throw new VirtualFileException(e);
+            throw new IOException(e);
         } finally {
-            try {
-                if (ais != null)
-                    ais.close();
-                if (fis != null)
-                    fis.close();
-            } catch (IOException e) {
-                throw new VirtualFileException(e);
-            }
+            if (ais != null)
+                ais.close();
+            if (fis != null)
+                fis.close();
         }
         return false;
     }

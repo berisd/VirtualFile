@@ -9,6 +9,8 @@
 
 package at.beris.virtualfile.util;
 
+import java.io.IOException;
+
 public interface VoidOperation<O> {
-    void execute(O object);
+    void execute(O object) throws IOException;
 }
