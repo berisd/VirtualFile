@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.SftpClient;
+import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.config.Configuration;
 
 import java.io.IOException;
@@ -54,7 +54,6 @@ public class TestFileHelper {
 
     public static SftpClient createSftpClient(URL url) throws IOException {
         SftpClient sftpClient = new SftpClient(url, new Configuration());
-        sftpClient.init();
         sftpClient.connect();
 
         return sftpClient;

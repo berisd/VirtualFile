@@ -1,9 +1,19 @@
-package at.beris.virtualfile.client;
+/*
+ * This file is part of VirtualFile.
+ *
+ * Copyright 2016 by Bernd Riedl <bernd.riedl@gmail.com>
+ *
+ * Licensed under GNU General Public License 3.0 or later.
+ * Some rights reserved. See COPYING, AUTHORS.
+ */
+
+package at.beris.virtualfile.client.sftp;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.client.FileInfo;
 import com.jcraft.jsch.SftpATTRS;
 
 import java.nio.file.attribute.FileTime;
@@ -11,7 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SftpFileInfo implements FileInfo {
+public class SftpFileInfo implements FileInfo<SftpATTRS> {
 
     private SftpATTRS sftpATTRS;
     private String path;
@@ -22,6 +32,11 @@ public class SftpFileInfo implements FileInfo {
 
     public String getPath() {
         return this.path;
+    }
+
+    @Override
+    public SftpATTRS getFile() {
+        return sftpATTRS;
     }
 
     @Override

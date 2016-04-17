@@ -11,7 +11,7 @@ package at.beris.virtualfile.config;
 
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileType;
-import at.beris.virtualfile.client.SftpClient;
+import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.LocalArchiveOperationProvider;
 import at.beris.virtualfile.provider.LocalArchivedFileOperationProvider;

@@ -12,6 +12,7 @@ package at.beris.virtualfile.client;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
+import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.AccessDeniedException;
 import org.junit.AfterClass;
@@ -36,7 +37,6 @@ public class SftpClientIntegrationTest {
         TestFileHelper.initIntegrationTest();
         FileManager.registerProtocolURLStreamHandlers();
         sftpClient = createSftpClient();
-        sftpClient.init();
         sftpClient.connect();
     }
 

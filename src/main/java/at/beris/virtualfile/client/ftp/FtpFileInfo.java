@@ -7,20 +7,21 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.client;
+package at.beris.virtualfile.client.ftp;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
+import at.beris.virtualfile.client.FileInfo;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FtpFileInfo implements FileInfo {
+public class FtpFileInfo implements FileInfo<FTPFile> {
     private FTPFile ftpFile;
     private String path;
 
@@ -40,6 +41,11 @@ public class FtpFileInfo implements FileInfo {
     @Override
     public String getPath() {
         return path;
+    }
+
+    @Override
+    public FTPFile getFile() {
+        return ftpFile;
     }
 
     @Override

@@ -11,6 +11,7 @@ package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
+import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.config.Configuration;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
@@ -71,7 +72,6 @@ public class FtpClientIntegrationTest {
         ftpServer.start();
 
         ftpClient = createFtpClient();
-        ftpClient.init();
         ftpClient.connect();
     }
 

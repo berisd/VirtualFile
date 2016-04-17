@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 public interface Client {
-    void init();
-
     URL getUrl();
 
     void setUrl(URL url);

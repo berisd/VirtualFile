@@ -7,9 +7,11 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.client;
+package at.beris.virtualfile.client.ftp;
 
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.client.AbstractClient;
+import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.lang3.StringUtils;
@@ -39,10 +41,10 @@ public class FtpClient extends AbstractClient {
 
     public FtpClient(URL url, Configuration config) {
         super(url, config);
+        init();
     }
 
-    @Override
-    public void init() {
+    private void init() {
         ftpClient = new FTPClient();
     }
 
@@ -212,10 +214,9 @@ public class FtpClient extends AbstractClient {
             connect();
     }
 
-    private FTPFile mlistFile(String pathname) throws IOException
-    {
+    private FTPFile mlistFile(String pathname) throws IOException {
         boolean success = FTPReply.isPositiveCompletion(ftpClient.sendCommand(FTPCmd.MLST, pathname));
-        if (success){
+        if (success) {
             String entry = StringUtils.trim(ftpClient.getReplyStrings()[1]);
             return MLSxEntryParser.parseEntry(entry);
         } else {

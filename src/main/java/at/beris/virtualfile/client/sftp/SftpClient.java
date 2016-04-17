@@ -1,21 +1,22 @@
 /*
  * This file is part of VirtualFile.
  *
- * Copyright 2015 by Bernd Riedl <bernd.riedl@gmail.com>
+ * Copyright 2016 by Bernd Riedl <bernd.riedl@gmail.com>
  *
  * Licensed under GNU General Public License 3.0 or later.
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.client;
+package at.beris.virtualfile.client.sftp;
 
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.config.value.AuthenticationType;
+import at.beris.virtualfile.client.AbstractClient;
+import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.exception.AccessDeniedException;
-import at.beris.virtualfile.exception.AuthenticationException;
 import at.beris.virtualfile.exception.FileNotFoundException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import com.jcraft.jsch.*;
@@ -34,22 +35,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-public class SftpClient implements Client {
+public class SftpClient extends AbstractClient {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SftpClient.class);
 
     private JSch jsch;
     private Session session;
     private ChannelSftp sftpChannel;
-    private Configuration config;
-    private URL url;
 
     public SftpClient(URL url, Configuration config) {
-        this.url = url;
-        this.config = config;
+        super(url, config);
+        init();
     }
 
-    @Override
-    public void init() {
+    private void init() {
         java.util.Properties sessionConfig = new java.util.Properties();
         sessionConfig.put("StrictHostKeyChecking", config.isStrictHostKeyChecking() ? "yes" : "no");
         sessionConfig.put("PreferredAuthentications", config.getAuthenticationType().getJschConfigValue());
@@ -310,52 +308,8 @@ public class SftpClient implements Client {
         return sftpChannel.stat(path).isDir();
     }
 
-    private String username() {
-        String usernameFromUrl = getUsernameFromUrl();
-        if (usernameFromUrl != null)
-            return usernameFromUrl;
-        else if (config.getUsername() != null)
-            return config.getUsername();
-        else
-            throw new AuthenticationException("Username not found.");
-    }
-
-    private char[] password() {
-        String passwordFromUrl = getPasswordFromUrl();
-        if (passwordFromUrl != null)
-            return passwordFromUrl.toCharArray();
-        else if (config.getPassword() != null)
-            return config.getPassword();
-        else
-            throw new AuthenticationException("Password not found.");
-    }
-
-    private String host() {
-        return url.getHost();
-    }
-
-    private int port() {
-        int port = url.getPort();
-        return port != -1 ? port : 22;
-    }
-
-    private String getUsernameFromUrl() {
-        String userInfo = url.getUserInfo();
-        if (userInfo != null) {
-            String userInfoParts[] = url.getUserInfo().split(":");
-            return userInfoParts[0];
-        }
-        return null;
-    }
-
-    private String getPasswordFromUrl() {
-        String userInfo = url.getUserInfo();
-        if (userInfo != null) {
-            String userInfoParts[] = url.getUserInfo().split(":");
-            if (userInfoParts.length > 1) {
-                return userInfoParts[1];
-            }
-        }
-        return null;
+    @Override
+    protected int defaultPort() {
+        return 22;
     }
 }
