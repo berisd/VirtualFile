@@ -31,7 +31,7 @@ public interface Client {
 
     void disconnect();
 
-    void deleteFile(String Path);
+    void deleteFile(String path);
 
     void createFile(String path);
 
@@ -39,7 +39,7 @@ public interface Client {
 
     void createDirectory(String path);
 
-    void deleteDirectory(String Path);
+    void deleteDirectory(String path);
 
     InputStream getInputStream(String path);
 

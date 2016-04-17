@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.client;
 
+import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
 import at.beris.virtualfile.config.Configuration;
@@ -33,6 +34,7 @@ public class SftpClientIntegrationTest {
     @BeforeClass
     public static void setUp() throws Exception {
         TestFileHelper.initIntegrationTest();
+        FileManager.registerProtocolURLStreamHandlers();
         sftpClient = createSftpClient();
         sftpClient.init();
         sftpClient.connect();

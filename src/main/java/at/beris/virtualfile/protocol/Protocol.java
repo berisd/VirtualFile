@@ -10,5 +10,5 @@
 package at.beris.virtualfile.protocol;
 
 public enum Protocol {
-    FILE, SFTP
+    FILE, SFTP, FTP
 }

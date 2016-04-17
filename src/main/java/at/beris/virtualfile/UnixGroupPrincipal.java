@@ -14,9 +14,14 @@ import java.nio.file.attribute.GroupPrincipal;
 
 public class UnixGroupPrincipal implements GroupPrincipal {
     Integer gid;
+    String groupName;
 
     public UnixGroupPrincipal(Integer gid) {
         this.gid = gid;
+    }
+
+    public UnixGroupPrincipal(String groupName) {
+        this.groupName = groupName;
     }
 
     public Integer getGid() {
@@ -25,7 +30,7 @@ public class UnixGroupPrincipal implements GroupPrincipal {
 
     @Override
     public String getName() {
-        return gid.toString();
+        return groupName != null ? groupName : gid.toString();
     }
 
     @Override

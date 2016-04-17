@@ -16,9 +16,17 @@ public class UnixUserPrincipal implements UserPrincipal {
     Integer uid;
     Integer gid;
 
+    String userName;
+    String groupName;
+
     public UnixUserPrincipal(Integer uid, Integer gid) {
         this.uid = uid;
         this.gid = gid;
+    }
+
+    public UnixUserPrincipal(String userName, String groupName) {
+        this.userName = userName;
+        this.groupName = groupName;
     }
 
     public void setUid(Integer uid) {
@@ -31,7 +39,7 @@ public class UnixUserPrincipal implements UserPrincipal {
 
     @Override
     public String getName() {
-        return uid.toString();
+        return userName != null ? userName : uid.toString();
     }
 
     @Override
