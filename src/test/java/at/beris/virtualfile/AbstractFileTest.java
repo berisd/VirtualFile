@@ -10,7 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.util.SingleValueOperation;
 import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static at.beris.virtualfile.TestFileHelper.createFilenamesTree;
-import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
+import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 

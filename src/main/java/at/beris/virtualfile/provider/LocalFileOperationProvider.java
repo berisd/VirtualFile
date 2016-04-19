@@ -16,6 +16,7 @@ import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -235,6 +236,11 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
             fileOwnerAttributeView.setOwner(model.getOwner());
         } else
             LOGGER.warn("Owner " + model.getOwner().getName() + " couldn't be set on file " + model.getUrl());
+    }
+
+    @Override
+    public List<at.beris.virtualfile.File> extract(FileModel model, at.beris.virtualfile.File target) throws IOException {
+        throw new OperationNotSupportedException();
     }
 
     private class LocalFileDeletingVisitor extends SimpleFileVisitor<Path> {

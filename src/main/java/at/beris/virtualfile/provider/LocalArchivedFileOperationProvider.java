@@ -14,6 +14,7 @@ import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
+import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.UrlUtils;
@@ -161,6 +162,11 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
     @Override
     public void setOwner(FileModel model) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public List<File> extract(FileModel model, File target) throws IOException {
+        throw new OperationNotSupportedException();
     }
 
     private String getArchivePath(FileModel model) {

@@ -15,6 +15,7 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.filter.Filter;
+import at.beris.virtualfile.provider.operation.FileOperation;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -27,10 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LocalArchiveOperationProvider extends LocalFileOperationProvider implements ArchiveOperationProvider {
 
@@ -39,6 +37,8 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
     public LocalArchiveOperationProvider(FileContext fileContext, Client client) {
         super(fileContext, client);
+        this.supportedOperations = new HashSet<>(BASIC_FILE_OPERATIONS);
+        this.supportedOperations.add(FileOperation.EXTRACT);
     }
 
     @Override

@@ -7,7 +7,7 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.operation;
+package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
@@ -15,7 +15,7 @@ import at.beris.virtualfile.provider.FileOperationProvider;
 
 import java.io.IOException;
 
-public abstract class AbstractFileOperation<T, P> implements FileOperation<T, P> {
+public abstract class AbstractFileOperation<T, P> implements CustomFileOperation<T, P> {
     protected FileContext fileContext;
     protected FileOperationProvider fileOperationProvider;
 

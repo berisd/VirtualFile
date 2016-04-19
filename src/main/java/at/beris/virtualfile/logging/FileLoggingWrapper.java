@@ -13,7 +13,7 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.ObjectWrapper;
 import org.slf4j.Logger;

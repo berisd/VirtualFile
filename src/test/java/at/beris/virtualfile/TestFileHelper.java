@@ -22,7 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
+import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
 
 public class TestFileHelper {
     public static final String HOME_DIRECTORY = System.getProperty("user.home") + java.io.File.separator + ".VirtualFile";

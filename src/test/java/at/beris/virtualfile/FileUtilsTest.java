@@ -9,8 +9,6 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.operation.FileOperation;
-import at.beris.virtualfile.operation.FileOperationEnum;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -19,8 +17,6 @@ import org.mockito.Mockito;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -55,12 +51,8 @@ public class FileUtilsTest {
     }
 
     private File createFile(String urlString) throws MalformedURLException {
-        Map<FileOperationEnum, FileOperation> fileOperationMap = new HashMap<>();
-        fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
-
         URL url = new URL(urlString);
         FileContext context = Mockito.mock(FileContext.class);
-        Mockito.when(context.getFileOperationMap(url)).thenReturn(fileOperationMap);
 
         return new UrlFile(null, url, context);
     }

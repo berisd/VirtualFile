@@ -11,7 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.CopyListener;
 
 import java.io.IOException;
 import java.io.InputStream;

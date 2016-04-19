@@ -19,7 +19,7 @@ import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.time.Instant;
 
-import static at.beris.virtualfile.operation.CopyOperation.COPY_BUFFER_SIZE;
+import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
 import static org.junit.Assert.*;
 
 public class FileManagerTest {

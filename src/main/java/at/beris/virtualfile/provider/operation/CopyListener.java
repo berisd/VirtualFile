@@ -7,7 +7,7 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.operation;
+package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.File;
 

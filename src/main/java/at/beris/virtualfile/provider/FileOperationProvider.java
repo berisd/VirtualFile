@@ -12,11 +12,14 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.filter.Filter;
+import at.beris.virtualfile.provider.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.FileOperation;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Set;
 
 public interface FileOperationProvider {
     Byte[] checksum(FileModel model) throws IOException;
@@ -66,4 +69,18 @@ public interface FileOperationProvider {
     void setLastModifiedTime(FileModel model) throws IOException;
 
     void setOwner(FileModel model) throws IOException;
+
+    List<File> extract(FileModel model, File target) throws IOException;
+
+    boolean isOperationSupported(FileOperation fileOperation);
+
+    Set<FileOperation> supportedOperations();
+
+    void add(FileModel model, File file) throws IOException;
+
+    void addAttributes(FileModel model) throws IOException;
+
+    void removeAttributes(FileModel model) throws IOException;
+
+    void copy(File sourceFile, File targetFile, CopyListener listener) throws IOException;
 }

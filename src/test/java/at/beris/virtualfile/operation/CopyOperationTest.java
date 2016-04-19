@@ -13,6 +13,8 @@ import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.provider.FileOperationProvider;
+import at.beris.virtualfile.provider.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.CopyOperation;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;

@@ -9,65 +9,52 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.operation.FileOperation;
-import at.beris.virtualfile.operation.FileOperationEnum;
-import at.beris.virtualfile.operation.Listener;
+import at.beris.virtualfile.provider.FileOperationProvider;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FileTest {
     @Test
     public void create() throws Exception {
-        Map<FileOperationEnum, FileOperation> fileOperationMap = new HashMap<>();
-        FileOperation fileOperation = Mockito.mock(FileOperation.class);
-        fileOperationMap.put(FileOperationEnum.CREATE, fileOperation);
-        fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
+        FileOperationProvider provider = Mockito.mock(FileOperationProvider.class);
 
         URL fileUrl = new URL("file:/home/testdir/test.txt");
         FileContext context = Mockito.mock(FileContext.class);
-        Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
+        Mockito.when(context.getFileOperationProvider(fileUrl)).thenReturn(provider);
 
         UrlFile file = new UrlFile(null, fileUrl, context);
         file.create();
-        Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
+        Mockito.verify(provider).create(Matchers.eq(file.getModel()));
     }
 
     @Test
     public void delete() throws Exception {
-        Map<FileOperationEnum, FileOperation> fileOperationMap = new HashMap<>();
-        FileOperation fileOperation = Mockito.mock(FileOperation.class);
-        fileOperationMap.put(FileOperationEnum.DELETE, fileOperation);
-        fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
+        FileOperationProvider provider = Mockito.mock(FileOperationProvider.class);
 
         URL fileUrl = new URL("file:/home/testdir/test.txt");
         FileContext context = Mockito.mock(FileContext.class);
-        Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
+        Mockito.when(context.getFileOperationProvider(fileUrl)).thenReturn(provider);
 
         UrlFile file = new UrlFile(null, fileUrl, context);
         file.delete();
 
-        Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
+        Mockito.verify(provider).delete(Matchers.eq(file.getModel()));
     }
 
     @Test
     public void exists() throws Exception {
-        Map<FileOperationEnum, FileOperation> fileOperationMap = new HashMap<>();
-        FileOperation fileOperation = Mockito.mock(FileOperation.class);
-        fileOperationMap.put(FileOperationEnum.EXISTS, fileOperation);
-        fileOperationMap.put(FileOperationEnum.UPDATE_MODEL, Mockito.mock(FileOperation.class));
+        FileOperationProvider provider = Mockito.mock(FileOperationProvider.class);
 
         URL fileUrl = new URL("file:/home/testdir/test.txt");
         FileContext context = Mockito.mock(FileContext.class);
-        Mockito.when(context.getFileOperationMap(fileUrl)).thenReturn(fileOperationMap);
+        Mockito.when(context.getFileOperationProvider(fileUrl)).thenReturn(provider);
 
         UrlFile file = new UrlFile(null, fileUrl, context);
         file.exists();
 
-        Mockito.verify(fileOperation).execute(Matchers.eq(file), Matchers.any(File.class), Matchers.any(Listener.class), Matchers.isNull());
+        Mockito.verify(provider).exists(Matchers.eq(file.getModel()));
     }
 }

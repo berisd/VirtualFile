@@ -7,12 +7,12 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.operation;
+package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.File;
 
 import java.io.IOException;
 
-public interface FileOperation<T, P> {
+public interface CustomFileOperation<T, P> {
     T execute(File source, File target, Listener listener, P... params) throws IOException;
 }

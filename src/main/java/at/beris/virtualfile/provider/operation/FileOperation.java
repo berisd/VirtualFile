@@ -7,9 +7,9 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.operation;
+package at.beris.virtualfile.provider.operation;
 
-public enum FileOperationEnum {
+public enum FileOperation {
     ADD_ATTRIBUTES,
     CHECKSUM,
     COPY,

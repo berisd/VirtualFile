@@ -14,7 +14,6 @@ import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.logging.FileLoggingWrapper;
-import at.beris.virtualfile.operation.*;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
@@ -33,7 +32,6 @@ public class FileContext {
 
     private Map<String, Client> siteUrlToClientMap;
     private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
-    private Map<FileOperationProvider, Map<FileOperationEnum, FileOperation>> fileOperationProviderToOperationMap;
     private Map<String, File> fileCache;
 
     public FileContext() {
@@ -46,7 +44,6 @@ public class FileContext {
         this.configurator = configurator;
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Client, Map<FileType, FileOperationProvider>>());
-        this.fileOperationProviderToOperationMap = Collections.synchronizedMap(new HashMap<FileOperationProvider, Map<FileOperationEnum, FileOperation>>());
         this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(configurator.getContextConfiguration().getFileCacheSize()));
     }
 
@@ -156,14 +153,6 @@ public class FileContext {
         return siteUrlToClientMap.get(UrlUtils.getSiteUrlString(url));
     }
 
-    Map<FileOperationEnum, FileOperation> getFileOperationMap(URL url) {
-        FileOperationProvider fileOperationProvider = getFileOperationProvider(url);
-
-        if (fileOperationProvider != null)
-            return fileOperationProviderToOperationMap.get(fileOperationProvider);
-        return null;
-    }
-
     FileOperationProvider getFileOperationProvider(URL url) {
         Client client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(url));
         FileType fileType = UrlUtils.getFileTypeForUrl(url);
@@ -193,9 +182,6 @@ public class FileContext {
             if (protocol != Protocol.FILE)
                 initClient(normalizedUrl);
             initFileOperationProvider(normalizedUrl, protocol, fileType, getClient(normalizedUrl));
-            FileOperationProvider fileOperationProvider = this.getFileOperationProvider(url);
-            initFileOperationMap(protocol, fileOperationProvider);
-
             file = createFileInstance(parent, normalizedUrl);
             fileCache.put(urlString, file);
         } catch (InstantiationException e) {
@@ -238,33 +224,6 @@ public class FileContext {
         return new FileLoggingWrapper(instance);
     }
 
-    private Map<FileOperationEnum, FileOperation> createFileOperationMap(Protocol protocol, FileOperationProvider fileOperationProvider) {
-        LOGGER.debug("createFileOperationMap (protocol: {}, fileOperationProvider: {})", protocol, fileOperationProvider);
-        //TODO Allow file operations supported by the protocol only
-        HashMap<FileOperationEnum, FileOperation> map = new HashMap<>();
-        map.put(FileOperationEnum.ADD_ATTRIBUTES, new AddAttributesOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.CHECKSUM, new ChecksumOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.COPY, new CopyOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.CREATE, new CreateOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.DELETE, new DeleteOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.EXISTS, new ExistsOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.EXTRACT, new ExtractOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.GET_INPUT_STREAM, new GetInputStreamOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.GET_OUTPUT_STREAM, new GetOutputStreamOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.LIST, new ListOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.REMOVE_ATTRIBUTES, new RemoveAttributesOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.SET_ACL, new SetAclOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.SET_ATTRIBUTES, new SetAttributesOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.SET_CREATION_TIME, new SetCreationTimeOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.SET_GROUP, new SetGroupOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.SET_LAST_ACCESS_TIME, new SetLastAccessTimeOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.SET_LAST_MODIFIED_TIME, new SetLastModifiedTimeOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.SET_OWNER, new SetOwnerOperation(this, fileOperationProvider));
-        map.put(FileOperationEnum.UPDATE_MODEL, new UpdateModelOperation(this, fileOperationProvider));
-
-        return map;
-    }
-
     private FileOperationProvider createFileOperationProviderInstance(Class instanceClass, Client client) throws InstantiationException, IllegalAccessException {
         LOGGER.debug("createFileOperationProviderInstance (instanceClass: {}, client: {})", instanceClass, client);
         FileOperationProvider instance = null;
@@ -278,15 +237,6 @@ public class FileContext {
         }
 
         return instance;
-    }
-
-    private void initFileOperationMap(Protocol protocol, FileOperationProvider fileOperationProvider) {
-        LOGGER.debug("initFileOperationMap(protocol: {}, fileOperationProvider : {})", protocol, fileOperationProvider);
-        Map<FileOperationEnum, FileOperation> fileOperationMap = fileOperationProviderToOperationMap.get(fileOperationProvider);
-        if (fileOperationMap == null) {
-            fileOperationMap = createFileOperationMap(protocol, fileOperationProvider);
-            fileOperationProviderToOperationMap.put(fileOperationProvider, fileOperationMap);
-        }
     }
 
     private void initClient(URL url) {
