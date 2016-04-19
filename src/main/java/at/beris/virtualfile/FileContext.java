@@ -79,11 +79,6 @@ public class FileContext {
         return newFile((File) null, new URL(urlString));
     }
 
-    public File newFile(URL parentUrl, URL url) throws IOException {
-        LOGGER.debug("newFile (parentUrl: {}, url: {})", parentUrl, url);
-        return newFile(newFile(parentUrl), url);
-    }
-
     /**
      * Creates a file instance for the corresponding url
      *
@@ -153,6 +148,10 @@ public class FileContext {
         return EnumSet.allOf(Protocol.class);
     }
 
+    public File getFile(String urlString) {
+        return fileCache.get(urlString);
+    }
+
     Client getClient(URL url) {
         return siteUrlToClientMap.get(UrlUtils.getSiteUrlString(url));
     }
@@ -179,8 +178,14 @@ public class FileContext {
         LOGGER.debug("createFile (parent: {}, url : {})", parent, url);
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         Protocol protocol = UrlUtils.getProtocol(normalizedUrl);
+
         if (configurator.getFileOperationProviderClassMap(protocol) == null)
             throw new IOException("No configuration found for protocol: " + protocol);
+
+        String urlString = normalizedUrl.toString();
+        File cachedFile = fileCache.get(urlString);
+        if (cachedFile != null)
+            return cachedFile;
 
         File file = null;
         try {
@@ -191,12 +196,8 @@ public class FileContext {
             FileOperationProvider fileOperationProvider = this.getFileOperationProvider(url);
             initFileOperationMap(protocol, fileOperationProvider);
 
-            String urlString = normalizedUrl.toString();
-            file = fileCache.get(urlString);
-            if (file == null) {
-                file = createFileInstance(parent, normalizedUrl);
-                fileCache.put(urlString, file);
-            }
+            file = createFileInstance(parent, normalizedUrl);
+            fileCache.put(urlString, file);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

@@ -74,10 +74,6 @@ public class FileManager {
         return new FileManagerLoggingWrapper(fileContext.newFile(url));
     }
 
-    public static File newFile(URL parentUrl, URL url) throws IOException {
-        return new FileManagerLoggingWrapper(fileContext.newFile(parentUrl, url));
-    }
-
     public static File newFile(File parent, URL url) throws IOException {
         return new FileManagerLoggingWrapper(fileContext.newFile(parent, url));
     }
