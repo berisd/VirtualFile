@@ -11,7 +11,6 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
-import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
@@ -63,17 +62,17 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
             while ((archiveEntry = ais.getNextEntry()) != null) {
                 Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
-                File file = FileManager.newFile(urlMap.get(PARENT_URL), urlMap.get(URL));
+                File file = fileContext.newFile(urlMap.get(PARENT_URL), urlMap.get(URL));
                 if (filter == null || filter.filter(file))
                     fileList.add(file);
             }
         } catch (ArchiveException e) {
             throw new IOException(e);
         } finally {
-                if (ais != null)
-                    ais.close();
-                if (fis != null)
-                    fis.close();
+            if (ais != null)
+                ais.close();
+            if (fis != null)
+                fis.close();
         }
         return fileList;
     }
@@ -103,7 +102,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                     out.close();
                 }
 
-                File file = FileManager.newFile(urlMap.get(URL));
+                File file = fileContext.newFile(urlMap.get(URL));
                 fileList.add(file);
             }
         } catch (ArchiveException e) {
@@ -111,10 +110,10 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
         } catch (URISyntaxException e) {
             throw new IOException(e);
         } finally {
-                if (ais != null)
-                    ais.close();
-                if (fis != null)
-                    fis.close();
+            if (ais != null)
+                ais.close();
+            if (fis != null)
+                fis.close();
         }
         return fileList;
     }

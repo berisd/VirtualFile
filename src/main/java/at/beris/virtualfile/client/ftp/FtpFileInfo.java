@@ -18,6 +18,7 @@ import at.beris.virtualfile.client.FileInfo;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.nio.file.attribute.FileTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,15 +52,15 @@ public class FtpFileInfo implements FileInfo<FTPFile> {
     @Override
     public void fillModel(FileModel model) {
         model.setFileExists(true);
-        model.setSize(ftpFile.getSize());
+        model.setSize(ftpFile != null ? ftpFile.getSize() : 0);
         model.setCreationTime(null);
-        model.setLastModifiedTime(FileTime.fromMillis(ftpFile.getTimestamp().getTime().getTime()));
+        model.setLastModifiedTime(ftpFile != null ? FileTime.fromMillis(ftpFile.getTimestamp().getTime().getTime()) : null);
         model.setLastAccessTime(null);
-        model.setAttributes(createAttributes());
-        model.setOwner(new UnixUserPrincipal(ftpFile.getName(), ftpFile.getGroup()));
-        model.setGroup(new UnixGroupPrincipal(ftpFile.getGroup()));
-        model.setDirectory(ftpFile.isDirectory());
-        model.setSymbolicLink(ftpFile.isSymbolicLink());
+        model.setAttributes(ftpFile != null ? createAttributes() : Collections.<FileAttribute>emptySet());
+        model.setOwner(ftpFile != null ? new UnixUserPrincipal(ftpFile.getName(), ftpFile.getGroup()): null);
+        model.setGroup(ftpFile != null ? new UnixGroupPrincipal(ftpFile.getGroup()) : null);
+        model.setDirectory(ftpFile != null ? ftpFile.isDirectory() : false);
+        model.setSymbolicLink(ftpFile != null ? ftpFile.isSymbolicLink() : false);
     }
 
     private Set<FileAttribute> createAttributes() {

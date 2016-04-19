@@ -51,6 +51,13 @@ public class UrlUtils {
         return new URL(context, spec);
     }
 
+    public static URL newUrlReplacePath(URL context, String path) throws IOException {
+        String contextUrlString = context.toString();
+        String newUrlString = contextUrlString.substring(0, contextUrlString.length() - context.getPath().length());
+        newUrlString+=path;
+        return new URL(newUrlString);
+    }
+
     public static URL getUrlForLocalPath(String path) throws IOException {
         return new URL(new java.io.File(path).toURI().toURL().toString() + (path.endsWith(java.io.File.separator) ? "/" : ""));
     }
@@ -66,20 +73,26 @@ public class UrlUtils {
 
         stringBuilder.append(url.getProtocol());
         stringBuilder.append(':');
+        if (! url.getProtocol().toLowerCase().equals("file"))
+            stringBuilder.append("//");
 
         String authority = url.getAuthority();
         if (!StringUtils.isEmpty(authority)) {
             String[] authorityParts = authority.split("@");
-            String[] userInfoParts = authorityParts[0].split(":");
 
-            stringBuilder.append("//");
-            stringBuilder.append(userInfoParts[0]);
+            if (authorityParts.length > 1) {
+                String[] userInfoParts = authorityParts[0].split(":");
+                stringBuilder.append(userInfoParts[0]);
 
-            if (userInfoParts.length > 1) {
-                stringBuilder.append(":***");
+                if (userInfoParts.length > 1) {
+                    stringBuilder.append(":***");
+                }
+                stringBuilder.append('@');
+                stringBuilder.append(authorityParts[1]);
             }
-            stringBuilder.append('@');
-            stringBuilder.append(authorityParts[1]);
+            else {
+                stringBuilder.append(authorityParts[0]);
+            }
         }
 
         stringBuilder.append(url.getPath());

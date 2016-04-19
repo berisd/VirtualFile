@@ -10,7 +10,6 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileContext;
-import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
@@ -61,7 +60,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
         if (model.isDirectory()) {
             for (java.io.File childFile : new java.io.File(model.getPath()).listFiles()) {
-                at.beris.virtualfile.File file = FileManager.newFile(childFile.toURI().toURL());
+                at.beris.virtualfile.File file = fileContext.newFile(childFile.toURI().toURL());
                 if (filter == null || filter.filter(file))
                     fileList.add(file);
             }

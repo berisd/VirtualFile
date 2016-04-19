@@ -10,7 +10,6 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileContext;
-import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.FileInfo;
@@ -26,9 +25,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SftpFileOperationProvider extends AbstractFileOperationProvider {
+public class DefaultClientFileOperationProvider extends AbstractFileOperationProvider {
 
-    public SftpFileOperationProvider(FileContext fileContext, Client client) {
+    public DefaultClientFileOperationProvider(FileContext fileContext, Client client) {
         super(fileContext, client);
     }
 
@@ -68,7 +67,7 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
 
         for (FileInfo fileInfo : fileInfoList) {
-            at.beris.virtualfile.File file = FileManager.newFile(UrlUtils.newUrl(model.getUrl(), fileInfo.getPath()));
+            at.beris.virtualfile.File file = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), fileInfo.getPath()));
             if (filter == null || filter.filter(file)) {
                 fileList.add(file);
             }
@@ -146,6 +145,6 @@ public class SftpFileOperationProvider extends AbstractFileOperationProvider {
             throw e;
         }
 
-        return FileManager.newLocalFile(path);
+        return fileContext.newLocalFile(path);
     }
 }

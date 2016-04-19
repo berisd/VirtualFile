@@ -382,4 +382,9 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File {
         logger.info("Delete {} from {}", file, rootFile);
         wrappedFile.delete(file);
     }
+
+    @Override
+    public String toString() {
+        return wrappedFile.toString();
+    }
 }

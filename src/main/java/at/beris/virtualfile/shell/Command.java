@@ -10,11 +10,12 @@
 package at.beris.virtualfile.shell;
 
 public enum Command {
-
+    CD("Change to working directory or archive"),
     CON("Connect to URL"),
     DIS("Disconnect"),
     EMPTY(""),
     HELP("Display help"),
+    LCD("Change to local directory or archive"),
     LS("List directory"),
     PWD("print current working directory"),
     LPWD("print current local directory"),

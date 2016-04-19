@@ -19,6 +19,7 @@ import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -26,12 +27,18 @@ import java.net.URL;
 import java.util.*;
 
 public class FileContext {
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FileContext.class);
+
     private Configurator configurator;
 
     private Map<String, Client> siteUrlToClientMap;
     private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
     private Map<FileOperationProvider, Map<FileOperationEnum, FileOperation>> fileOperationProviderToOperationMap;
     private Map<String, File> fileCache;
+
+    public FileContext() {
+        this(new Configurator());
+    }
 
     public FileContext(Configurator configurator) {
         registerProtocolURLStreamHandlers();
@@ -54,6 +61,7 @@ public class FileContext {
      * @return
      */
     public File newLocalFile(String path) throws IOException {
+        LOGGER.debug("newLocalFile (path: {})", path);
         URL url = new java.io.File(path).toURI().toURL();
         if (path.endsWith(java.io.File.separator))
             url = new URL(url.toString() + "/");
@@ -63,14 +71,16 @@ public class FileContext {
     /**
      * Creates a file. (Convenience method)
      *
-     * @param url
+     * @param urlString
      * @return
      */
-    public File newFile(String url) throws IOException {
-        return newFile((File) null, new URL(url));
+    public File newFile(String urlString) throws IOException {
+        LOGGER.debug("newFile (urlString: {})", urlString);
+        return newFile((File) null, new URL(urlString));
     }
 
     public File newFile(URL parentUrl, URL url) throws IOException {
+        LOGGER.debug("newFile (parentUrl: {}, url: {})", parentUrl, url);
         return newFile(newFile(parentUrl), url);
     }
 
@@ -82,10 +92,12 @@ public class FileContext {
      * @return
      */
     public File newFile(File parent, URL url) throws IOException {
+        LOGGER.debug("newFile (parentFile: {}, url: {})", parent, url);
         return createFile(parent, url);
     }
 
     public File newFile(URL url) throws IOException {
+        LOGGER.debug("newFile (url: {}) ", url);
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         String fullPath = normalizedUrl.getPath();
         File parentFile = null;
@@ -114,6 +126,7 @@ public class FileContext {
      * Set property so that URL class will find custom handlers
      */
     public void registerProtocolURLStreamHandlers() {
+        LOGGER.debug("registerProtocolURLStreamHandlers");
         String propertyKey = "java.protocol.handler.pkgs";
         String propertyValue = System.getProperties().getProperty(propertyKey);
         if (StringUtils.isEmpty(propertyValue))
@@ -125,10 +138,12 @@ public class FileContext {
     }
 
     public void removeFileFromCache(File file) throws IOException {
+        LOGGER.debug("removeFileFromCache (file : {})", file);
         fileCache.remove(file.getUrl().toString());
     }
 
     public void dispose(File file) throws IOException {
+        LOGGER.debug("dispose (file : {})", file);
         removeFileFromCache(file);
         file.dispose();
     }
@@ -161,6 +176,7 @@ public class FileContext {
     }
 
     private File createFile(File parent, URL url) throws IOException {
+        LOGGER.debug("createFile (parent: {}, url : {})", parent, url);
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         Protocol protocol = UrlUtils.getProtocol(normalizedUrl);
         if (configurator.getFileOperationProviderClassMap(protocol) == null)
@@ -169,7 +185,8 @@ public class FileContext {
         File file = null;
         try {
             FileType fileType = UrlUtils.getFileTypeForUrl(normalizedUrl);
-            initClient(normalizedUrl);
+            if (protocol != Protocol.FILE)
+                initClient(normalizedUrl);
             initFileOperationProvider(normalizedUrl, protocol, fileType, getClient(normalizedUrl));
             FileOperationProvider fileOperationProvider = this.getFileOperationProvider(url);
             initFileOperationMap(protocol, fileOperationProvider);
@@ -189,6 +206,7 @@ public class FileContext {
     }
 
     private Client createClientInstance(URL url) {
+        LOGGER.debug("createClientInstance (url: {})", url);
         Client client = null;
 
         Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
@@ -206,6 +224,7 @@ public class FileContext {
     }
 
     private File createFileInstance(File parent, URL url) {
+        LOGGER.debug("createFileInstance (parent: {}, url: {})", parent, url);
         UrlFile instance;
 
         try {
@@ -219,6 +238,7 @@ public class FileContext {
     }
 
     private Map<FileOperationEnum, FileOperation> createFileOperationMap(Protocol protocol, FileOperationProvider fileOperationProvider) {
+        LOGGER.debug("createFileOperationMap (protocol: {}, fileOperationProvider: {})", protocol, fileOperationProvider);
         //TODO Allow file operations supported by the protocol only
         HashMap<FileOperationEnum, FileOperation> map = new HashMap<>();
         map.put(FileOperationEnum.ADD_ATTRIBUTES, new AddAttributesOperation(this, fileOperationProvider));
@@ -245,6 +265,7 @@ public class FileContext {
     }
 
     private FileOperationProvider createFileOperationProviderInstance(Class instanceClass, Client client) throws InstantiationException, IllegalAccessException {
+        LOGGER.debug("createFileOperationProviderInstance (instanceClass: {}, client: {})", instanceClass, client);
         FileOperationProvider instance = null;
 
         Constructor constructor = null;
@@ -259,6 +280,7 @@ public class FileContext {
     }
 
     private void initFileOperationMap(Protocol protocol, FileOperationProvider fileOperationProvider) {
+        LOGGER.debug("initFileOperationMap(protocol: {}, fileOperationProvider : {})", protocol, fileOperationProvider);
         Map<FileOperationEnum, FileOperation> fileOperationMap = fileOperationProviderToOperationMap.get(fileOperationProvider);
         if (fileOperationMap == null) {
             fileOperationMap = createFileOperationMap(protocol, fileOperationProvider);
@@ -267,6 +289,7 @@ public class FileContext {
     }
 
     private void initClient(URL url) {
+        LOGGER.debug("initClient(url: {}", url);
         Client client = getClient(url);
         if (client == null) {
             client = createClientInstance(url);
@@ -274,8 +297,9 @@ public class FileContext {
         }
     }
 
-    private void initFileOperationProvider(URL normalizedUrl, Protocol protocol, FileType fileType, Client client) throws InstantiationException, IllegalAccessException {
-        FileOperationProvider fileOperationProvider = getFileOperationProvider(normalizedUrl);
+    private void initFileOperationProvider(URL url, Protocol protocol, FileType fileType, Client client) throws InstantiationException, IllegalAccessException {
+        LOGGER.debug("initFileOperationProvider(url: {}, protocol: {}, fileType: {}, client: {})", url, protocol, fileType, client);
+        FileOperationProvider fileOperationProvider = getFileOperationProvider(url);
         if (fileOperationProvider == null) {
             Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
             if (fileOperationProviderMap == null) {

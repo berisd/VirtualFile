@@ -11,12 +11,13 @@ package at.beris.virtualfile.config;
 
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileType;
+import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.protocol.Protocol;
+import at.beris.virtualfile.provider.DefaultClientFileOperationProvider;
 import at.beris.virtualfile.provider.LocalArchiveOperationProvider;
 import at.beris.virtualfile.provider.LocalArchivedFileOperationProvider;
 import at.beris.virtualfile.provider.LocalFileOperationProvider;
-import at.beris.virtualfile.provider.SftpFileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
 
 import java.io.IOException;
@@ -48,8 +49,10 @@ public class Configurator {
 
         put(Protocol.FILE, createLocalFileOperationProviderClassMap(), null);
         configurationPerProtocolMap.put(Protocol.FILE, new Configuration(defaultConfiguration));
-        put(Protocol.SFTP, createSftpFileOperationProviderClassMap(), SftpClient.class);
+        put(Protocol.SFTP, createClientFileOperationProviderClassMap(), SftpClient.class);
         configurationPerProtocolMap.put(Protocol.SFTP, new Configuration(defaultConfiguration));
+        put(Protocol.FTP, createClientFileOperationProviderClassMap(), FtpClient.class);
+        configurationPerProtocolMap.put(Protocol.FTP, new Configuration(defaultConfiguration));
     }
 
     public Map<FileType, Class> getFileOperationProviderClassMap(Protocol protocol) {
@@ -73,12 +76,13 @@ public class Configurator {
         return localFileProviderForExtMap;
     }
 
-    private Map<FileType, Class> createSftpFileOperationProviderClassMap() {
-        Map<FileType, Class> localFileProviderForExtMap = new HashMap<>();
-        localFileProviderForExtMap.put(FileType.DEFAULT, SftpFileOperationProvider.class);
-        localFileProviderForExtMap.put(FileType.ARCHIVED, LocalArchivedFileOperationProvider.class);
-        localFileProviderForExtMap.put(FileType.ARCHIVE, LocalArchiveOperationProvider.class);
-        return localFileProviderForExtMap;
+
+    private Map<FileType, Class> createClientFileOperationProviderClassMap() {
+        Map<FileType, Class> fileProviderClassMap = new HashMap<>();
+        fileProviderClassMap.put(FileType.DEFAULT, DefaultClientFileOperationProvider.class);
+        fileProviderClassMap.put(FileType.ARCHIVED, LocalArchivedFileOperationProvider.class);
+        fileProviderClassMap.put(FileType.ARCHIVE, LocalArchiveOperationProvider.class);
+        return fileProviderClassMap;
     }
 
     public Configuration createConfiguration(URL url) {

@@ -77,4 +77,11 @@ public class SamplesTest {
         FileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(TestFileHelper.readSftpPassword());
         assertTrue(file.isDirectory());
     }
+
+    @Test
+    @Ignore
+    public void ftpListFiles() throws IOException {
+        File file = FileManager.newFile("ftp://gd.tuwien.ac.at/");
+        assertTrue(file.list().size() > 0);
+    }
 }

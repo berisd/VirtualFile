@@ -134,7 +134,7 @@ public class FtpClient extends AbstractClient {
         checkConnection();
         ftpClient.changeWorkingDirectory(path);
         for (FTPFile ftpFile : ftpClient.listFiles()) {
-            FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory(), ftpFile);
+            FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory() + ftpFile.getName(), ftpFile);
             fileList.add(ftpFileInfo);
         }
 

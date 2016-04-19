@@ -11,11 +11,11 @@ package at.beris.virtualfile.shell;
 
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
+import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -46,7 +46,7 @@ public class Shell {
                 line = StringUtils.trim(scanner.next());
                 cmd = parseCommandLine(line);
                 processCommand(cmd);
-            } catch (MalformedURLException e) {
+            } catch (IOException e) {
                 System.out.println("Error: " + e.getMessage());
             }
 
@@ -67,11 +67,17 @@ public class Shell {
 
     private void processCommand(Pair<Command, List<String>> cmd) throws IOException {
         switch (cmd.getLeft()) {
+            case CD:
+                change(cmd.getRight().get(0), false);
+                break;
             case CON:
                 connect(new URL(cmd.getRight().get(0)));
                 break;
             case HELP:
                 displayHelp();
+                break;
+            case LCD:
+                change(cmd.getRight().get(0), true);
                 break;
             case LPWD:
                 System.out.println(localFile.getPath());
@@ -96,21 +102,19 @@ public class Shell {
     private void displayHelp() {
         String helpFormatStr = "%-10s - %s";
         for (Command cmd : Command.values()) {
-           if (cmd == Command.EMPTY)
-               continue;
+            if (cmd == Command.EMPTY)
+                continue;
             System.out.println(String.format(helpFormatStr, cmd.toString().toLowerCase(), cmd.getDescription()));
         }
     }
 
     private void displayStatistics() {
-        int mb = 1024 * 1024;
-
         Runtime runtime = Runtime.getRuntime();
-        System.out.println("** Heap utilization statistics [MB] **");
-        System.out.println("Used Memory:" + (runtime.totalMemory() - runtime.freeMemory()) / mb);
-        System.out.println("Free Memory:" + runtime.freeMemory() / mb);
-        System.out.println("Total Memory:" + runtime.totalMemory() / mb);
-        System.out.println("Max Memory:" + runtime.maxMemory() / mb);
+        System.out.println("** Heap utilization statistics [KB] **");
+        System.out.println(String.format("Used Memory: %,d", (runtime.totalMemory() - runtime.freeMemory()) / 1024));
+        System.out.println(String.format("Free Memory: %,d", runtime.freeMemory() / 1024));
+        System.out.println(String.format("Total Memory: %,d", runtime.totalMemory() / 1024));
+        System.out.println(String.format("Max Memory: %,d", runtime.maxMemory() / 1024));
     }
 
     private void quit() throws IOException {
@@ -129,8 +133,31 @@ public class Shell {
             System.out.println(NO_WORKING_FILE_MSG);
             return;
         }
-        for(File file : workingFile.list()) {
+        for (File file : workingFile.list()) {
             System.out.println(String.format("%-20s %d kb %s", file.getName(), file.getSize() / 1024, file.isDirectory() ? "<DIR>" : ""));
         }
+    }
+
+    private void change(String directoryName, boolean local) throws IOException {
+        File file = local ? localFile : workingFile;
+        Deque<String> pathParts = new LinkedList<>(Arrays.asList(file.getPath().split("/")));
+        if (file.getPath().equals("/"))
+            pathParts.add("");
+
+        if (directoryName.equals(".."))
+            pathParts.pollLast();
+        else if (directoryName.startsWith("/")) {
+            pathParts.clear();
+            pathParts.add(directoryName);
+        }
+        else
+            pathParts.add(directoryName);
+
+        String newpath = StringUtils.join(pathParts.toArray(), "/") + (directoryName.endsWith("/") ? "" : "/");
+
+        if (local)
+            localFile = fileContext.newFile(UrlUtils.newUrlReplacePath(localFile.getUrl(), newpath));
+        else
+            workingFile = fileContext.newFile(UrlUtils.newUrlReplacePath(workingFile.getUrl(), newpath));
     }
 }
