@@ -10,11 +10,10 @@
 package at.beris.virtualfile.config;
 
 import at.beris.virtualfile.File;
-import at.beris.virtualfile.FileContext;
-import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.protocol.Protocol;
+import at.beris.virtualfile.util.UrlUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -31,7 +30,7 @@ public class ConfiguratorTest {
     @Before
     public void setUp() {
         config = new Configurator();
-        new FileContext(config).registerProtocolURLStreamHandlers();
+        UrlUtils.registerProtocolURLStreamHandlers();
     }
 
     @Test

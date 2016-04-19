@@ -26,7 +26,6 @@ public class FileManager {
 
     static {
         fileContext = new FileContext(new Configurator());
-        fileContext.registerProtocolURLStreamHandlers();
     }
 
     private FileManager() {
@@ -99,9 +98,5 @@ public class FileManager {
 
     public static Set<Protocol> allProtocols() {
         return EnumSet.allOf(Protocol.class);
-    }
-
-    public static void registerProtocolURLStreamHandlers() {
-        fileContext.registerProtocolURLStreamHandlers();
     }
 }

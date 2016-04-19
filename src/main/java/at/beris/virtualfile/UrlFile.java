@@ -107,11 +107,13 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void dispose() {
-        model.clear();
-        model = null;
+        if (model != null) {
+            model.clear();
+            model = null;
+        }
         parent = null;
+        url = null;
         fileOperationProvider = null;
-
     }
 
     @Override

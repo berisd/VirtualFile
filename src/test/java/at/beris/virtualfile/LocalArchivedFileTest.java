@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,7 @@ public class LocalArchivedFileTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() throws Exception {
-        FileManager.registerProtocolURLStreamHandlers();
+        UrlUtils.registerProtocolURLStreamHandlers();
 
         String directoryUrlPattern = "src" + java.io.File.separator + "test" + java.io.File.separator + "resources" + java.io.File.separator + "testarchive.??/TreeDb/";
         String fileNameUrlPattern = "src" + java.io.File.separator + "test" + java.io.File.separator + "resources" + java.io.File.separator + "testarchive.??/TreeDb/file.xml";

@@ -16,6 +16,7 @@ public enum Command {
     EMPTY(""),
     HELP("Display help"),
     LCD("Change to local directory or archive"),
+    LLS("List local directory or archive"),
     LS("List directory"),
     PWD("print current working directory"),
     LPWD("print current local directory"),

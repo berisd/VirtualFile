@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.util.UrlUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -35,7 +35,7 @@ public class FileOperationProviderTest {
 
     @Parameters
     public static Collection<Object[]> data() throws Exception {
-        FileManager.registerProtocolURLStreamHandlers();
+        UrlUtils.registerProtocolURLStreamHandlers();
 
         //TODO Make test with mocks
         return Arrays.asList(new Object[][]{

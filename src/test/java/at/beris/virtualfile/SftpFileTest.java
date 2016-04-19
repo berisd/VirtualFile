@@ -34,7 +34,7 @@ public class SftpFileTest extends AbstractFileTest {
     @BeforeClass
     public static void setUp() throws Exception {
         initIntegrationTest();
-        FileManager.registerProtocolURLStreamHandlers();
+        UrlUtils.registerProtocolURLStreamHandlers();
 
         URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestFileHelper.SSH_HOME_DIRECTORY);
         sourceFileUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_FILE_NAME);

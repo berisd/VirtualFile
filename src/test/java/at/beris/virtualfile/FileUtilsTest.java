@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class FileUtilsTest {
     @BeforeClass
     public static void setUp() {
-        FileManager.registerProtocolURLStreamHandlers();
+        UrlUtils.registerProtocolURLStreamHandlers();
     }
 
     @Test

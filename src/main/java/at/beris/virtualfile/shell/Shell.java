@@ -19,9 +19,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
+
 public class Shell {
     private final static String NO_WORKING_FILE_MSG = "No working file. use con.";
-
 
     private FileContext fileContext;
     private File localFile;
@@ -82,11 +83,13 @@ public class Shell {
             case LPWD:
                 System.out.println(localFile.getPath());
                 break;
+            case LLS:
+                list(true);
             case LS:
-                list();
+                list(false);
                 break;
             case PWD:
-                System.out.println(workingFile != null ? workingFile.getUrl().toString() : NO_WORKING_FILE_MSG);
+                System.out.println(workingFile != null ? maskedUrlString(workingFile.getUrl()) : NO_WORKING_FILE_MSG);
                 break;
             case STAT:
                 displayStatistics();
@@ -118,23 +121,22 @@ public class Shell {
     }
 
     private void quit() throws IOException {
-//        //TODO dispose all files
-//        fileContext.dispose(workFile);
-//        if (workFile != null)
-//            fileContext.dispose(workFile);
+        fileContext.dispose();
     }
 
     private void connect(URL url) throws IOException {
         workingFile = fileContext.newFile(url);
     }
 
-    private void list() throws IOException {
-        if (workingFile == null) {
+    private void list(boolean local) throws IOException {
+        File file = local ? localFile : workingFile;
+
+        if (file == null && !local) {
             System.out.println(NO_WORKING_FILE_MSG);
             return;
         }
-        for (File file : workingFile.list()) {
-            System.out.println(String.format("%-20s %d kb %s", file.getName(), file.getSize() / 1024, file.isDirectory() ? "<DIR>" : ""));
+        for (File childFile : file.list()) {
+            System.out.println(String.format("%-20s %d kb %s", childFile.getName(), childFile.getSize() / 1024, childFile.isDirectory() ? "<DIR>" : ""));
         }
     }
 
@@ -149,8 +151,7 @@ public class Shell {
         else if (directoryName.startsWith("/")) {
             pathParts.clear();
             pathParts.add(directoryName);
-        }
-        else
+        } else
             pathParts.add(directoryName);
 
         String newpath = StringUtils.join(pathParts.toArray(), "/") + (directoryName.endsWith("/") ? "" : "/");

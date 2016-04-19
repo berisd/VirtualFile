@@ -99,4 +99,18 @@ public class UrlUtils {
 
         return stringBuilder.toString();
     }
+
+    /**
+     * Set property so that URL class will find custom handlers
+     */
+    public static void registerProtocolURLStreamHandlers() {
+        String propertyKey = "java.protocol.handler.pkgs";
+        String propertyValue = System.getProperties().getProperty(propertyKey);
+        if (StringUtils.isEmpty(propertyValue))
+            propertyValue = "";
+        else
+            propertyValue += "|";
+        propertyValue += at.beris.virtualfile.protocol.Protocol.class.getPackage().getName();
+        System.getProperties().setProperty(propertyKey, propertyValue);
+    }
 }
