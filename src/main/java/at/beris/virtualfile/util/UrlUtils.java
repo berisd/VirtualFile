@@ -22,29 +22,28 @@ public class UrlUtils {
         return Protocol.valueOf(url.getProtocol().toUpperCase());
     }
 
-    public static String getSiteUrlString(URL url) {
-        String urlString = url.toString();
+    public static String getSiteUrlString(String urlString) {
         return urlString.substring(0, urlString.indexOf("/", urlString.indexOf("//") + 2));
     }
 
-    public static FileType getFileTypeForUrl(URL url) {
+    public static FileType getFileTypeForUrl(String urlString) {
         FileType fileType = FileType.DEFAULT;
-        String[] pathParts = url.toString().split("/");
+        String[] pathParts = urlString.split("/");
 
         if (FileUtils.isArchive(pathParts[pathParts.length - 1]))
             fileType = FileType.ARCHIVE;
-        else if (FileUtils.isArchived(url))
+        else if (FileUtils.isArchived(urlString))
             fileType = FileType.ARCHIVED;
         return fileType;
     }
 
-    public static URL normalizeUrl(URL url) throws IOException {
-        URI uri = URI.create(url.toString());
+    public static URL normalizeUrl(String urlString) throws IOException {
+        URI uri = URI.create(urlString);
         return uri.normalize().toURL();
     }
 
-    public static URL newUrl(String url) throws IOException {
-        return new URL(url);
+    public static URL newUrl(String urlString) throws IOException {
+        return new URL(urlString);
     }
 
     public static URL newUrl(URL context, String spec) throws IOException {
@@ -54,7 +53,7 @@ public class UrlUtils {
     public static URL newUrlReplacePath(URL context, String path) throws IOException {
         String contextUrlString = context.toString();
         String newUrlString = contextUrlString.substring(0, contextUrlString.length() - context.getPath().length());
-        newUrlString+=path;
+        newUrlString += path;
         return new URL(newUrlString);
     }
 
@@ -73,7 +72,7 @@ public class UrlUtils {
 
         stringBuilder.append(url.getProtocol());
         stringBuilder.append(':');
-        if (! url.getProtocol().toLowerCase().equals("file"))
+        if (!url.getProtocol().toLowerCase().equals("file"))
             stringBuilder.append("//");
 
         String authority = url.getAuthority();
@@ -89,8 +88,7 @@ public class UrlUtils {
                 }
                 stringBuilder.append('@');
                 stringBuilder.append(authorityParts[1]);
-            }
-            else {
+            } else {
                 stringBuilder.append(authorityParts[0]);
             }
         }

@@ -34,7 +34,7 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File {
 
     private File wrappedFile;
     private File rootFile;
-    private StringBuilder stringBuilder;
+
     private Logger logger;
 
     public FileLoggingWrapper(File file) {
@@ -46,7 +46,6 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File {
             rootFile = (File) wrapper.getWrappedObject();
         }
 
-        this.stringBuilder = new StringBuilder();
         this.logger = LoggerFactory.getLogger(FileLoggingWrapper.class);
     }
 
@@ -68,6 +67,7 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File {
     @Override
     public Byte[] checksum() throws IOException {
         logger.info("Calculate checksum for {}", rootFile);
+        StringBuilder stringBuilder = new StringBuilder();
         Byte[] checksum = wrappedFile.checksum();
         stringBuilder.setLength(0);
         stringBuilder.append("Returns: ");

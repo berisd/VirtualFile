@@ -23,7 +23,7 @@ public class FileTest {
 
         URL fileUrl = new URL("file:/home/testdir/test.txt");
         FileContext context = Mockito.mock(FileContext.class);
-        Mockito.when(context.getFileOperationProvider(fileUrl)).thenReturn(provider);
+        Mockito.when(context.getFileOperationProvider(fileUrl.toString())).thenReturn(provider);
 
         UrlFile file = new UrlFile(null, fileUrl, context);
         file.create();
@@ -36,7 +36,7 @@ public class FileTest {
 
         URL fileUrl = new URL("file:/home/testdir/test.txt");
         FileContext context = Mockito.mock(FileContext.class);
-        Mockito.when(context.getFileOperationProvider(fileUrl)).thenReturn(provider);
+        Mockito.when(context.getFileOperationProvider(fileUrl.toString())).thenReturn(provider);
 
         UrlFile file = new UrlFile(null, fileUrl, context);
         file.delete();
@@ -50,7 +50,7 @@ public class FileTest {
 
         URL fileUrl = new URL("file:/home/testdir/test.txt");
         FileContext context = Mockito.mock(FileContext.class);
-        Mockito.when(context.getFileOperationProvider(fileUrl)).thenReturn(provider);
+        Mockito.when(context.getFileOperationProvider(fileUrl.toString())).thenReturn(provider);
 
         UrlFile file = new UrlFile(null, fileUrl, context);
         file.exists();

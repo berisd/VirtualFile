@@ -26,8 +26,8 @@ public class FileUtils {
         return false;
     }
 
-    public static boolean isArchived(URL url) {
-        String[] pathParts = url.toString().split("/");
+    public static boolean isArchived(String urlString) {
+        String[] pathParts = urlString.split("/");
 
         for (int i = 0; i < pathParts.length - 1; i++) {
             if (isArchive(pathParts[i]))

@@ -39,7 +39,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     public UrlFile(File parent, URL url, FileContext context) {
         this.parent = parent;
         this.url = url;
-        this.fileOperationProvider = context.getFileOperationProvider(url);
+        this.fileOperationProvider = context.getFileOperationProvider(url.toString());
     }
 
     @Override

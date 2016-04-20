@@ -141,8 +141,14 @@ public class Shell {
     }
 
     private void change(String directoryName, boolean local) throws IOException {
+        if (!local && workingFile == null) {
+            System.out.println(NO_WORKING_FILE_MSG);
+            return;
+        }
+
         File file = local ? localFile : workingFile;
         Deque<String> pathParts = new LinkedList<>(Arrays.asList(file.getPath().split("/")));
+
         if (file.getPath().equals("/"))
             pathParts.add("");
 

@@ -86,7 +86,7 @@ public class FileContext {
     public File newFile(File parent, URL url) throws IOException {
         LOGGER.debug("newFile (parentFile: {}, url: {})", parent, maskedUrlString(url));
 
-        URL normalizedUrl = UrlUtils.normalizeUrl(url);
+        URL normalizedUrl = UrlUtils.normalizeUrl(url.toString());
         String urlString = normalizedUrl.toString();
         File cachedFile = fileCache.get(urlString);
         if (cachedFile != null)
@@ -97,23 +97,22 @@ public class FileContext {
 
     public File newFile(URL url) throws IOException {
         LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
-        URL normalizedUrl = UrlUtils.normalizeUrl(url);
+        URL normalizedUrl = UrlUtils.normalizeUrl(url.toString());
         String fullPath = normalizedUrl.getPath();
         File parentFile = null;
 
-        String[] pathParts;
         if (fullPath.equals("/"))
             return newFile((File) null, normalizedUrl);
         else {
-            pathParts = fullPath.split("/");
-            String path = "";
+            String[] pathParts = fullPath.split("/");
+            StringBuilder stringBuilder = new StringBuilder();
             for (int i = 0; i < pathParts.length; i++) {
-                path += pathParts[i];
+                stringBuilder.append(pathParts[i]);
 
                 if ((i < pathParts.length - 1) || fullPath.endsWith("/"))
-                    path += "/";
+                    stringBuilder.append('/');
 
-                String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl) + path;
+                String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl.toString()) + stringBuilder.toString();
                 URL pathUrl = new URL(pathUrlString);
                 parentFile = newFile(parentFile, pathUrl);
             }
@@ -147,13 +146,13 @@ public class FileContext {
         return fileCache.get(urlString);
     }
 
-    Client getClient(URL url) {
-        return siteUrlToClientMap.get(UrlUtils.getSiteUrlString(url));
+    Client getClient(String urlString) {
+        return siteUrlToClientMap.get(UrlUtils.getSiteUrlString(urlString));
     }
 
-    FileOperationProvider getFileOperationProvider(URL url) {
-        Client client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(url));
-        FileType fileType = UrlUtils.getFileTypeForUrl(url);
+    FileOperationProvider getFileOperationProvider(String urlString) {
+        Client client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(urlString));
+        FileType fileType = UrlUtils.getFileTypeForUrl(urlString);
 
         Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
         if (fileOperationProviderMap != null)
@@ -168,81 +167,72 @@ public class FileContext {
         if (configurator.getFileOperationProviderClassMap(protocol) == null)
             throw new IOException("No configuration found for protocol: " + protocol);
 
-        File file = null;
         try {
-            FileType fileType = UrlUtils.getFileTypeForUrl(url);
+            FileType fileType = UrlUtils.getFileTypeForUrl(url.toString());
             if (protocol != Protocol.FILE)
                 initClient(url);
-            initFileOperationProvider(url, protocol, fileType, getClient(url));
-            file = createFileInstance(parent, url);
+            initFileOperationProvider(url, protocol, fileType, getClient(url.toString()));
+            File file = createFileInstance(parent, url);
             fileCache.put(url.toString(), file);
+            return file;
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-        return file;
     }
 
     private Client createClientInstance(URL url) {
         LOGGER.debug("createClientInstance (url: {})", maskedUrlString(url));
-        Client client = null;
 
         Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
-
         if (clientClass != null) {
             try {
                 Configuration configuration = configurator.createConfiguration(url);
                 Constructor constructor = clientClass.getConstructor(URL.class, Configuration.class);
-                client = (Client) constructor.newInstance(url, configuration);
+                return (Client) constructor.newInstance(url, configuration);
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }
         }
-        return client;
+        return null;
     }
 
     private File createFileInstance(File parent, URL url) {
         LOGGER.debug("createFileInstance (parent: {}, url: {})", parent, maskedUrlString(url));
-        UrlFile instance;
 
         try {
             Constructor constructor = UrlFile.class.getConstructor(File.class, URL.class, FileContext.class);
-            instance = (UrlFile) constructor.newInstance(parent, url, this);
+            UrlFile instance = (UrlFile) constructor.newInstance(parent, url, this);
+            return new FileLoggingWrapper(instance);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
-
-        return new FileLoggingWrapper(instance);
     }
 
     private FileOperationProvider createFileOperationProviderInstance(Class instanceClass, Client client) throws InstantiationException, IllegalAccessException {
         LOGGER.debug("createFileOperationProviderInstance (instanceClass: {}, client: {})", instanceClass, client);
-        FileOperationProvider instance = null;
 
-        Constructor constructor = null;
         try {
-            constructor = instanceClass.getConstructor(this.getClass(), Client.class);
-            instance = (FileOperationProvider) constructor.newInstance(this, client);
+            Constructor constructor = instanceClass.getConstructor(this.getClass(), Client.class);
+            return (FileOperationProvider) constructor.newInstance(this, client);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
-
-        return instance;
     }
 
     private void initClient(URL url) {
         LOGGER.debug("initClient(url: {}", maskedUrlString(url));
-        Client client = getClient(url);
+        Client client = getClient(url.toString());
         if (client == null) {
             client = createClientInstance(url);
-            siteUrlToClientMap.put(UrlUtils.getSiteUrlString(url), client);
+            siteUrlToClientMap.put(UrlUtils.getSiteUrlString(url.toString()), client);
         }
     }
 
     private void initFileOperationProvider(URL url, Protocol protocol, FileType fileType, Client client) throws InstantiationException, IllegalAccessException {
         LOGGER.debug("initFileOperationProvider(url: {}, protocol: {}, fileType: {}, client: {})", maskedUrlString(url), protocol, fileType, client);
-        FileOperationProvider fileOperationProvider = getFileOperationProvider(url);
+        FileOperationProvider fileOperationProvider = getFileOperationProvider(url.toString());
         if (fileOperationProvider == null) {
             Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
             if (fileOperationProviderMap == null) {
