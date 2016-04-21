@@ -40,7 +40,7 @@ public class CopyOperationTest {
 
         new CopyOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
 
-        Mockito.verify(listener, times(1)).startCopyFile(Matchers.any(String.class), Matchers.any(Long.class));
+        Mockito.verify(listener, times(1)).startFile(Matchers.any(File.class), Matchers.any(Long.class));
         Mockito.verify(listener, times(1)).afterBlockCopied(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
     }
 
@@ -70,7 +70,7 @@ public class CopyOperationTest {
 
         new CopyOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
 
-        Mockito.verify(listener, times(1)).startCopyFile(Matchers.any(String.class), Matchers.any(Long.class));
+        Mockito.verify(listener, times(1)).startFile(Matchers.any(File.class), Matchers.any(Long.class));
         Mockito.verify(listener, times(1)).afterBlockCopied(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
     }
 

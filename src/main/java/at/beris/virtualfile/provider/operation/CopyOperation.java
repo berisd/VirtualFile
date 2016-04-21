@@ -59,8 +59,10 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
             }
         } else {
             if (listener != null)
-                listener.startCopyFile(source.getPath(), filesProcessed + 1);
+                listener.startFile(source, filesProcessed + 1);
             copyFile(source, target, listener);
+            if (listener != null)
+                listener.finishedFile(source);
             filesProcessed++;
         }
         target.refresh();

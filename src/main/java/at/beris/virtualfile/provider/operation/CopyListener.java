@@ -12,7 +12,9 @@ package at.beris.virtualfile.provider.operation;
 import at.beris.virtualfile.File;
 
 public interface CopyListener extends Listener {
-    void startCopyFile(String fileName, long currentFileNumber);
+    void startFile(File file, long currentFileNumber);
+
+    void finishedFile(File file);
 
     void afterBlockCopied(long fileSize, long bytesCopiedBlock, long bytesCopiedTotal);
 
