@@ -20,5 +20,9 @@ public interface CopyListener extends Listener {
 
     boolean interrupt();
 
-    void fileExists(File file);
+    /**
+     * @param file
+     * @return true: continue with current file, false: continue with next file
+     */
+    boolean fileExists(File file);
 }

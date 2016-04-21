@@ -42,27 +42,32 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
     }
 
     private void copyRecursive(File source, File target, CopyListener listener) throws IOException {
+        boolean createFile = true;
         if (target.exists()) {
             if (listener != null)
-                listener.fileExists(target);
+                createFile = listener.fileExists(target);
         }
 
         if (source.isDirectory()) {
-            if (!target.exists())
-                target.create();
+            if (createFile) {
+                if (!target.exists())
+                    target.create();
 
-            for (File sourceChildFile : source.list()) {
-                URL targetUrl = target.getUrl();
-                URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
-                File targetChildFile = fileContext.newFile(targetChildUrl);
-                copyRecursive(sourceChildFile, targetChildFile, listener);
+                for (File sourceChildFile : source.list()) {
+                    URL targetUrl = target.getUrl();
+                    URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
+                    File targetChildFile = fileContext.newFile(targetChildUrl);
+                    copyRecursive(sourceChildFile, targetChildFile, listener);
+                }
             }
         } else {
-            if (listener != null)
-                listener.startFile(source, filesProcessed + 1);
-            copyFile(source, target, listener);
-            if (listener != null)
-                listener.finishedFile(source);
+            if (createFile) {
+                if (listener != null)
+                    listener.startFile(source, filesProcessed + 1);
+                copyFile(source, target, listener);
+                if (listener != null)
+                    listener.finishedFile(source);
+            }
             filesProcessed++;
         }
         target.refresh();
