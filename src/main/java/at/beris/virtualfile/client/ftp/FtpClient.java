@@ -161,6 +161,12 @@ public class FtpClient extends AbstractClient {
 
     }
 
+    @Override
+    public void dispose() throws IOException {
+        disconnect();
+        ftpClient = null;
+    }
+
     public boolean completePendingCommand() throws IOException {
         return ftpClient.completePendingCommand();
     }

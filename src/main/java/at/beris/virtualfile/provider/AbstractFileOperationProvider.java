@@ -31,7 +31,7 @@ public abstract class AbstractFileOperationProvider implements FileOperationProv
     protected Set<FileOperation> supportedOperations;
     protected Map<FileOperation, CustomFileOperation> customFileOperationMap;
 
-    protected static final Set<FileOperation> BASIC_FILE_OPERATIONS = Collections.unmodifiableSet(createBasicOperations());
+    protected static final Set<FileOperation> BASIC_FILE_OPERATIONS = createBasicOperations();
 
     public AbstractFileOperationProvider(FileContext fileContext, Client client) {
         super();
@@ -120,6 +120,16 @@ public abstract class AbstractFileOperationProvider implements FileOperationProv
     @Override
     public void copy(File sourceFile, File targetFile, CopyListener listener) throws IOException {
         ((CustomFileOperation<Void, Void>) customFileOperationMap.get(FileOperation.COPY)).execute(sourceFile, targetFile, listener, (Void) null);
+    }
+
+    @Override
+    public void dispose() {
+        fileContext = null;
+        client = null;
+        supportedOperations.clear();
+        supportedOperations = null;
+        customFileOperationMap.clear();
+        customFileOperationMap = null;
     }
 
     private static Set<FileOperation> createBasicOperations() {

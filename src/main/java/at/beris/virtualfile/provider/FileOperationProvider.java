@@ -83,4 +83,6 @@ public interface FileOperationProvider {
     void removeAttributes(FileModel model) throws IOException;
 
     void copy(File sourceFile, File targetFile, CopyListener listener) throws IOException;
+
+    void dispose();
 }

@@ -189,13 +189,4 @@ public class FileModel {
         group = null;
         url = null;
     }
-
-    public FileType requiredFileOperationProviderType() {
-        if (isArchive())
-            return FileType.ARCHIVE;
-        else if (isArchived())
-            return FileType.ARCHIVED;
-        else
-            return FileType.DEFAULT;
-    }
 }

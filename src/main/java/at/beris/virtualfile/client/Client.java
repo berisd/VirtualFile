@@ -55,4 +55,6 @@ public interface Client {
     void setOwner(String path, UserPrincipal owner) throws IOException;
 
     void setGroup(String path, GroupPrincipal group) throws IOException;
+
+    void dispose() throws IOException;
 }

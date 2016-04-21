@@ -73,9 +73,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     @Override
     public void delete(FileModel model) throws IOException {
         java.io.File file = new java.io.File(model.getPath());
-        if (file.exists()) {
-            Files.walkFileTree(new java.io.File(file.getPath()).toPath(), new LocalFileDeletingVisitor());
-        }
+        Files.walkFileTree(new java.io.File(file.getPath()).toPath(), new LocalFileDeletingVisitor());
     }
 
     @Override
@@ -258,12 +256,6 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         public FileVisitResult postVisitDirectory(Path directory, IOException ioe)
                 throws IOException {
             Files.delete(directory);
-            return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFileFailed(Path file, IOException ioe)
-                throws IOException {
             return FileVisitResult.CONTINUE;
         }
     }

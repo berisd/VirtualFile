@@ -266,7 +266,8 @@ public class FileContext {
     private void disposeFileTypeToFileOperationProviderMap(Map<FileType, FileOperationProvider> map) {
         Iterator<Map.Entry<FileType, FileOperationProvider>> it = map.entrySet().iterator();
         while (it.hasNext()) {
-            it.next();
+            Map.Entry<FileType, FileOperationProvider> next = it.next();
+            next.getValue().dispose();
             it.remove();
         }
     }
@@ -274,7 +275,8 @@ public class FileContext {
     private void disposeSiteUrlToClientMap() throws IOException {
         Iterator<Map.Entry<String, Client>> it = siteUrlToClientMap.entrySet().iterator();
         while (it.hasNext()) {
-            it.next();
+            Map.Entry<String, Client> next = it.next();
+            next.getValue().dispose();
             it.remove();
         }
     }

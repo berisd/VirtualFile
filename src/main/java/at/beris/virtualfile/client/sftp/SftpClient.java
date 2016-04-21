@@ -296,6 +296,14 @@ public class SftpClient extends AbstractClient {
         }
     }
 
+    @Override
+    public void dispose() throws IOException {
+        disconnect();
+        sftpChannel = null;
+        session = null;
+        jsch = null;
+    }
+
     private void checkChannel() throws IOException {
         try {
             if (session == null)
