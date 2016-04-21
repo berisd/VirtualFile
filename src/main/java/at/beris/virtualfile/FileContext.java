@@ -90,6 +90,9 @@ public class FileContext {
             normalizedUrl = UrlUtils.newUrl(normalizedUrl.toString() + "/");
 
         String fullPath = normalizedUrl.getPath();
+        if (fullPath.equals("/"))
+            return newFile((File) null, normalizedUrl);
+
         File parentFile = null;
         StringBuilder stringBuilder = new StringBuilder();
 
