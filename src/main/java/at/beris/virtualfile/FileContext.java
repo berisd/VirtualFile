@@ -86,24 +86,21 @@ public class FileContext {
     public File newFile(URL url) throws IOException {
         LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
+        if ("".equals(normalizedUrl.getPath()))
+            normalizedUrl = UrlUtils.newUrl(normalizedUrl.toString() + "/");
+
         String fullPath = normalizedUrl.getPath();
         File parentFile = null;
+        StringBuilder stringBuilder = new StringBuilder();
 
-        if (fullPath.equals("/"))
-            return newFile((File) null, normalizedUrl);
-        else {
-            String[] pathParts = fullPath.split("/");
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < pathParts.length; i++) {
-                stringBuilder.append(pathParts[i]);
+        for (String pathPart : fullPath.split("/")) {
+            stringBuilder.append(pathPart);
+            if (stringBuilder.length() < fullPath.length())
+                stringBuilder.append('/');
 
-                if ((i < pathParts.length - 1) || fullPath.endsWith("/"))
-                    stringBuilder.append('/');
-
-                String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl.toString()) + stringBuilder.toString();
-                URL pathUrl = UrlUtils.normalizeUrl(new URL(pathUrlString));
-                parentFile = newFile(parentFile, pathUrl);
-            }
+            String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl.toString()) + stringBuilder.toString();
+            URL pathUrl = UrlUtils.normalizeUrl(new URL(pathUrlString));
+            parentFile = newFile(parentFile, pathUrl);
         }
         return parentFile;
     }
