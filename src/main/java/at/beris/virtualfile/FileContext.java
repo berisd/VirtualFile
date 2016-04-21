@@ -79,25 +79,13 @@ public class FileContext {
     /**
      * Creates a file instance for the corresponding url
      *
-     * @param parent
      * @param url
      * @return
+     * @throws IOException
      */
-    public File newFile(File parent, URL url) throws IOException {
-        LOGGER.debug("newFile (parentFile: {}, url: {})", parent, maskedUrlString(url));
-
-        URL normalizedUrl = UrlUtils.normalizeUrl(url.toString());
-        String urlString = normalizedUrl.toString();
-        File cachedFile = fileCache.get(urlString);
-        if (cachedFile != null)
-            return cachedFile;
-
-        return createFile(parent, normalizedUrl);
-    }
-
     public File newFile(URL url) throws IOException {
         LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
-        URL normalizedUrl = UrlUtils.normalizeUrl(url.toString());
+        URL normalizedUrl = UrlUtils.normalizeUrl(url);
         String fullPath = normalizedUrl.getPath();
         File parentFile = null;
 
@@ -113,11 +101,22 @@ public class FileContext {
                     stringBuilder.append('/');
 
                 String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl.toString()) + stringBuilder.toString();
-                URL pathUrl = new URL(pathUrlString);
+                URL pathUrl = UrlUtils.normalizeUrl(new URL(pathUrlString));
                 parentFile = newFile(parentFile, pathUrl);
             }
         }
         return parentFile;
+    }
+
+    File newFile(File parent, URL url) throws IOException {
+        LOGGER.debug("newFile (parentFile: {}, url: {})", parent, maskedUrlString(url));
+
+        String urlString = url.toString();
+        File cachedFile = fileCache.get(urlString);
+        if (cachedFile != null)
+            return cachedFile;
+
+        return createFile(parent, url);
     }
 
     public void removeFileFromCache(File file) throws IOException {

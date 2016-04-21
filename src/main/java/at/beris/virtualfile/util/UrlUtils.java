@@ -37,8 +37,8 @@ public class UrlUtils {
         return fileType;
     }
 
-    public static URL normalizeUrl(String urlString) throws IOException {
-        URI uri = URI.create(urlString);
+    public static URL normalizeUrl(URL url) throws IOException {
+        URI uri = URI.create(url.toString());
         return uri.normalize().toURL();
     }
 
@@ -53,7 +53,7 @@ public class UrlUtils {
     public static URL newUrlReplacePath(URL context, String path) throws IOException {
         String contextUrlString = context.toString();
         String newUrlString = contextUrlString.substring(0, contextUrlString.length() - context.getPath().length());
-        newUrlString += path;
+        newUrlString+=path;
         return new URL(newUrlString);
     }
 
@@ -72,7 +72,7 @@ public class UrlUtils {
 
         stringBuilder.append(url.getProtocol());
         stringBuilder.append(':');
-        if (!url.getProtocol().toLowerCase().equals("file"))
+        if (! url.getProtocol().toLowerCase().equals("file"))
             stringBuilder.append("//");
 
         String authority = url.getAuthority();
@@ -88,7 +88,8 @@ public class UrlUtils {
                 }
                 stringBuilder.append('@');
                 stringBuilder.append(authorityParts[1]);
-            } else {
+            }
+            else {
                 stringBuilder.append(authorityParts[0]);
             }
         }

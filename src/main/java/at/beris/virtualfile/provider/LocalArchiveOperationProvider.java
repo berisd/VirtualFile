@@ -62,7 +62,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
             while ((archiveEntry = ais.getNextEntry()) != null) {
                 Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
-                File file = fileContext.newFile(fileContext.getFile(PARENT_URL.toString()), urlMap.get(URL));
+                File file = fileContext.newFile(urlMap.get(URL));
                 if (filter == null || filter.filter(file))
                     fileList.add(file);
             }

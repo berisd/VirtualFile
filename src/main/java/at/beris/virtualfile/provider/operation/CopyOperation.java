@@ -54,8 +54,7 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
             for (File sourceChildFile : source.list()) {
                 URL targetUrl = target.getUrl();
                 URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
-
-                File targetChildFile = fileContext.newFile(target, targetChildUrl);
+                File targetChildFile = fileContext.newFile(targetChildUrl);
                 copyRecursive(sourceChildFile, targetChildFile, listener);
             }
         } else {
