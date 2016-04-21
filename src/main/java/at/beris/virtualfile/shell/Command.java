@@ -10,26 +10,36 @@
 package at.beris.virtualfile.shell;
 
 public enum Command {
-    CD("Change to working directory or archive"),
-    CON("Connect to URL"),
-    DIS("Disconnect"),
-    EMPTY(""),
-    HELP("Display help"),
-    LCD("Change to local directory or archive"),
-    LLS("List local directory or archive"),
-    LS("List directory"),
-    PWD("print current working directory"),
-    LPWD("print current local directory"),
-    QUIT("Quit shell"),
-    STAT("Display statistics");
+    CD("Change to working directory or archive", new int[]{1}),
+    CON("Connect to URL", new int[]{1}),
+    DIS("Disconnect", new int[]{0}),
+    GET("Get file from working site", new int[]{1}),
+    HELP("Display help", new int[]{0}),
+    LCD("Change to local directory or archive", new int[]{1}),
+    LLS("List local directory or archive", new int[]{0}),
+    LRM("Remove local file", new int[]{1}),
+    LS("List directory", new int[]{0}),
+    PUT("Put file to working site", new int[]{1}),
+    PWD("print current working directory", new int[]{0}),
+    LPWD("print current local directory", new int[]{0}),
+    QUIT("Quit shell", new int[]{0}),
+    RM("Remove working file", new int[]{1}),
+    STAT("Display statistics", new int[]{0}),
+    UNKNOWN("", new int[]{0});
 
     private String description;
+    private int[] argumentCounts;
 
-    Command(String description) {
+    Command(String description, int[] argumentCounts) {
         this.description = description;
+        this.argumentCounts = argumentCounts;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public int[] getArgumentCounts() {
+        return argumentCounts;
     }
 }
