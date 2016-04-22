@@ -10,20 +10,20 @@
 package at.beris.virtualfile.shell;
 
 public enum Command {
-    CD("Change to working directory or archive", new int[]{1}),
+    CD("Change to directory or archive", new int[]{1}),
     CON("Connect to URL", new int[]{1}),
     DIS("Disconnect", new int[]{0}),
-    GET("Get file from working site", new int[]{1}),
+    GET("Get file from URL", new int[]{1}),
     HELP("Display help", new int[]{0}),
     LCD("Change to local directory or archive", new int[]{1}),
     LLS("List local directory or archive", new int[]{0}),
     LRM("Remove local file", new int[]{1}),
     LS("List directory", new int[]{0}),
-    PUT("Put file to working site", new int[]{1}),
-    PWD("print current working directory", new int[]{0}),
+    PUT("Put file to url", new int[]{1}),
+    PWD("print current directory", new int[]{0}),
     LPWD("print current local directory", new int[]{0}),
     QUIT("Quit shell", new int[]{0}),
-    RM("Remove working file", new int[]{1}),
+    RM("Remove file", new int[]{1}),
     STAT("Display statistics", new int[]{0}),
     UNKNOWN("", new int[]{0});
 

@@ -11,7 +11,10 @@ package at.beris.virtualfile.shell;
 
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
+import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.provider.operation.CopyListener;
+import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -20,6 +23,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.UserPrincipal;
+import java.text.DateFormat;
 import java.util.*;
 
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
@@ -27,6 +33,9 @@ import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 public class Shell {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Shell.class);
     private final static String NOT_CONNECTED_MSG = "You're not connected. use con.";
+    private final static DateFormat DATE_FORMATTER = DateFormat.getDateInstance();
+    private final static DateFormat TIME_FORMATTER = DateFormat.getTimeInstance();
+
 
     private FileContext fileContext;
     private File localFile;
@@ -112,6 +121,9 @@ public class Shell {
             case LS:
                 list(false);
                 break;
+            case PUT:
+                put(cmd.getRight().get(0));
+                break;
             case PWD:
                 System.out.println(workingFile != null ? maskedUrlString(workingFile.getUrl()) : NOT_CONNECTED_MSG);
                 break;
@@ -191,9 +203,72 @@ public class Shell {
             System.out.println(NOT_CONNECTED_MSG);
             return;
         }
+
+        int maxLengthOwner = 0, maxLengthGroup = 0, maxLengthSize = 0;
+        int maxLengthDateStr = 0, maxLengthTimeStr = 0;
+
+        StringBuilder sb = new StringBuilder();
+        List<ExtFileModel> fileModelList = new ArrayList<>();
         for (File childFile : file.list()) {
-            System.out.println(String.format("%-20s %d kb %s", childFile.getName(), childFile.getSize() / 1024, childFile.isDirectory() ? "<DIR>" : ""));
+            ExtFileModel model = new ExtFileModel();
+            model.setUrl(childFile.getUrl());
+            model.setAttributes(childFile.getAttributes());
+            model.setDirectory(childFile.isDirectory());
+            model.setOwner(childFile.getOwner());
+            model.setGroup(childFile.getGroup());
+            model.setSize(childFile.getSize());
+            model.setLastModifiedTime(childFile.getLastModifiedTime());
+
+            UserPrincipal owner = model.getOwner();
+            if (owner != null && maxLengthOwner < owner.getName().length())
+                maxLengthOwner = model.getOwner().getName().length();
+            GroupPrincipal group = model.getGroup();
+            if (group != null && maxLengthGroup < group.getName().length())
+                maxLengthGroup = model.getGroup().getName().length();
+            String sizeString = String.valueOf(model.getSize());
+            if (maxLengthSize < sizeString.length())
+                maxLengthSize = sizeString.length();
+
+            if (model.getLastModifiedTime() != null) {
+                Date lastModifiedDate = new Date(model.getLastModifiedTime().toMillis());
+                model.dateStr = DATE_FORMATTER.format(lastModifiedDate);
+                if (maxLengthDateStr < model.dateStr.length())
+                    maxLengthDateStr = model.dateStr.length();
+                model.timeStr = TIME_FORMATTER.format(lastModifiedDate);
+                if (maxLengthTimeStr < model.timeStr.length())
+                    maxLengthTimeStr = model.timeStr.length();
+            } else {
+                model.dateStr = "";
+                model.timeStr = "";
+            }
+
+            fileModelList.add(model);
         }
+
+        for (ExtFileModel model : fileModelList) {
+            sb.setLength(0);
+            sb.append(model.isDirectory() ? 'd' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.OWNER_READ) ? 'r' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.OWNER_WRITE) ? 'w' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.OWNER_EXECUTE) ? 'x' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.GROUP_READ) ? 'r' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.GROUP_WRITE) ? 'w' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.GROUP_EXECUTE) ? 'x' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.OTHERS_READ) ? 'r' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.OTHERS_WRITE) ? 'w' : '-');
+            sb.append(model.getAttributes().contains(PosixFilePermission.OTHERS_EXECUTE) ? 'x' : '-').append(' ');
+            sb.append(StringUtils.rightPad(model.getOwner().getName(), maxLengthOwner, ' ')).append(' ');
+            sb.append(StringUtils.rightPad(model.getGroup().getName(), maxLengthGroup, ' ')).append(' ');
+            sb.append(StringUtils.leftPad(String.valueOf(model.getSize()), maxLengthSize, ' ')).append(' ');
+            sb.append(StringUtils.leftPad(model.dateStr, maxLengthDateStr, ' ')).append(' ');
+            sb.append(StringUtils.leftPad(model.timeStr, maxLengthTimeStr, ' ')).append(' ');
+            sb.append(FileUtils.getName(model.getPath()));
+            System.out.println(sb.toString());
+        }
+
+        for (FileModel fileModel : fileModelList)
+            fileModel.clear();
+        fileModelList.clear();
     }
 
     private void change(String directoryName, boolean local) throws IOException {
@@ -203,7 +278,14 @@ public class Shell {
         }
 
         File file = local ? localFile : workingFile;
-        URL newUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(file.getUrl().toString() + directoryName + (directoryName.endsWith("/") ? "" : "/")));
+
+        URL newUrl;
+        if (directoryName.startsWith("/"))
+            newUrl = UrlUtils.normalizeUrl(UrlUtils.newUrlReplacePath(file.getUrl(), directoryName + (directoryName.endsWith("/") ? "" : "/")));
+        else {
+            newUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(file.getUrl().toString() + directoryName + (directoryName.endsWith("/") ? "" : "/")));
+        }
+
         File actionFile = fileContext.newFile(newUrl);
 
         if (actionFile.exists()) {
@@ -227,13 +309,28 @@ public class Shell {
         System.out.println("");
     }
 
+    private void put(String fileName) throws IOException {
+        if (workingFile == null) {
+            System.out.println(NOT_CONNECTED_MSG);
+            return;
+        }
+
+        URL sourceUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(localFile.getUrl(), fileName));
+        File sourceFile = fileContext.newFile(sourceUrl);
+        URL targetUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(workingFile.getUrl(), fileName));
+        File targetFile = fileContext.newFile(targetUrl);
+
+        sourceFile.copy(targetFile, new CustomCopyListener());
+        System.out.println("");
+    }
+
     private void remove(boolean local, String fileName) throws IOException {
         if (!local && workingFile == null) {
             System.out.println(NOT_CONNECTED_MSG);
             return;
         }
 
-        URL actionUrl = UrlUtils.newUrl((local ? localFile : workingFile).getUrl(), fileName);
+        URL actionUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl((local ? localFile : workingFile).getUrl(), fileName));
         fileContext.newFile(actionUrl).delete();
     }
 
@@ -283,5 +380,10 @@ public class Shell {
             }
             return false;
         }
+    }
+
+    private class ExtFileModel extends FileModel {
+        public String dateStr;
+        public String timeStr;
     }
 }

@@ -14,15 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum PosixFilePermission implements FileAttribute {
-    GROUP_EXECUTE(java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE),
+    OWNER_READ(java.nio.file.attribute.PosixFilePermission.OWNER_READ),
+    OWNER_WRITE(java.nio.file.attribute.PosixFilePermission.OWNER_WRITE),
+    OWNER_EXECUTE(java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE),
     GROUP_READ(java.nio.file.attribute.PosixFilePermission.GROUP_READ),
     GROUP_WRITE(java.nio.file.attribute.PosixFilePermission.GROUP_WRITE),
-    OTHERS_EXECUTE(java.nio.file.attribute.PosixFilePermission.OTHERS_EXECUTE),
+    GROUP_EXECUTE(java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE),
     OTHERS_READ(java.nio.file.attribute.PosixFilePermission.OTHERS_READ),
     OTHERS_WRITE(java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE),
-    OWNER_EXECUTE(java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE),
-    OWNER_READ(java.nio.file.attribute.PosixFilePermission.OWNER_READ),
-    OWNER_WRITE(java.nio.file.attribute.PosixFilePermission.OWNER_WRITE);
+    OTHERS_EXECUTE(java.nio.file.attribute.PosixFilePermission.OTHERS_EXECUTE);
 
     private java.nio.file.attribute.PosixFilePermission nioPermission;
 
