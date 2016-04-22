@@ -148,6 +148,8 @@ public interface File {
 
     void setLastModifiedTime(FileTime time) throws IOException;
 
+    void setModel(FileModel model) throws IOException;
+
     void setOwner(UserPrincipal owner) throws IOException;
 
     /**

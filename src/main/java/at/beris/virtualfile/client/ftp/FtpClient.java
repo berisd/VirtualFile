@@ -13,6 +13,8 @@ import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.AbstractClient;
 import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.exception.OperationNotSupportedException;
+import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPCmd;
@@ -44,11 +46,13 @@ public class FtpClient extends AbstractClient {
     }
 
     private void init() {
+        LOGGER.debug("init");
         ftpClient = new FTPClient();
     }
 
     @Override
     public void connect() throws IOException {
+        LOGGER.info("Connecting to " + username() + "@" + host() + ":" + String.valueOf(port()));
         ftpClient.connect(host(), port());
         if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
             disconnect();
@@ -60,6 +64,7 @@ public class FtpClient extends AbstractClient {
 
     @Override
     public void disconnect() throws IOException {
+        LOGGER.info("Disconnecting from " + username() + "@" + host() + ":" + String.valueOf(port()));
         if (ftpClient.isConnected()) {
             ftpClient.logout();
             ftpClient.disconnect();
@@ -68,12 +73,14 @@ public class FtpClient extends AbstractClient {
 
     @Override
     public void deleteFile(String path) throws IOException {
+        LOGGER.debug("deleteFile (path : {})", path);
         checkConnection();
         ftpClient.deleteFile(path);
     }
 
     @Override
     public void createFile(String path) throws IOException {
+        LOGGER.debug("createFile (path : {})", path);
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[]{})) {
             checkConnection();
             ftpClient.storeFile(path, inputStream);
@@ -84,6 +91,7 @@ public class FtpClient extends AbstractClient {
 
     @Override
     public boolean exists(String path) throws IOException {
+        LOGGER.debug("exists (path : {})", path);
         checkConnection();
         String status = ftpClient.getStatus(path);
         return status != null;
@@ -91,32 +99,49 @@ public class FtpClient extends AbstractClient {
 
     @Override
     public void createDirectory(String path) throws IOException {
+        LOGGER.debug("createDirectory (path : {})", path);
         checkConnection();
         ftpClient.makeDirectory(path);
     }
 
     @Override
     public void deleteDirectory(String path) throws IOException {
+        LOGGER.debug("deleteDirectory (path : {})", path);
         checkConnection();
         ftpClient.removeDirectory(path);
     }
 
     @Override
     public InputStream getInputStream(String path) throws IOException {
+        LOGGER.debug("getInputStream (path : {})", path);
         checkConnection();
         return ftpClient.retrieveFileStream(path);
     }
 
     @Override
     public OutputStream getOutputStream(String path) throws IOException {
+        LOGGER.debug("getOutputStream (path : {})", path);
         checkConnection();
         return ftpClient.storeFileStream(path);
     }
 
     @Override
     public FileInfo getFileInfo(String path) throws IOException {
+        LOGGER.debug("getFileInfo (path: {})", path);
         checkConnection();
-        return new FtpFileInfo(path, mlistFile(path));
+        if ("/".equals(path)) {
+            return new FtpFileInfo(path, null);
+        } else {
+            String lastPathPart = UrlUtils.getLastPathPart(path);
+            String parentPath = UrlUtils.getParentPath(path);
+            ftpClient.changeWorkingDirectory(parentPath);
+            FTPFile[] ftpFiles = ftpClient.listFiles();
+            for (FTPFile ftpFile : ftpFiles) {
+                if (ftpFile.getName().equals(lastPathPart))
+                    return new FtpFileInfo(path + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
+            }
+            return new FtpFileInfo(path, null);
+        }
     }
 
     protected String username() {
@@ -130,11 +155,14 @@ public class FtpClient extends AbstractClient {
     }
 
     public List<FileInfo> list(String path) throws IOException {
+        LOGGER.debug("list (path: {})", path);
         List<FileInfo> fileList = new ArrayList<>();
         checkConnection();
         ftpClient.changeWorkingDirectory(path);
         for (FTPFile ftpFile : ftpClient.listFiles()) {
-            FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory() + ftpFile.getName(), ftpFile);
+            FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory() +
+                    (!ftpClient.printWorkingDirectory().endsWith("/") ? "/" : "") +
+                    ftpFile.getName() + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
             fileList.add(ftpFileInfo);
         }
 
@@ -143,22 +171,22 @@ public class FtpClient extends AbstractClient {
 
     @Override
     public void setLastModifiedTime(String path, FileTime time) {
-
+        throw new OperationNotSupportedException();
     }
 
     @Override
     public void setAttributes(String path, Set<FileAttribute> attributes) {
-
+        throw new OperationNotSupportedException();
     }
 
     @Override
     public void setOwner(String path, UserPrincipal owner) {
-
+        throw new OperationNotSupportedException();
     }
 
     @Override
     public void setGroup(String path, GroupPrincipal group) {
-
+        throw new OperationNotSupportedException();
     }
 
     @Override
@@ -177,11 +205,18 @@ public class FtpClient extends AbstractClient {
     }
 
     private FTPFile mlistFile(String pathname) throws IOException {
+//        if (pathname.startsWith("/"))
+//            pathname = pathname.substring(1);
+
         boolean success = FTPReply.isPositiveCompletion(ftpClient.sendCommand(FTPCmd.MLST, pathname));
         if (success) {
             String entry = StringUtils.trim(ftpClient.getReplyStrings()[1]);
             return MLSxEntryParser.parseEntry(entry);
         } else {
+            String[] replyStrings = ftpClient.getReplyStrings();
+            LOGGER.info("mlistfile error");
+            for (String replyString : replyStrings)
+                LOGGER.info(replyString);
             return null;
         }
     }

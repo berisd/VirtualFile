@@ -53,7 +53,7 @@ public class UrlUtils {
     public static URL newUrlReplacePath(URL context, String path) throws IOException {
         String contextUrlString = context.toString();
         String newUrlString = contextUrlString.substring(0, contextUrlString.length() - context.getPath().length());
-        newUrlString+=path;
+        newUrlString += path;
         return new URL(newUrlString);
     }
 
@@ -72,7 +72,7 @@ public class UrlUtils {
 
         stringBuilder.append(url.getProtocol());
         stringBuilder.append(':');
-        if (! url.getProtocol().toLowerCase().equals("file"))
+        if (!url.getProtocol().toLowerCase().equals("file"))
             stringBuilder.append("//");
 
         String authority = url.getAuthority();
@@ -88,8 +88,7 @@ public class UrlUtils {
                 }
                 stringBuilder.append('@');
                 stringBuilder.append(authorityParts[1]);
-            }
-            else {
+            } else {
                 stringBuilder.append(authorityParts[0]);
             }
         }
@@ -97,6 +96,20 @@ public class UrlUtils {
         stringBuilder.append(url.getPath());
 
         return stringBuilder.toString();
+    }
+
+    public static String getParentPath(String urlPath) {
+        if (urlPath.endsWith("/"))
+            urlPath = urlPath.substring(0, urlPath.lastIndexOf('/'));
+        String parentPath = urlPath.substring(0, urlPath.lastIndexOf('/') + 1);
+        return parentPath;
+    }
+
+    public static String getLastPathPart(String urlPath) {
+        if (urlPath.endsWith("/"))
+            urlPath = urlPath.substring(0, urlPath.lastIndexOf('/'));
+        String urlPart = urlPath.substring(urlPath.lastIndexOf('/') + 1);
+        return urlPart;
     }
 
     /**

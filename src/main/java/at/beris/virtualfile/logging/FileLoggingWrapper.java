@@ -354,6 +354,12 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File {
     }
 
     @Override
+    public void setModel(FileModel model) throws IOException {
+        logger.debug("Set model to {} for {}", model, rootFile);
+        wrappedFile.setModel(model);
+    }
+
+    @Override
     public void setOwner(UserPrincipal owner) throws IOException {
         logger.info("Set owner to {} for {}", owner, rootFile);
         wrappedFile.setOwner(owner);

@@ -14,7 +14,6 @@ import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.filter.Filter;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 
 public class FileUtils {
@@ -70,5 +69,12 @@ public class FileUtils {
                 attributesString = (attributesString != "" ? ", " : "") + attribute.toString();
         }
         return attributesString;
+    }
+
+    public static String getName(String path) {
+        if (path.endsWith("/"))
+            path = path.substring(0, path.lastIndexOf('/'));
+        String name = path.substring(path.lastIndexOf('/') + 1);
+        return name;
     }
 }

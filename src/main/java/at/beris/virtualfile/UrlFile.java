@@ -56,11 +56,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public String getName() throws IOException {
         checkModel();
-        String path = model.getPath();
-        if (path.endsWith("/"))
-            path = path.substring(0, path.lastIndexOf('/'));
-        String name = path.substring(path.lastIndexOf('/') + 1);
-        return name;
+        return FileUtils.getName(model.getPath());
     }
 
     @Override
@@ -391,6 +387,14 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public int compareTo(UrlFile o) {
         return model.getUrl().toString().compareTo(o.getUrl().toString());
+    }
+
+    @Override
+    public void setModel(FileModel model) throws IOException {
+        this.model = model;
+        if (parent != null)
+            model.setParent(parent.getModel());
+        model.setUrl(url);
     }
 
     void updateModel() throws IOException {

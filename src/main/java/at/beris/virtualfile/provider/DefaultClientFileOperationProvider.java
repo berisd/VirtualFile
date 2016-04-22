@@ -67,9 +67,12 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
 
         for (FileInfo fileInfo : fileInfoList) {
-            at.beris.virtualfile.File file = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), fileInfo.getPath()));
-            if (filter == null || filter.filter(file)) {
-                fileList.add(file);
+            at.beris.virtualfile.File childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), fileInfo.getPath()));
+            FileModel childModel = new FileModel();
+            fileInfo.fillModel(childModel);
+            childFile.setModel(childModel);
+            if (filter == null || filter.filter(childFile)) {
+                fileList.add(childFile);
             }
         }
         return fileList;

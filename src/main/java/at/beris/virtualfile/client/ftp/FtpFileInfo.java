@@ -57,7 +57,7 @@ public class FtpFileInfo implements FileInfo<FTPFile> {
         model.setLastModifiedTime(ftpFile != null ? FileTime.fromMillis(ftpFile.getTimestamp().getTime().getTime()) : null);
         model.setLastAccessTime(null);
         model.setAttributes(ftpFile != null ? createAttributes() : Collections.<FileAttribute>emptySet());
-        model.setOwner(ftpFile != null ? new UnixUserPrincipal(ftpFile.getName(), ftpFile.getGroup()): null);
+        model.setOwner(ftpFile != null ? new UnixUserPrincipal(ftpFile.getUser(), ftpFile.getGroup()) : null);
         model.setGroup(ftpFile != null ? new UnixGroupPrincipal(ftpFile.getGroup()) : null);
         model.setDirectory(ftpFile != null ? ftpFile.isDirectory() : false);
         model.setSymbolicLink(ftpFile != null ? ftpFile.isSymbolicLink() : false);
