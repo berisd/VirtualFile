@@ -13,10 +13,13 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.config.Configuration;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.Authority;
 import org.apache.ftpserver.ftplet.UserManager;
+import org.apache.ftpserver.impl.FtpIoSession;
+import org.apache.ftpserver.listener.Listener;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.apache.ftpserver.usermanager.impl.BaseUser;
@@ -42,6 +45,7 @@ public class FtpClientIntegrationTest {
     private static final String TEST_STRING = "This is a test string";
 
     private static FtpServer ftpServer;
+    private static Listener ftpServerListener;
     private static FtpClient ftpClient;
 
     @BeforeClass
@@ -62,12 +66,13 @@ public class FtpClientIntegrationTest {
         userManager.save(user);
 
         FtpServerFactory serverFactory = new FtpServerFactory();
+
         serverFactory.setUserManager(userManager);
         ListenerFactory factory = new ListenerFactory();
-// set the port of the listener
         factory.setPort(FTP_PORT);
-        serverFactory.addListener("default", factory.createListener());
-// start the server
+        factory.setIdleTimeout(2);
+        ftpServerListener = factory.createListener();
+        serverFactory.addListener("default", ftpServerListener);
         ftpServer = serverFactory.createServer();
 
         ftpServer.start();
@@ -139,6 +144,30 @@ public class FtpClientIntegrationTest {
     public void list() throws IOException {
         List<FileInfo> fileInfoList = ftpClient.list("/");
         Assert.assertTrue(fileInfoList.size() > 0);
+    }
+
+    @Test
+    public void reconnectAfterIdleTimeout() throws IOException, InterruptedException {
+        try {
+            ftpClient.createFile(TEST_FILE);
+            Thread.currentThread().sleep(3000);
+            Assert.assertTrue(ftpClient.list("/").size() > 0);
+        } catch (FTPConnectionClosedException e) {
+            fail(e.getClass().getSimpleName() + " not handled.");
+        }
+    }
+
+    @Test
+    public void reconnectAfterServerClosedConnection() throws IOException {
+        try {
+            ftpClient.createFile(TEST_FILE);
+            for (FtpIoSession session : ftpServerListener.getActiveSessions()) {
+                session.close();
+            }
+            Assert.assertTrue(ftpClient.list("/").size() > 0);
+        } catch (FTPConnectionClosedException e) {
+            fail(e.getClass().getSimpleName() + " not handled.");
+        }
     }
 
     private static FtpClient createFtpClient() throws Exception {

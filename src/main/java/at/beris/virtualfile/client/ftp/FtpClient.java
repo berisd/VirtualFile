@@ -17,6 +17,7 @@ import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.LoggerFactory;
@@ -30,11 +31,14 @@ import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 public class FtpClient extends AbstractClient {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FtpClient.class);
+    private final static int MAX_CONNECTION_ATTEMPTS = 3;
 
     private FTPClient ftpClient;
 
@@ -56,90 +60,132 @@ public class FtpClient extends AbstractClient {
             disconnect();
             return;
         }
-
-        ftpClient.login(username(), String.valueOf(password()));
+        login();
     }
 
     @Override
     public void disconnect() throws IOException {
         LOGGER.info("Disconnecting from " + username() + "@" + host() + ":" + String.valueOf(port()));
-        if (ftpClient.isConnected()) {
-            ftpClient.logout();
-            ftpClient.disconnect();
-        }
-    }
-
-    @Override
-    public void deleteFile(String path) throws IOException {
-        LOGGER.debug("deleteFile (path : {})", path);
-        checkConnection();
-        ftpClient.deleteFile(path);
-    }
-
-    @Override
-    public void createFile(String path) throws IOException {
-        LOGGER.debug("createFile (path : {})", path);
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[]{})) {
-            checkConnection();
-            ftpClient.storeFile(path, inputStream);
-        } catch (IOException e) {
-            throw e;
-        }
-    }
-
-    @Override
-    public boolean exists(String path) throws IOException {
-        LOGGER.debug("exists (path : {})", path);
-        checkConnection();
-        String status = ftpClient.getStatus(path);
-        return status != null;
-    }
-
-    @Override
-    public void createDirectory(String path) throws IOException {
-        LOGGER.debug("createDirectory (path : {})", path);
-        checkConnection();
-        ftpClient.makeDirectory(path);
-    }
-
-    @Override
-    public void deleteDirectory(String path) throws IOException {
-        LOGGER.debug("deleteDirectory (path : {})", path);
-        checkConnection();
-        ftpClient.removeDirectory(path);
-    }
-
-    @Override
-    public InputStream getInputStream(String path) throws IOException {
-        LOGGER.debug("getInputStream (path : {})", path);
-        checkConnection();
-        return new FtpInputStream(ftpClient.retrieveFileStream(path), ftpClient);
-    }
-
-    @Override
-    public OutputStream getOutputStream(String path) throws IOException {
-        LOGGER.debug("getOutputStream (path : {})", path);
-        checkConnection();
-        return new FtpOutputStream(ftpClient.storeFileStream(path), ftpClient);
-    }
-
-    @Override
-    public FileInfo getFileInfo(String path) throws IOException {
-        LOGGER.debug("getFileInfo (path: {})", path);
-        checkConnection();
-        if ("/".equals(path)) {
-            return new FtpFileInfo(path, null);
-        } else {
-            String lastPathPart = UrlUtils.getLastPathPart(path);
-            String parentPath = UrlUtils.getParentPath(path);
-            ftpClient.changeWorkingDirectory(parentPath);
-            FTPFile[] ftpFiles = ftpClient.listFiles();
-            for (FTPFile ftpFile : ftpFiles) {
-                if (ftpFile.getName().equals(lastPathPart))
-                    return new FtpFileInfo(path + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
+        executionHandler(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                if (ftpClient.isConnected()) {
+                    ftpClient.logout();
+                    ftpClient.disconnect();
+                }
+                return null;
             }
-            return new FtpFileInfo(path, null);
-        }
+        });
+    }
+
+    @Override
+    public void deleteFile(final String path) throws IOException {
+        LOGGER.debug("deleteFile (path : {})", path);
+        executionHandler(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                ftpClient.deleteFile(path);
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void createFile(final String path) throws IOException {
+        LOGGER.debug("createFile (path : {})", path);
+        executionHandler(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                try (ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[]{})) {
+                    checkConnection();
+                    ftpClient.storeFile(path, inputStream);
+                } catch (IOException e) {
+                    throw e;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public boolean exists(final String path) throws IOException {
+        LOGGER.debug("exists (path : {})", path);
+        return executionHandler(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                String status = ftpClient.getStatus(path);
+                return status != null;
+            }
+        });
+    }
+
+    @Override
+    public void createDirectory(final String path) throws IOException {
+        LOGGER.debug("createDirectory (path : {})", path);
+        executionHandler(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                ftpClient.makeDirectory(path);
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void deleteDirectory(final String path) throws IOException {
+        LOGGER.debug("deleteDirectory (path : {})", path);
+        executionHandler(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                ftpClient.removeDirectory(path);
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public InputStream getInputStream(final String path) throws IOException {
+        LOGGER.debug("getInputStream (path : {})", path);
+        return executionHandler(new Callable<FtpInputStream>() {
+            @Override
+            public FtpInputStream call() throws Exception {
+                return new FtpInputStream(ftpClient.retrieveFileStream(path), ftpClient);
+            }
+        });
+    }
+
+    @Override
+    public OutputStream getOutputStream(final String path) throws IOException {
+        LOGGER.debug("getOutputStream (path : {})", path);
+        return executionHandler(new Callable<FtpOutputStream>() {
+            @Override
+            public FtpOutputStream call() throws Exception {
+                return new FtpOutputStream(ftpClient.storeFileStream(path), ftpClient);
+            }
+        });
+    }
+
+    @Override
+    public FileInfo getFileInfo(final String path) throws IOException {
+        LOGGER.debug("getFileInfo (path: {})", path);
+        return executionHandler(new Callable<FileInfo>() {
+            @Override
+            public FileInfo call() throws Exception {
+                if ("/".equals(path)) {
+                    return new FtpFileInfo(path, null);
+                } else {
+                    String lastPathPart = UrlUtils.getLastPathPart(path);
+                    String parentPath = UrlUtils.getParentPath(path);
+                    ftpClient.changeWorkingDirectory(parentPath);
+                    FTPFile[] ftpFiles = ftpClient.listFiles();
+                    for (FTPFile ftpFile : ftpFiles) {
+                        if (ftpFile.getName().equals(lastPathPart))
+                            return new FtpFileInfo(path + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
+                    }
+                    return new FtpFileInfo(path, null);
+                }
+            }
+        });
     }
 
     protected String username() {
@@ -152,19 +198,24 @@ public class FtpClient extends AbstractClient {
         return 21;
     }
 
-    public List<FileInfo> list(String path) throws IOException {
+    public List<FileInfo> list(final String path) throws IOException {
         LOGGER.debug("list (path: {})", path);
-        List<FileInfo> fileList = new ArrayList<>();
-        checkConnection();
-        ftpClient.changeWorkingDirectory(path);
-        for (FTPFile ftpFile : ftpClient.listFiles()) {
-            FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory() +
-                    (!ftpClient.printWorkingDirectory().endsWith("/") ? "/" : "") +
-                    ftpFile.getName() + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
-            fileList.add(ftpFileInfo);
-        }
+        List<FileInfo> fileInfoList = executionHandler(new Callable<List<FileInfo>>() {
+            @Override
+            public List<FileInfo> call() throws Exception {
+                List<FileInfo> fileList = new ArrayList<>();
+                ftpClient.changeWorkingDirectory(path);
+                for (FTPFile ftpFile : ftpClient.listFiles()) {
+                    FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory() +
+                            (!ftpClient.printWorkingDirectory().endsWith("/") ? "/" : "") +
+                            ftpFile.getName() + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
+                    fileList.add(ftpFileInfo);
+                }
+                return fileList;
+            }
+        });
 
-        return fileList;
+        return fileInfoList != null ? fileInfoList : Collections.EMPTY_LIST;
     }
 
     @Override
@@ -196,5 +247,38 @@ public class FtpClient extends AbstractClient {
     private void checkConnection() throws IOException {
         if (!ftpClient.isConnected())
             connect();
+    }
+
+    private void login() throws IOException {
+        LOGGER.debug("login");
+        executionHandler(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                ftpClient.login(username(), String.valueOf(password()));
+                return null;
+            }
+        });
+    }
+
+    private <T> T executionHandler(Callable<T> action) throws IOException {
+        int connectionAttempts = MAX_CONNECTION_ATTEMPTS;
+        while (connectionAttempts > 0) {
+            try {
+                checkConnection();
+                return action.call();
+            } catch (FTPConnectionClosedException e) {
+                LOGGER.warn("Server closed connection. Reconnecting.");
+                LOGGER.debug("Exception", e);
+                connectionAttempts--;
+                connect();
+            } catch (IOException e) {
+                LOGGER.debug("Exception", e);
+                throw e;
+            } catch (Exception e) {
+                LOGGER.debug("Exception", e);
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
     }
 }
