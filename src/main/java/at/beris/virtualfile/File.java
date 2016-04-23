@@ -152,6 +152,8 @@ public interface File {
 
     void setOwner(UserPrincipal owner) throws IOException;
 
+    void setUrl(URL url) throws IOException;
+
     /**
      * Free the file with all resources
      */

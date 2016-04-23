@@ -16,10 +16,7 @@ import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.*;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
@@ -39,6 +36,7 @@ import java.util.concurrent.Callable;
 public class FtpClient extends AbstractClient {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FtpClient.class);
     private final static int MAX_CONNECTION_ATTEMPTS = 3;
+    private String physicalRootPath = "";
 
     private FTPClient ftpClient;
 
@@ -61,6 +59,7 @@ public class FtpClient extends AbstractClient {
             return;
         }
         login();
+        setFileType(FTP.BINARY_FILE_TYPE);
     }
 
     @Override
@@ -172,6 +171,9 @@ public class FtpClient extends AbstractClient {
             @Override
             public FileInfo call() throws Exception {
                 if ("/".equals(path)) {
+                    if ("".equals(physicalRootPath)) {
+                        initPhysicalRootPath();
+                    }
                     return new FtpFileInfo(path, null);
                 } else {
                     String lastPathPart = UrlUtils.getLastPathPart(path);
@@ -179,8 +181,15 @@ public class FtpClient extends AbstractClient {
                     ftpClient.changeWorkingDirectory(parentPath);
                     FTPFile[] ftpFiles = ftpClient.listFiles();
                     for (FTPFile ftpFile : ftpFiles) {
-                        if (ftpFile.getName().equals(lastPathPart))
-                            return new FtpFileInfo(path + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
+                        if (ftpFile.getName().equals(lastPathPart)) {
+                            if (ftpFile.isSymbolicLink()) {
+                                String path = ftpFile.getLink() + (ftpFile.isDirectory() ? "/" : "");
+                                if (path.substring(0, physicalRootPath.length()).equals(physicalRootPath))
+                                    path = "/" + path.substring(physicalRootPath.length()) + "/";
+                                return new FtpFileInfo(path, ftpFile);
+                            } else
+                                return new FtpFileInfo(path + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
+                        }
                     }
                     return new FtpFileInfo(path, null);
                 }
@@ -256,6 +265,32 @@ public class FtpClient extends AbstractClient {
             public Void call() throws Exception {
                 ftpClient.login(username(), String.valueOf(password()));
                 return null;
+            }
+        });
+    }
+
+    private void setFileType(final int fileType) throws IOException {
+        LOGGER.debug("setFileType (fileType: {})", fileType);
+        executionHandler(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                ftpClient.setFileType(fileType);
+                return null;
+            }
+        });
+    }
+
+    private void initPhysicalRootPath() throws IOException {
+        physicalRootPath = executionHandler(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                ftpClient.changeWorkingDirectory("/");
+                for (FTPFile ftpFile : ftpClient.listFiles()) {
+                    if (ftpFile.isSymbolicLink() && ".".equals(ftpFile.getLink())) {
+                        return "/" + ftpFile.getName() + "/";
+                    }
+                }
+                return "";
             }
         });
     }

@@ -290,9 +290,9 @@ public class Shell {
 
         if (actionFile.exists()) {
             if (local)
-                localFile = fileContext.newFile(newUrl);
+                localFile = actionFile;
             else
-                workingFile = fileContext.newFile(newUrl);
+                workingFile = actionFile;
         } else
             throw new NoSuchFileException(actionFile.getUrl().toString());
     }

@@ -366,6 +366,12 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File {
     }
 
     @Override
+    public void setUrl(URL url) throws IOException {
+        logger.info("Set url to {} for {}", url, rootFile);
+        wrappedFile.setUrl(url);
+    }
+
+    @Override
     public void dispose() throws IOException {
         logger.debug("Dispose {}", rootFile);
         wrappedFile.dispose();

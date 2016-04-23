@@ -15,8 +15,11 @@ import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.client.FileInfo;
+import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.net.ftp.FTPFile;
 
+import java.io.IOException;
+import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,8 +53,14 @@ public class FtpFileInfo implements FileInfo<FTPFile> {
     }
 
     @Override
-    public void fillModel(FileModel model) {
+    public void fillModel(FileModel model) throws IOException {
         model.setFileExists(true);
+
+        if (model.getUrl() != null && !model.getPath().equals(path)) {
+            URL newUrl = UrlUtils.newUrlReplacePath(model.getUrl(), path);
+            model.setUrl(newUrl);
+        }
+
         model.setSize(ftpFile != null ? ftpFile.getSize() : 0);
         model.setCreationTime(null);
         model.setLastModifiedTime(ftpFile != null ? FileTime.fromMillis(ftpFile.getTimestamp().getTime().getTime()) : null);

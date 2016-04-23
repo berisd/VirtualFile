@@ -35,10 +35,12 @@ public class UrlFile implements File, Comparable<UrlFile> {
     private FileModel model;
     private URL url;
     private FileOperationProvider fileOperationProvider;
+    private FileContext context;
 
     public UrlFile(File parent, URL url, FileContext context) {
         this.parent = parent;
         this.url = url;
+        this.context = context;
         this.fileOperationProvider = context.getFileOperationProvider(url.toString());
     }
 
@@ -109,6 +111,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
         }
         parent = null;
         url = null;
+        context = null;
         fileOperationProvider = null;
     }
 
@@ -213,6 +216,11 @@ public class UrlFile implements File, Comparable<UrlFile> {
         model.setOwner(owner);
         fileOperationProvider.setOwner(model);
         updateModel();
+    }
+
+    @Override
+    public void setUrl(URL url) throws IOException {
+        this.url = url;
     }
 
     @Override
@@ -404,6 +412,9 @@ public class UrlFile implements File, Comparable<UrlFile> {
     private void checkModel() throws IOException {
         if (model == null)
             createModel();
+        if (!model.getUrl().toString().equals(url.toString())) {
+            context.replaceFileUrl(url, model.getUrl());
+        }
     }
 
     private void createModel() throws IOException {

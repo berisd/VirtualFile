@@ -81,7 +81,7 @@ public class Configurator {
         Map<FileType, Class> fileProviderClassMap = new HashMap<>();
         fileProviderClassMap.put(FileType.DEFAULT, DefaultClientFileOperationProvider.class);
         fileProviderClassMap.put(FileType.ARCHIVED, LocalArchivedFileOperationProvider.class);
-        fileProviderClassMap.put(FileType.ARCHIVE, LocalArchiveOperationProvider.class);
+        fileProviderClassMap.put(FileType.ARCHIVE, DefaultClientFileOperationProvider.class);
         return fileProviderClassMap;
     }
 

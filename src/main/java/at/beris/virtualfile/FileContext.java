@@ -119,6 +119,13 @@ public class FileContext {
         return createFile(parent, url);
     }
 
+    public void replaceFileUrl(URL oldUrl, URL newUrl) throws IOException {
+        File file = fileCache.get(oldUrl.toString());
+        fileCache.remove(oldUrl.toString());
+        file.setUrl(newUrl);
+        fileCache.put(newUrl.toString(), file);
+    }
+
     public void removeFileFromCache(File file) throws IOException {
         LOGGER.debug("removeFileFromCache (file : {})", file);
         fileCache.remove(file.getUrl().toString());

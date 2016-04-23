@@ -141,7 +141,7 @@ public class FileModel {
     }
 
     public String getPath() {
-        return url.getPath();
+        return url != null ? url.getPath() : "";
     }
 
     public boolean isSymbolicLink() {

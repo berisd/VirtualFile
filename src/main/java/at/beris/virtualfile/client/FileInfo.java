@@ -11,10 +11,12 @@ package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.FileModel;
 
+import java.io.IOException;
+
 public interface FileInfo<T> {
     String getPath();
 
     T getFile();
 
-    void fillModel(FileModel model);
+    void fillModel(FileModel model) throws IOException;
 }
