@@ -107,7 +107,6 @@ public class FtpClientIntegrationTest {
         try (OutputStream outputstream = ftpClient.getOutputStream(TEST_FILE)) {
             outputstream.write(TEST_STRING.getBytes());
         }
-        ftpClient.completePendingCommand();
 
         FileInfo fileInfo = ftpClient.getFileInfo(TEST_FILE);
         FileModel model = new FileModel();
@@ -124,14 +123,12 @@ public class FtpClientIntegrationTest {
         try (OutputStream outputstream = ftpClient.getOutputStream(TEST_FILE)) {
             outputstream.write(TEST_STRING.getBytes());
         }
-        ftpClient.completePendingCommand();
 
         byte[] bytesReadArray = new byte[TEST_STRING.length()];
         int bytesRead = 0;
         try (InputStream inputstream = ftpClient.getInputStream(TEST_FILE)) {
             bytesRead = inputstream.read(bytesReadArray);
         }
-        ftpClient.completePendingCommand();
 
         assertEquals(TEST_STRING.length(), bytesRead);
         assertArrayEquals(TEST_STRING.getBytes(), bytesReadArray);

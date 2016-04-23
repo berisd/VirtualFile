@@ -17,10 +17,8 @@ import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPCmd;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.parser.MLSxEntryParser;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
@@ -115,14 +113,14 @@ public class FtpClient extends AbstractClient {
     public InputStream getInputStream(String path) throws IOException {
         LOGGER.debug("getInputStream (path : {})", path);
         checkConnection();
-        return ftpClient.retrieveFileStream(path);
+        return new FtpInputStream(ftpClient.retrieveFileStream(path), ftpClient);
     }
 
     @Override
     public OutputStream getOutputStream(String path) throws IOException {
         LOGGER.debug("getOutputStream (path : {})", path);
         checkConnection();
-        return ftpClient.storeFileStream(path);
+        return new FtpOutputStream(ftpClient.storeFileStream(path), ftpClient);
     }
 
     @Override
@@ -195,29 +193,8 @@ public class FtpClient extends AbstractClient {
         ftpClient = null;
     }
 
-    public boolean completePendingCommand() throws IOException {
-        return ftpClient.completePendingCommand();
-    }
-
     private void checkConnection() throws IOException {
         if (!ftpClient.isConnected())
             connect();
-    }
-
-    private FTPFile mlistFile(String pathname) throws IOException {
-//        if (pathname.startsWith("/"))
-//            pathname = pathname.substring(1);
-
-        boolean success = FTPReply.isPositiveCompletion(ftpClient.sendCommand(FTPCmd.MLST, pathname));
-        if (success) {
-            String entry = StringUtils.trim(ftpClient.getReplyStrings()[1]);
-            return MLSxEntryParser.parseEntry(entry);
-        } else {
-            String[] replyStrings = ftpClient.getReplyStrings();
-            LOGGER.info("mlistfile error");
-            for (String replyString : replyStrings)
-                LOGGER.info(replyString);
-            return null;
-        }
     }
 }
