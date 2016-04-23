@@ -113,7 +113,7 @@ public class FtpClient extends AbstractClient {
             @Override
             public Boolean call() throws Exception {
                 String status = ftpClient.getStatus(path);
-                return status != null;
+                return status.split("\n").length > 2;
             }
         });
     }
@@ -188,7 +188,7 @@ public class FtpClient extends AbstractClient {
                                     path = "/" + path.substring(physicalRootPath.length()) + "/";
                                 return new FtpFileInfo(path, ftpFile);
                             } else
-                                return new FtpFileInfo(path + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
+                                return new FtpFileInfo(path + (ftpFile.isDirectory() && !path.endsWith("/") ? "/" : ""), ftpFile);
                         }
                     }
                     return new FtpFileInfo(path, null);

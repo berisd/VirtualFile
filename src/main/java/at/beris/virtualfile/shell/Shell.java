@@ -339,11 +339,16 @@ public class Shell {
     }
 
     private class CustomCopyListener implements CopyListener {
+        private final static char PROGRESS_CHAR = '*';
+        private final static int NUM_PROGRESS_CHARS_100_PERC = 80;
+
+        private int progressCharsPrinted;
 
         @Override
         public void startFile(File file, long currentFileNumber) {
             try {
-                System.out.println("Copying " + file.getPath() + "     ");
+                System.out.println("Copying " + file.getPath());
+                progressCharsPrinted = 0;
             } catch (IOException e) {
                 logException(e);
             }
@@ -351,14 +356,22 @@ public class Shell {
 
         @Override
         public void finishedFile(File file) {
+            if (NUM_PROGRESS_CHARS_100_PERC - progressCharsPrinted > 0)
+                System.out.print(StringUtils.repeat(PROGRESS_CHAR, (NUM_PROGRESS_CHARS_100_PERC - progressCharsPrinted)));
             System.out.println("");
         }
 
         @Override
         public void afterBlockCopied(long fileSize, long bytesCopiedBlock, long bytesCopiedTotal) {
-            long percent = bytesCopiedTotal * 100 / fileSize;
-            if (percent % 4 == 0)
-                System.out.print("*");
+            int percent = (int) ((bytesCopiedTotal * 100) / fileSize);
+//            int currentNumProgressCharsToPrint = percent / (100 / NUM_PROGRESS_CHARS_100_PERC);
+            int currentNumProgressCharsToPrint = (int) Math.floor(percent / (100 / (float) NUM_PROGRESS_CHARS_100_PERC));
+
+            if (progressCharsPrinted < currentNumProgressCharsToPrint) {
+                System.out.print(PROGRESS_CHAR);
+                System.out.flush();
+                progressCharsPrinted++;
+            }
         }
 
         @Override

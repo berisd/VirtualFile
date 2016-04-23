@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.NoSuchFileException;
 
 public class CopyOperation extends AbstractFileOperation<Void, Void> {
     public final static int COPY_BUFFER_SIZE = 1024 * 16;
@@ -32,6 +33,8 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
     @Override
     public Void execute(File source, File target, Listener listener, Void... params) throws IOException {
         filesProcessed = 0L;
+        if (!source.exists())
+            throw new NoSuchFileException(source.getPath());
         if (source.isDirectory() && !target.isDirectory())
             throw new OperationNotSupportedException("Can't copy directory to a file!");
         if (!source.isDirectory() && target.isDirectory())
