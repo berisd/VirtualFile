@@ -80,7 +80,7 @@ public class CopyOperationTest {
 
         File sourceFile = createFileMock(url, isDirectory);
         Mockito.when(sourceFile.getInputStream()).thenReturn(inputStream);
-
+        Mockito.when(sourceFile.exists()).thenReturn(true);
         return sourceFile;
     }
 
@@ -89,7 +89,7 @@ public class CopyOperationTest {
 
         File targetFile = createFileMock(url, isDirectory);
         Mockito.when(targetFile.getOutputStream()).thenReturn(outputStream);
-
+        Mockito.when(targetFile.exists()).thenReturn(false);
         return targetFile;
     }
 
