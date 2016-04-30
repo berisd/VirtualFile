@@ -17,6 +17,7 @@ import at.beris.virtualfile.logging.FileLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -144,8 +145,26 @@ public class FileContext {
     }
 
     public Set<Protocol> enabledProtocols() {
-        //TODO Only return enabled protocols
-        return EnumSet.allOf(Protocol.class);
+        Map<Protocol, Pair<String, String>> protocolClassMap = new HashMap<>();
+        protocolClassMap.put(Protocol.SFTP, Pair.of("JSch", "com.jcraft.jsch.JSch"));
+        protocolClassMap.put(Protocol.FTP, Pair.of("Apache Commons Net", "org.apache.commons.net.ftp.FTP"));
+
+        Set<Protocol> enabledProtocols = new HashSet<>();
+        enabledProtocols.add(Protocol.FILE);
+
+        for(Map.Entry<Protocol, Pair<String, String>> entry : protocolClassMap.entrySet()) {
+            Protocol protocol = entry.getKey();
+            Pair<String, String> protocolLibrary = entry.getValue();
+            try {
+                if (Class.forName(protocolLibrary.getRight()) != null)
+                    enabledProtocols.add(protocol);
+            } catch (ClassNotFoundException e) {
+            }
+            if (!enabledProtocols.contains(protocol))
+                LOGGER.info(protocolLibrary.getLeft() + " not installed. No support for protocol " + protocol);
+        }
+
+        return Collections.unmodifiableSet(enabledProtocols);
     }
 
     public File getFile(String urlString) {
