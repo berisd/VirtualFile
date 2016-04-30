@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
@@ -37,7 +38,7 @@ public class FtpClient extends AbstractClient {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FtpClient.class);
     private final static int MAX_CONNECTION_ATTEMPTS = 3;
     private String physicalRootPath = "";
-
+    private boolean reconnect;
     private FTPClient ftpClient;
 
     public FtpClient(URL url, Configuration config) {
@@ -48,11 +49,13 @@ public class FtpClient extends AbstractClient {
     private void init() {
         LOGGER.debug("init");
         ftpClient = new FTPClient();
+        ftpClient.setControlEncoding("UTF-8");
     }
 
     @Override
     public void connect() throws IOException {
         LOGGER.info("Connecting to " + username() + "@" + host() + ":" + String.valueOf(port()));
+        reconnect = true;
         ftpClient.connect(host(), port());
         if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
             disconnect();
@@ -68,6 +71,7 @@ public class FtpClient extends AbstractClient {
         executionHandler(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
+                reconnect = false;
                 if (ftpClient.isConnected()) {
                     ftpClient.logout();
                     ftpClient.disconnect();
@@ -83,7 +87,10 @@ public class FtpClient extends AbstractClient {
         executionHandler(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                ftpClient.deleteFile(path);
+                int replyCode = ftpClient.dele(path);
+                String replyText = ftpClient.getReplyString();
+                if (!FTPReply.isPositiveCompletion(replyCode))
+                    LOGGER.warn("Unexpected Reply (Code: {}, Text: '{}'", replyCode, replyText);
                 return null;
             }
         });
@@ -109,13 +116,33 @@ public class FtpClient extends AbstractClient {
     @Override
     public boolean exists(final String path) throws IOException {
         LOGGER.debug("exists (path : {})", path);
-        return executionHandler(new Callable<Boolean>() {
+        Boolean exists = executionHandler(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                String status = ftpClient.getStatus(path);
-                return status.split("\n").length > 2;
+
+                int replyCode = ftpClient.stat(path);
+                String replyText = ftpClient.getReplyString();
+                if (!FTPReply.isPositiveCompletion(replyCode)) {
+                    // this replyText code is set when file doesn't exist on the server
+                    if (FTPReply.FILE_ACTION_NOT_TAKEN == replyCode)
+                        return false;
+                    else {
+                        LOGGER.warn("Unexpected Reply (Code: {}, Text: '{}'", replyCode, replyText);
+                    }
+                }
+
+                String[] replyTextParts = replyText.split("\n");
+                if (replyTextParts.length <= 2) {
+                    if (ftpClient.changeWorkingDirectory(path))
+                        ftpClient.changeToParentDirectory();
+                    else
+                        return false;
+                }
+                return true;
             }
         });
+        LOGGER.debug("Returns: {}", exists);
+        return exists;
     }
 
     @Override
@@ -124,7 +151,15 @@ public class FtpClient extends AbstractClient {
         executionHandler(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                ftpClient.makeDirectory(path);
+                int replyCode = ftpClient.mkd(path);
+                String replyText = ftpClient.getReplyString();
+                if (!FTPReply.isPositiveCompletion(replyCode)) {
+                    // this replyText code is set when file already exists on the server
+                    if (FTPReply.FILE_UNAVAILABLE == replyCode)
+                        throw new FileAlreadyExistsException(path);
+                    else
+                        LOGGER.warn("Unexpected Reply (Code: {}, Text: '{}'", replyCode, replyText);
+                }
                 return null;
             }
         });
@@ -136,7 +171,11 @@ public class FtpClient extends AbstractClient {
         executionHandler(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                ftpClient.removeDirectory(path);
+                int replyCode = ftpClient.rmd(path);
+                String replyText = ftpClient.getReplyString();
+                if (!FTPReply.isPositiveCompletion(replyCode)) {
+                    LOGGER.warn("Unexpected Reply (Code: {}, Text: '{}'", replyCode, replyText);
+                }
                 return null;
             }
         });
@@ -213,12 +252,18 @@ public class FtpClient extends AbstractClient {
             @Override
             public List<FileInfo> call() throws Exception {
                 List<FileInfo> fileList = new ArrayList<>();
-                ftpClient.changeWorkingDirectory(path);
-                for (FTPFile ftpFile : ftpClient.listFiles()) {
-                    FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory() +
-                            (!ftpClient.printWorkingDirectory().endsWith("/") ? "/" : "") +
-                            ftpFile.getName() + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
-                    fileList.add(ftpFileInfo);
+                int replyCode = ftpClient.cwd(path);
+                String replyText = ftpClient.getReplyString();
+
+                if (FTPReply.isPositiveCompletion(replyCode)) {
+                    for (FTPFile ftpFile : ftpClient.listFiles()) {
+                        FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory() +
+                                (!ftpClient.printWorkingDirectory().endsWith("/") ? "/" : "") +
+                                ftpFile.getName() + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
+                        fileList.add(ftpFileInfo);
+                    }
+                } else {
+                    LOGGER.warn("Unexpected Reply (Code: {}, Text: '{}'", replyCode, replyText);
                 }
                 return fileList;
             }
@@ -302,10 +347,12 @@ public class FtpClient extends AbstractClient {
                 checkConnection();
                 return action.call();
             } catch (FTPConnectionClosedException e) {
-                LOGGER.warn("Server closed connection. Reconnecting.");
                 LOGGER.debug("Exception", e);
-                connectionAttempts--;
-                connect();
+                if (reconnect) {
+                    LOGGER.warn("Server closed connection. Reconnecting.");
+                    connectionAttempts--;
+                    connect();
+                }
             } catch (IOException e) {
                 LOGGER.debug("Exception", e);
                 throw e;

@@ -85,6 +85,8 @@ public class FtpClientIntegrationTest {
     public static void tearDown() throws IOException {
         if (ftpClient.exists(TEST_FILE))
             ftpClient.deleteFile(TEST_FILE);
+        if (ftpClient.exists(TEST_DIRECTORY))
+            ftpClient.deleteDirectory(TEST_DIRECTORY);
         if (ftpClient != null)
             ftpClient.disconnect();
         ftpServer.stop();
