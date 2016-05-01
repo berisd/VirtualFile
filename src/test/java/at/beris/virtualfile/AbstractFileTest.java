@@ -10,7 +10,9 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.provider.operation.CopyListener;
+import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.SingleValueOperation;
 import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
@@ -42,7 +44,7 @@ public abstract class AbstractFileTest {
     public static String TEST_SOURCE_DIRECTORY_NAME = "testdirectory";
     public static String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory";
 
-    protected static FileManager fileManager;
+    protected FileContext fileContext;
 
     protected static URL sourceFileUrl;
     protected static URL targetFileUrl;
@@ -54,14 +56,16 @@ public abstract class AbstractFileTest {
     }
 
     protected void createFile(VoidOperation<File> assertHook) throws IOException {
-        File file = FileManager.newFile(sourceFileUrl);
+        File file = fileContext.newFile(sourceFileUrl);
         file.create();
 
         if (assertHook != null) {
             assertHook.execute(file);
         } else {
             assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
-            assertTrue(TestFileHelper.isDateCloseToNow(file.getCreationTime(), 10));
+            // FileStore.readAttributes for Windows might return old value, so don't check
+            if (OsUtils.detectOSFamily() != OsFamily.WINDOWS)
+                assertTrue(TestFileHelper.isDateCloseToNow(file.getCreationTime(), 10));
             assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
             assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
             assertTrue(file.getOwner() instanceof UserPrincipal);
@@ -72,7 +76,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void createDirectory() throws IOException {
-        File file = FileManager.newFile(sourceDirectoryUrl);
+        File file = fileContext.newFile(sourceDirectoryUrl);
         file.create();
 
         assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
@@ -82,7 +86,7 @@ public abstract class AbstractFileTest {
 
     protected void copyFile() throws IOException {
         File sourceFile = TestFileHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
-        File targetFile = FileManager.newFile(targetFileUrl);
+        File targetFile = fileContext.newFile(targetFileUrl);
         CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
         sourceFile.copy(targetFile, copyListenerMock);
         assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
@@ -97,8 +101,8 @@ public abstract class AbstractFileTest {
 
         TestFileHelper.createFileTreeData(sourceFileUrlList);
 
-        File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
-        File targetDirectory = FileManager.newFile(targetDirectoryUrl);
+        File sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+        File targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
         CopyListener copyListener = Mockito.mock(CopyListener.class);
         Mockito.when(copyListener.interrupt()).thenReturn(false);
@@ -111,7 +115,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void deleteFile() throws IOException {
-        File sourceFile = FileManager.newFile(sourceFileUrl);
+        File sourceFile = fileContext.newFile(sourceFileUrl);
         sourceFile.create();
         assertTrue(sourceFile.exists());
         sourceFile.delete();
@@ -122,8 +126,8 @@ public abstract class AbstractFileTest {
         List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         TestFileHelper.createFileTreeData(sourceFileUrlList);
 
-        File sourceDirectory = FileManager.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
-        File targetDirectory = FileManager.newFile(targetDirectoryUrl);
+        File sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+        File targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
         sourceDirectory.copy(targetDirectory, Mockito.mock(CopyListener.class));
 
@@ -135,19 +139,19 @@ public abstract class AbstractFileTest {
     }
 
     protected void getFileAttributes(VoidOperation assertHook) throws IOException {
-        File file = FileManager.newFile(sourceFileUrl);
+        File file = fileContext.newFile(sourceFileUrl);
         file.create();
         assertHook.execute(file);
         file.delete();
     }
 
     protected void setFileAttributes(Set<FileAttribute> attributes) throws IOException {
-        File file = FileManager.newFile(sourceFileUrl);
+        File file = fileContext.newFile(sourceFileUrl);
         file.create();
         file.setAttributes(attributes.toArray(new FileAttribute[0]));
-        FileManager.dispose(file);
+        fileContext.dispose(file);
 
-        file = FileManager.newFile(sourceFileUrl);
+        file = fileContext.newFile(sourceFileUrl);
         Set<FileAttribute> actualAttributes = file.getAttributes();
 
         assertTrue(attributes.containsAll(actualAttributes));
@@ -157,13 +161,13 @@ public abstract class AbstractFileTest {
     }
 
     protected void setOwner(UserPrincipal owner) throws IOException {
-        File file = FileManager.newFile(sourceFileUrl);
+        File file = fileContext.newFile(sourceFileUrl);
         file.create();
         file.setOwner(owner);
 
-        FileManager.dispose(file);
+        fileContext.dispose(file);
 
-        file = FileManager.newFile(sourceFileUrl);
+        file = fileContext.newFile(sourceFileUrl);
         assertEquals(owner.getName(), file.getOwner().getName());
         file.delete();
     }
@@ -173,15 +177,15 @@ public abstract class AbstractFileTest {
     }
 
     protected void setGroup(GroupPrincipal group) throws IOException {
-        File file = FileManager.newFile(sourceFileUrl);
+        File file = fileContext.newFile(sourceFileUrl);
         file.create();
         if (group == null)
             group = file.getGroup();
         file.setGroup(group);
 
-        FileManager.dispose(file);
+        fileContext.dispose(file);
 
-        file = FileManager.newFile(sourceFileUrl);
+        file = fileContext.newFile(sourceFileUrl);
         assertEquals(group.getName(), file.getGroup().getName());
         file.delete();
     }
@@ -247,18 +251,27 @@ public abstract class AbstractFileTest {
 
     protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) throws IOException {
         for (int i = 0; i < sourceFileUrlList.size(); i++) {
-            File sourceFile = FileManager.newFile(sourceFileUrlList.get(i));
-            File targetFile = FileManager.newFile(targetFileUrlList.get(i));
+            File sourceFile = fileContext.newFile(sourceFileUrlList.get(i));
+            File targetFile = fileContext.newFile(targetFileUrlList.get(i));
 
             if (!sourceFile.isDirectory())
                 assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
         }
     }
 
-    protected static void tearDown() throws IOException {
+    protected void beforeTest() {
+        fileContext = new FileContext();
+    }
+
+    protected void afterTest() throws IOException {
+        cleanupFiles(fileContext);
+        fileContext.dispose();
+    }
+
+    private void cleanupFiles(FileContext fileContext) throws IOException {
         for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
             if (url != null) {
-                File file = FileManager.newFile(url);
+                File file = fileContext.newFile(url);
                 if (file.exists())
                     file.delete();
             }
@@ -274,14 +287,14 @@ public abstract class AbstractFileTest {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        File file = FileManager.newFile(sourceFileUrl);
+        File file = fileContext.newFile(sourceFileUrl);
         file.create();
         operation.setValue(file, fileTime);
+        fileContext.dispose(file);
 
-        FileManager.dispose(file);
-
-        file = FileManager.newFile(sourceFileUrl);
+        file = fileContext.newFile(sourceFileUrl);
         assertEquals(dateFormat.format(new Date(fileTime.toMillis())), dateFormat.format(new Date(operation.getValue(file).toMillis())));
         file.delete();
+        fileContext.dispose(file);
     }
 }

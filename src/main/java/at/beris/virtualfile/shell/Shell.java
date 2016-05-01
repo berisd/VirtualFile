@@ -262,7 +262,7 @@ public class Shell {
             sb.append(StringUtils.leftPad(String.valueOf(model.getSize()), maxLengthSize, ' ')).append(' ');
             sb.append(StringUtils.leftPad(model.dateStr, maxLengthDateStr, ' ')).append(' ');
             sb.append(StringUtils.leftPad(model.timeStr, maxLengthTimeStr, ' ')).append(' ');
-            sb.append(FileUtils.getName(model.getPath()));
+            sb.append(FileUtils.getName(model.getUrl().toString()));
             System.out.println(sb.toString());
         }
 

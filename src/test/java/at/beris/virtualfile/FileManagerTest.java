@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
-import java.time.Instant;
+import java.util.Date;
 
 import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
 import static org.junit.Assert.*;
@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 public class FileManagerTest {
     public final static String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public final static long TEST_SOURCE_FILE_SIZE = COPY_BUFFER_SIZE + 10;
-    public final static Instant TEST_SOURCE_FILE_LAST_MODIFIED = Instant.now();
+    public final static Date TEST_SOURCE_FILE_LAST_MODIFIED = new Date();
 
     @Test
     public void createLocalFile() throws Exception {
@@ -42,7 +42,7 @@ public class FileManagerTest {
         assertEquals(TEST_SOURCE_FILE_SIZE, file.getSize());
         Assert.assertFalse(file.isDirectory());
         assertEquals(sourceFile.getAbsolutePath(), file.getPath());
-        assertTrue(TestFileHelper.isInstantClose(TEST_SOURCE_FILE_LAST_MODIFIED, file.getLastModifiedTime().toInstant(), 2));
+        assertTrue(TestFileHelper.isDateClose(TEST_SOURCE_FILE_LAST_MODIFIED, new Date(file.getLastModifiedTime().toMillis()), 2));
         assertNotNull(file.getParent());
         Assert.assertArrayEquals(expectedChecksum, file.checksum());
         Assert.assertFalse(file.isArchive());
@@ -60,7 +60,7 @@ public class FileManagerTest {
             dataString.append("t");
 
         Files.write(file.toPath(), dataString.toString().getBytes());
-        Files.setLastModifiedTime(file.toPath(), FileTime.from(TEST_SOURCE_FILE_LAST_MODIFIED));
+        Files.setLastModifiedTime(file.toPath(), FileTime.fromMillis(TEST_SOURCE_FILE_LAST_MODIFIED.getTime()));
         return file;
     }
 

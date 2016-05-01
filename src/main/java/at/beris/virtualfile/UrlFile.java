@@ -58,7 +58,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public String getName() throws IOException {
         checkModel();
-        return FileUtils.getName(model.getPath());
+        return FileUtils.getName(model.getUrl().getPath());
     }
 
     @Override
@@ -88,7 +88,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     @Override
     public String getPath() throws IOException {
         checkModel();
-        return model.getPath();
+        return model.getUrl().getPath();
     }
 
     @Override

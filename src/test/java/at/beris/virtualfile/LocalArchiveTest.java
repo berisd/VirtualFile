@@ -9,9 +9,7 @@
 
 package at.beris.virtualfile;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,11 +24,21 @@ public class LocalArchiveTest extends AbstractFileTest {
     public static void setUp() throws Exception {
     }
 
+    @Before
+    public void beforeTest() {
+        super.beforeTest();
+    }
+
+    @After
+    public void afterTest() throws IOException {
+        super.afterTest();
+    }
+
     @Test
     @Ignore
     public void createArchive() throws IOException {
 
-        File archiveFile = fileManager.newLocalFile(ZIP_FILENAME);
+        File archiveFile = fileContext.newLocalFile(ZIP_FILENAME);
 
         archiveFile.create();
 
@@ -57,7 +65,7 @@ public class LocalArchiveTest extends AbstractFileTest {
 
     @Test
     public void listArchive() throws IOException {
-        File file = fileManager.newLocalFile(ZIP_FILENAME);
+        File file = fileContext.newLocalFile(ZIP_FILENAME);
         assertTrue(file.getSize() > 0);
         List<File> list = file.list();
         assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, list.size());

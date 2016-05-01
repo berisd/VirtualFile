@@ -14,10 +14,7 @@ import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -40,9 +37,14 @@ public class LocalUnixFileTest extends AbstractFileTest {
         targetDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
-    @AfterClass
-    public static void tearDown() throws IOException {
-        AbstractFileTest.tearDown();
+    @Before
+    public void beforeTest() {
+        super.beforeTest();
+    }
+
+    @After
+    public void afterTest() throws IOException {
+        super.afterTest();
     }
 
     @Test

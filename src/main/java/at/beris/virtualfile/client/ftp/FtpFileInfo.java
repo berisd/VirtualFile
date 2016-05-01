@@ -56,7 +56,7 @@ public class FtpFileInfo implements FileInfo<FTPFile> {
     public void fillModel(FileModel model) throws IOException {
         model.setFileExists(true);
 
-        if (model.getUrl() != null && !model.getPath().equals(path)) {
+        if (model.getUrl() != null && !model.getUrl().getPath().equals(path)) {
             URL newUrl = UrlUtils.newUrlReplacePath(model.getUrl(), path);
             model.setUrl(newUrl);
         }

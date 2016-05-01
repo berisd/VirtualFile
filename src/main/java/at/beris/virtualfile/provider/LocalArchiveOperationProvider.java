@@ -56,7 +56,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
         try {
             ArchiveStreamFactory factory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new java.io.File(model.getPath())));
+            fis = new BufferedInputStream(new FileInputStream(new java.io.File(model.getUrl().toURI())));
             ais = factory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 
@@ -66,7 +66,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                 if (filter == null || filter.filter(file))
                     fileList.add(file);
             }
-        } catch (ArchiveException e) {
+        } catch (ArchiveException | URISyntaxException e) {
             throw new IOException(e);
         } finally {
             if (ais != null)
@@ -87,7 +87,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
             target.create();
 
             ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new java.io.File(model.getPath())));
+            fis = new BufferedInputStream(new FileInputStream(new java.io.File(model.getUrl().toURI())));
             ais = archiveStreamFactory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 

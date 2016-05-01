@@ -13,7 +13,8 @@ import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
-import org.junit.AfterClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -43,9 +44,14 @@ public class SftpFileTest extends AbstractFileTest {
         targetDirectoryUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
-    @AfterClass
-    public static void tearDown() throws IOException {
-        AbstractFileTest.tearDown();
+    @Before
+    public void beforeTest() {
+        super.beforeTest();
+    }
+
+    @After
+    public void afterTest() throws IOException {
+        super.afterTest();
     }
 
     @Test

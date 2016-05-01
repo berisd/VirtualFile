@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.security.MessageDigest;
@@ -40,30 +42,42 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public void create(FileModel model) throws IOException {
-        String pathName = model.getPath();
-        java.io.File file = new java.io.File(pathName);
+        File file = null;
+        try {
+            file = new File(model.getUrl().toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
         if (model.isDirectory()) {
             if (!file.mkdirs())
-                throw new FileAlreadyExistsException(pathName);
+                throw new FileAlreadyExistsException(model.getUrl().toString());
         } else {
             if (!file.createNewFile())
-                throw new FileAlreadyExistsException(pathName);
+                throw new FileAlreadyExistsException(model.getUrl().toString());
         }
     }
 
     @Override
-    public Boolean exists(FileModel model) {
-        return new java.io.File(model.getPath()).exists();
+    public Boolean exists(FileModel model) throws IOException {
+        try {
+            return new File(model.getUrl().toURI()).exists();
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) throws IOException {
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
         if (model.isDirectory()) {
-            for (java.io.File childFile : new java.io.File(model.getPath()).listFiles()) {
-                at.beris.virtualfile.File file = fileContext.newFile(childFile.toURI().toURL());
-                if (filter == null || filter.filter(file))
-                    fileList.add(file);
+            try {
+                for (File childFile : new File(model.getUrl().toURI()).listFiles()) {
+                    at.beris.virtualfile.File file = fileContext.newFile(childFile.toURI().toURL());
+                    if (filter == null || filter.filter(file))
+                        fileList.add(file);
+                }
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
             }
         }
 
@@ -72,15 +86,19 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public void delete(FileModel model) throws IOException {
-        java.io.File file = new java.io.File(model.getPath());
-        Files.walkFileTree(new java.io.File(file.getPath()).toPath(), new LocalFileDeletingVisitor());
+        File file = null;
+        try {
+            file = new File(model.getUrl().toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        Files.walkFileTree(file.toPath(), new LocalFileDeletingVisitor());
     }
 
     @Override
     public Byte[] checksum(FileModel model) throws IOException {
-        try {
+        try (FileInputStream fis = new FileInputStream(new java.io.File(model.getUrl().toURI()));) {
             MessageDigest md = MessageDigest.getInstance("SHA1");
-            FileInputStream fis = new FileInputStream(model.getPath());
             byte[] dataBytes = new byte[1024];
 
             int nread;
@@ -96,12 +114,19 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
             return digestBytes;
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
         }
     }
 
     @Override
     public void updateModel(FileModel model) throws IOException {
-        java.io.File file = new java.io.File(model.getPath());
+        File file = null;
+        try {
+            file = new File(model.getUrl().toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
         model.setFileExists(file.exists());
 
         if (!model.isFileExists())
@@ -142,17 +167,30 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public InputStream getInputStream(FileModel model) throws IOException {
-        return new FileInputStream(model.getPath());
+        try {
+            return new FileInputStream(new File(model.getUrl().toURI()));
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public OutputStream getOutputStream(FileModel model) throws IOException {
-        return new FileOutputStream(model.getPath());
+        try {
+            return new FileOutputStream(new File(model.getUrl().toURI()));
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public void setAcl(FileModel model) throws IOException {
-        java.io.File file = new java.io.File(model.getPath());
+        File file = null;
+        try {
+            file = new File(model.getUrl().toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
         FileStore fileStore = null;
         fileStore = Files.getFileStore(file.toPath());
 
@@ -166,7 +204,12 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public void setAttributes(FileModel model) throws IOException {
-        java.io.File file = new java.io.File(model.getPath());
+        File file = null;
+        try {
+            file = new File(model.getUrl().toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
 
         Set<BasicFilePermission> basicFilePermissionSet = new HashSet<>();
         Set<DosFileAttribute> dosAttributeSet = new HashSet<>();
@@ -197,12 +240,17 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public void setCreationTime(FileModel model) throws IOException {
-        setTimes(model.getPath(), null, null, model.getCreationTime());
+        setTimes(model.getUrl(), null, null, model.getCreationTime());
     }
 
     @Override
     public void setGroup(FileModel model) throws IOException {
-        java.io.File file = new java.io.File(model.getPath());
+        File file = null;
+        try {
+            file = new File(model.getUrl().toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
 
         FileStore fileStore = Files.getFileStore(file.toPath());
         boolean posixFileAttributeViewSupported = fileStore.supportsFileAttributeView(PosixFileAttributeView.class);
@@ -215,17 +263,22 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public void setLastAccessTime(FileModel model) throws IOException {
-        setTimes(model.getPath(), null, model.getLastAccessTime(), null);
+        setTimes(model.getUrl(), null, model.getLastAccessTime(), null);
     }
 
     @Override
     public void setLastModifiedTime(FileModel model) throws IOException {
-        setTimes(model.getPath(), model.getLastModifiedTime(), null, null);
+        setTimes(model.getUrl(), model.getLastModifiedTime(), null, null);
     }
 
     @Override
     public void setOwner(FileModel model) throws IOException {
-        java.io.File file = new java.io.File(model.getPath());
+        File file = null;
+        try {
+            file = new File(model.getUrl().toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
         FileStore fileStore = null;
         fileStore = Files.getFileStore(file.toPath());
 
@@ -334,10 +387,14 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         posixFileAttributeView.setPermissions(newPermissions);
     }
 
-    private void setTimes(String path, FileTime lastModifiedTime, FileTime lastAccessTime, FileTime createTime) throws IOException {
-        java.io.File file = new java.io.File(path);
-        FileStore fileStore = null;
-        fileStore = Files.getFileStore(file.toPath());
+    private void setTimes(URL url, FileTime lastModifiedTime, FileTime lastAccessTime, FileTime createTime) throws IOException {
+        File file = null;
+        try {
+            file = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        FileStore fileStore = Files.getFileStore(file.toPath());
 
         if (fileStore.supportsFileAttributeView(BasicFileAttributeView.class)) {
             BasicFileAttributeView attributeView = Files.getFileAttributeView(file.toPath(), BasicFileAttributeView.class);
@@ -346,7 +403,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         } else {
             String timeType = lastModifiedTime != null ? "LastModifiedTime" :
                     (lastAccessTime != null ? "LastAccessTime" : "CreateTime");
-            LOGGER.warn(timeType + " couldn't be set on file " + path);
+            LOGGER.warn(timeType + " couldn't be set on file " + url.toString());
         }
     }
 }

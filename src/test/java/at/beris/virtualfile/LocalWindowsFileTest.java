@@ -15,17 +15,22 @@ import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
-import org.junit.AfterClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class LocalWindowsFileTest extends AbstractFileTest {
@@ -36,13 +41,18 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
         sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
         targetFileUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);
-        sourceDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/");
-        targetDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/");
+        sourceDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + java.io.File.separator);
+        targetDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + java.io.File.separator);
     }
 
-    @AfterClass
-    public static void tearDown() throws IOException {
-        AbstractFileTest.tearDown();
+    @Before
+    public void beforeTest() {
+        super.beforeTest();
+    }
+
+    @After
+    public void afterTest() throws IOException {
+        super.afterTest();
     }
 
     @Test
@@ -91,7 +101,16 @@ public class LocalWindowsFileTest extends AbstractFileTest {
         Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(BasicFilePermission.EXECUTE);
         attributes.add(DosFileAttribute.HIDDEN);
-        super.setFileAttributes(attributes);
+        File file = fileContext.newFile(sourceFileUrl);
+        file.create();
+        file.setAttributes(attributes.toArray(new FileAttribute[0]));
+        fileContext.dispose(file);
+
+        file = fileContext.newFile(sourceFileUrl);
+        Set<FileAttribute> actualAttributes = file.getAttributes();
+        assertTrue(actualAttributes.containsAll(attributes));
+        file.delete();
+        fileContext.dispose(file);
     }
 
     @Test
@@ -102,8 +121,18 @@ public class LocalWindowsFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void setGroup() throws IOException {
-        super.setGroup();
+    public void setAcl() throws IOException {
+        File file = fileContext.newFile(sourceFileUrl);
+        file.create();
+        List<AclEntry> acl = file.getAcl();
+        List<AclEntry> newAcl = new ArrayList<>(acl);
+        newAcl.remove(0);
+        file.setAcl(newAcl);
+        fileContext.dispose(file);
+
+        file = fileContext.newFile(sourceFileUrl);
+        assertEquals(newAcl.size(), file.getAcl().size());
+        file.delete();
     }
 
     @Test

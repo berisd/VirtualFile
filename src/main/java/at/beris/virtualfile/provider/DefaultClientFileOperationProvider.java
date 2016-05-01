@@ -34,23 +34,23 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
     @Override
     public void create(FileModel model) throws IOException {
         if (model.isDirectory())
-            client.createDirectory(model.getPath());
+            client.createDirectory(model.getUrl().getPath());
         else {
-            client.createFile(model.getPath());
+            client.createFile(model.getUrl().getPath());
         }
     }
 
     @Override
     public Boolean exists(FileModel model) throws IOException {
-        return client.exists(model.getPath());
+        return client.exists(model.getUrl().getPath());
     }
 
     @Override
     public void delete(FileModel model) throws IOException {
         if (model.isDirectory())
-            client.deleteDirectory(model.getPath());
+            client.deleteDirectory(model.getUrl().getPath());
         else
-            client.deleteFile(model.getPath());
+            client.deleteFile(model.getUrl().getPath());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
 
     @Override
     public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) throws IOException {
-        List<FileInfo> fileInfoList = client.list(model.getPath());
+        List<FileInfo> fileInfoList = client.list(model.getUrl().getPath());
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
 
         for (FileInfo fileInfo : fileInfoList) {
@@ -80,11 +80,11 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
 
     @Override
     public void updateModel(FileModel model) throws IOException {
-        model.setFileExists(client.exists(model.getPath()));
+        model.setFileExists(client.exists(model.getUrl().getPath()));
         if (!model.isFileExists())
             return;
 
-        FileInfo fileInfo = client.getFileInfo(model.getPath());
+        FileInfo fileInfo = client.getFileInfo(model.getUrl().getPath());
         fileInfo.fillModel(model);
     }
 
@@ -95,17 +95,17 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
 
     @Override
     public InputStream getInputStream(FileModel model) throws IOException {
-        return client.getInputStream(model.getPath());
+        return client.getInputStream(model.getUrl().getPath());
     }
 
     @Override
     public OutputStream getOutputStream(FileModel model) throws IOException {
-        return client.getOutputStream(model.getPath());
+        return client.getOutputStream(model.getUrl().getPath());
     }
 
     @Override
     public void setAttributes(FileModel model) throws IOException {
-        client.setAttributes(model.getPath(), model.getAttributes());
+        client.setAttributes(model.getUrl().getPath(), model.getAttributes());
     }
 
     @Override
@@ -115,7 +115,7 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
 
     @Override
     public void setGroup(FileModel model) throws IOException {
-        client.setGroup(model.getPath(), model.getGroup());
+        client.setGroup(model.getUrl().getPath(), model.getGroup());
     }
 
     @Override
@@ -125,12 +125,12 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
 
     @Override
     public void setLastModifiedTime(FileModel model) throws IOException {
-        client.setLastModifiedTime(model.getPath(), model.getLastModifiedTime());
+        client.setLastModifiedTime(model.getUrl().getPath(), model.getLastModifiedTime());
     }
 
     @Override
     public void setOwner(FileModel model) throws IOException {
-        client.setOwner(model.getPath(), model.getOwner());
+        client.setOwner(model.getUrl().getPath(), model.getOwner());
     }
 
     private at.beris.virtualfile.File copyToLocalFile(FileModel model, String path) throws IOException {
@@ -138,7 +138,7 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
         int length;
 
         try (
-                InputStream inputStream = client.getInputStream(model.getPath());
+                InputStream inputStream = client.getInputStream(model.getUrl().getPath());
                 OutputStream outputStream = new FileOutputStream(path)
         ) {
             while ((length = inputStream.read(buffer)) > 0) {

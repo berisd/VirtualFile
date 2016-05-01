@@ -22,6 +22,7 @@ import org.apache.commons.compress.archivers.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,12 +53,12 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
         try {
             // if not exists create UrlArchive
             // insert or update ArchiveEntry
-            FileOutputStream fileOutputStream = new FileOutputStream(model.getPath());
+            FileOutputStream fileOutputStream = new FileOutputStream(new java.io.File(model.getUrl().toURI()));
             ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
             ArchiveOutputStream archiveOutputStream = archiveStreamFactory.createArchiveOutputStream(ArchiveStreamFactory.ZIP, fileOutputStream);
             archiveOutputStream.close();
 
-        } catch (ArchiveException e) {
+        } catch (ArchiveException | URISyntaxException e) {
             throw new IOException(e);
         }
     }
@@ -65,7 +66,7 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
     @Override
     public Boolean exists(FileModel model) throws IOException {
         String archivePath = getArchivePath(model);
-        String targetArchiveEntryPath = model.getPath().substring(archivePath.length() + 1);
+        String targetArchiveEntryPath = model.getUrl().getPath().substring(archivePath.length() + 1);
 
         ArchiveInputStream ais = null;
         InputStream fis = null;
@@ -170,7 +171,7 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
     }
 
     private String getArchivePath(FileModel model) {
-        String[] pathParts = model.getPath().split("/");
+        String[] pathParts = model.getUrl().getPath().split("/");
         String archivePath = "";
         for (int endIndex = pathParts.length - 2; endIndex >= 0; endIndex--) {
             if (FileUtils.isArchive(pathParts[endIndex])) {

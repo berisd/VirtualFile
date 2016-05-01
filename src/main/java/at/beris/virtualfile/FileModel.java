@@ -140,10 +140,6 @@ public class FileModel {
         this.fileExists = fileExists;
     }
 
-    public String getPath() {
-        return url != null ? url.getPath() : "";
-    }
-
     public boolean isSymbolicLink() {
         return isSymbolicLink;
     }

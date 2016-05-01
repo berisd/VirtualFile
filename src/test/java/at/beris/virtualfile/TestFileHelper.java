@@ -15,11 +15,11 @@ import at.beris.virtualfile.config.Configuration;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
@@ -28,7 +28,7 @@ public class TestFileHelper {
     public static final String HOME_DIRECTORY = System.getProperty("user.home") + java.io.File.separator + ".VirtualFile";
     public static final String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public static final String TEST_TARGET_FILE_NAME = "targetfile1.txt";
-    public static final Instant TEST_SOURCE_FILE_LAST_MODIFIED = Instant.now();
+    public static final Date TEST_SOURCE_FILE_LAST_MODIFIED = new Date();
     public static final int TEST_SOURCE_FILE_SIZE = COPY_BUFFER_SIZE + 10;
 
     public static final String TEST_SOURCE_DIRECTORY_NAME = "testdirectory/";
@@ -45,7 +45,7 @@ public class TestFileHelper {
     public static String readSftpPassword() {
         List<String> stringList = null;
         try {
-            stringList = Files.readAllLines(new java.io.File(TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "sshlogin.txt").toPath());
+            stringList = Files.readAllLines(new java.io.File(TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "sshlogin.txt").toPath(), Charset.defaultCharset());
         } catch (IOException e) {
             return "";
         }
@@ -60,15 +60,14 @@ public class TestFileHelper {
     }
 
     public static boolean isDateCloseToNow(FileTime fileTime, int seconds) {
-        long nowMillis = System.currentTimeMillis();
-        long dateMillis = fileTime.toMillis();
-
-        return (dateMillis > (nowMillis - seconds * 1000)) && (dateMillis < nowMillis);
+        return isDateClose(new Date(fileTime.toMillis()), new Date(System.currentTimeMillis()), seconds);
     }
 
-    public static boolean isInstantClose(Instant instant, Instant otherInstant, int seconds) {
-        Instant instantPlusSeconds = instant.plus(seconds, ChronoUnit.SECONDS);
-        return otherInstant.compareTo(instantPlusSeconds) < 0;
+    public static boolean isDateClose(Date date, Date otherDate, int seconds) {
+        long dateMillis = date.getTime();
+        long otherMillis = otherDate.getTime();
+
+        return (dateMillis > (otherMillis - seconds * 1000)) && (dateMillis < otherMillis);
     }
 
     public static File createLocalSourceFile(URL url) {
@@ -81,7 +80,7 @@ public class TestFileHelper {
                 dataString.append("t");
 
             Files.write(file.toPath(), dataString.toString().getBytes());
-            Files.setLastModifiedTime(file.toPath(), FileTime.from(TEST_SOURCE_FILE_LAST_MODIFIED));
+            Files.setLastModifiedTime(file.toPath(), FileTime.fromMillis(TEST_SOURCE_FILE_LAST_MODIFIED.getTime()));
 
             return FileManager.newFile(file.toURI().toURL());
         } catch (IOException e) {
@@ -110,7 +109,12 @@ public class TestFileHelper {
         int index = 0;
         List<File> fileList = new ArrayList<>();
         for (String fileUrl : fileUrlList) {
-            java.io.File file = new java.io.File(new URL(fileUrl).getPath());
+            java.io.File file = null;
+            try {
+                file = new java.io.File(new URL(fileUrl).toURI());
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
             if (fileUrl.indexOf('.') == -1) {
                 // directory
                 file.mkdirs();
