@@ -10,6 +10,9 @@
 package at.beris.virtualfile.os;
 
 public enum OsFamily {
+    MAC,
+    SOLARIS,
     UNIX,
+    UNKNOWN,
     WINDOWS
 }
