@@ -44,9 +44,9 @@ public class FileContext {
         UrlUtils.registerProtocolURLStreamHandlers();
 
         this.configurator = configurator;
-        this.siteUrlToClientMap = Collections.synchronizedMap(new HashMap<String, Client>());
-        this.clientToFileOperationProvidersMap = Collections.synchronizedMap(new HashMap<Client, Map<FileType, FileOperationProvider>>());
-        this.fileCache = Collections.synchronizedMap(new LRUMap<String, File>(configurator.getContextConfiguration().getFileCacheSize()));
+        this.siteUrlToClientMap = new HashMap<>();
+        this.clientToFileOperationProvidersMap = new HashMap<>();
+        this.fileCache = new LRUMap<>(configurator.getContextConfiguration().getFileCacheSize());
     }
 
     public Configurator getConfigurator() {
