@@ -33,6 +33,7 @@ import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 public class Shell {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Shell.class);
     private final static String NOT_CONNECTED_MSG = "You're not connected. use con.";
+    private final static String CANT_GO_UP_FROM_ROOT_MSG = "You can't change up from the root directory.";
     private final static DateFormat DATE_FORMATTER = DateFormat.getDateInstance();
     private final static DateFormat TIME_FORMATTER = DateFormat.getTimeInstance();
 
@@ -279,6 +280,11 @@ public class Shell {
 
         File file = local ? localFile : workingFile;
 
+        if ("/".equals(file.getPath()) && "..".equals(directoryName)) {
+            System.out.println(CANT_GO_UP_FROM_ROOT_MSG);
+            return;
+        }
+
         URL newUrl;
         if (directoryName.startsWith("/"))
             newUrl = UrlUtils.normalizeUrl(UrlUtils.newUrlReplacePath(file.getUrl(), directoryName + (directoryName.endsWith("/") ? "" : "/")));
@@ -350,7 +356,7 @@ public class Shell {
         @Override
         public void startFile(File file, long currentFileNumber) {
             try {
-                System.out.println("Copying " + file.getPath());
+                System.out.println(String.format("Copying %s [%,d KB]", file.getPath(), Math.round(file.getSize()/1024)));
                 progressCharsPrinted = 0;
             } catch (IOException e) {
                 logException(e);
