@@ -11,6 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
+import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
@@ -33,7 +34,7 @@ public class LocalUnixFileTest extends AbstractFileTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        org.junit.Assume.assumeTrue("Host operating system isn't Unix. Skipping test..", !OsUtils.isWindows());
+        org.junit.Assume.assumeTrue("Host operating system isn't Unix. Skipping test..", OsUtils.detectOSFamily() != OsFamily.WINDOWS);
 
         sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
         targetFileUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);

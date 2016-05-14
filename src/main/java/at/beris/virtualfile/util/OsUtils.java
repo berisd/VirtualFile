@@ -14,10 +14,6 @@ import at.beris.virtualfile.os.OsFamily;
 public class OsUtils {
     private static String OS = System.getProperty("os.name").toLowerCase();
 
-    public static boolean isWindows() {
-        return (OS.indexOf("win") >= 0);
-    }
-
     public static OsFamily detectOSFamily() {
         if (OS.indexOf("win") >= 0)
             return OsFamily.WINDOWS;
