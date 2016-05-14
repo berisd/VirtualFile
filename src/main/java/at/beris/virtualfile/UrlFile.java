@@ -74,6 +74,12 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
+    public URL getLinkTarget() throws IOException {
+        checkModel();
+        return model.getLinkTarget();
+    }
+
+    @Override
     public FileTime getLastAccessTime() throws IOException {
         checkModel();
         return model.getLastAccessTime();

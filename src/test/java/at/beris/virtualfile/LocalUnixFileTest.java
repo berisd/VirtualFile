@@ -17,12 +17,16 @@ import at.beris.virtualfile.util.VoidOperation;
 import org.junit.*;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class LocalUnixFileTest extends AbstractFileTest {
@@ -55,6 +59,25 @@ public class LocalUnixFileTest extends AbstractFileTest {
     @Test
     public void createDirectory() throws IOException {
         super.createDirectory();
+    }
+
+    @Test
+    public void createSymbolicLink() throws IOException {
+        String symLinkName = TEST_SOURCE_DIRECTORY_NAME + "Link";
+        Path dir = new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toPath();
+        Path symLink = new java.io.File(symLinkName).toPath();
+
+        Files.createDirectory(dir);
+        Files.createSymbolicLink(symLink, dir);
+
+        URL symLinkUrl = UrlUtils.getUrlForLocalPath(symLinkName);
+        File file = fileContext.newFile(symLinkUrl);
+
+        assertTrue(file.isSymbolicLink());
+        assertEquals(dir.toUri().toURL().toString(), file.getLinkTarget().toString());
+
+        Files.delete(symLink);
+        Files.delete(dir);
     }
 
     @Test

@@ -172,6 +172,14 @@ public class FileLoggingWrapper implements ObjectWrapper<File>, File {
     }
 
     @Override
+    public URL getLinkTarget() throws IOException {
+        logger.debug("Get linkTarget for {}", rootFile);
+        URL linkTarget = wrappedFile.getLinkTarget();
+        logger.debug("Returns: {}", linkTarget);
+        return linkTarget;
+    }
+
+    @Override
     public FileModel getModel() throws IOException {
         logger.debug("Get model for {}", rootFile);
         FileModel model = wrappedFile.getModel();

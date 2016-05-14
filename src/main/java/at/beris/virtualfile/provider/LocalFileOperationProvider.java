@@ -320,7 +320,13 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         model.setCreationTime(basicFileAttributes.creationTime());
         model.setSize(file.isDirectory() ? (file.list() != null ? file.list().length : 0) : basicFileAttributes.size());
         model.setDirectory(file.isDirectory());
-        model.setSymbolicLink(basicFileAttributes.isSymbolicLink());
+        boolean isSymbolicLink = Files.isSymbolicLink(file.toPath());
+        model.setSymbolicLink(isSymbolicLink);
+        if (isSymbolicLink) {
+            Path symbolicLink = Files.readSymbolicLink(file.toPath());
+            model.setLinkTarget(symbolicLink.toUri().toURL());
+        } else
+            model.setLinkTarget(null);
     }
 
     private void fillDosFileAttributes(java.io.File file, FileModel model) throws IOException {

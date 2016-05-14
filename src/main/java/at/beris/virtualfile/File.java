@@ -74,6 +74,8 @@ public interface File {
 
     FileTime getLastModifiedTime() throws IOException;
 
+    URL getLinkTarget() throws IOException;
+
     FileModel getModel() throws IOException;
 
     String getName() throws IOException;

@@ -288,6 +288,9 @@ public class Shell {
 
         File actionFile = fileContext.newFile(newUrl);
 
+        if (actionFile.isSymbolicLink())
+            actionFile = fileContext.newFile(actionFile.getLinkTarget());
+
         if (actionFile.exists()) {
             if (local)
                 localFile = actionFile;
