@@ -41,10 +41,10 @@ public class SftpClient extends AbstractClient {
     private JSch jsch;
     private Session session;
     private ChannelSftp sftpChannel;
+    private boolean isInitialized = false;
 
     public SftpClient(URL url, Configuration config) throws IOException {
         super(url, config);
-        init();
     }
 
     private void init() throws IOException {
@@ -67,6 +67,7 @@ public class SftpClient extends AbstractClient {
             if (config.getAuthenticationType() == AuthenticationType.PASSWORD)
                 session.setPassword(String.valueOf(password()));
             session.setTimeout(config.getTimeOut() * 1000);
+            isInitialized = true;
         } catch (JSchException e) {
             handleJSchException(e, null);
         }
@@ -86,6 +87,8 @@ public class SftpClient extends AbstractClient {
     public void connect() throws IOException {
         LOGGER.info("Connecting to " + username() + "@" + host() + ":" + String.valueOf(port()));
         try {
+            if (! isInitialized)
+                init();
             session.connect();
             HostKey hostkey = session.getHostKey();
             LOGGER.info("HostKey: " + hostkey.getHost() + " " + hostkey.getType() + " " + hostkey.getFingerPrint(jsch));
