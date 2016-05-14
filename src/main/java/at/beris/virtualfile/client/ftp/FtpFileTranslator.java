@@ -14,65 +14,53 @@ import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
-import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.attribute.FileTime;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FtpFileInfo implements FileInfo<FTPFile> {
-    private FTPFile ftpFile;
-    private String path;
+public final class FtpFileTranslator {
 
-    public FtpFileInfo(String path, FTPFile ftpFile) {
-        this.ftpFile = ftpFile;
-        this.path = path;
-    }
+    public static void fillModel(FileModel model, FTPFile ftpFile, FtpClient client) throws IOException {
+        String physicalRootPath = client.getPhysicalRootPath();
+        String parentPath = model.getParent() != null ? model.getParent().getUrl().getPath() : "";
 
-    public void setFtpFile(FTPFile ftpFile) {
-        this.ftpFile = ftpFile;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    @Override
-    public String getPath() {
-        return path;
-    }
-
-    @Override
-    public FTPFile getFile() {
-        return ftpFile;
-    }
-
-    @Override
-    public void fillModel(FileModel model) throws IOException {
-        model.setFileExists(true);
-
-        if (model.getUrl() != null && !model.getUrl().getPath().equals(path)) {
-            URL newUrl = UrlUtils.newUrlReplacePath(model.getUrl(), path);
-            model.setUrl(newUrl);
+        if (!"".equals(physicalRootPath)) {
+            if (parentPath.length() >= physicalRootPath.length()
+                    && parentPath.substring(0, physicalRootPath.length()).equals(physicalRootPath))
+                parentPath = "/" + parentPath.substring(physicalRootPath.length());
         }
 
-        model.setSize(ftpFile != null ? ftpFile.getSize() : 0);
+        if (ftpFile.isSymbolicLink()) {
+            String linkPath = ftpFile.getLink() + (ftpFile.getLink().endsWith("/") ? "" : "/");
+
+            if (!"".equals(physicalRootPath)) {
+                if (linkPath.length() >= physicalRootPath.length()
+                        && linkPath.substring(0, physicalRootPath.length()).equals(physicalRootPath))
+                    linkPath = "/" + linkPath.substring(physicalRootPath.length());
+            }
+            String filePath = parentPath + linkPath;
+            URL linkTargetUrl = UrlUtils.normalizeUrl(UrlUtils.newUrlReplacePath(model.getParent().getUrl(), filePath));
+            model.setLinkTarget(linkTargetUrl);
+        }
+
+        model.setFileExists(true);
+        model.setSize(ftpFile.getSize());
         model.setCreationTime(null);
-        model.setLastModifiedTime(ftpFile != null ? FileTime.fromMillis(ftpFile.getTimestamp().getTime().getTime()) : null);
+        model.setLastModifiedTime(FileTime.fromMillis(ftpFile.getTimestamp().getTime().getTime()));
         model.setLastAccessTime(null);
-        model.setAttributes(ftpFile != null ? createAttributes() : Collections.<FileAttribute>emptySet());
-        model.setOwner(ftpFile != null ? new UnixUserPrincipal(ftpFile.getUser(), ftpFile.getGroup()) : null);
-        model.setGroup(ftpFile != null ? new UnixGroupPrincipal(ftpFile.getGroup()) : null);
-        model.setDirectory(ftpFile != null ? ftpFile.isDirectory() : false);
-        model.setSymbolicLink(ftpFile != null ? ftpFile.isSymbolicLink() : false);
+        model.setAttributes(createAttributes(ftpFile));
+        model.setOwner(new UnixUserPrincipal(ftpFile.getUser(), ftpFile.getGroup()));
+        model.setGroup(new UnixGroupPrincipal(ftpFile.getGroup()));
+        model.setDirectory(ftpFile.isDirectory());
+        model.setSymbolicLink(ftpFile.isSymbolicLink());
     }
 
-    private Set<FileAttribute> createAttributes() {
+    private static Set<FileAttribute> createAttributes(FTPFile ftpFile) {
         Set<FileAttribute> attributeSet = new HashSet<>();
 
         for (int accessType : new int[]{FTPFile.USER_ACCESS, FTPFile.GROUP_ACCESS, FTPFile.WORLD_ACCESS}) {
@@ -88,7 +76,7 @@ public class FtpFileInfo implements FileInfo<FTPFile> {
         return attributeSet;
     }
 
-    private FileAttribute calculateAttribute(int accessType, int permissionType) {
+    private static FileAttribute calculateAttribute(int accessType, int permissionType) {
         if (accessType == FTPFile.USER_ACCESS) {
             if (permissionType == FTPFile.READ_PERMISSION)
                 return PosixFilePermission.OWNER_READ;

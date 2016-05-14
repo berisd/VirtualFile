@@ -21,7 +21,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
-public interface Client {
+public interface Client<T> {
     URL getUrl();
 
     void setUrl(URL url);
@@ -44,9 +44,9 @@ public interface Client {
 
     OutputStream getOutputStream(String path) throws IOException;
 
-    FileInfo getFileInfo(String path) throws IOException;
+    T getFileInfo(String path) throws IOException;
 
-    List<FileInfo> list(String path) throws IOException;
+    List<T> list(String path) throws IOException;
 
     void setLastModifiedTime(String path, FileTime time) throws IOException;
 

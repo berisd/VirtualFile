@@ -9,10 +9,11 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
 import at.beris.virtualfile.client.sftp.SftpClient;
+import at.beris.virtualfile.client.sftp.SftpFile;
+import at.beris.virtualfile.client.sftp.SftpFileTranslator;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.AfterClass;
@@ -73,9 +74,9 @@ public class SftpClientIntegrationTest {
 
         }
 
-        FileInfo fileInfo = sftpClient.getFileInfo(TEST_FILE);
+        SftpFile fileInfo = sftpClient.getFileInfo(TEST_FILE);
         FileModel model = new FileModel();
-        fileInfo.fillModel(model);
+        SftpFileTranslator.fillModel(model, fileInfo);
 
         assertNotNull(model.getLastModifiedTime());
         assertEquals(TEST_STRING.length(), model.getSize());

@@ -40,7 +40,7 @@ public class FileOperationProviderTest {
         //TODO Make test with mocks
         return Arrays.asList(new Object[][]{
 //                        {new File(TEST_SOURCE_FILE_NAME).toURI().toURL(), new LocalFileOperationProvider(), null},
-//                        {new URL("sftp://sshtest:password@www.beris.at:22/home/sshtest/" + TEST_SOURCE_FILE_NAME), new DefaultClientFileOperationProvider(), createSftpClient(new URL("sftp://sshtest:password@www.beris.at:22/home/sshtest/" + TEST_SOURCE_FILE_NAME))}
+//                        {new URL("sftp://sshtest:password@www.beris.at:22/home/sshtest/" + TEST_SOURCE_FILE_NAME), new SftpClientFileOperationProvider(), createSftpClient(new URL("sftp://sshtest:password@www.beris.at:22/home/sshtest/" + TEST_SOURCE_FILE_NAME))}
                 }
         );
     }

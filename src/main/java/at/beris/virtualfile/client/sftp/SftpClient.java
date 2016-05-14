@@ -13,7 +13,6 @@ import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.AbstractClient;
-import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.value.AuthenticationType;
 import com.jcraft.jsch.*;
@@ -35,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-public class SftpClient extends AbstractClient {
+public class SftpClient extends AbstractClient<SftpFile> {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SftpClient.class);
 
     private JSch jsch;
@@ -87,7 +86,7 @@ public class SftpClient extends AbstractClient {
     public void connect() throws IOException {
         LOGGER.info("Connecting to " + username() + "@" + host() + ":" + String.valueOf(port()));
         try {
-            if (! isInitialized)
+            if (!isInitialized)
                 init();
             session.connect();
             HostKey hostkey = session.getHostKey();
@@ -207,9 +206,9 @@ public class SftpClient extends AbstractClient {
     }
 
     @Override
-    public FileInfo getFileInfo(String path) throws IOException {
+    public SftpFile getFileInfo(String path) throws IOException {
         LOGGER.debug("getFileInfo (path : {})", path);
-        SftpFileInfo fileInfo = new SftpFileInfo();
+        SftpFile fileInfo = new SftpFile();
         try {
             checkChannel();
             SftpATTRS sftpATTRS = sftpChannel.stat(path);
@@ -222,9 +221,9 @@ public class SftpClient extends AbstractClient {
     }
 
     @Override
-    public List<FileInfo> list(String path) throws IOException {
+    public List<SftpFile> list(String path) throws IOException {
         LOGGER.debug("list (path : {})", path);
-        List<FileInfo> IFileInfoList = new ArrayList<>();
+        List<SftpFile> IFileInfoList = new ArrayList<>();
 
         try {
             checkChannel();

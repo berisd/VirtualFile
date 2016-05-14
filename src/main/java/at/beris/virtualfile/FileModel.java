@@ -24,6 +24,7 @@ import java.util.Set;
 
 public class FileModel {
     private URL url;
+    private URL linkTarget;     // contains link target if file is a symbolic link
     private FileTime lastModifiedTime;
     private FileTime lastAccessTime;
     private FileTime creationTime;
@@ -40,7 +41,6 @@ public class FileModel {
     public FileModel() {
         attributes = new HashSet<>();
         acl = new ArrayList<>();
-
     }
 
     public URL getUrl() {
@@ -172,6 +172,14 @@ public class FileModel {
         this.acl = acl;
     }
 
+    public URL getLinkTarget() {
+        return linkTarget;
+    }
+
+    public void setLinkTarget(URL linkTarget) {
+        this.linkTarget = linkTarget;
+    }
+
     public void clear() {
         acl.clear();
         acl = null;
@@ -184,5 +192,6 @@ public class FileModel {
         owner = null;
         group = null;
         url = null;
+        linkTarget = null;
     }
 }

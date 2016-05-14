@@ -13,7 +13,7 @@ import at.beris.virtualfile.config.Configuration;
 
 import java.net.URL;
 
-public abstract class AbstractClient implements Client {
+public abstract class AbstractClient<T> implements Client<T> {
     protected Configuration config;
     protected URL url;
 

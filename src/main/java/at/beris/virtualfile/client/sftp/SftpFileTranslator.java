@@ -13,7 +13,6 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.client.FileInfo;
 import com.jcraft.jsch.SftpATTRS;
 
 import java.nio.file.attribute.FileTime;
@@ -21,43 +20,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SftpFileInfo implements FileInfo<SftpATTRS> {
+public class SftpFileTranslator {
 
-    private SftpATTRS sftpATTRS;
-    private String path;
-
-    public void setSftpATTRS(SftpATTRS sftpATTRS) {
-        this.sftpATTRS = sftpATTRS;
-    }
-
-    public String getPath() {
-        return this.path;
-    }
-
-    @Override
-    public SftpATTRS getFile() {
-        return sftpATTRS;
-    }
-
-    @Override
-    public void fillModel(FileModel model) {
+    public static void fillModel(FileModel model, SftpFile fileInfo) {
+        SftpATTRS sftpATTRS = fileInfo.getFile();
         model.setFileExists(true);
         model.setSize(sftpATTRS.getSize());
         model.setCreationTime(null);
         model.setLastModifiedTime(FileTime.fromMillis(sftpATTRS.getMTime() * 1000L));
         model.setLastAccessTime(FileTime.fromMillis(sftpATTRS.getATime() * 1000L));
-        model.setAttributes(createAttributes());
+        model.setAttributes(createAttributes(sftpATTRS));
         model.setOwner(new UnixUserPrincipal(sftpATTRS.getUId(), sftpATTRS.getGId()));
         model.setGroup(new UnixGroupPrincipal(sftpATTRS.getGId()));
         model.setDirectory(sftpATTRS.isDir());
         model.setSymbolicLink(sftpATTRS.isLink());
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    private Set<FileAttribute> createAttributes() {
+    private static Set<FileAttribute> createAttributes(SftpATTRS sftpATTRS) {
         Set<FileAttribute> attributeSet = new HashSet<>();
         int permissions = sftpATTRS.getPermissions();
 

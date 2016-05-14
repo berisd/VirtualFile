@@ -11,8 +11,9 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.client.Client;
-import at.beris.virtualfile.client.FileInfo;
+import at.beris.virtualfile.client.sftp.SftpClient;
+import at.beris.virtualfile.client.sftp.SftpFile;
+import at.beris.virtualfile.client.sftp.SftpFileTranslator;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
@@ -25,9 +26,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultClientFileOperationProvider extends AbstractFileOperationProvider {
-
-    public DefaultClientFileOperationProvider(FileContext fileContext, Client client) {
+public class SftpClientFileOperationProvider extends AbstractFileOperationProvider<SftpClient> {
+    public SftpClientFileOperationProvider(FileContext fileContext, SftpClient client) {
         super(fileContext, client);
     }
 
@@ -63,13 +63,13 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
 
     @Override
     public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) throws IOException {
-        List<FileInfo> fileInfoList = client.list(model.getUrl().getPath());
+        List<SftpFile> fileInfoList = client.list(model.getUrl().getPath());
         List<at.beris.virtualfile.File> fileList = new ArrayList<>();
 
-        for (FileInfo fileInfo : fileInfoList) {
-            at.beris.virtualfile.File childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), fileInfo.getPath()));
+        for (SftpFile sftpFile : fileInfoList) {
+            at.beris.virtualfile.File childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), sftpFile.getPath()));
             FileModel childModel = new FileModel();
-            fileInfo.fillModel(childModel);
+            SftpFileTranslator.fillModel(childModel, sftpFile);
             childFile.setModel(childModel);
             if (filter == null || filter.filter(childFile)) {
                 fileList.add(childFile);
@@ -84,8 +84,8 @@ public class DefaultClientFileOperationProvider extends AbstractFileOperationPro
         if (!model.isFileExists())
             return;
 
-        FileInfo fileInfo = client.getFileInfo(model.getUrl().getPath());
-        fileInfo.fillModel(model);
+        SftpFile sftpFile = client.getFileInfo(model.getUrl().getPath());
+        SftpFileTranslator.fillModel(model, sftpFile);
     }
 
     @Override

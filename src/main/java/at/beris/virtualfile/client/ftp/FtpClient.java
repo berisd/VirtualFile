@@ -11,7 +11,6 @@ package at.beris.virtualfile.client.ftp;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.AbstractClient;
-import at.beris.virtualfile.client.FileInfo;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.util.UrlUtils;
@@ -28,16 +27,13 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 
-public class FtpClient extends AbstractClient {
+public class FtpClient extends AbstractClient<FTPFile> {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FtpClient.class);
     private final static int MAX_CONNECTION_ATTEMPTS = 3;
-    private String physicalRootPath = "";
+    private String physicalRootPath;
     private boolean reconnect;
     private FTPClient ftpClient;
 
@@ -204,16 +200,16 @@ public class FtpClient extends AbstractClient {
     }
 
     @Override
-    public FileInfo getFileInfo(final String path) throws IOException {
+    public FTPFile getFileInfo(final String path) throws IOException {
         LOGGER.debug("getFileInfo (path: {})", path);
-        return executionHandler(new Callable<FileInfo>() {
+        return executionHandler(new Callable<FTPFile>() {
             @Override
-            public FileInfo call() throws Exception {
+            public FTPFile call() throws Exception {
                 if ("/".equals(path)) {
-                    if ("".equals(physicalRootPath)) {
-                        initPhysicalRootPath();
-                    }
-                    return new FtpFileInfo(path, null);
+                    FTPFile rootFile = new FTPFile();
+                    rootFile.setName("/");
+                    rootFile.setTimestamp(GregorianCalendar.getInstance());
+                    return rootFile;
                 } else {
                     String lastPathPart = UrlUtils.getLastPathPart(path);
                     String parentPath = UrlUtils.getParentPath(path);
@@ -221,16 +217,10 @@ public class FtpClient extends AbstractClient {
                     FTPFile[] ftpFiles = ftpClient.listFiles();
                     for (FTPFile ftpFile : ftpFiles) {
                         if (ftpFile.getName().equals(lastPathPart)) {
-                            if (ftpFile.isSymbolicLink()) {
-                                String path = ftpFile.getLink() + (ftpFile.isDirectory() ? "/" : "");
-                                if (path.substring(0, physicalRootPath.length()).equals(physicalRootPath))
-                                    path = "/" + path.substring(physicalRootPath.length()) + "/";
-                                return new FtpFileInfo(path, ftpFile);
-                            } else
-                                return new FtpFileInfo(path + (ftpFile.isDirectory() && !path.endsWith("/") ? "/" : ""), ftpFile);
+                            return ftpFile;
                         }
                     }
-                    return new FtpFileInfo(path, null);
+                    return new FTPFile();
                 }
             }
         });
@@ -246,30 +236,24 @@ public class FtpClient extends AbstractClient {
         return 21;
     }
 
-    public List<FileInfo> list(final String path) throws IOException {
+    public List<FTPFile> list(final String path) throws IOException {
         LOGGER.debug("list (path: {})", path);
-        List<FileInfo> fileInfoList = executionHandler(new Callable<List<FileInfo>>() {
+        List<FTPFile> fileInfoList = executionHandler(new Callable<List<FTPFile>>() {
             @Override
-            public List<FileInfo> call() throws Exception {
-                List<FileInfo> fileList = new ArrayList<>();
+            public List<FTPFile> call() throws Exception {
                 int replyCode = ftpClient.cwd(path);
                 String replyText = ftpClient.getReplyString();
 
                 if (FTPReply.isPositiveCompletion(replyCode)) {
-                    for (FTPFile ftpFile : ftpClient.listFiles()) {
-                        FtpFileInfo ftpFileInfo = new FtpFileInfo(ftpClient.printWorkingDirectory() +
-                                (!ftpClient.printWorkingDirectory().endsWith("/") ? "/" : "") +
-                                ftpFile.getName() + (ftpFile.isDirectory() ? "/" : ""), ftpFile);
-                        fileList.add(ftpFileInfo);
-                    }
+                    return Arrays.asList(ftpClient.listFiles());
                 } else {
                     LOGGER.warn("Unexpected Reply (Code: {}, Text: '{}'", replyCode, replyText);
                 }
-                return fileList;
+                return Collections.emptyList();
             }
         });
 
-        return fileInfoList != null ? fileInfoList : Collections.EMPTY_LIST;
+        return fileInfoList;
     }
 
     @Override
@@ -325,19 +309,22 @@ public class FtpClient extends AbstractClient {
         });
     }
 
-    private void initPhysicalRootPath() throws IOException {
-        physicalRootPath = executionHandler(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                ftpClient.changeWorkingDirectory("/");
-                for (FTPFile ftpFile : ftpClient.listFiles()) {
-                    if (ftpFile.isSymbolicLink() && ".".equals(ftpFile.getLink())) {
-                        return "/" + ftpFile.getName() + "/";
+    public String getPhysicalRootPath() throws IOException {
+        if (physicalRootPath == null) {
+            physicalRootPath = executionHandler(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    ftpClient.changeWorkingDirectory("/");
+                    for (FTPFile ftpFile : ftpClient.listFiles()) {
+                        if (ftpFile.isSymbolicLink() && ".".equals(ftpFile.getLink())) {
+                            return "/" + ftpFile.getName() + "/";
+                        }
                     }
+                    return "";
                 }
-                return "";
-            }
-        });
+            });
+        }
+        return physicalRootPath;
     }
 
     private <T> T executionHandler(Callable<T> action) throws IOException {

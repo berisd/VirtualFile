@@ -152,7 +152,7 @@ public class FileContext {
         Set<Protocol> enabledProtocols = new HashSet<>();
         enabledProtocols.add(Protocol.FILE);
 
-        for(Map.Entry<Protocol, Pair<String, String>> entry : protocolClassMap.entrySet()) {
+        for (Map.Entry<Protocol, Pair<String, String>> entry : protocolClassMap.entrySet()) {
             Protocol protocol = entry.getKey();
             Pair<String, String> protocolLibrary = entry.getValue();
             try {
@@ -239,7 +239,8 @@ public class FileContext {
         LOGGER.debug("createFileOperationProviderInstance (instanceClass: {}, client: {})", instanceClass, client);
 
         try {
-            Constructor constructor = instanceClass.getConstructor(this.getClass(), Client.class);
+            Class clientClass = client != null ? client.getClass() : Client.class;
+            Constructor constructor = instanceClass.getConstructor(this.getClass(), clientClass);
             return (FileOperationProvider) constructor.newInstance(this, client);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

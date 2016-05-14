@@ -12,8 +12,10 @@ package at.beris.virtualfile.client;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestFileHelper;
 import at.beris.virtualfile.client.ftp.FtpClient;
+import at.beris.virtualfile.client.ftp.FtpFileTranslator;
 import at.beris.virtualfile.config.Configuration;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.Authority;
@@ -115,9 +117,9 @@ public class FtpClientIntegrationTest {
             outputstream.write(TEST_STRING.getBytes());
         }
 
-        FileInfo fileInfo = ftpClient.getFileInfo(TEST_FILE);
+        FTPFile fileInfo = ftpClient.getFileInfo(TEST_FILE);
         FileModel model = new FileModel();
-        fileInfo.fillModel(model);
+        FtpFileTranslator.fillModel(model, fileInfo, ftpClient);
 
         assertNotNull(model.getLastModifiedTime());
         assertEquals(TEST_STRING.length(), model.getSize());
@@ -144,7 +146,7 @@ public class FtpClientIntegrationTest {
 
     @Test
     public void list() throws IOException {
-        List<FileInfo> fileInfoList = ftpClient.list("/");
+        List<FTPFile> fileInfoList = ftpClient.list("/");
         Assert.assertTrue(fileInfoList.size() > 0);
     }
 

@@ -12,7 +12,6 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.File;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CopyListener;
@@ -25,15 +24,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
-public abstract class AbstractFileOperationProvider implements FileOperationProvider {
+public abstract class AbstractFileOperationProvider<CLIENT> implements FileOperationProvider {
     protected FileContext fileContext;
-    protected Client client;
+    protected CLIENT client;
     protected Set<FileOperation> supportedOperations;
     protected Map<FileOperation, CustomFileOperation> customFileOperationMap;
 
     protected static final Set<FileOperation> BASIC_FILE_OPERATIONS = createBasicOperations();
 
-    public AbstractFileOperationProvider(FileContext fileContext, Client client) {
+    public AbstractFileOperationProvider(FileContext fileContext, CLIENT client) {
         super();
         this.fileContext = fileContext;
         this.client = client;
