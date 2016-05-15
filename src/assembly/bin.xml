@@ -1,0 +1,52 @@
+<!--
+  ~ This file is part of VirtualFile.
+  ~
+  ~ Copyright 2016 by Bernd Riedl <bernd.riedl@gmail.com>
+  ~
+  ~ Licensed under GNU General Public License 3.0 or later.
+  ~ Some rights reserved. See COPYING, AUTHORS.
+  -->
+
+<assembly>
+    <id>bin</id>
+    <formats>
+        <format>tar.gz</format>
+        <format>zip</format>
+    </formats>
+
+    <!--<dependencySets>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
+            <unpack>false</unpack>
+        </dependencySet>
+    </dependencySets>-->
+
+    <fileSets>
+        <!--<fileSet>
+            <fileMode>0755</fileMode>
+            <filtered>true</filtered>
+            <directory>${project.build.scriptSourceDirectory}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>run.*</include>
+            </includes>
+        </fileSet>-->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>AUTHORS*</include>
+                <include>COPYING*</include>
+                <include>README*</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

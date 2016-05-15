@@ -1,0 +1,15 @@
+Authors of VirtualFile
+
+  Copyright 2015-2016 by Bernd Riedl <bernd.riedl@gmail.com>
+
+  Copying and distribution of this file, with or without modification,
+  are permitted in any medium without royalty provided the copyright
+  notice and this notice are preserved.
+
+This Software uses various 3rd party libraries:
+
+Apache Commons Lang (c) Apache Software Foundation http://commons.apache.org/
+Apache Commons Compress (c) Apache Software Foundation http://commons.apache.org/
+Apache Commons Net (c) Apache Software Foundation http://commons.apache.org/
+JSch - Java Secure Channel by ymnk@jcraft.com, JCraft,Inc. http://www.jcraft.com/jsch/
+Simple Logging Facade for Java (SLF4J) (c) 2004-2014 QOS.ch http://www.slf4j.org/
