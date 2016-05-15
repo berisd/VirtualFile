@@ -16,6 +16,8 @@ import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,8 @@ import java.util.*;
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
 public class UrlFile implements File, Comparable<UrlFile> {
+
+    private static Logger logger = LoggerFactory.getLogger(UrlFile.class);
 
     private File parent;
     private FileModel model;
@@ -46,71 +50,99 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public URL getUrl() {
+        logger.debug("Get URL for {}", this);
+        logger.debug("Returns: {}", url);
         return url;
     }
 
     @Override
     public FileModel getModel() throws IOException {
+        logger.debug("Get model for {}", this);
         checkModel();
+        logger.debug("Returns: ", model);
         return model;
     }
 
     @Override
     public String getName() throws IOException {
+        logger.debug("Get name for {}", this);
         checkModel();
-        return FileUtils.getName(model.getUrl().getPath());
+        String name = FileUtils.getName(model.getUrl().getPath());
+        logger.debug("Returns: {}", name);
+        return name;
     }
 
     @Override
     public FileTime getCreationTime() throws IOException {
+        logger.debug("Get creationTime for {}", this);
         checkModel();
-        return model.getCreationTime();
+        FileTime creationTime = model.getCreationTime();
+        logger.debug("Returns: {}", creationTime);
+        return creationTime;
     }
 
     @Override
     public FileTime getLastModifiedTime() throws IOException {
+        logger.debug("Get lastModifiedTime for {}", this);
         checkModel();
-        return model.getLastModifiedTime();
+        FileTime lastModifiedTime = model.getLastModifiedTime();
+        logger.debug("Returns: {}", lastModifiedTime);
+        return lastModifiedTime;
     }
 
     @Override
     public URL getLinkTarget() throws IOException {
+        logger.debug("Get linkTarget for {}", this);
         checkModel();
-        return model.getLinkTarget();
+        URL linkTarget = model.getLinkTarget();
+        logger.debug("Returns: {}", linkTarget);
+        return linkTarget;
     }
 
     @Override
     public FileTime getLastAccessTime() throws IOException {
+        logger.debug("Get lastAccessTime for {}", this);
         checkModel();
-        return model.getLastAccessTime();
+        FileTime lastAccessTime = model.getLastAccessTime();
+        logger.debug("Returns: {}", lastAccessTime);
+        return lastAccessTime;
     }
 
     @Override
     public long getSize() throws IOException {
+        logger.debug("Get size for {}", this);
         checkModel();
-        return model.getSize();
+        long size = model.getSize();
+        logger.debug("Returns: {}", size);
+        return size;
     }
 
     @Override
     public String getPath() throws IOException {
+        logger.debug("Get path for {}", this);
         checkModel();
-        return model.getUrl().getPath();
+        String path = model.getUrl().getPath();
+        logger.debug("Returns: {}", path);
+        return path;
     }
 
     @Override
     public void delete() throws IOException {
+        logger.info("Delete {}", this);
         checkModel();
         fileOperationProvider.delete(model);
     }
 
     @Override
     public void delete(File file) throws IOException {
+        logger.info("Delete {} from {}", file, this);
         checkModel();
         throw new NotImplementedException();
     }
 
     @Override
     public void dispose() {
+        logger.debug("Dispose {}", this);
         if (model != null) {
             model.clear();
             model = null;
@@ -123,62 +155,91 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public Byte[] checksum() throws IOException {
+        logger.info("Calculate checksum for {}", this);
         checkModel();
-        return fileOperationProvider.checksum(model);
+        Byte[] checksum = fileOperationProvider.checksum(model);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.setLength(0);
+        stringBuilder.append("Returns: ");
+        for (byte b : checksum)
+            stringBuilder.append(String.format("%02x", b));
+        logger.info(stringBuilder.toString());
+        return checksum;
     }
 
     @Override
     public boolean isDirectory() throws IOException {
+        logger.debug("Check isDirectory for {}", this);
         checkModel();
-        return model.isDirectory();
+        Boolean isDirectory = model.isDirectory();
+        logger.debug("Returns: {}", isDirectory);
+        return isDirectory;
     }
 
     @Override
     public boolean isSymbolicLink() throws IOException {
+        logger.debug("Check isSymbolicLink for {}", this);
         checkModel();
-        return model.isSymbolicLink();
+        boolean isSymbolicLink = model.isSymbolicLink();
+        logger.debug("Returns: {}", isSymbolicLink);
+        return isSymbolicLink;
     }
 
     @Override
     public boolean isContainer() throws IOException {
+        logger.debug("Check isContainer for {}", this);
         checkModel();
-        return isArchive() || isDirectory();
+        boolean isContainer = isArchive() || isDirectory();
+        logger.debug("Returns: {}", isContainer);
+        return isContainer;
     }
 
     @Override
     public File getParent() {
+        logger.debug("Get parent for {}", this);
+        logger.debug("Returns: {}", parent);
         return parent;
     }
 
     @Override
     public File getRoot() throws IOException {
+        logger.debug("Get root for {}", this);
         checkModel();
         File root = this;
         while (root.getParent() != null)
             root = root.getParent();
+        logger.debug("Returns: {}", root);
         return root;
     }
 
     @Override
     public boolean isRoot() throws IOException {
+        logger.debug("Check isRoot for {}", this);
         checkModel();
-        return this.toString().equals(getRoot() != null ? getRoot().toString() : "");
+        boolean isRoot = this.toString().equals(getRoot() != null ? getRoot().toString() : "");
+        logger.debug("Returns: {}", isRoot);
+        return isRoot;
     }
 
     @Override
     public Boolean exists() throws IOException {
+        logger.info("Check exists for {}", this);
         checkModel();
-        return fileOperationProvider.exists(model);
+        Boolean exists = fileOperationProvider.exists(model);
+        logger.info("Returns: {}", exists);
+        return exists;
     }
 
     @Override
     public List<File> extract(File target) throws IOException {
+        logger.info("Extract {} to {}", this, target);
         checkModel();
         return fileOperationProvider.extract(model, target);
     }
 
     @Override
     public void create() throws IOException {
+        logger.info("Create {}", this);
         checkModel();
         fileOperationProvider.create(model);
         updateModel();
@@ -186,24 +247,30 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public InputStream getInputStream() throws IOException {
+        logger.debug("Get Inputstream for {}", this);
         checkModel();
         return fileOperationProvider.getInputStream(model);
     }
 
     @Override
     public OutputStream getOutputStream() throws IOException {
+        logger.debug("Get Outputstream for {}", this);
         checkModel();
         return fileOperationProvider.getOutputStream(model);
     }
 
     @Override
     public List<AclEntry> getAcl() throws IOException {
+        logger.debug("Get ACL for {}", this);
         checkModel();
-        return model.getAcl();
+        List<AclEntry> acl = model.getAcl();
+        logger.debug("Returns: {}", acl);
+        return acl;
     }
 
     @Override
     public void setAcl(List<AclEntry> acl) throws IOException {
+        logger.info("Set ACL to {} for {}", acl, this);
         checkModel();
         model.setAcl(acl);
         fileOperationProvider.setAcl(model);
@@ -212,12 +279,16 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public UserPrincipal getOwner() throws IOException {
+        logger.debug("Get owner for {}", this);
         checkModel();
-        return model.getOwner();
+        UserPrincipal owner = model.getOwner();
+        logger.debug("Returns: {}", owner);
+        return owner;
     }
 
     @Override
     public void setOwner(UserPrincipal owner) throws IOException {
+        logger.info("Set owner to {} for {}", owner, this);
         checkModel();
         model.setOwner(owner);
         fileOperationProvider.setOwner(model);
@@ -226,17 +297,22 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setUrl(URL url) throws IOException {
+        logger.info("Set url to {} for {}", url, this);
         this.url = url;
     }
 
     @Override
     public GroupPrincipal getGroup() throws IOException {
+        logger.debug("Get group for {}", this);
         checkModel();
-        return model.getGroup();
+        GroupPrincipal group = model.getGroup();
+        logger.debug("Returns: {}" + group);
+        return group;
     }
 
     @Override
     public void setGroup(GroupPrincipal group) throws IOException {
+        logger.info("Set group to {} for {}", group, this);
         checkModel();
         model.setGroup(group);
         fileOperationProvider.setGroup(model);
@@ -245,6 +321,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setLastAccessTime(FileTime time) throws IOException {
+        logger.info("Set lastAccessTime to {} for {}", time, this);
         checkModel();
         model.setLastAccessTime(time);
         fileOperationProvider.setLastAccessTime(model);
@@ -253,6 +330,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setLastModifiedTime(FileTime time) throws IOException {
+        logger.info("Set lastModifiedTime to {} for {}", time, this);
         checkModel();
         model.setLastModifiedTime(time);
         fileOperationProvider.setLastModifiedTime(model);
@@ -261,6 +339,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setAttributes(FileAttribute... attributes) throws IOException {
+        logger.info("Set attributes for {}", this);
         checkModel();
         model.setAttributes(new HashSet<>(Arrays.asList(attributes)));
         fileOperationProvider.setAttributes(model);
@@ -269,6 +348,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setCreationTime(FileTime time) throws IOException {
+        logger.info("Set creationTime to {} for {}", time, this);
         checkModel();
         model.setCreationTime(time);
         fileOperationProvider.setCreationTime(model);
@@ -277,18 +357,23 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public Set<FileAttribute> getAttributes() throws IOException {
+        logger.debug("Get attributes for {}", this);
         checkModel();
-        return model.getAttributes();
+        Set<FileAttribute> attributes = model.getAttributes();
+        logger.debug("Returns: {}", FileUtils.getAttributesString(attributes.toArray(new FileAttribute[0])));
+        return attributes;
     }
 
     @Override
     public void add(File file) throws IOException {
+        logger.info("Add {} to {}", file, this);
         checkModel();
         fileOperationProvider.add(model, file);
     }
 
     @Override
     public void addAttributes(FileAttribute... attributes) throws IOException {
+        logger.info("Add attributes {} to {}", FileUtils.getAttributesString(attributes), this);
         checkModel();
         if (attributes.length < 1)
             return;
@@ -302,6 +387,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void removeAttributes(FileAttribute... attributes) throws IOException {
+        logger.info("Remove attributes {} from {}", FileUtils.getAttributesString(attributes), this);
         checkModel();
         if (attributes.length < 1)
             return;
@@ -315,6 +401,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public List<File> find(Filter filter) throws IOException {
+        logger.info("Find children for {} with filter {}", this, filter);
         checkModel();
         Filter directoriesFilter = new IsDirectoryFilter().equalTo(true);
         Filter withDirectoriesFilter = ((Filter) filter.clone()).or(new IsDirectoryFilter().equalTo(true));
@@ -331,56 +418,71 @@ public class UrlFile implements File, Comparable<UrlFile> {
             fileList.addAll(directory.find(filter));
         }
         directoryList.clear();
-
+        logger.info("Returns: {} entries", fileList.size());
         return fileList;
     }
 
     @Override
     public List<File> list() throws IOException {
+        logger.info("List children for {}", this);
         checkModel();
-        return fileOperationProvider.list(model, null);
+        List<File> fileList = fileOperationProvider.list(model, null);
+        logger.info("Returns: {} entries", fileList.size());
+        return fileList;
     }
 
     @Override
     public List<File> list(Filter filter) throws IOException {
+        logger.info("List children for {} with filter {}", this, filter);
         checkModel();
-        return fileOperationProvider.list(model, filter);
+        List<File> fileList = fileOperationProvider.list(model, filter);
+        logger.info("Returns: {} entries", fileList.size());
+        return fileList;
     }
 
     @Override
     public boolean isArchive() throws IOException {
+        logger.debug("Check isArchive for {}", this);
         checkModel();
-        return model.isArchive();
+        Boolean isArchive = model.isArchive();
+        logger.debug("Returns: {}", isArchive);
+        return isArchive;
     }
 
     @Override
     public boolean isArchived() throws IOException {
+        logger.debug("Check isArchived for {}", this);
         checkModel();
-        return model.isArchived();
+        boolean isArchived = model.isArchived();
+        logger.debug("Returns: {}", isArchived);
+        return isArchived;
     }
 
     @Override
     public void copy(File targetFile) throws IOException {
+        logger.info("Copy {} to {}", this, targetFile);
         checkModel();
         fileOperationProvider.copy(this, targetFile, null);
     }
 
     @Override
     public void copy(File targetFile, CopyListener listener) throws IOException {
+        logger.info("Copy {} to {} with Listener", this, targetFile);
         checkModel();
         fileOperationProvider.copy(this, targetFile, listener);
     }
 
     @Override
     public void refresh() throws IOException {
+        logger.info("Refresh {}", this);
         checkModel();
         updateModel();
     }
 
     @Override
     public String toString() {
-        return this.getClass().getInterfaces()[0].getSimpleName() + ((model != null && model.getUrl() != null) ? " " + maskedUrlString(model.getUrl()) :
-                "@" + Integer.toHexString(System.identityHashCode(this)));
+        return String.format("%s@%s [%s]", this.getClass().getSimpleName(),
+                Integer.toHexString(System.identityHashCode(this)), maskedUrlString(url));
     }
 
     @Override
@@ -405,6 +507,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
 
     @Override
     public void setModel(FileModel model) throws IOException {
+        logger.debug("Set model to {} for {}", model, this);
         this.model = model;
         if (parent != null)
             model.setParent(parent.getModel());
@@ -412,10 +515,12 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     void updateModel() throws IOException {
+        logger.debug("Update model for {}", this);
         fileOperationProvider.updateModel(model);
     }
 
     private void checkModel() throws IOException {
+        logger.debug("Check model for {}", this);
         if (model == null)
             createModel();
         if (!model.getUrl().toString().equals(url.toString())) {
@@ -424,6 +529,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     private void createModel() throws IOException {
+        logger.debug("Create model for {}", this);
         model = new FileModel();
         if (parent != null)
             model.setParent(parent.getModel());

@@ -12,7 +12,6 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.config.ContextConfiguration;
-import at.beris.virtualfile.logging.FileManagerLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.UrlUtils;
 
@@ -55,7 +54,7 @@ public class FileManager {
      * @return
      */
     public static File newLocalFile(String path) throws IOException {
-        return new FileManagerLoggingWrapper(fileContext.newLocalFile(path));
+        return fileContext.newLocalFile(path);
     }
 
     /**
@@ -65,27 +64,26 @@ public class FileManager {
      * @return
      */
     public static File newLocalDirectory(String path) throws IOException {
-        return new FileManagerLoggingWrapper(fileContext.newLocalFile(path +
-                (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator)));
+        return fileContext.newLocalFile(path + (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator));
     }
 
     public static File newFile(String url) throws IOException {
-        return new FileManagerLoggingWrapper(fileContext.newFile(url));
+        return fileContext.newFile(url);
     }
 
     public static File newFile(File parent, URL url) throws IOException {
-        return new FileManagerLoggingWrapper(fileContext.newFile(parent, url));
+        return fileContext.newFile(parent, url);
     }
 
     public static File newFile(URL url) throws IOException {
-        return new FileManagerLoggingWrapper(fileContext.newFile(url));
+        return fileContext.newFile(url);
     }
 
     public static File newDirectory(URL url) throws IOException {
         URL normalizedUrl = url;
         if (!url.getPath().endsWith("/"))
             normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
-        return new FileManagerLoggingWrapper(fileContext.newFile(normalizedUrl));
+        return fileContext.newFile(normalizedUrl);
     }
 
     public static void dispose(File file) throws IOException {

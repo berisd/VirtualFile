@@ -13,7 +13,6 @@ import at.beris.virtualfile.cache.LRUMap;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.logging.FileLoggingWrapper;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
@@ -229,7 +228,7 @@ public class FileContext {
         try {
             Constructor constructor = UrlFile.class.getConstructor(File.class, URL.class, FileContext.class);
             UrlFile instance = (UrlFile) constructor.newInstance(parent, url, this);
-            return new FileLoggingWrapper(instance);
+            return instance;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
