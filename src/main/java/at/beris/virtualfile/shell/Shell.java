@@ -47,7 +47,7 @@ public class Shell {
         fileContext = new FileContext();
         localFile = fileContext.newLocalFile(System.getProperty("user.dir"));
         scanner = new Scanner(System.in);
-        scanner.useDelimiter(System.lineSeparator());
+        scanner.useDelimiter("\n");
     }
 
     public static void main(String args[]) {
