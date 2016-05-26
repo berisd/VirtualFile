@@ -1,5 +1,5 @@
 # VirtualFile
-Simple URL based file management
+Simple URL based file management library
 
 Note on building project:
 
