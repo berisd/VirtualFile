@@ -1,9 +1,9 @@
 # VirtualFile
-Simple URL based file management library
-Supported file systems: local, ftp, sftp
+Simple URL based file management library.<br/>
+Supported file systems: local, ftp, sftp.
 
-Note on building project:
-I'm developing on Linux, sometimes not all tests pass on Windows
+Note on building project:<br/>
+I'm developing on Linux, sometimes not all tests pass on Windows.
 
 ## Examples ##
 
