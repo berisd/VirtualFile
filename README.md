@@ -5,21 +5,6 @@ Note on building project:
 
 I'm developing on Linux, sometimes not all tests pass on Windows
 
-## Shell ##
-
-You can play around with the shell to see the VirtualFile library in action.
-Run the class at.beris.virtualfile.shell.Shell to start it. type "help" for Help.
-
-e.g. Those commands will connect to a remote site, download a file, delete the downloaded file and quit the shell
-
-* con ftp://lanet.lv
-* ls
-* cd pub
-* get idx.html
-* lls
-* lrm idx.html
-* quit
-
 ## Examples ##
 
 1) Extract local zipfile
@@ -60,3 +45,18 @@ FileManager.getConfiguration().setStrictHostKeyChecking(false);
 File file = FileManager.newFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip", configurator);
 file.copy(FileMananger.newLocalDirectory("."));
 ```
+
+## Shell ##
+
+You can play around with the shell to see the VirtualFile library in action.
+Run the class at.beris.virtualfile.shell.Shell to start it. type "help" for Help.
+
+e.g. Those commands will connect to a remote site, download a file, delete the downloaded file and quit the shell
+
+* con ftp://lanet.lv
+* ls
+* cd pub
+* get idx.html
+* lls
+* lrm idx.html
+* quit
