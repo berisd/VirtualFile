@@ -98,7 +98,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public Byte[] checksum(FileModel model) throws IOException {
-        try (FileInputStream fis = new FileInputStream(new java.io.File(model.getUrl().toURI()));) {
+        try (FileInputStream fis = new FileInputStream(new File(model.getUrl().toURI()));) {
             MessageDigest md = MessageDigest.getInstance("SHA1");
             byte[] dataBytes = new byte[1024];
 
@@ -314,7 +314,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         }
     }
 
-    private void fillBasicFileAttributes(FileModel model, java.io.File file) throws IOException {
+    private void fillBasicFileAttributes(FileModel model, File file) throws IOException {
         BasicFileAttributes basicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         model.setLastModifiedTime(basicFileAttributes.lastModifiedTime());
         model.setLastAccessTime(basicFileAttributes.lastAccessTime());
@@ -330,7 +330,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
             model.setLinkTarget(null);
     }
 
-    private void fillDosFileAttributes(java.io.File file, FileModel model) throws IOException {
+    private void fillDosFileAttributes(File file, FileModel model) throws IOException {
         Set<FileAttribute> attributes = model.getAttributes();
         DosFileAttributes dosFileAttributes = Files.readAttributes(file.toPath(), DosFileAttributes.class);
         if (dosFileAttributes.isArchive())
@@ -343,7 +343,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
             attributes.add(DosFileAttribute.SYSTEM);
     }
 
-    private void fillDefaultFileAttributes(java.io.File file, FileModel model) {
+    private void fillDefaultFileAttributes(File file, FileModel model) {
         Set<FileAttribute> attributes = model.getAttributes();
         if (file.canRead()) {
             attributes.add(BasicFilePermission.READ);
@@ -356,7 +356,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         }
     }
 
-    private void fillPosixFileAttributes(java.io.File file, FileModel model) throws IOException {
+    private void fillPosixFileAttributes(File file, FileModel model) throws IOException {
         Set<FileAttribute> attributes = model.getAttributes();
 
         PosixFileAttributeView fileAttributeView = Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
@@ -370,13 +370,13 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         }
     }
 
-    private void setBasicFileAttributes(java.io.File file, Set<BasicFilePermission> basicFilePermissionSet) {
+    private void setBasicFileAttributes(File file, Set<BasicFilePermission> basicFilePermissionSet) {
         file.setExecutable(basicFilePermissionSet.contains(BasicFilePermission.EXECUTE));
         file.setReadable(basicFilePermissionSet.contains(BasicFilePermission.READ));
         file.setWritable(basicFilePermissionSet.contains(BasicFilePermission.WRITE));
     }
 
-    private void setDosFileAttributes(java.io.File file, Set<DosFileAttribute> dosAttributeSet) throws IOException {
+    private void setDosFileAttributes(File file, Set<DosFileAttribute> dosAttributeSet) throws IOException {
         DosFileAttributeView dosFileAttributeView = Files.getFileAttributeView(file.toPath(), DosFileAttributeView.class);
         dosFileAttributeView.setArchive(dosAttributeSet.contains(DosFileAttribute.ARCHIVE));
         dosFileAttributeView.setHidden(dosAttributeSet.contains(DosFileAttribute.HIDDEN));
@@ -384,7 +384,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         dosFileAttributeView.setSystem(dosAttributeSet.contains(DosFileAttribute.SYSTEM));
     }
 
-    private void setPosixFilePermissions(java.io.File file, Set<PosixFilePermission> posixFilePermissionSet) throws IOException {
+    private void setPosixFilePermissions(File file, Set<PosixFilePermission> posixFilePermissionSet) throws IOException {
         PosixFileAttributeView posixFileAttributeView = Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
         Set<java.nio.file.attribute.PosixFilePermission> newPermissions = new HashSet<>();
 

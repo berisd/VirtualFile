@@ -53,7 +53,7 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
         try {
             // if not exists create UrlArchive
             // insert or update ArchiveEntry
-            FileOutputStream fileOutputStream = new FileOutputStream(new java.io.File(model.getUrl().toURI()));
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(model.getUrl().toURI()));
             ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
             ArchiveOutputStream archiveOutputStream = archiveStreamFactory.createArchiveOutputStream(ArchiveStreamFactory.ZIP, fileOutputStream);
             archiveOutputStream.close();
@@ -73,7 +73,7 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
 
         try {
             ArchiveStreamFactory factory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new java.io.File(archivePath)));
+            fis = new BufferedInputStream(new FileInputStream(new File(archivePath)));
             ais = factory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 

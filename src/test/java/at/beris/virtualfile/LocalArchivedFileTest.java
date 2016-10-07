@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,8 +33,8 @@ public class LocalArchivedFileTest {
     public static Collection<Object[]> data() throws Exception {
         UrlUtils.registerProtocolURLStreamHandlers();
 
-        String directoryUrlPattern = "src" + java.io.File.separator + "test" + java.io.File.separator + "resources" + java.io.File.separator + "testarchive.??/TreeDb/";
-        String fileNameUrlPattern = "src" + java.io.File.separator + "test" + java.io.File.separator + "resources" + java.io.File.separator + "testarchive.??/TreeDb/file.xml";
+        String directoryUrlPattern = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.??/TreeDb/";
+        String fileNameUrlPattern = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.??/TreeDb/file.xml";
         //TODO Extension 7z StreamingNotSupportedException: The 7z doesn't support streaming
         String[] archiveExtensions = {"zip", "tar"};
 
@@ -69,7 +70,7 @@ public class LocalArchivedFileTest {
     }
 
     private String extractName(String path) {
-        String[] pathParts = StringUtils.split(path, java.io.File.separator);
+        String[] pathParts = StringUtils.split(path, File.separator);
         return pathParts[pathParts.length - 1];
 
     }

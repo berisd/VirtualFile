@@ -13,6 +13,7 @@ import at.beris.virtualfile.FileType;
 import at.beris.virtualfile.protocol.Protocol;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -58,7 +59,7 @@ public class UrlUtils {
     }
 
     public static URL getUrlForLocalPath(String path) throws IOException {
-        return new URL(new java.io.File(path).toURI().toURL().toString() + (path.endsWith(java.io.File.separator) ? "/" : ""));
+        return new URL(new File(path).toURI().toURL().toString() + (path.endsWith(File.separator) ? "/" : ""));
     }
 
     /**

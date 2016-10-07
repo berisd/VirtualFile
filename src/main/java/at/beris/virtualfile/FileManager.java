@@ -15,6 +15,7 @@ import at.beris.virtualfile.config.ContextConfiguration;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.UrlUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.EnumSet;
@@ -64,7 +65,7 @@ public class FileManager {
      * @return
      */
     public static VirtualFile newLocalDirectory(String path) throws IOException {
-        return fileContext.newLocalFile(path + (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator));
+        return fileContext.newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
     }
 
     public static VirtualFile newFile(String url) throws IOException {

@@ -19,6 +19,7 @@ import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -60,8 +61,8 @@ public class FileContext {
      */
     public VirtualFile newLocalFile(String path) throws IOException {
         LOGGER.debug("newLocalFile (path: {})", path);
-        URL url = new java.io.File(path).toURI().toURL();
-        if (path.endsWith(java.io.File.separator))
+        URL url = new File(path).toURI().toURL();
+        if (path.endsWith(File.separator))
             url = new URL(url.toString() + "/");
         return newFile(url);
     }

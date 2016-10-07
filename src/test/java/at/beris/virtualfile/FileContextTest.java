@@ -13,6 +13,7 @@ import at.beris.virtualfile.protocol.Protocol;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,14 +45,14 @@ public class FileContextTest {
 
     @Test
     public void createLocalFile() throws Exception {
-        java.io.File sourceFile = createFile();
+        File sourceFile = createFile();
         byte[] checkSumBytes = generate_checksum(sourceFile);
 
         Byte[] expectedChecksum = new Byte[checkSumBytes.length];
         for (int i = 0; i < checkSumBytes.length; i++)
             expectedChecksum[i] = checkSumBytes[i];
 
-        VirtualFile file = FileManager.newFile(new java.io.File(TEST_SOURCE_FILE_NAME).toURI().toURL());
+        VirtualFile file = FileManager.newFile(new File(TEST_SOURCE_FILE_NAME).toURI().toURL());
         assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
         assertEquals(TEST_SOURCE_FILE_SIZE, file.getSize());
         Assert.assertFalse(file.isDirectory());
@@ -65,8 +66,8 @@ public class FileContextTest {
     }
 
 
-    private java.io.File createFile() throws IOException {
-        java.io.File file = new java.io.File(TEST_SOURCE_FILE_NAME);
+    private File createFile() throws IOException {
+        File file = new File(TEST_SOURCE_FILE_NAME);
 
         StringBuilder dataString = new StringBuilder("t");
 
@@ -78,7 +79,7 @@ public class FileContextTest {
         return file;
     }
 
-    private byte[] generate_checksum(java.io.File file) throws Exception {
+    private byte[] generate_checksum(File file) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA1");
         FileInputStream fis = new FileInputStream(file.getPath());
         byte[] dataBytes = new byte[1024];

@@ -19,6 +19,7 @@ import at.beris.virtualfile.util.VoidOperation;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.attribute.FileTime;
@@ -96,7 +97,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void copyDirectory() throws IOException {
-        List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+        List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         List<String> targetFileUrlList = createFilenamesTree(targetDirectoryUrl.toString());
 
         TestFileHelper.createFileTreeData(sourceFileUrlList);
@@ -123,7 +124,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void deleteDirectory() throws IOException {
-        List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
+        List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         TestFileHelper.createFileTreeData(sourceFileUrlList);
 
         VirtualFile sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);

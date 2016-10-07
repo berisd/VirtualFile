@@ -56,7 +56,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
         try {
             ArchiveStreamFactory factory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new java.io.File(model.getUrl().toURI())));
+            fis = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
             ais = factory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 
@@ -87,7 +87,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
             target.create();
 
             ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new java.io.File(model.getUrl().toURI())));
+            fis = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
             ais = archiveStreamFactory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 
@@ -95,9 +95,9 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                 Map<String, URL> urlMap = getArchiveEntryURLMap(target.getUrl(), archiveEntry);
 
                 if (archiveEntry.isDirectory()) {
-                    Files.createDirectory(new java.io.File(urlMap.get(URL).toURI()).toPath());
+                    Files.createDirectory(new File(urlMap.get(URL).toURI()).toPath());
                 } else {
-                    OutputStream out = new FileOutputStream(new java.io.File(urlMap.get(URL).toURI()));
+                    OutputStream out = new FileOutputStream(new File(urlMap.get(URL).toURI()));
                     IOUtils.copy(ais, out);
                     out.close();
                 }

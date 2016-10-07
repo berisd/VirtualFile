@@ -20,10 +20,7 @@ import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.net.ftp.FTPFile;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +56,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     @Override
     public Byte[] checksum(FileModel model) throws IOException {
         String tempDir = System.getProperty("java.io.tmpdir");
-        String tempFilePath = tempDir + java.io.File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
+        String tempFilePath = tempDir + File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
         VirtualFile tempFile = copyToLocalFile(model, tempFilePath);
         return tempFile.checksum();
     }

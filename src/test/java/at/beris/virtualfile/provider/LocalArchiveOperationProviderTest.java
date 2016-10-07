@@ -12,10 +12,12 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.FileModel;
 import org.junit.Test;
 
+import java.io.File;
+
 public class LocalArchiveOperationProviderTest {
     @Test
     public void testList() throws Exception {
-        java.io.File file = new java.io.File("src/test/resources/testarchive.zip");
+        File file = new File("src/test/resources/testarchive.zip");
 
         FileModel fileModel = new FileModel();
         fileModel.setUrl(file.toURI().toURL());

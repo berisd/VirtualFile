@@ -14,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
@@ -37,8 +38,8 @@ public class SamplesTest {
 
     @Test
     public void extractArchive() throws IOException {
-        VirtualFile archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
-                "resources" + java.io.File.separator + "testarchive.zip");
+        VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
+                "resources" + File.separator + "testarchive.zip");
         VirtualFile directory = FileManager.newLocalDirectory("extracted");
         List<VirtualFile> extractedFiles = archive.extract(directory);
         Assert.assertEquals(33, extractedFiles.size());
@@ -47,8 +48,8 @@ public class SamplesTest {
 
     @Test
     public void listArchive() throws IOException {
-        VirtualFile archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
-                "resources" + java.io.File.separator + "testarchive.zip");
+        VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
+                "resources" + File.separator + "testarchive.zip");
         Assert.assertEquals(33, archive.list().size());
     }
 
@@ -63,16 +64,16 @@ public class SamplesTest {
 
     @Test
     public void AuthWithPublicKey() throws IOException {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         FileManager.getConfiguration().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
-                .setPrivateKeyFile(TestFileHelper.TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "id_dsa");
+                .setPrivateKeyFile(TestFileHelper.TEST_CREDENTIALS_DIRECTORY + File.separator + "id_dsa");
         VirtualFile file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
         assertTrue(file.isDirectory());
     }
 
     @Test
     public void AuthWithPasswordNoStrictHost() throws IOException {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         VirtualFile file = FileManager.newFile("sftp://sshtest:@www.beris.at:22/home/sshtest/.ssh");
         FileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(TestFileHelper.readSftpPassword());
         assertTrue(file.isDirectory());

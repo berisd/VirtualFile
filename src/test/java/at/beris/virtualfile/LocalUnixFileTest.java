@@ -17,6 +17,7 @@ import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
 import org.junit.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileSystems;
@@ -65,8 +66,8 @@ public class LocalUnixFileTest extends AbstractFileTest {
     @Test
     public void createSymbolicLink() throws IOException {
         String symLinkName = TEST_SOURCE_DIRECTORY_NAME + "Link";
-        Path dir = new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toPath();
-        Path symLink = new java.io.File(symLinkName).toPath();
+        Path dir = new File(TEST_SOURCE_DIRECTORY_NAME).toPath();
+        Path symLink = new File(symLinkName).toPath();
 
         Files.createDirectory(dir);
         Files.createSymbolicLink(symLink, dir);

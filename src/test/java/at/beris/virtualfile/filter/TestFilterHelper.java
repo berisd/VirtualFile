@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestFilterHelper {
-    private final static Logger LOGGER = LoggerFactory.getLogger(java.io.File.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
 
     public static List<VirtualFile> createFiles(String rootDir) throws Exception {
         List<VirtualFile> fileList = new ArrayList<>();
@@ -44,7 +45,7 @@ public class TestFilterHelper {
                 file.create();
                 file.setAttributes(fileData.attributes);
                 if (!file.isDirectory()) {
-                    Files.write(new java.io.File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, fileData.size / dataString.length()).getBytes());
+                    Files.write(new File(file.getUrl().toURI()).toPath(), StringUtils.repeat(dataString, fileData.size / dataString.length()).getBytes());
                 }
                 file.refresh();
                 fileList.add(file);

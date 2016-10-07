@@ -12,6 +12,7 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.config.Configuration;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -25,7 +26,7 @@ import java.util.List;
 import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
 
 public class TestFileHelper {
-    public static final String HOME_DIRECTORY = System.getProperty("user.home") + java.io.File.separator + ".VirtualFile";
+    public static final String HOME_DIRECTORY = System.getProperty("user.home") + File.separator + ".VirtualFile";
     public static final String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public static final String TEST_TARGET_FILE_NAME = "targetfile1.txt";
     public static final Date TEST_SOURCE_FILE_LAST_MODIFIED = new Date();
@@ -34,18 +35,18 @@ public class TestFileHelper {
     public static final String TEST_SOURCE_DIRECTORY_NAME = "testdirectory/";
     public static final String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory/";
 
-    public static final String TEST_CREDENTIALS_DIRECTORY = HOME_DIRECTORY + java.io.File.separator + "test" + java.io.File.separator;
+    public static final String TEST_CREDENTIALS_DIRECTORY = HOME_DIRECTORY + File.separator + "test" + File.separator;
 
     public static final String SSH_HOME_DIRECTORY = "/home/sshtest/";
 
     public static void initIntegrationTest() throws Exception {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
     }
 
     public static String readSftpPassword() {
         List<String> stringList = null;
         try {
-            stringList = Files.readAllLines(new java.io.File(TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "sshlogin.txt").toPath(), Charset.defaultCharset());
+            stringList = Files.readAllLines(new File(TEST_CREDENTIALS_DIRECTORY + File.separator + "sshlogin.txt").toPath(), Charset.defaultCharset());
         } catch (IOException e) {
             return "";
         }
@@ -72,7 +73,7 @@ public class TestFileHelper {
 
     public static VirtualFile createLocalSourceFile(URL url) {
         try {
-            java.io.File file = new java.io.File(url.toURI());
+            File file = new File(url.toURI());
 
             StringBuilder dataString = new StringBuilder("t");
 
@@ -109,9 +110,9 @@ public class TestFileHelper {
         int index = 0;
         List<VirtualFile> fileList = new ArrayList<>();
         for (String fileUrl : fileUrlList) {
-            java.io.File file = null;
+            File file = null;
             try {
-                file = new java.io.File(new URL(fileUrl).toURI());
+                file = new File(new URL(fileUrl).toURI());
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }

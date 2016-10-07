@@ -11,13 +11,14 @@ package at.beris.virtualfile;
 
 import org.junit.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class LocalArchiveTest extends AbstractFileTest {
-    private static final String ZIP_FILENAME = "src" + java.io.File.separator + "test" + java.io.File.separator + "resources" + java.io.File.separator + "testarchive.zip";
+    private static final String ZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.zip";
     private static final int NUMBER_OF_ARCHIVE_ENTRIES = 33;
 
     @BeforeClass
@@ -42,7 +43,7 @@ public class LocalArchiveTest extends AbstractFileTest {
 
         archiveFile.create();
 
-        assertTrue(new java.io.File(archiveFile.getPath()).exists());
+        assertTrue(new File(archiveFile.getPath()).exists());
         assertTrue(archiveFile.isArchive());
         assertFalse(archiveFile.isArchived());
 
