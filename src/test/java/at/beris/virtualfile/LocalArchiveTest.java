@@ -38,7 +38,7 @@ public class LocalArchiveTest extends AbstractFileTest {
     @Ignore
     public void createArchive() throws IOException {
 
-        File archiveFile = fileContext.newLocalFile(ZIP_FILENAME);
+        VirtualFile archiveFile = fileContext.newLocalFile(ZIP_FILENAME);
 
         archiveFile.create();
 
@@ -49,13 +49,13 @@ public class LocalArchiveTest extends AbstractFileTest {
         archiveFile.delete();
 
 //
-//        File archivedFile1 = fileManager.newFile(archive, "hallo.txt");
-//        File archivedFile2 = fileManager.newFile(archive, "hallo2.txt");
-//        File directory3 = fileManager.newDirectory("dir1");
+//        VirtualFile archivedFile1 = fileManager.newFile(archive, "hallo.txt");
+//        VirtualFile archivedFile2 = fileManager.newFile(archive, "hallo2.txt");
+//        VirtualFile directory3 = fileManager.newDirectory("dir1");
 //        fileManager.newFile(directory3, "hallo3.txt");
 //        fileManager.newFile(directory3, "hallo4.txt");
 //        fileManager.newFile(directory3, "hallo5.txt");
-//        File directory34 = fileManager.newDirectory(directory3, "dir2");
+//        VirtualFile directory34 = fileManager.newDirectory(directory3, "dir2");
 //        fileManager.newFile(directory34, "hallo6.txt");
 //
 //        archive.add(archivedFile1);
@@ -65,9 +65,9 @@ public class LocalArchiveTest extends AbstractFileTest {
 
     @Test
     public void listArchive() throws IOException {
-        File file = fileContext.newLocalFile(ZIP_FILENAME);
+        VirtualFile file = fileContext.newLocalFile(ZIP_FILENAME);
         assertTrue(file.getSize() > 0);
-        List<File> list = file.list();
+        List<VirtualFile> list = file.list();
         assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, list.size());
     }
 }

@@ -9,12 +9,12 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 
 public interface CopyListener extends Listener {
-    void startFile(File file, long currentFileNumber);
+    void startFile(VirtualFile file, long currentFileNumber);
 
-    void finishedFile(File file);
+    void finishedFile(VirtualFile file);
 
     void afterBlockCopied(long fileSize, long bytesCopiedBlock, long bytesCopiedTotal);
 
@@ -24,5 +24,5 @@ public interface CopyListener extends Listener {
      * @param file
      * @return true: continue with current file, false: continue with next file
      */
-    boolean fileExists(File file);
+    boolean fileExists(VirtualFile file);
 }

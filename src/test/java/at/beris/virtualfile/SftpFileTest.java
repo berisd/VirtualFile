@@ -56,9 +56,9 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void createFile() throws IOException {
-        super.createFile(new VoidOperation<File>() {
+        super.createFile(new VoidOperation<VirtualFile>() {
             @Override
-            public void execute(File file) throws IOException {
+            public void execute(VirtualFile file) throws IOException {
                 assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
@@ -98,9 +98,9 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() throws IOException {
-        super.getFileAttributes(new VoidOperation<File>() {
+        super.getFileAttributes(new VoidOperation<VirtualFile>() {
             @Override
-            public void execute(File file) throws IOException {
+            public void execute(VirtualFile file) throws IOException {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));

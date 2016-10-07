@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
@@ -47,8 +47,8 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     }
 
     @Override
-    public List<File> list(FileModel model, Filter filter) throws IOException {
-        List<File> fileList = new ArrayList<>();
+    public List<VirtualFile> list(FileModel model, Filter filter) throws IOException {
+        List<VirtualFile> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
 
@@ -62,7 +62,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
             while ((archiveEntry = ais.getNextEntry()) != null) {
                 Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
-                File file = fileContext.newFile(urlMap.get(URL));
+                VirtualFile file = fileContext.newFile(urlMap.get(URL));
                 if (filter == null || filter.filter(file))
                     fileList.add(file);
             }
@@ -78,8 +78,8 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     }
 
     @Override
-    public List<File> extract(FileModel model, File target) throws IOException {
-        List<File> fileList = new ArrayList<>();
+    public List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException {
+        List<VirtualFile> fileList = new ArrayList<>();
         ArchiveInputStream ais = null;
         InputStream fis = null;
 
@@ -102,7 +102,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                     out.close();
                 }
 
-                File file = fileContext.newFile(urlMap.get(URL));
+                VirtualFile file = fileContext.newFile(urlMap.get(URL));
                 fileList.add(file);
             }
         } catch (ArchiveException e) {

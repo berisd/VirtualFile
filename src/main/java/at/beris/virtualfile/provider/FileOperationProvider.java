@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CopyListener;
@@ -47,7 +47,7 @@ public interface FileOperationProvider {
      * @param filter
      * @return
      */
-    List<File> list(FileModel model, Filter filter) throws IOException;
+    List<VirtualFile> list(FileModel model, Filter filter) throws IOException;
 
     /**
      * Updates the Model with information from the physical file.
@@ -70,19 +70,19 @@ public interface FileOperationProvider {
 
     void setOwner(FileModel model) throws IOException;
 
-    List<File> extract(FileModel model, File target) throws IOException;
+    List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException;
 
     boolean isOperationSupported(FileOperation fileOperation);
 
     Set<FileOperation> supportedOperations();
 
-    void add(FileModel model, File file) throws IOException;
+    void add(FileModel model, VirtualFile file) throws IOException;
 
     void addAttributes(FileModel model) throws IOException;
 
     void removeAttributes(FileModel model) throws IOException;
 
-    void copy(File sourceFile, File targetFile, CopyListener listener) throws IOException;
+    void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) throws IOException;
 
     void dispose();
 }

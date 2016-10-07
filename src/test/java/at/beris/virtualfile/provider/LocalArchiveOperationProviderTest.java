@@ -22,7 +22,7 @@ public class LocalArchiveOperationProviderTest {
         //TODO Rework
 //        LocalArchiveOperationProvider provider = new LocalArchiveOperationProvider();
 
-//        List<File> fileList = provider.list(null, fileModel, null);
+//        List<VirtualFile> fileList = provider.list(null, fileModel, null);
 //        Assert.assertTrue(fileList.size()>0);
     }
 }

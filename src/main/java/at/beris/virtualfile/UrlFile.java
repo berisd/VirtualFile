@@ -31,17 +31,17 @@ import java.util.*;
 
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
-public class UrlFile implements File, Comparable<UrlFile> {
+public class UrlFile implements VirtualFile, Comparable<UrlFile> {
 
     private static Logger logger = LoggerFactory.getLogger(UrlFile.class);
 
-    private File parent;
+    private VirtualFile parent;
     private FileModel model;
     private URL url;
     private FileOperationProvider fileOperationProvider;
     private FileContext context;
 
-    public UrlFile(File parent, URL url, FileContext context) {
+    public UrlFile(VirtualFile parent, URL url, FileContext context) {
         this.parent = parent;
         this.url = url;
         this.context = context;
@@ -134,7 +134,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public void delete(File file) throws IOException {
+    public void delete(VirtualFile file) throws IOException {
         logger.info("Delete {} from {}", file, this);
         checkModel();
         throw new NotImplementedException();
@@ -195,17 +195,17 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public File getParent() {
+    public VirtualFile getParent() {
         logger.debug("Get parent for {}", this);
         logger.debug("Returns: {}", parent);
         return parent;
     }
 
     @Override
-    public File getRoot() throws IOException {
+    public VirtualFile getRoot() throws IOException {
         logger.debug("Get root for {}", this);
         checkModel();
-        File root = this;
+        VirtualFile root = this;
         while (root.getParent() != null)
             root = root.getParent();
         logger.debug("Returns: {}", root);
@@ -231,7 +231,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public List<File> extract(File target) throws IOException {
+    public List<VirtualFile> extract(VirtualFile target) throws IOException {
         logger.info("Extract {} to {}", this, target);
         checkModel();
         return fileOperationProvider.extract(model, target);
@@ -365,7 +365,7 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public void add(File file) throws IOException {
+    public void add(VirtualFile file) throws IOException {
         logger.info("Add {} to {}", file, this);
         checkModel();
         fileOperationProvider.add(model, file);
@@ -400,21 +400,21 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public List<File> find(Filter filter) throws IOException {
+    public List<VirtualFile> find(Filter filter) throws IOException {
         logger.info("Find children for {} with filter {}", this, filter);
         checkModel();
         Filter directoriesFilter = new IsDirectoryFilter().equalTo(true);
         Filter withDirectoriesFilter = ((Filter) filter.clone()).or(new IsDirectoryFilter().equalTo(true));
 
-        List<File> fileList = fileOperationProvider.list(model, withDirectoriesFilter);
+        List<VirtualFile> fileList = fileOperationProvider.list(model, withDirectoriesFilter);
 
-        Map<Filter, List<File>> partitionedFileList = FileUtils.groupFileListByFilters(fileList, Arrays.asList(filter, directoriesFilter));
+        Map<Filter, List<VirtualFile>> partitionedFileList = FileUtils.groupFileListByFilters(fileList, Arrays.asList(filter, directoriesFilter));
 
         fileList.clear();
         fileList = partitionedFileList.get(filter);
-        List<File> directoryList = partitionedFileList.get(directoriesFilter);
+        List<VirtualFile> directoryList = partitionedFileList.get(directoriesFilter);
 
-        for (File directory : directoryList) {
+        for (VirtualFile directory : directoryList) {
             fileList.addAll(directory.find(filter));
         }
         directoryList.clear();
@@ -423,19 +423,19 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public List<File> list() throws IOException {
+    public List<VirtualFile> list() throws IOException {
         logger.info("List children for {}", this);
         checkModel();
-        List<File> fileList = fileOperationProvider.list(model, null);
+        List<VirtualFile> fileList = fileOperationProvider.list(model, null);
         logger.info("Returns: {} entries", fileList.size());
         return fileList;
     }
 
     @Override
-    public List<File> list(Filter filter) throws IOException {
+    public List<VirtualFile> list(Filter filter) throws IOException {
         logger.info("List children for {} with filter {}", this, filter);
         checkModel();
-        List<File> fileList = fileOperationProvider.list(model, filter);
+        List<VirtualFile> fileList = fileOperationProvider.list(model, filter);
         logger.info("Returns: {} entries", fileList.size());
         return fileList;
     }
@@ -459,14 +459,14 @@ public class UrlFile implements File, Comparable<UrlFile> {
     }
 
     @Override
-    public void copy(File targetFile) throws IOException {
+    public void copy(VirtualFile targetFile) throws IOException {
         logger.info("Copy {} to {}", this, targetFile);
         checkModel();
         fileOperationProvider.copy(this, targetFile, null);
     }
 
     @Override
-    public void copy(File targetFile, CopyListener listener) throws IOException {
+    public void copy(VirtualFile targetFile, CopyListener listener) throws IOException {
         logger.info("Copy {} to {} with Listener", this, targetFile);
         checkModel();
         fileOperationProvider.copy(this, targetFile, listener);

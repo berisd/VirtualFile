@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.client.Client;
@@ -34,13 +34,13 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
     }
 
     @Override
-    public List<File> list(FileModel model, Filter filter) {
-        List<File> files = new ArrayList<>();
-//        File backFile = add(this.archiveFile, createEmptyArchiveEntry());
+    public List<VirtualFile> list(FileModel model, Filter filter) {
+        List<VirtualFile> files = new ArrayList<>();
+//        VirtualFile backFile = add(this.archiveFile, createEmptyArchiveEntry());
 //        backFile.setParent(this.parentFile);
 //
 //        files.add(backFile);
-//        for (File childFile : children) {
+//        for (VirtualFile childFile : children) {
 //            files.add(childFile);
 //        }
 
@@ -166,7 +166,7 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
     }
 
     @Override
-    public List<File> extract(FileModel model, File target) throws IOException {
+    public List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException {
         throw new OperationNotSupportedException();
     }
 

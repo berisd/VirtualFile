@@ -11,6 +11,7 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.ftp.FtpFileTranslator;
 import at.beris.virtualfile.exception.NotImplementedException;
@@ -59,21 +60,21 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     public Byte[] checksum(FileModel model) throws IOException {
         String tempDir = System.getProperty("java.io.tmpdir");
         String tempFilePath = tempDir + java.io.File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
-        at.beris.virtualfile.File tempFile = copyToLocalFile(model, tempFilePath);
+        VirtualFile tempFile = copyToLocalFile(model, tempFilePath);
         return tempFile.checksum();
     }
 
     @Override
-    public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) throws IOException {
+    public List<VirtualFile> list(FileModel model, Filter filter) throws IOException {
         List<FTPFile> ftpFileList = client.list(resolveUrl(model).getPath());
-        List<at.beris.virtualfile.File> fileList = new ArrayList<>();
+        List<VirtualFile> fileList = new ArrayList<>();
 
         String parentPath = model.getUrl().getPath();
         for (FTPFile ftpFile : ftpFileList) {
             FileModel childModel = new FileModel();
             childModel.setParent(model);
             String childPath = parentPath + ftpFile.getName() + (ftpFile.isDirectory() ? "/" : "");
-            at.beris.virtualfile.File childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), childPath));
+            VirtualFile childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), childPath));
             FtpFileTranslator.fillModel(childModel, ftpFile, client);
             childFile.setModel(childModel);
             if (filter == null || filter.filter(childFile)) {
@@ -138,7 +139,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
         client.setOwner(model.getUrl().getPath(), model.getOwner());
     }
 
-    private at.beris.virtualfile.File copyToLocalFile(FileModel model, String path) throws IOException {
+    private VirtualFile copyToLocalFile(FileModel model, String path) throws IOException {
         byte[] buffer = new byte[1024];
         int length;
 

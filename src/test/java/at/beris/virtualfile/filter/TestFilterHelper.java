@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
@@ -26,8 +26,8 @@ import java.util.List;
 public class TestFilterHelper {
     private final static Logger LOGGER = LoggerFactory.getLogger(java.io.File.class);
 
-    public static List<File> createFiles(String rootDir) throws Exception {
-        List<File> fileList = new ArrayList<>();
+    public static List<VirtualFile> createFiles(String rootDir) throws Exception {
+        List<VirtualFile> fileList = new ArrayList<>();
         String dataString = "0123456789ABCDEF";
 
         List<FileData> fileDataList = new ArrayList<>();
@@ -38,7 +38,7 @@ public class TestFilterHelper {
         fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ, PosixFilePermission.GROUP_EXECUTE));
 
         for (FileData fileData : fileDataList) {
-            File file = FileManager.newLocalFile(fileData.name);
+            VirtualFile file = FileManager.newLocalFile(fileData.name);
             try {
 
                 file.create();
@@ -56,9 +56,9 @@ public class TestFilterHelper {
         return fileList;
     }
 
-    public static List<String> getNameListFromFileList(List<File> fileList) throws IOException {
+    public static List<String> getNameListFromFileList(List<VirtualFile> fileList) throws IOException {
         List<String> nameList = new ArrayList<>();
-        for (File file : fileList)
+        for (VirtualFile file : fileList)
             nameList.add(file.getName());
         return nameList;
     }

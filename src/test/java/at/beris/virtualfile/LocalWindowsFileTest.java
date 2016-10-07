@@ -88,9 +88,9 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() throws IOException {
-        super.getFileAttributes(new VoidOperation<File>() {
+        super.getFileAttributes(new VoidOperation<VirtualFile>() {
             @Override
-            public void execute(File file) throws IOException {
+            public void execute(VirtualFile file) throws IOException {
                 assertTrue(file.getAttributes().contains(BasicFilePermission.READ));
                 assertTrue(file.getAttributes().contains(BasicFilePermission.WRITE));
             }
@@ -102,7 +102,7 @@ public class LocalWindowsFileTest extends AbstractFileTest {
         Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(BasicFilePermission.EXECUTE);
         attributes.add(DosFileAttribute.HIDDEN);
-        File file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         file.setAttributes(attributes.toArray(new FileAttribute[0]));
         fileContext.dispose(file);
@@ -123,7 +123,7 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void setAcl() throws IOException {
-        File file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         List<AclEntry> acl = file.getAcl();
         List<AclEntry> newAcl = new ArrayList<>(acl);

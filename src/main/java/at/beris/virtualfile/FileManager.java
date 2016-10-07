@@ -43,7 +43,7 @@ public class FileManager {
         return fileContext.getConfigurator().getConfiguration(protocol);
     }
 
-    public static Configuration getConfiguration(File file) throws IOException {
+    public static Configuration getConfiguration(VirtualFile file) throws IOException {
         return fileContext.getConfigurator().getConfiguration(file);
     }
 
@@ -53,7 +53,7 @@ public class FileManager {
      * @param path
      * @return
      */
-    public static File newLocalFile(String path) throws IOException {
+    public static VirtualFile newLocalFile(String path) throws IOException {
         return fileContext.newLocalFile(path);
     }
 
@@ -63,30 +63,30 @@ public class FileManager {
      * @param path
      * @return
      */
-    public static File newLocalDirectory(String path) throws IOException {
+    public static VirtualFile newLocalDirectory(String path) throws IOException {
         return fileContext.newLocalFile(path + (path.endsWith(java.io.File.separator) ? "" : java.io.File.separator));
     }
 
-    public static File newFile(String url) throws IOException {
+    public static VirtualFile newFile(String url) throws IOException {
         return fileContext.newFile(url);
     }
 
-    public static File newFile(File parent, URL url) throws IOException {
+    public static VirtualFile newFile(VirtualFile parent, URL url) throws IOException {
         return fileContext.newFile(parent, url);
     }
 
-    public static File newFile(URL url) throws IOException {
+    public static VirtualFile newFile(URL url) throws IOException {
         return fileContext.newFile(url);
     }
 
-    public static File newDirectory(URL url) throws IOException {
+    public static VirtualFile newDirectory(URL url) throws IOException {
         URL normalizedUrl = url;
         if (!url.getPath().endsWith("/"))
             normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
         return fileContext.newFile(normalizedUrl);
     }
 
-    public static void dispose(File file) throws IOException {
+    public static void dispose(VirtualFile file) throws IOException {
         fileContext.dispose(file);
     }
 

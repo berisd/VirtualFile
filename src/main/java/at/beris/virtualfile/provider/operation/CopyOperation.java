@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -31,7 +31,7 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
     }
 
     @Override
-    public Void execute(File source, File target, Listener listener, Void... params) throws IOException {
+    public Void execute(VirtualFile source, VirtualFile target, Listener listener, Void... params) throws IOException {
         filesProcessed = 0L;
         if (!source.exists())
             throw new NoSuchFileException(source.getPath());
@@ -44,7 +44,7 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
         return null;
     }
 
-    private void copyRecursive(File source, File target, CopyListener listener) throws IOException {
+    private void copyRecursive(VirtualFile source, VirtualFile target, CopyListener listener) throws IOException {
         boolean createFile = true;
         if (target.exists()) {
             if (listener != null)
@@ -56,10 +56,10 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
                 if (!target.exists())
                     target.create();
 
-                for (File sourceChildFile : source.list()) {
+                for (VirtualFile sourceChildFile : source.list()) {
                     URL targetUrl = target.getUrl();
                     URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
-                    File targetChildFile = fileContext.newFile(targetChildUrl);
+                    VirtualFile targetChildFile = fileContext.newFile(targetChildUrl);
                     copyRecursive(sourceChildFile, targetChildFile, listener);
                 }
             }
@@ -76,7 +76,7 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
         target.refresh();
     }
 
-    private void copyFile(File source, File target, CopyListener listener) throws IOException {
+    private void copyFile(VirtualFile source, VirtualFile target, CopyListener listener) throws IOException {
         InputStream inputStream = source.getInputStream();
         OutputStream outputStream = target.getOutputStream();
         byte[] buffer = new byte[COPY_BUFFER_SIZE];

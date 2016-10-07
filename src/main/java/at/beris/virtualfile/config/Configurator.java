@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.config;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileType;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.sftp.SftpClient;
@@ -116,7 +116,7 @@ public class Configurator {
         return configurationPerProtocolMap.get(protocol);
     }
 
-    public Configuration getConfiguration(File file) throws IOException {
+    public Configuration getConfiguration(VirtualFile file) throws IOException {
         return configurationPerUrlMap.get(file.getUrl());
     }
 

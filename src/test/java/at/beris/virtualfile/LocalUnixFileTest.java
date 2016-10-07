@@ -72,7 +72,7 @@ public class LocalUnixFileTest extends AbstractFileTest {
         Files.createSymbolicLink(symLink, dir);
 
         URL symLinkUrl = UrlUtils.getUrlForLocalPath(symLinkName);
-        File file = fileContext.newFile(symLinkUrl);
+        VirtualFile file = fileContext.newFile(symLinkUrl);
 
         assertTrue(file.isSymbolicLink());
         assertEquals(dir.toUri().toURL().toString(), file.getLinkTarget().toString());
@@ -103,9 +103,9 @@ public class LocalUnixFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() throws IOException {
-        super.getFileAttributes(new VoidOperation<File>() {
+        super.getFileAttributes(new VoidOperation<VirtualFile>() {
             @Override
-            public void execute(File file) throws IOException {
+            public void execute(VirtualFile file) throws IOException {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));

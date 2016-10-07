@@ -24,16 +24,16 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
-public interface File {
-    void add(File file) throws IOException;
+public interface VirtualFile {
+    void add(VirtualFile file) throws IOException;
 
     void addAttributes(FileAttribute... attributes) throws IOException;
 
     Byte[] checksum() throws IOException;
 
-    void copy(File targetFile) throws IOException;
+    void copy(VirtualFile targetFile) throws IOException;
 
-    void copy(File targetFile, CopyListener listener) throws IOException;
+    void copy(VirtualFile targetFile, CopyListener listener) throws IOException;
 
     /**
      * Creates an empty file
@@ -45,11 +45,11 @@ public interface File {
 
     void delete() throws IOException;
 
-    void delete(File file) throws IOException;
+    void delete(VirtualFile file) throws IOException;
 
     Boolean exists() throws IOException;
 
-    List<File> extract(File target) throws IOException;
+    List<VirtualFile> extract(VirtualFile target) throws IOException;
 
     /**
      * Find files recursively matching a filter
@@ -57,7 +57,7 @@ public interface File {
      * @param filter A filter
      * @return A list of files
      */
-    List<File> find(Filter filter) throws IOException;
+    List<VirtualFile> find(Filter filter) throws IOException;
 
     List<AclEntry> getAcl() throws IOException;
 
@@ -84,11 +84,11 @@ public interface File {
 
     UserPrincipal getOwner() throws IOException;
 
-    File getParent() throws IOException;
+    VirtualFile getParent() throws IOException;
 
     String getPath() throws IOException;
 
-    File getRoot() throws IOException;
+    VirtualFile getRoot() throws IOException;
 
     /**
      * Returns the size in bytes for a file and the number of contained items for a directory
@@ -100,12 +100,12 @@ public interface File {
     URL getUrl() throws IOException;
 
     /**
-     * File is an archive
+     * VirtualFile is an archive
      */
     boolean isArchive() throws IOException;
 
     /**
-     * File is archived within an archive
+     * VirtualFile is archived within an archive
      */
     boolean isArchived() throws IOException;
 
@@ -122,14 +122,14 @@ public interface File {
      *
      * @return A list of files
      */
-    List<File> list() throws IOException;
+    List<VirtualFile> list() throws IOException;
 
     /**
      * List contained files non-recursively filtered by a filter
      *
      * @return A list of files
      */
-    List<File> list(Filter filter) throws IOException;
+    List<VirtualFile> list(Filter filter) throws IOException;
 
     /**
      * Updates the model with information from the physical file

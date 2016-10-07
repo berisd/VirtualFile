@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
@@ -26,5 +26,5 @@ public abstract class AbstractFileOperation<T, P> implements CustomFileOperation
     }
 
     @Override
-    public abstract T execute(File source, File target, Listener listener, P... params) throws IOException;
+    public abstract T execute(VirtualFile source, VirtualFile target, Listener listener, P... params) throws IOException;
 }

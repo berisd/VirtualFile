@@ -55,14 +55,14 @@ public class LocalArchivedFileTest {
 
     @Test
     public void directoryInfo() throws IOException {
-        File file = FileManager.newLocalFile(directoryPath);
+        VirtualFile file = FileManager.newLocalFile(directoryPath);
         assertEquals(extractName(directoryPath), file.getName());
         assertTrue(file.isDirectory());
     }
 
     @Test
     public void fileInfo() throws IOException {
-        File file = FileManager.newLocalFile(filePath);
+        VirtualFile file = FileManager.newLocalFile(filePath);
         assertEquals(extractName(filePath), file.getName());
         assertEquals(fileSize, file.getSize());
         assertFalse(file.isDirectory());

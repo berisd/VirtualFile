@@ -70,7 +70,7 @@ public class TestFileHelper {
         return (dateMillis > (otherMillis - seconds * 1000)) && (dateMillis < otherMillis);
     }
 
-    public static File createLocalSourceFile(URL url) {
+    public static VirtualFile createLocalSourceFile(URL url) {
         try {
             java.io.File file = new java.io.File(url.toURI());
 
@@ -102,12 +102,12 @@ public class TestFileHelper {
         return fileList;
     }
 
-    public static List<File> createFileTreeData(List<String> fileUrlList) throws IOException {
+    public static List<VirtualFile> createFileTreeData(List<String> fileUrlList) throws IOException {
         String testString = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttest";
         StringBuilder dataString = new StringBuilder(testString);
 
         int index = 0;
-        List<File> fileList = new ArrayList<>();
+        List<VirtualFile> fileList = new ArrayList<>();
         for (String fileUrl : fileUrlList) {
             java.io.File file = null;
             try {

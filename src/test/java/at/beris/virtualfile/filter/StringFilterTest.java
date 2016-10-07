@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileManager;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class StringFilterTest {
     private static final String TEST_DIRECTORY = "testdir/";
-    private static File testDirectory;
+    private static VirtualFile testDirectory;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -36,7 +36,7 @@ public class StringFilterTest {
 
     @Test
     public void filterContains() throws IOException {
-        List<File> filteredList = testDirectory.find(new FileNameFilter().contains("good"));
+        List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().contains("good"));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("goodmovie.avi"));
@@ -44,7 +44,7 @@ public class StringFilterTest {
 
     @Test
     public void filterStartsWith() throws IOException {
-        List<File> filteredList = testDirectory.find(new FileNameFilter().startsWith("test"));
+        List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().startsWith("test"));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
@@ -53,7 +53,7 @@ public class StringFilterTest {
 
     @Test
     public void filterEndsWith() throws IOException {
-        List<File> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt"));
+        List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt"));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("testfile1.txt"));
@@ -62,7 +62,7 @@ public class StringFilterTest {
 
     @Test
     public void filterMatches() throws IOException {
-        List<File> filteredList = testDirectory.find(new FileNameFilter().matches(".*odm.*$"));
+        List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().matches(".*odm.*$"));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
         Assert.assertTrue(filteredFileNameList.contains("goodmovie.avi"));

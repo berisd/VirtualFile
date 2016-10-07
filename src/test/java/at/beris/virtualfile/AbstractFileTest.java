@@ -55,8 +55,8 @@ public abstract class AbstractFileTest {
         createFile(null);
     }
 
-    protected void createFile(VoidOperation<File> assertHook) throws IOException {
-        File file = fileContext.newFile(sourceFileUrl);
+    protected void createFile(VoidOperation<VirtualFile> assertHook) throws IOException {
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
 
         if (assertHook != null) {
@@ -76,7 +76,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void createDirectory() throws IOException {
-        File file = fileContext.newFile(sourceDirectoryUrl);
+        VirtualFile file = fileContext.newFile(sourceDirectoryUrl);
         file.create();
 
         assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
@@ -85,8 +85,8 @@ public abstract class AbstractFileTest {
     }
 
     protected void copyFile() throws IOException {
-        File sourceFile = TestFileHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
-        File targetFile = fileContext.newFile(targetFileUrl);
+        VirtualFile sourceFile = TestFileHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile targetFile = fileContext.newFile(targetFileUrl);
         CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
         sourceFile.copy(targetFile, copyListenerMock);
         assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
@@ -101,8 +101,8 @@ public abstract class AbstractFileTest {
 
         TestFileHelper.createFileTreeData(sourceFileUrlList);
 
-        File sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
-        File targetDirectory = fileContext.newFile(targetDirectoryUrl);
+        VirtualFile sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+        VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
         CopyListener copyListener = Mockito.mock(CopyListener.class);
         Mockito.when(copyListener.interrupt()).thenReturn(false);
@@ -115,7 +115,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void deleteFile() throws IOException {
-        File sourceFile = fileContext.newFile(sourceFileUrl);
+        VirtualFile sourceFile = fileContext.newFile(sourceFileUrl);
         sourceFile.create();
         assertTrue(sourceFile.exists());
         sourceFile.delete();
@@ -126,8 +126,8 @@ public abstract class AbstractFileTest {
         List<String> sourceFileUrlList = createFilenamesTree(new java.io.File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         TestFileHelper.createFileTreeData(sourceFileUrlList);
 
-        File sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
-        File targetDirectory = fileContext.newFile(targetDirectoryUrl);
+        VirtualFile sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+        VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
         sourceDirectory.copy(targetDirectory, Mockito.mock(CopyListener.class));
 
@@ -139,14 +139,14 @@ public abstract class AbstractFileTest {
     }
 
     protected void getFileAttributes(VoidOperation assertHook) throws IOException {
-        File file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         assertHook.execute(file);
         file.delete();
     }
 
     protected void setFileAttributes(Set<FileAttribute> attributes) throws IOException {
-        File file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         file.setAttributes(attributes.toArray(new FileAttribute[0]));
         fileContext.dispose(file);
@@ -161,7 +161,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void setOwner(UserPrincipal owner) throws IOException {
-        File file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         file.setOwner(owner);
 
@@ -177,7 +177,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void setGroup(GroupPrincipal group) throws IOException {
-        File file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         if (group == null)
             group = file.getGroup();
@@ -191,42 +191,42 @@ public abstract class AbstractFileTest {
     }
 
     protected void setCreationTime() throws IOException {
-        setTime(new SingleValueOperation<File, FileTime>() {
+        setTime(new SingleValueOperation<VirtualFile, FileTime>() {
             @Override
-            public void setValue(File object, FileTime value) throws IOException {
+            public void setValue(VirtualFile object, FileTime value) throws IOException {
                 object.setCreationTime(value);
             }
 
             @Override
-            public FileTime getValue(File object) throws IOException {
+            public FileTime getValue(VirtualFile object) throws IOException {
                 return object.getCreationTime();
             }
         });
     }
 
     protected void setLastModifiedTime() throws IOException {
-        setTime(new SingleValueOperation<File, FileTime>() {
+        setTime(new SingleValueOperation<VirtualFile, FileTime>() {
             @Override
-            public void setValue(File object, FileTime value) throws IOException {
+            public void setValue(VirtualFile object, FileTime value) throws IOException {
                 object.setLastModifiedTime(value);
             }
 
             @Override
-            public FileTime getValue(File object) throws IOException {
+            public FileTime getValue(VirtualFile object) throws IOException {
                 return object.getLastModifiedTime();
             }
         });
     }
 
     protected void setLastAccessTime() throws IOException {
-        setTime(new SingleValueOperation<File, FileTime>() {
+        setTime(new SingleValueOperation<VirtualFile, FileTime>() {
             @Override
-            public void setValue(File object, FileTime value) throws IOException {
+            public void setValue(VirtualFile object, FileTime value) throws IOException {
                 object.setLastAccessTime(value);
             }
 
             @Override
-            public FileTime getValue(File object) throws IOException {
+            public FileTime getValue(VirtualFile object) throws IOException {
                 return object.getLastAccessTime();
             }
         });
@@ -251,8 +251,8 @@ public abstract class AbstractFileTest {
 
     protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) throws IOException {
         for (int i = 0; i < sourceFileUrlList.size(); i++) {
-            File sourceFile = fileContext.newFile(sourceFileUrlList.get(i));
-            File targetFile = fileContext.newFile(targetFileUrlList.get(i));
+            VirtualFile sourceFile = fileContext.newFile(sourceFileUrlList.get(i));
+            VirtualFile targetFile = fileContext.newFile(targetFileUrlList.get(i));
 
             if (!sourceFile.isDirectory())
                 assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
@@ -271,14 +271,14 @@ public abstract class AbstractFileTest {
     private void cleanupFiles(FileContext fileContext) throws IOException {
         for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
             if (url != null) {
-                File file = fileContext.newFile(url);
+                VirtualFile file = fileContext.newFile(url);
                 if (file.exists())
                     file.delete();
             }
         }
     }
 
-    private void setTime(SingleValueOperation<File, FileTime> operation) throws IOException {
+    private void setTime(SingleValueOperation<VirtualFile, FileTime> operation) throws IOException {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         calendar.roll(Calendar.YEAR, false);
@@ -287,7 +287,7 @@ public abstract class AbstractFileTest {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        File file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         operation.setValue(file, fileTime);
         fileContext.dispose(file);

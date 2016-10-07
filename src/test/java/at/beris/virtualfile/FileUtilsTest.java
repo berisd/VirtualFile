@@ -29,7 +29,7 @@ public class FileUtilsTest {
     @Test
     public void maskLocalUnixFileString() throws Exception {
         String urlString = "file:/home/bernd/IdeaProjects/VirtualFile/testfile1.txt";
-        File file = createFile(urlString);
+        VirtualFile file = createFile(urlString);
         assertEquals(urlString, UrlUtils.maskedUrlString(file.getUrl()));
     }
 
@@ -38,7 +38,7 @@ public class FileUtilsTest {
     public void maskLocalWindowsFileString() throws Exception {
         //TODO urls with Windows style Filename not working
         String urlString = "file:///C:/Documents%20and%20Settings/davris/FileSchemeURIs.doc";
-        File file = createFile(urlString);
+        VirtualFile file = createFile(urlString);
         assertEquals(urlString, UrlUtils.maskedUrlString(file.getUrl()));
     }
 
@@ -46,11 +46,11 @@ public class FileUtilsTest {
     public void maskSftpFileString() throws Exception {
         String urlString = "sftp://sshtest:mypassword@www.example.com:22/home/sshtest/targetfile1.txt";
         String expectedString = "sftp://sshtest:***@www.example.com:22/home/sshtest/targetfile1.txt";
-        File file = createFile(urlString);
+        VirtualFile file = createFile(urlString);
         assertEquals(expectedString, UrlUtils.maskedUrlString(file.getUrl()));
     }
 
-    private File createFile(String urlString) throws MalformedURLException {
+    private VirtualFile createFile(String urlString) throws MalformedURLException {
         URL url = new URL(urlString);
         FileContext context = Mockito.mock(FileContext.class);
 

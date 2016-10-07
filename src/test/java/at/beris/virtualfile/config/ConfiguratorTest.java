@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.config;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.protocol.Protocol;
@@ -56,7 +56,7 @@ public class ConfiguratorTest {
 
     @Test
     public void createClientConfigCheckInheritance() throws Exception {
-        File file = Mockito.mock(UrlFile.class);
+        VirtualFile file = Mockito.mock(UrlFile.class);
         Mockito.when(file.getUrl()).thenReturn(new URL("sftp://test:pwd@site.example.com:22/test.txt"));
 
         config.getConfiguration().setTimeOut(111);
@@ -74,7 +74,7 @@ public class ConfiguratorTest {
 
     @Test
     public void createClientConfigCheckRemoval() throws Exception {
-        File file = Mockito.mock(UrlFile.class);
+        VirtualFile file = Mockito.mock(UrlFile.class);
         Mockito.when(file.getUrl()).thenReturn(new URL("sftp://test:pwd@site.example.com:22/test.txt"));
 
         config.createConfiguration(file.getUrl());
@@ -96,7 +96,7 @@ public class ConfiguratorTest {
 
     @Test
     public void setClientConfigValue() throws Exception {
-        File file = Mockito.mock(UrlFile.class);
+        VirtualFile file = Mockito.mock(UrlFile.class);
         Mockito.when(file.getUrl()).thenReturn(new URL("sftp://test:pwd@site.example.com:22/test.txt"));
 
         config.createConfiguration(file.getUrl());
@@ -111,7 +111,7 @@ public class ConfiguratorTest {
 
     @Test
     public void removeClientConfigValues() throws Exception {
-        File file = Mockito.mock(UrlFile.class);
+        VirtualFile file = Mockito.mock(UrlFile.class);
         Mockito.when(file.getUrl()).thenReturn(new URL("sftp://test:pwd@site.example.com:22/test.txt"));
 
         config.createConfiguration(file.getUrl());

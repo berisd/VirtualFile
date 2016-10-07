@@ -51,7 +51,7 @@ public class FileContextTest {
         for (int i = 0; i < checkSumBytes.length; i++)
             expectedChecksum[i] = checkSumBytes[i];
 
-        File file = FileManager.newFile(new java.io.File(TEST_SOURCE_FILE_NAME).toURI().toURL());
+        VirtualFile file = FileManager.newFile(new java.io.File(TEST_SOURCE_FILE_NAME).toURI().toURL());
         assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
         assertEquals(TEST_SOURCE_FILE_SIZE, file.getSize());
         Assert.assertFalse(file.isDirectory());

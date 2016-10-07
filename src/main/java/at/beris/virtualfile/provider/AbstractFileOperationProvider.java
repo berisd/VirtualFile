@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
@@ -60,7 +60,7 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
     public abstract OutputStream getOutputStream(FileModel model) throws IOException;
 
     @Override
-    public abstract List<File> list(FileModel model, Filter filter) throws IOException;
+    public abstract List<VirtualFile> list(FileModel model, Filter filter) throws IOException;
 
     @Override
     public abstract void updateModel(FileModel model) throws IOException;
@@ -87,12 +87,12 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
     public abstract void setOwner(FileModel model) throws IOException;
 
     @Override
-    public List<File> extract(FileModel model, File target) throws IOException {
+    public List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void add(FileModel model, File file) {
+    public void add(FileModel model, VirtualFile file) {
         throw new OperationNotSupportedException();
     }
 
@@ -117,7 +117,7 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
     }
 
     @Override
-    public void copy(File sourceFile, File targetFile, CopyListener listener) throws IOException {
+    public void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) throws IOException {
         ((CustomFileOperation<Void, Void>) customFileOperationMap.get(FileOperation.COPY)).execute(sourceFile, targetFile, listener, (Void) null);
     }
 

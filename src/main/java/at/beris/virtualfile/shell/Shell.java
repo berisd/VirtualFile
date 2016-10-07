@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.shell;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.attribute.PosixFilePermission;
@@ -39,8 +39,8 @@ public class Shell {
 
 
     private FileContext fileContext;
-    private File localFile;
-    private File workingFile;
+    private VirtualFile localFile;
+    private VirtualFile workingFile;
     private Scanner scanner;
 
     public Shell() throws IOException {
@@ -198,7 +198,7 @@ public class Shell {
     }
 
     private void list(boolean local) throws IOException {
-        File file = local ? localFile : workingFile;
+        VirtualFile file = local ? localFile : workingFile;
 
         if (file == null && !local) {
             System.out.println(NOT_CONNECTED_MSG);
@@ -210,7 +210,7 @@ public class Shell {
 
         StringBuilder sb = new StringBuilder();
         List<ExtFileModel> fileModelList = new ArrayList<>();
-        for (File childFile : file.list()) {
+        for (VirtualFile childFile : file.list()) {
             ExtFileModel model = new ExtFileModel();
             model.setUrl(childFile.getUrl());
             model.setAttributes(childFile.getAttributes());
@@ -278,7 +278,7 @@ public class Shell {
             return;
         }
 
-        File file = local ? localFile : workingFile;
+        VirtualFile file = local ? localFile : workingFile;
 
         if ("/".equals(file.getPath()) && "..".equals(directoryName)) {
             System.out.println(CANT_GO_UP_FROM_ROOT_MSG);
@@ -292,7 +292,7 @@ public class Shell {
             newUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(file.getUrl().toString() + directoryName + (directoryName.endsWith("/") ? "" : "/")));
         }
 
-        File actionFile = fileContext.newFile(newUrl);
+        VirtualFile actionFile = fileContext.newFile(newUrl);
 
         if (actionFile.isSymbolicLink())
             actionFile = fileContext.newFile(actionFile.getLinkTarget());
@@ -313,7 +313,7 @@ public class Shell {
         }
 
         URL actionUrl = UrlUtils.newUrl(workingFile.getUrl(), fileName);
-        File actionFile = fileContext.newFile(actionUrl);
+        VirtualFile actionFile = fileContext.newFile(actionUrl);
         actionFile.copy(localFile, new CustomCopyListener());
         System.out.println("");
     }
@@ -325,9 +325,9 @@ public class Shell {
         }
 
         URL sourceUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(localFile.getUrl(), fileName));
-        File sourceFile = fileContext.newFile(sourceUrl);
+        VirtualFile sourceFile = fileContext.newFile(sourceUrl);
         URL targetUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(workingFile.getUrl(), fileName));
-        File targetFile = fileContext.newFile(targetUrl);
+        VirtualFile targetFile = fileContext.newFile(targetUrl);
 
         sourceFile.copy(targetFile, new CustomCopyListener());
         System.out.println("");
@@ -354,7 +354,7 @@ public class Shell {
         private int progressCharsPrinted;
 
         @Override
-        public void startFile(File file, long currentFileNumber) {
+        public void startFile(VirtualFile file, long currentFileNumber) {
             try {
                 System.out.println(String.format("Copying %s [%,d KB]", file.getPath(), Math.round(file.getSize()/1024)));
                 progressCharsPrinted = 0;
@@ -364,7 +364,7 @@ public class Shell {
         }
 
         @Override
-        public void finishedFile(File file) {
+        public void finishedFile(VirtualFile file) {
             if (NUM_PROGRESS_CHARS_100_PERC - progressCharsPrinted > 0)
                 System.out.print(StringUtils.repeat(PROGRESS_CHAR, (NUM_PROGRESS_CHARS_100_PERC - progressCharsPrinted)));
             System.out.println("");
@@ -389,7 +389,7 @@ public class Shell {
         }
 
         @Override
-        public boolean fileExists(File file) {
+        public boolean fileExists(VirtualFile file) {
             try {
                 System.out.println(file.getPath() + " already exists. Overwrite? (y/n)");
                 String next = scanner.next();

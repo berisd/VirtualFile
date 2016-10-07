@@ -11,6 +11,7 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.client.sftp.SftpFile;
 import at.beris.virtualfile.client.sftp.SftpFileTranslator;
@@ -57,17 +58,17 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
     public Byte[] checksum(FileModel model) throws IOException {
         String tempDir = System.getProperty("java.io.tmpdir");
         String tempFilePath = tempDir + java.io.File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
-        at.beris.virtualfile.File tempFile = copyToLocalFile(model, tempFilePath);
+        VirtualFile tempFile = copyToLocalFile(model, tempFilePath);
         return tempFile.checksum();
     }
 
     @Override
-    public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) throws IOException {
+    public List<VirtualFile> list(FileModel model, Filter filter) throws IOException {
         List<SftpFile> fileInfoList = client.list(model.getUrl().getPath());
-        List<at.beris.virtualfile.File> fileList = new ArrayList<>();
+        List<VirtualFile> fileList = new ArrayList<>();
 
         for (SftpFile sftpFile : fileInfoList) {
-            at.beris.virtualfile.File childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), sftpFile.getPath()));
+            VirtualFile childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), sftpFile.getPath()));
             FileModel childModel = new FileModel();
             SftpFileTranslator.fillModel(childModel, sftpFile);
             childFile.setModel(childModel);
@@ -133,7 +134,7 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
         client.setOwner(model.getUrl().getPath(), model.getOwner());
     }
 
-    private at.beris.virtualfile.File copyToLocalFile(FileModel model, String path) throws IOException {
+    private VirtualFile copyToLocalFile(FileModel model, String path) throws IOException {
         byte[] buffer = new byte[1024];
         int length;
 

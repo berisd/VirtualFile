@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.File;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.FileAttribute;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class FileAttributesFilter extends CollectionFilter<Set<FileAttribute>, FileAttribute> {
     @Override
-    protected Set<FileAttribute> getValue(File file) throws IOException {
+    protected Set<FileAttribute> getValue(VirtualFile file) throws IOException {
         return file.getAttributes();
     }
 }

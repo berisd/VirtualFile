@@ -33,7 +33,7 @@ public class FileContext {
 
     private Map<String, Client> siteUrlToClientMap;
     private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
-    private Map<String, File> fileCache;
+    private Map<String, VirtualFile> fileCache;
 
     public FileContext() {
         this(new Configurator());
@@ -58,7 +58,7 @@ public class FileContext {
      * @param path
      * @return
      */
-    public File newLocalFile(String path) throws IOException {
+    public VirtualFile newLocalFile(String path) throws IOException {
         LOGGER.debug("newLocalFile (path: {})", path);
         URL url = new java.io.File(path).toURI().toURL();
         if (path.endsWith(java.io.File.separator))
@@ -72,8 +72,8 @@ public class FileContext {
      * @param urlString
      * @return
      */
-    public File newFile(String urlString) throws IOException {
-        return newFile((File) null, new URL(urlString));
+    public VirtualFile newFile(String urlString) throws IOException {
+        return newFile((VirtualFile) null, new URL(urlString));
     }
 
     /**
@@ -83,7 +83,7 @@ public class FileContext {
      * @return
      * @throws IOException
      */
-    public File newFile(URL url) throws IOException {
+    public VirtualFile newFile(URL url) throws IOException {
         LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         if ("".equals(normalizedUrl.getPath()))
@@ -91,9 +91,9 @@ public class FileContext {
 
         String fullPath = normalizedUrl.getPath();
         if (fullPath.equals("/"))
-            return newFile((File) null, normalizedUrl);
+            return newFile((VirtualFile) null, normalizedUrl);
 
-        File parentFile = null;
+        VirtualFile parentFile = null;
         StringBuilder stringBuilder = new StringBuilder();
 
         for (String pathPart : fullPath.split("/")) {
@@ -108,11 +108,11 @@ public class FileContext {
         return parentFile;
     }
 
-    File newFile(File parent, URL url) throws IOException {
+    VirtualFile newFile(VirtualFile parent, URL url) throws IOException {
         LOGGER.debug("newFile (parentFile: {}, url: {})", parent, maskedUrlString(url));
 
         String urlString = url.toString();
-        File cachedFile = fileCache.get(urlString);
+        VirtualFile cachedFile = fileCache.get(urlString);
         if (cachedFile != null)
             return cachedFile;
 
@@ -120,18 +120,18 @@ public class FileContext {
     }
 
     public void replaceFileUrl(URL oldUrl, URL newUrl) throws IOException {
-        File file = fileCache.get(oldUrl.toString());
+        VirtualFile file = fileCache.get(oldUrl.toString());
         fileCache.remove(oldUrl.toString());
         file.setUrl(newUrl);
         fileCache.put(newUrl.toString(), file);
     }
 
-    public void removeFileFromCache(File file) throws IOException {
+    public void removeFileFromCache(VirtualFile file) throws IOException {
         LOGGER.debug("removeFileFromCache (file : {})", file);
         fileCache.remove(file.getUrl().toString());
     }
 
-    public void dispose(File file) throws IOException {
+    public void dispose(VirtualFile file) throws IOException {
         LOGGER.debug("dispose (file : {})", file);
         removeFileFromCache(file);
         file.dispose();
@@ -166,7 +166,7 @@ public class FileContext {
         return Collections.unmodifiableSet(enabledProtocols);
     }
 
-    public File getFile(String urlString) {
+    public VirtualFile getFile(String urlString) {
         return fileCache.get(urlString);
     }
 
@@ -184,7 +184,7 @@ public class FileContext {
         return null;
     }
 
-    private File createFile(File parent, URL url) throws IOException {
+    private VirtualFile createFile(VirtualFile parent, URL url) throws IOException {
         LOGGER.debug("createFile (parent: {}, url : {})", parent, maskedUrlString(url));
 
         Protocol protocol = UrlUtils.getProtocol(url);
@@ -196,7 +196,7 @@ public class FileContext {
             if (protocol != Protocol.FILE)
                 initClient(url);
             initFileOperationProvider(url, protocol, fileType, getClient(url.toString()));
-            File file = createFileInstance(parent, url);
+            VirtualFile file = createFileInstance(parent, url);
             fileCache.put(url.toString(), file);
             return file;
         } catch (InstantiationException e) {
@@ -222,11 +222,11 @@ public class FileContext {
         return null;
     }
 
-    private File createFileInstance(File parent, URL url) {
+    private VirtualFile createFileInstance(VirtualFile parent, URL url) {
         LOGGER.debug("createFileInstance (parent: {}, url: {})", parent, maskedUrlString(url));
 
         try {
-            Constructor constructor = UrlFile.class.getConstructor(File.class, URL.class, FileContext.class);
+            Constructor constructor = UrlFile.class.getConstructor(VirtualFile.class, URL.class, FileContext.class);
             UrlFile instance = (UrlFile) constructor.newInstance(parent, url, this);
             return instance;
         } catch (ReflectiveOperationException e) {
@@ -272,9 +272,9 @@ public class FileContext {
     }
 
     private void disposeFileCache() throws IOException {
-        Iterator<Map.Entry<String, File>> it = fileCache.entrySet().iterator();
+        Iterator<Map.Entry<String, VirtualFile>> it = fileCache.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, File> entry = it.next();
+            Map.Entry<String, VirtualFile> entry = it.next();
             entry.getValue().dispose();
             it.remove();
         }

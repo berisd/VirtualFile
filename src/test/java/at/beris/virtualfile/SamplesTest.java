@@ -27,9 +27,9 @@ public class SamplesTest {
     @Test
     @Ignore
     public void addFilesToDirectory() throws IOException {
-        File dir = FileManager.newLocalDirectory("testdir");
+        VirtualFile dir = FileManager.newLocalDirectory("testdir");
         dir.create();
-        File file = FileManager.newLocalFile("abc.txt");
+        VirtualFile file = FileManager.newLocalFile("abc.txt");
         dir.add(file);
         file.create();
         dir.delete();
@@ -37,26 +37,26 @@ public class SamplesTest {
 
     @Test
     public void extractArchive() throws IOException {
-        File archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
+        VirtualFile archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
                 "resources" + java.io.File.separator + "testarchive.zip");
-        File directory = FileManager.newLocalDirectory("extracted");
-        List<File> extractedFiles = archive.extract(directory);
+        VirtualFile directory = FileManager.newLocalDirectory("extracted");
+        List<VirtualFile> extractedFiles = archive.extract(directory);
         Assert.assertEquals(33, extractedFiles.size());
         directory.delete();
     }
 
     @Test
     public void listArchive() throws IOException {
-        File archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
+        VirtualFile archive = FileManager.newLocalFile("src" + java.io.File.separator + "test" + java.io.File.separator +
                 "resources" + java.io.File.separator + "testarchive.zip");
         Assert.assertEquals(33, archive.list().size());
     }
 
     @Test
     public void copyFileToDirectory() throws IOException {
-        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
+        VirtualFile file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
         file.copy(FileManager.newLocalFile("."));
-        File copiedFile = FileManager.newLocalFile("dokuwiki-stable.tgz");
+        VirtualFile copiedFile = FileManager.newLocalFile("dokuwiki-stable.tgz");
         Assert.assertArrayEquals(file.checksum(), copiedFile.checksum());
         copiedFile.delete();
     }
@@ -66,14 +66,14 @@ public class SamplesTest {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         FileManager.getConfiguration().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
                 .setPrivateKeyFile(TestFileHelper.TEST_CREDENTIALS_DIRECTORY + java.io.File.separator + "id_dsa");
-        File file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
+        VirtualFile file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
         assertTrue(file.isDirectory());
     }
 
     @Test
     public void AuthWithPasswordNoStrictHost() throws IOException {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new java.io.File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
-        File file = FileManager.newFile("sftp://sshtest:@www.beris.at:22/home/sshtest/.ssh");
+        VirtualFile file = FileManager.newFile("sftp://sshtest:@www.beris.at:22/home/sshtest/.ssh");
         FileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(TestFileHelper.readSftpPassword());
         assertTrue(file.isDirectory());
     }
@@ -81,7 +81,7 @@ public class SamplesTest {
     @Test
     @Ignore
     public void ftpListFiles() throws IOException {
-        File file = FileManager.newFile("ftp://gd.tuwien.ac.at/");
+        VirtualFile file = FileManager.newFile("ftp://gd.tuwien.ac.at/");
         assertTrue(file.list().size() > 0);
     }
 }

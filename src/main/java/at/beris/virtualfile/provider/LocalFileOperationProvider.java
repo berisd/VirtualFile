@@ -11,6 +11,7 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
@@ -67,12 +68,12 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public List<at.beris.virtualfile.File> list(FileModel model, Filter filter) throws IOException {
-        List<at.beris.virtualfile.File> fileList = new ArrayList<>();
+    public List<VirtualFile> list(FileModel model, Filter filter) throws IOException {
+        List<VirtualFile> fileList = new ArrayList<>();
         if (model.isDirectory()) {
             try {
                 for (File childFile : new File(model.getUrl().toURI()).listFiles()) {
-                    at.beris.virtualfile.File file = fileContext.newFile(childFile.toURI().toURL());
+                    VirtualFile file = fileContext.newFile(childFile.toURI().toURL());
                     if (filter == null || filter.filter(file))
                         fileList.add(file);
                 }
@@ -290,7 +291,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     }
 
     @Override
-    public List<at.beris.virtualfile.File> extract(FileModel model, at.beris.virtualfile.File target) throws IOException {
+    public List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException {
         throw new OperationNotSupportedException();
     }
 
