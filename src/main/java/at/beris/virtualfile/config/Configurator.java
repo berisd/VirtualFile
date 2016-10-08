@@ -90,7 +90,7 @@ public class Configurator {
         return fileProviderClassMap;
     }
 
-    public Configuration createConfiguration(URL url) {
+    public Configuration createConfiguration(URL url) throws IOException {
         Protocol protocol = UrlUtils.getProtocol(url);
 
         Configuration protocolConfig = configurationPerProtocolMap.get(protocol);
@@ -99,10 +99,11 @@ public class Configurator {
             configurationPerProtocolMap.put(protocol, protocolConfig);
         }
 
-        Configuration urlConfig = configurationPerUrlMap.get(url);
+        URL siteUrl = UrlUtils.newUrl(UrlUtils.getSiteUrlString(url.toString()));
+        Configuration urlConfig = configurationPerUrlMap.get(siteUrl);
         if (urlConfig == null) {
             urlConfig = new Configuration(protocolConfig);
-            configurationPerUrlMap.put(url, urlConfig);
+            configurationPerUrlMap.put(siteUrl, urlConfig);
         }
 
         return urlConfig;
@@ -117,7 +118,8 @@ public class Configurator {
     }
 
     public Configuration getConfiguration(VirtualFile file) throws IOException {
-        return configurationPerUrlMap.get(file.getUrl());
+        URL siteUrl = UrlUtils.newUrl(UrlUtils.getSiteUrlString(file.getUrl().toString()));
+        return configurationPerUrlMap.get(siteUrl);
     }
 
     public ContextConfiguration getContextConfiguration() {

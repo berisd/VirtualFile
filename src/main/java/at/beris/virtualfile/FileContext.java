@@ -35,6 +35,7 @@ public class FileContext {
     private Map<String, Client> siteUrlToClientMap;
     private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
     private Map<String, VirtualFile> fileCache;
+    private Map<VirtualFile, VirtualFile> fileToParentFileMap;
 
     public FileContext() {
         this(new Configurator());
@@ -46,6 +47,7 @@ public class FileContext {
         this.configurator = configurator;
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProvidersMap = new HashMap<>();
+        this.fileToParentFileMap = new HashMap();
         this.fileCache = new LRUMap<>(configurator.getContextConfiguration().getFileCacheSize());
     }
 
@@ -74,7 +76,7 @@ public class FileContext {
      * @return
      */
     public VirtualFile newFile(String urlString) throws IOException {
-        return newFile((VirtualFile) null, new URL(urlString));
+        return newFile(new URL(urlString));
     }
 
     /**
@@ -91,10 +93,8 @@ public class FileContext {
             normalizedUrl = UrlUtils.newUrl(normalizedUrl.toString() + "/");
 
         String fullPath = normalizedUrl.getPath();
-        if (fullPath.equals("/"))
-            return newFile((VirtualFile) null, normalizedUrl);
-
         VirtualFile parentFile = null;
+        VirtualFile file = null;
         StringBuilder stringBuilder = new StringBuilder();
 
         for (String pathPart : fullPath.split("/")) {
@@ -104,20 +104,20 @@ public class FileContext {
 
             String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl.toString()) + stringBuilder.toString();
             URL pathUrl = UrlUtils.normalizeUrl(new URL(pathUrlString));
-            parentFile = newFile(parentFile, pathUrl);
+
+            file = fileCache.get(pathUrl);
+            if (file == null) {
+                file = createFile(pathUrl);
+                fileCache.put(pathUrl.toString(), file);
+            }
+
+            if (parentFile != null) {
+                fileToParentFileMap.put(file, parentFile);
+            }
+
+            parentFile = file;
         }
-        return parentFile;
-    }
-
-    VirtualFile newFile(VirtualFile parent, URL url) throws IOException {
-        LOGGER.debug("newFile (parentFile: {}, url: {})", parent, maskedUrlString(url));
-
-        String urlString = url.toString();
-        VirtualFile cachedFile = fileCache.get(urlString);
-        if (cachedFile != null)
-            return cachedFile;
-
-        return createFile(parent, url);
+        return file;
     }
 
     public void replaceFileUrl(URL oldUrl, URL newUrl) throws IOException {
@@ -167,12 +167,16 @@ public class FileContext {
         return Collections.unmodifiableSet(enabledProtocols);
     }
 
-    public VirtualFile getFile(String urlString) {
+    VirtualFile getFile(String urlString) {
         return fileCache.get(urlString);
     }
 
-    Client getClient(String urlString) {
-        return siteUrlToClientMap.get(UrlUtils.getSiteUrlString(urlString));
+    VirtualFile getParentFile(VirtualFile file) {
+        return fileToParentFileMap.get(file);
+    }
+
+    Client getClient(String siteUrlString) {
+        return siteUrlToClientMap.get(siteUrlString);
     }
 
     FileOperationProvider getFileOperationProvider(String urlString) {
@@ -185,8 +189,8 @@ public class FileContext {
         return null;
     }
 
-    private VirtualFile createFile(VirtualFile parent, URL url) throws IOException {
-        LOGGER.debug("createFile (parent: {}, url : {})", parent, maskedUrlString(url));
+    private VirtualFile createFile(URL url) throws IOException {
+        LOGGER.debug("createFile (url : {})", maskedUrlString(url));
 
         Protocol protocol = UrlUtils.getProtocol(url);
         if (configurator.getFileOperationProviderClassMap(protocol) == null)
@@ -196,18 +200,15 @@ public class FileContext {
             FileType fileType = UrlUtils.getFileTypeForUrl(url.toString());
             if (protocol != Protocol.FILE)
                 initClient(url);
-            initFileOperationProvider(url, protocol, fileType, getClient(url.toString()));
-            VirtualFile file = createFileInstance(parent, url);
-            fileCache.put(url.toString(), file);
+            initFileOperationProvider(url, protocol, fileType, getClient(UrlUtils.getSiteUrlString(url.toString())));
+            VirtualFile file = createFileInstance(url);
             return file;
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Client createClientInstance(URL url) {
+    private Client createClientInstance(URL url) throws IOException {
         LOGGER.debug("createClientInstance (url: {})", maskedUrlString(url));
 
         Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
@@ -223,12 +224,12 @@ public class FileContext {
         return null;
     }
 
-    private VirtualFile createFileInstance(VirtualFile parent, URL url) {
-        LOGGER.debug("createFileInstance (parent: {}, url: {})", parent, maskedUrlString(url));
+    private VirtualFile createFileInstance(URL url) {
+        LOGGER.debug("createFileInstance (url: {})", maskedUrlString(url));
 
         try {
-            Constructor constructor = UrlFile.class.getConstructor(VirtualFile.class, URL.class, FileContext.class);
-            UrlFile instance = (UrlFile) constructor.newInstance(parent, url, this);
+            Constructor constructor = UrlFile.class.getConstructor(URL.class, FileContext.class);
+            UrlFile instance = (UrlFile) constructor.newInstance(url, this);
             return instance;
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
@@ -247,12 +248,13 @@ public class FileContext {
         }
     }
 
-    private void initClient(URL url) {
+    private void initClient(URL url) throws IOException {
         LOGGER.debug("initClient(url: {}", maskedUrlString(url));
-        Client client = getClient(url.toString());
+        String siteUrlString = UrlUtils.getSiteUrlString(url.toString());
+        Client client = getClient(siteUrlString);
         if (client == null) {
-            client = createClientInstance(url);
-            siteUrlToClientMap.put(UrlUtils.getSiteUrlString(url.toString()), client);
+            client = createClientInstance(UrlUtils.newUrl(siteUrlString));
+            siteUrlToClientMap.put(siteUrlString, client);
         }
     }
 

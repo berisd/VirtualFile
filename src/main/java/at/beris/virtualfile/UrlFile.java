@@ -35,14 +35,12 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
 
     private static Logger logger = LoggerFactory.getLogger(UrlFile.class);
 
-    private VirtualFile parent;
     private FileModel model;
     private URL url;
     private FileOperationProvider fileOperationProvider;
     private FileContext context;
 
-    public UrlFile(VirtualFile parent, URL url, FileContext context) {
-        this.parent = parent;
+    public UrlFile(URL url, FileContext context) {
         this.url = url;
         this.context = context;
         this.fileOperationProvider = context.getFileOperationProvider(url.toString());
@@ -147,7 +145,6 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
             model.clear();
             model = null;
         }
-        parent = null;
         url = null;
         context = null;
         fileOperationProvider = null;
@@ -197,6 +194,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     @Override
     public VirtualFile getParent() {
         logger.debug("Get parent for {}", this);
+        VirtualFile parent = context.getParentFile(this);
         logger.debug("Returns: {}", parent);
         return parent;
     }
@@ -497,18 +495,19 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
 
     @Override
     public int hashCode() {
-        return model.getUrl().toString().hashCode();
+        return url.toString().hashCode();
     }
 
     @Override
     public int compareTo(UrlFile o) {
-        return model.getUrl().toString().compareTo(o.getUrl().toString());
+        return url.toString().compareTo(url.toString());
     }
 
     @Override
     public void setModel(FileModel model) throws IOException {
         logger.debug("Set model to {} for {}", model, this);
         this.model = model;
+        VirtualFile parent = context.getParentFile(this);
         if (parent != null)
             model.setParent(parent.getModel());
         model.setUrl(url);
@@ -523,7 +522,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
         logger.debug("Check model for {}", this);
         if (model == null)
             createModel();
-        if (!model.getUrl().toString().equals(url.toString())) {
+        if (model.getUrl() != null && !url.toString().equals(model.getUrl().toString())) {
             context.replaceFileUrl(url, model.getUrl());
         }
     }
@@ -531,6 +530,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     private void createModel() throws IOException {
         logger.debug("Create model for {}", this);
         model = new FileModel();
+        VirtualFile parent = context.getParentFile(this);
         if (parent != null)
             model.setParent(parent.getModel());
         model.setUrl(url);

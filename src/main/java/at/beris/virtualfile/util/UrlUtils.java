@@ -24,7 +24,11 @@ public class UrlUtils {
     }
 
     public static String getSiteUrlString(String urlString) {
-        return urlString.substring(0, urlString.indexOf("/", urlString.indexOf("//") + 2));
+        int indexPathBegin = urlString.indexOf("/", urlString.indexOf("//") + 2);
+        if (indexPathBegin == -1)
+            return urlString;
+        else
+            return urlString.substring(0, indexPathBegin);
     }
 
     public static FileType getFileTypeForUrl(String urlString) {

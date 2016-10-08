@@ -54,6 +54,6 @@ public class FileUtilsTest {
         URL url = new URL(urlString);
         FileContext context = Mockito.mock(FileContext.class);
 
-        return new UrlFile(null, url, context);
+        return new UrlFile(url, context);
     }
 }

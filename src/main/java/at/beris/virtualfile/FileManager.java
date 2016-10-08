@@ -72,10 +72,6 @@ public class FileManager {
         return fileContext.newFile(url);
     }
 
-    public static VirtualFile newFile(VirtualFile parent, URL url) throws IOException {
-        return fileContext.newFile(parent, url);
-    }
-
     public static VirtualFile newFile(URL url) throws IOException {
         return fileContext.newFile(url);
     }
