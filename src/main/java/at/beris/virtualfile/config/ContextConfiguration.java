@@ -23,7 +23,7 @@ public class ContextConfiguration {
     }
 
     public void initValues() {
-        settings.put(ContextConfigurationOption.FILE_CACHE_SIZE, new IntegerConfigValue(4096));
+        settings.put(ContextConfigurationOption.FILE_CACHE_SIZE, new IntegerConfigValue(10000));
     }
 
     public Integer getFileCacheSize() {
