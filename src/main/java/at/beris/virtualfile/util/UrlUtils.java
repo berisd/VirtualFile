@@ -17,8 +17,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UrlUtils {
+
+    public static final String PROPERTY_KEY_PROTOCOL_HANDLER_PKGS = "java.protocol.handler.pkgs";
+
     public static Protocol getProtocol(URL url) {
         return Protocol.valueOf(url.getProtocol().toUpperCase());
     }
@@ -104,9 +110,9 @@ public class UrlUtils {
     }
 
     public static URL getParentUrl(URL url) throws IOException {
-        String fullPath = url.getPath();
-
-        if ("/".equals(fullPath))
+        String path = url.getPath();
+        int indexPathBegin = path.indexOf("/", path.indexOf("//") + 2);
+        if (indexPathBegin == -1)
             return null;
 
         String parentPath = UrlUtils.getParentPath(url.toString());
@@ -129,13 +135,21 @@ public class UrlUtils {
      * Set property so that URL class will find custom handlers
      */
     public static void registerProtocolURLStreamHandlers() {
-        String propertyKey = "java.protocol.handler.pkgs";
-        String propertyValue = System.getProperties().getProperty(propertyKey);
-        if (StringUtils.isEmpty(propertyValue))
-            propertyValue = "";
-        else
-            propertyValue += "|";
-        propertyValue += at.beris.virtualfile.protocol.Protocol.class.getPackage().getName();
-        System.getProperties().setProperty(propertyKey, propertyValue);
+        String propertyValue = System.getProperties().getProperty(PROPERTY_KEY_PROTOCOL_HANDLER_PKGS);
+        Set<String> partSet = new HashSet<>();
+        if (!StringUtils.isEmpty(propertyValue))
+            partSet.addAll(Arrays.asList(StringUtils.split(propertyValue, '|')));
+        partSet.add(at.beris.virtualfile.protocol.Protocol.class.getPackage().getName());
+        System.getProperties().setProperty(PROPERTY_KEY_PROTOCOL_HANDLER_PKGS, StringUtils.join(partSet, '|'));
+    }
+
+    public static void unregisterProtocolURLStreamHandlers() {
+        String propertyValue = System.getProperties().getProperty(PROPERTY_KEY_PROTOCOL_HANDLER_PKGS);
+        if (!StringUtils.isEmpty(propertyValue)) {
+            Set<String> partSet = new HashSet<>();
+            partSet.addAll(Arrays.asList(StringUtils.split(propertyValue, '|')));
+            partSet.remove(at.beris.virtualfile.protocol.Protocol.class.getPackage().getName());
+            System.getProperties().setProperty(PROPERTY_KEY_PROTOCOL_HANDLER_PKGS, StringUtils.join(partSet, '|'));
+        }
     }
 }

@@ -61,14 +61,18 @@ public class FileUtils {
     }
 
     public static String getAttributesString(FileAttribute[] attributes) {
-        String attributesString = "";
+        StringBuilder sb = new StringBuilder();
+
         if (attributes.length < 1)
-            attributesString = "<none>";
+            sb.append("<none>");
         else {
-            for (FileAttribute attribute : attributes)
-                attributesString = (! attributesString.equals("")  ? ", " : "") + attribute.toString();
+            for (FileAttribute attribute : attributes) {
+                if (sb.length() > 0)
+                    sb.append(", ");
+                sb.append(attribute.toString());
+            }
         }
-        return attributesString;
+        return sb.toString();
     }
 
     public static String getName(String path) {
