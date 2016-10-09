@@ -12,5 +12,5 @@ package at.beris.virtualfile.cache;
 import at.beris.virtualfile.VirtualFile;
 
 public interface FileCacheCallbackHandler {
-    void beforeEntryRemoved(VirtualFile entry);
+    void beforeEntryRemoved(VirtualFile value);
 }

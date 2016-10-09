@@ -27,6 +27,7 @@ import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.*;
 
+import static at.beris.virtualfile.util.CollectionUtils.removeEntriesByValueFromMap;
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
 public class FileContext {
@@ -127,19 +128,18 @@ public class FileContext {
 
     public void replaceFileUrl(URL oldUrl, URL newUrl) throws IOException {
         VirtualFile file = fileCache.get(oldUrl.toString());
+        removeEntriesByValueFromMap(fileToParentFileMap, file);
+        fileToParentFileMap.remove(file.getUrl().toString());
         fileCache.remove(oldUrl.toString());
         file.setUrl(newUrl);
         fileCache.put(newUrl.toString(), file);
     }
 
-    public void removeFileFromCache(VirtualFile file) throws IOException {
-        LOGGER.debug("removeFileFromCache (file : {})", file);
-        fileCache.remove(file.getUrl().toString());
-    }
-
     public void dispose(VirtualFile file) throws IOException {
         LOGGER.debug("dispose (file : {})", file);
-        removeFileFromCache(file);
+        removeEntriesByValueFromMap(fileToParentFileMap, file);
+        fileToParentFileMap.remove(file.getUrl().toString());
+        fileCache.remove(file.getUrl().toString());
         file.dispose();
     }
 
@@ -177,13 +177,9 @@ public class FileContext {
         VirtualFile parentFile = fileToParentFileMap.get(file);
 
         if (parentFile == null) {
-            String fullPath = file.getUrl().getPath();
-
-            if ("/".equals(fullPath))
+            URL parentUrl = UrlUtils.getParentUrl(file.getUrl());
+            if (parentUrl == null)
                 return null;
-
-            String parentPath = UrlUtils.getParentPath(file.getUrl().toString());
-            URL parentUrl = UrlUtils.newUrl(UrlUtils.newUrl(UrlUtils.getSiteUrlString(file.getUrl().toString())), parentPath);
 
             parentFile = fileCache.get(parentUrl.toString());
             if (parentFile == null) {
@@ -313,13 +309,8 @@ public class FileContext {
     private class CustomFileCacheCallbackHandlerHandler implements FileCacheCallbackHandler {
 
         @Override
-        public void beforeEntryRemoved(VirtualFile entry) {
-            for (Map.Entry<VirtualFile, VirtualFile> mapEntry : fileToParentFileMap.entrySet()) {
-                if (mapEntry.getValue().equals(entry)) {
-                    fileToParentFileMap.remove(mapEntry.getKey());
-                    break;
-                }
-            }
+        public void beforeEntryRemoved(VirtualFile value) {
+            removeEntriesByValueFromMap(fileToParentFileMap, value);
         }
     }
 }

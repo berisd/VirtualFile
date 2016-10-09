@@ -103,6 +103,16 @@ public class UrlUtils {
         return stringBuilder.toString();
     }
 
+    public static URL getParentUrl(URL url) throws IOException {
+        String fullPath = url.getPath();
+
+        if ("/".equals(fullPath))
+            return null;
+
+        String parentPath = UrlUtils.getParentPath(url.toString());
+        return newUrl(newUrl(getSiteUrlString(url.toString())), parentPath);
+    }
+
     public static String getParentPath(String urlPath) {
         if (urlPath.endsWith("/"))
             urlPath = urlPath.substring(0, urlPath.lastIndexOf('/'));
