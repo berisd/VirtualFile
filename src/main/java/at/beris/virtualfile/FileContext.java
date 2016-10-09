@@ -9,7 +9,9 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.cache.LRUMap;
+import at.beris.virtualfile.cache.DisposableObject;
+import at.beris.virtualfile.cache.FileCache;
+import at.beris.virtualfile.cache.FileCacheCallbackHandler;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
@@ -38,17 +40,20 @@ public class FileContext {
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
 
     public FileContext() {
-        this(new Configurator());
+        this(new Configurator(), new FileCache(1024));
     }
 
-    public FileContext(Configurator configurator) {
+    public FileContext(Configurator configurator, FileCache fileCache) {
         UrlUtils.registerProtocolURLStreamHandlers();
 
         this.configurator = configurator;
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProvidersMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
-        this.fileCache = new LRUMap<>(configurator.getContextConfiguration().getFileCacheSize());
+
+        fileCache.setSize(configurator.getContextConfiguration().getFileCacheSize());
+        fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
+        this.fileCache = fileCache;
     }
 
     public Configurator getConfigurator() {
@@ -139,9 +144,10 @@ public class FileContext {
     }
 
     public void dispose() throws IOException {
-        disposeFileCache();
+        fileToParentFileMap.clear();
+        disposeMap(fileCache);
         disposeClientToFileOperationProvidersMap();
-        disposeSiteUrlToClientMap();
+        disposeMap(siteUrlToClientMap);
     }
 
     public Set<Protocol> enabledProtocols() {
@@ -167,11 +173,25 @@ public class FileContext {
         return Collections.unmodifiableSet(enabledProtocols);
     }
 
-    VirtualFile getFile(String urlString) {
-        return fileCache.get(urlString);
-    }
+    VirtualFile getParentFile(VirtualFile file) throws IOException {
+        VirtualFile parentFile = fileToParentFileMap.get(file);
 
-    VirtualFile getParentFile(VirtualFile file) {
+        if (parentFile == null) {
+            String fullPath = file.getUrl().getPath();
+
+            if ("/".equals(fullPath))
+                return null;
+
+            String parentPath = UrlUtils.getParentPath(file.getUrl().toString());
+            URL parentUrl = UrlUtils.newUrl(UrlUtils.newUrl(UrlUtils.getSiteUrlString(file.getUrl().toString())), parentPath);
+
+            parentFile = fileCache.get(parentUrl.toString());
+            if (parentFile == null) {
+                parentFile = createFile(parentUrl);
+                fileCache.put(parentUrl.toString(), parentFile);
+            }
+        }
+
         return fileToParentFileMap.get(file);
     }
 
@@ -274,10 +294,10 @@ public class FileContext {
         }
     }
 
-    private void disposeFileCache() throws IOException {
-        Iterator<Map.Entry<String, VirtualFile>> it = fileCache.entrySet().iterator();
+    private <K, V extends DisposableObject> void disposeMap(Map<K, V> map) throws IOException {
+        Iterator<Map.Entry<K, V>> it = map.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, VirtualFile> entry = it.next();
+            Map.Entry<K, V> entry = it.next();
             entry.getValue().dispose();
             it.remove();
         }
@@ -287,26 +307,21 @@ public class FileContext {
         Iterator<Map.Entry<Client, Map<FileType, FileOperationProvider>>> it = clientToFileOperationProvidersMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Client, Map<FileType, FileOperationProvider>> entry = it.next();
-            disposeFileTypeToFileOperationProviderMap(entry.getValue());
+            disposeMap(entry.getValue());
             it.remove();
         }
     }
 
-    private void disposeFileTypeToFileOperationProviderMap(Map<FileType, FileOperationProvider> map) {
-        Iterator<Map.Entry<FileType, FileOperationProvider>> it = map.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<FileType, FileOperationProvider> next = it.next();
-            next.getValue().dispose();
-            it.remove();
-        }
-    }
+    private class CustomFileCacheCallbackHandlerHandler implements FileCacheCallbackHandler {
 
-    private void disposeSiteUrlToClientMap() throws IOException {
-        Iterator<Map.Entry<String, Client>> it = siteUrlToClientMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Client> next = it.next();
-            next.getValue().dispose();
-            it.remove();
+        @Override
+        public void beforeEntryRemoved(VirtualFile entry) {
+            for (Map.Entry<VirtualFile, VirtualFile> mapEntry : fileToParentFileMap.entrySet()) {
+                if (mapEntry.getValue().equals(entry)) {
+                    fileToParentFileMap.remove(mapEntry.getKey());
+                    break;
+                }
+            }
         }
     }
 }

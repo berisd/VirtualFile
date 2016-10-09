@@ -10,7 +10,6 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.Configuration;
-import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.config.ContextConfiguration;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.UrlUtils;
@@ -25,7 +24,7 @@ public class FileManager {
     private static final FileContext fileContext;
 
     static {
-        fileContext = new FileContext(new Configurator());
+        fileContext = new FileContext();
     }
 
     private FileManager() {

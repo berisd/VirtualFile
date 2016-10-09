@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CopyListener;
 
@@ -24,7 +25,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
-public interface VirtualFile {
+public interface VirtualFile extends DisposableObject {
     void add(VirtualFile file) throws IOException;
 
     void addAttributes(FileAttribute... attributes) throws IOException;
@@ -156,8 +157,5 @@ public interface VirtualFile {
 
     void setUrl(URL url) throws IOException;
 
-    /**
-     * Free the file with all resources
-     */
     void dispose() throws IOException;
 }

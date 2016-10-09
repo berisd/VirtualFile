@@ -10,6 +10,7 @@
 package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.cache.DisposableObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +22,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
-public interface Client<T> {
+public interface Client<T> extends DisposableObject {
     URL getUrl();
 
     void setUrl(URL url);

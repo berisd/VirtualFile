@@ -9,8 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.provider.operation.FileOperation;
@@ -21,7 +22,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
 
-public interface FileOperationProvider {
+public interface FileOperationProvider extends DisposableObject {
     Byte[] checksum(FileModel model) throws IOException;
 
     /**

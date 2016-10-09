@@ -192,7 +192,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public VirtualFile getParent() {
+    public VirtualFile getParent() throws IOException {
         logger.debug("Get parent for {}", this);
         VirtualFile parent = context.getParentFile(this);
         logger.debug("Returns: {}", parent);
