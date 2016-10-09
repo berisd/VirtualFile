@@ -147,8 +147,6 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
             while ((length = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, length);
             }
-        } catch (IOException e) {
-            throw e;
         }
 
         return fileContext.newLocalFile(path);

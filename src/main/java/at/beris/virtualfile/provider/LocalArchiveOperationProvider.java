@@ -105,9 +105,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                 VirtualFile file = fileContext.newFile(urlMap.get(URL));
                 fileList.add(file);
             }
-        } catch (ArchiveException e) {
-            throw new IOException(e);
-        } catch (URISyntaxException e) {
+        } catch (ArchiveException | URISyntaxException e) {
             throw new IOException(e);
         } finally {
             if (ais != null)
@@ -127,7 +125,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
         String path = StringUtils.join(pathParts, "/", 0, pathParts.length - 1);
 
         String parentUrlString = rootUrl.toString() + (rootUrl.toString().endsWith("/") ? "" : "/")
-                + path + (path != "" ? "/" : "");
+                + path + (path.equals("")  ? "" : "/");
         String urlString = parentUrlString + pathParts[pathParts.length - 1]
                 + (archiveEntryPath.endsWith("/") ? "/" : "");
 

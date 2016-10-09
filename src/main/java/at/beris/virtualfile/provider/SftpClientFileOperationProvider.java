@@ -145,8 +145,6 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
             while ((length = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, length);
             }
-        } catch (IOException e) {
-            throw e;
         }
 
         return fileContext.newLocalFile(path);

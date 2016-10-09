@@ -28,8 +28,7 @@ public interface FileOperationProvider extends DisposableObject {
     /**
      * Creates a new  physical representation
      *
-     * @param model
-     * @return
+     * @param model FileModel
      */
     void create(FileModel model) throws IOException;
 
@@ -44,16 +43,16 @@ public interface FileOperationProvider extends DisposableObject {
     /**
      * List files in this file
      *
-     * @param model
-     * @param filter
-     * @return
+     * @param model FileModel
+     * @param filter Filter
+     * @return List of files
      */
     List<VirtualFile> list(FileModel model, Filter filter) throws IOException;
 
     /**
      * Updates the Model with information from the physical file.
      *
-     * @param model
+     * @param model FileModel
      */
     void updateModel(FileModel model) throws IOException;
 

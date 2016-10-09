@@ -50,8 +50,8 @@ public class FileManager {
     /**
      * Creates a local file with with the given path. (Convenience method)
      *
-     * @param path
-     * @return
+     * @param path Path
+     * @return New File instance
      */
     public static VirtualFile newLocalFile(String path) throws IOException {
         return fileContext.newLocalFile(path);
@@ -60,8 +60,8 @@ public class FileManager {
     /**
      * Creates a local directory with with the given path. (Convenience method)
      *
-     * @param path
-     * @return
+     * @param path Path
+     * @return New File Instance
      */
     public static VirtualFile newLocalDirectory(String path) throws IOException {
         return fileContext.newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));

@@ -69,8 +69,8 @@ public class UrlUtils {
     /**
      * Masks sensitive information in an url (e.g. for logging)
      *
-     * @param url
-     * @return
+     * @param url URL
+     * @return Masked URL String
      */
     public static String maskedUrlString(URL url) {
         StringBuilder stringBuilder = new StringBuilder("");
@@ -106,15 +106,13 @@ public class UrlUtils {
     public static String getParentPath(String urlPath) {
         if (urlPath.endsWith("/"))
             urlPath = urlPath.substring(0, urlPath.lastIndexOf('/'));
-        String parentPath = urlPath.substring(0, urlPath.lastIndexOf('/') + 1);
-        return parentPath;
+        return urlPath.substring(0, urlPath.lastIndexOf('/') + 1);
     }
 
     public static String getLastPathPart(String urlPath) {
         if (urlPath.endsWith("/"))
             urlPath = urlPath.substring(0, urlPath.lastIndexOf('/'));
-        String urlPart = urlPath.substring(urlPath.lastIndexOf('/') + 1);
-        return urlPart;
+        return urlPath.substring(urlPath.lastIndexOf('/') + 1);
     }
 
     /**

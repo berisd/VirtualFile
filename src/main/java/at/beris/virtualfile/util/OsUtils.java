@@ -15,13 +15,13 @@ public class OsUtils {
     private static String OS = System.getProperty("os.name").toLowerCase();
 
     public static OsFamily detectOSFamily() {
-        if (OS.indexOf("win") >= 0)
+        if (OS.contains("win"))
             return OsFamily.WINDOWS;
-        else if (OS.indexOf("mac") >= 0)
+        else if (OS.contains("mac"))
             return OsFamily.MAC;
-        else if (OS.indexOf("sunos") >= 0)
+        else if (OS.contains("sunos"))
             return OsFamily.SOLARIS;
-        else if (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0)
+        else if (OS.contains("nix") || OS.contains("nux") || OS.indexOf("aix") > 0)
             return OsFamily.UNIX;
         else
             return OsFamily.UNKNOWN;

@@ -98,7 +98,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
     @Override
     public Byte[] checksum(FileModel model) throws IOException {
-        try (FileInputStream fis = new FileInputStream(new File(model.getUrl().toURI()));) {
+        try (FileInputStream fis = new FileInputStream(new File(model.getUrl().toURI()))) {
             MessageDigest md = MessageDigest.getInstance("SHA1");
             byte[] dataBytes = new byte[1024];
 

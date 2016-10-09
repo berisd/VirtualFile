@@ -21,7 +21,7 @@ public interface CopyListener extends Listener {
     boolean interrupt();
 
     /**
-     * @param file
+     * @param file File
      * @return true: continue with current file, false: continue with next file
      */
     boolean fileExists(VirtualFile file);

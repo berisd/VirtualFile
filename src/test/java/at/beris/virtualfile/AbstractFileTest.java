@@ -69,7 +69,7 @@ public abstract class AbstractFileTest {
                 assertTrue(TestFileHelper.isDateCloseToNow(file.getCreationTime(), 10));
             assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
             assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
-            assertTrue(file.getOwner() instanceof UserPrincipal);
+            assertTrue(file.getOwner() != null);
             assertEquals(0, file.getSize());
             assertFalse(file.isDirectory());
         }

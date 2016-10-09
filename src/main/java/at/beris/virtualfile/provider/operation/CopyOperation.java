@@ -77,14 +77,12 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
     }
 
     private void copyFile(VirtualFile source, VirtualFile target, CopyListener listener) throws IOException {
-        InputStream inputStream = source.getInputStream();
-        OutputStream outputStream = target.getOutputStream();
         byte[] buffer = new byte[COPY_BUFFER_SIZE];
 
         long bytesWrittenTotal = 0;
         long bytesWrittenBlock = 0;
         int length;
-        try {
+        try (InputStream inputStream = source.getInputStream(); OutputStream outputStream = target.getOutputStream()) {
             while ((length = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, length);
                 bytesWrittenBlock = length;
@@ -94,9 +92,6 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
                 if (listener != null && listener.interrupt())
                     break;
             }
-        } finally {
-            inputStream.close();
-            outputStream.close();
         }
     }
 }

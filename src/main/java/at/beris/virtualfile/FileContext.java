@@ -63,8 +63,8 @@ public class FileContext {
     /**
      * Creates a local file. (Convenience method)
      *
-     * @param path
-     * @return
+     * @param path Path
+     * @return New file
      */
     public VirtualFile newLocalFile(String path) throws IOException {
         LOGGER.debug("newLocalFile (path: {})", path);
@@ -77,8 +77,8 @@ public class FileContext {
     /**
      * Creates a file. (Convenience method)
      *
-     * @param urlString
-     * @return
+     * @param urlString URL String
+     * @return New File
      */
     public VirtualFile newFile(String urlString) throws IOException {
         return newFile(new URL(urlString));
@@ -87,9 +87,9 @@ public class FileContext {
     /**
      * Creates a file instance for the corresponding url
      *
-     * @param url
-     * @return
-     * @throws IOException
+     * @param url URL
+     * @return New File Instance
+     * @throws IOException IOException
      */
     public VirtualFile newFile(URL url) throws IOException {
         LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
@@ -164,7 +164,7 @@ public class FileContext {
             try {
                 if (Class.forName(protocolLibrary.getRight()) != null)
                     enabledProtocols.add(protocol);
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ignored) {
             }
             if (!enabledProtocols.contains(protocol))
                 LOGGER.info(protocolLibrary.getLeft() + " not installed. No support for protocol " + protocol);
@@ -221,8 +221,7 @@ public class FileContext {
             if (protocol != Protocol.FILE)
                 initClient(url);
             initFileOperationProvider(url, protocol, fileType, getClient(UrlUtils.getSiteUrlString(url.toString())));
-            VirtualFile file = createFileInstance(url);
-            return file;
+            return createFileInstance(url);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -249,8 +248,7 @@ public class FileContext {
 
         try {
             Constructor constructor = UrlFile.class.getConstructor(URL.class, FileContext.class);
-            UrlFile instance = (UrlFile) constructor.newInstance(url, this);
-            return instance;
+            return (UrlFile) constructor.newInstance(url, this);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }

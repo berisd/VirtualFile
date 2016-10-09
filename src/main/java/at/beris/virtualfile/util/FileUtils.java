@@ -40,7 +40,7 @@ public class FileUtils {
     }
 
     public static List<String> getArchiveExtensions() {
-        return Arrays.asList(new String[]{"ZIP", "JAR", "TAR", "7Z", "ARJ"});
+        return Arrays.asList("ZIP", "JAR", "TAR", "7Z", "ARJ");
     }
 
     public static Map<Filter, List<VirtualFile>> groupFileListByFilters(List<VirtualFile> fileList, List<Filter> filterList) throws IOException {
@@ -66,7 +66,7 @@ public class FileUtils {
             attributesString = "<none>";
         else {
             for (FileAttribute attribute : attributes)
-                attributesString = (attributesString != "" ? ", " : "") + attribute.toString();
+                attributesString = (! attributesString.equals("")  ? ", " : "") + attribute.toString();
         }
         return attributesString;
     }
@@ -74,7 +74,6 @@ public class FileUtils {
     public static String getName(String path) {
         if (path.endsWith("/"))
             path = path.substring(0, path.lastIndexOf('/'));
-        String name = path.substring(path.lastIndexOf('/') + 1);
-        return name;
+        return path.substring(path.lastIndexOf('/') + 1);
     }
 }

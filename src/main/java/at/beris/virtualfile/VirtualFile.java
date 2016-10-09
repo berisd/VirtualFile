@@ -39,8 +39,7 @@ public interface VirtualFile extends DisposableObject {
     /**
      * Creates an empty file
      *
-     * @return true if the named file does not exist and was successfully created; false if the named file already exists
-     * @throws IOException
+     * @throws IOException IOException
      */
     void create() throws IOException;
 
@@ -94,7 +93,7 @@ public interface VirtualFile extends DisposableObject {
     /**
      * Returns the size in bytes for a file and the number of contained items for a directory
      *
-     * @return
+     * @return File size
      */
     long getSize() throws IOException;
 

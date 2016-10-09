@@ -101,8 +101,6 @@ public class FtpClient extends AbstractClient<FTPFile> {
                 try (ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[]{})) {
                     checkConnection();
                     ftpClient.storeFile(path, inputStream);
-                } catch (IOException e) {
-                    throw e;
                 }
                 return null;
             }
@@ -238,7 +236,8 @@ public class FtpClient extends AbstractClient<FTPFile> {
 
     public List<FTPFile> list(final String path) throws IOException {
         LOGGER.debug("list (path: {})", path);
-        List<FTPFile> fileInfoList = executionHandler(new Callable<List<FTPFile>>() {
+
+        return executionHandler(new Callable<List<FTPFile>>() {
             @Override
             public List<FTPFile> call() throws Exception {
                 int replyCode = ftpClient.cwd(path);
@@ -252,8 +251,6 @@ public class FtpClient extends AbstractClient<FTPFile> {
                 return Collections.emptyList();
             }
         });
-
-        return fileInfoList;
     }
 
     @Override

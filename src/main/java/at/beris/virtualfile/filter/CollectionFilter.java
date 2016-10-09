@@ -16,7 +16,7 @@ import java.util.HashSet;
 
 public abstract class CollectionFilter<C extends Collection, E> extends BasicFilter<C> {
     public CollectionFilter contains(E value) {
-        putOperationValues(Operation.CONTAINS, (C) Collections.singletonList(new HashSet<>(Arrays.asList(value))));
+        putOperationValues(Operation.CONTAINS, (C) Collections.singletonList(new HashSet<>(Collections.singletonList(value))));
         return this;
     }
 
@@ -41,7 +41,7 @@ public abstract class CollectionFilter<C extends Collection, E> extends BasicFil
             case EQUAL:
                 return value.containsAll(filterValue) && value.size() == filterValue.size();
             case CONTAINS:
-                return filterValue.iterator().hasNext() ? value.contains(filterValue.iterator().next()) : false;
+                return filterValue.iterator().hasNext() && value.contains(filterValue.iterator().next());
             default:
                 return super.matchSingleValue(value, filterValue, operation);
         }
