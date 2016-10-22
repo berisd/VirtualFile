@@ -17,18 +17,13 @@ import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
 import org.junit.*;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class LocalUnixFileTest extends AbstractFileTest {
@@ -44,13 +39,13 @@ public class LocalUnixFileTest extends AbstractFileTest {
     }
 
     @Before
-    public void beforeTest() {
-        super.beforeTest();
+    public void beforeTestCase() throws Exception {
+        super.beforeTestCase();
     }
 
     @After
-    public void afterTest() throws IOException {
-        super.afterTest();
+    public void afterTestCase() throws IOException {
+        super.afterTestCase();
     }
 
     @Test
@@ -65,21 +60,7 @@ public class LocalUnixFileTest extends AbstractFileTest {
 
     @Test
     public void createSymbolicLink() throws IOException {
-        String symLinkName = TEST_SOURCE_DIRECTORY_NAME + "Link";
-        Path dir = new File(TEST_SOURCE_DIRECTORY_NAME).toPath();
-        Path symLink = new File(symLinkName).toPath();
-
-        Files.createDirectory(dir);
-        Files.createSymbolicLink(symLink, dir);
-
-        URL symLinkUrl = UrlUtils.getUrlForLocalPath(symLinkName);
-        VirtualFile file = fileContext.newFile(symLinkUrl);
-
-        assertTrue(file.isSymbolicLink());
-        assertEquals(dir.toUri().toURL().toString(), file.getLinkTarget().toString());
-
-        Files.delete(symLink);
-        Files.delete(dir);
+        super.createSymbolicLink();
     }
 
     @Test
@@ -149,5 +130,10 @@ public class LocalUnixFileTest extends AbstractFileTest {
     @Test
     public void setLastAccessTime() throws IOException {
         super.setLastAccessTime();
+    }
+
+    @Override
+    protected FileContext createFileContext() {
+        return new FileContext();
     }
 }

@@ -26,20 +26,20 @@ public class LocalArchiveTest extends AbstractFileTest {
     }
 
     @Before
-    public void beforeTest() {
-        super.beforeTest();
+    public void beforeTestCase() throws Exception {
+        super.beforeTestCase();
     }
 
     @After
-    public void afterTest() throws IOException {
-        super.afterTest();
+    public void afterTestCase() throws IOException {
+        super.afterTestCase();
     }
 
     @Test
     @Ignore
     public void createArchive() throws IOException {
 
-        VirtualFile archiveFile = fileContext.newLocalFile(ZIP_FILENAME);
+        VirtualFile archiveFile = getFileContext().newLocalFile(ZIP_FILENAME);
 
         archiveFile.create();
 
@@ -66,9 +66,14 @@ public class LocalArchiveTest extends AbstractFileTest {
 
     @Test
     public void listArchive() throws IOException {
-        VirtualFile file = fileContext.newLocalFile(ZIP_FILENAME);
+        VirtualFile file = getFileContext().newLocalFile(ZIP_FILENAME);
         assertTrue(file.getSize() > 0);
         List<VirtualFile> list = file.list();
         assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, list.size());
+    }
+
+    @Override
+    protected FileContext createFileContext() {
+        return new FileContext();
     }
 }

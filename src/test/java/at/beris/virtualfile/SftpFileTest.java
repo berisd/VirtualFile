@@ -33,10 +33,13 @@ import static org.junit.Assert.*;
 public class SftpFileTest extends AbstractFileTest {
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void beforeTest() throws Exception {
         initIntegrationTest();
-        UrlUtils.registerProtocolURLStreamHandlers();
+    }
 
+    @Before
+    public void beforeTestCase() throws Exception {
+        super.beforeTestCase();
         URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestFileHelper.SSH_HOME_DIRECTORY);
         sourceFileUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_FILE_NAME);
         targetFileUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_TARGET_FILE_NAME);
@@ -44,14 +47,9 @@ public class SftpFileTest extends AbstractFileTest {
         targetDirectoryUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
-    @Before
-    public void beforeTest() {
-        super.beforeTest();
-    }
-
     @After
-    public void afterTest() throws IOException {
-        super.afterTest();
+    public void afterTestCase() throws IOException {
+        super.afterTestCase();
     }
 
     @Test
@@ -127,5 +125,10 @@ public class SftpFileTest extends AbstractFileTest {
     public void setGroup() throws IOException {
         UnixGroupPrincipal group = new UnixGroupPrincipal(1002);
         super.setGroup(group);
+    }
+
+    @Override
+    protected FileContext createFileContext() {
+        return new FileContext();
     }
 }

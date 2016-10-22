@@ -47,13 +47,13 @@ public class LocalWindowsFileTest extends AbstractFileTest {
     }
 
     @Before
-    public void beforeTest() {
-        super.beforeTest();
+    public void beforeTestCase() throws Exception {
+        super.beforeTestCase();
     }
 
     @After
-    public void afterTest() throws IOException {
-        super.afterTest();
+    public void afterTestCase() throws IOException {
+        super.afterTestCase();
     }
 
     @Test
@@ -102,16 +102,16 @@ public class LocalWindowsFileTest extends AbstractFileTest {
         Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(BasicFilePermission.EXECUTE);
         attributes.add(DosFileAttribute.HIDDEN);
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = getFileContext().newFile(sourceFileUrl);
         file.create();
         file.setAttributes(attributes.toArray(new FileAttribute[0]));
-        fileContext.dispose(file);
+        getFileContext().dispose(file);
 
-        file = fileContext.newFile(sourceFileUrl);
+        file = getFileContext().newFile(sourceFileUrl);
         Set<FileAttribute> actualAttributes = file.getAttributes();
         assertTrue(actualAttributes.containsAll(attributes));
         file.delete();
-        fileContext.dispose(file);
+        getFileContext().dispose(file);
     }
 
     @Test
@@ -123,15 +123,15 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void setAcl() throws IOException {
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = getFileContext().newFile(sourceFileUrl);
         file.create();
         List<AclEntry> acl = file.getAcl();
         List<AclEntry> newAcl = new ArrayList<>(acl);
         newAcl.remove(0);
         file.setAcl(newAcl);
-        fileContext.dispose(file);
+        getFileContext().dispose(file);
 
-        file = fileContext.newFile(sourceFileUrl);
+        file = getFileContext().newFile(sourceFileUrl);
         assertEquals(newAcl.size(), file.getAcl().size());
         file.delete();
     }
@@ -149,5 +149,10 @@ public class LocalWindowsFileTest extends AbstractFileTest {
     @Test
     public void setLastAccessTime() throws IOException {
         super.setLastAccessTime();
+    }
+
+    @Override
+    protected FileContext createFileContext() {
+        return new FileContext();
     }
 }

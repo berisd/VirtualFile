@@ -22,6 +22,8 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
@@ -45,7 +47,7 @@ public abstract class AbstractFileTest {
     public static String TEST_SOURCE_DIRECTORY_NAME = "testdirectory";
     public static String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory";
 
-    protected FileContext fileContext;
+    private FileContext fileContext;
 
     protected static URL sourceFileUrl;
     protected static URL targetFileUrl;
@@ -83,6 +85,24 @@ public abstract class AbstractFileTest {
         assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
         assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
         assertTrue(file.isDirectory());
+    }
+
+    protected void createSymbolicLink() throws IOException {
+        String symLinkName = TEST_SOURCE_DIRECTORY_NAME + "Link";
+        Path dir = new File(TEST_SOURCE_DIRECTORY_NAME).toPath();
+        Path symLink = new File(symLinkName).toPath();
+
+        Files.createDirectory(dir);
+        Files.createSymbolicLink(symLink, dir);
+
+        URL symLinkUrl = UrlUtils.getUrlForLocalPath(symLinkName);
+        VirtualFile file = fileContext.newFile(symLinkUrl);
+
+        assertTrue(file.isSymbolicLink());
+        assertEquals(dir.toUri().toURL().toString(), file.getLinkTarget().toString());
+
+        Files.delete(symLink);
+        Files.delete(dir);
     }
 
     protected void copyFile() throws IOException {
@@ -260,16 +280,22 @@ public abstract class AbstractFileTest {
         }
     }
 
-    protected void beforeTest() {
-        fileContext = new FileContext();
+    protected abstract FileContext createFileContext();
+
+    public FileContext getFileContext() {
+        return fileContext;
     }
 
-    protected void afterTest() throws IOException {
-        cleanupFiles(fileContext);
+    protected void beforeTestCase() throws Exception {
+        fileContext = createFileContext();
+    }
+
+    protected void afterTestCase() throws IOException {
+        cleanupFiles();
         fileContext.dispose();
     }
 
-    private void cleanupFiles(FileContext fileContext) throws IOException {
+    private void cleanupFiles() throws IOException {
         for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
             if (url != null) {
                 VirtualFile file = fileContext.newFile(url);
