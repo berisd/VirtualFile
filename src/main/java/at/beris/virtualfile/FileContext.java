@@ -65,14 +65,20 @@ public class FileContext {
      * Creates a local file. (Convenience method)
      *
      * @param path Path
-     * @return New file
+     * @return New VirtualFile
      */
     public VirtualFile newLocalFile(String path) throws IOException {
-        LOGGER.debug("newLocalFile (path: {})", path);
-        URL url = new File(path).toURI().toURL();
-        if (path.endsWith(File.separator))
-            url = new URL(url.toString() + "/");
-        return newFile(url);
+        return newFile(UrlUtils.getUrlForLocalPath(path));
+    }
+
+    /**
+     * Creates a local direcoty. (Convenience method)
+     *
+     * @param path path
+     * @return New VirtualFile
+     */
+    public VirtualFile newLocalDirectory(String path) throws IOException {
+        return newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
     }
 
     /**
@@ -124,6 +130,13 @@ public class FileContext {
             parentFile = file;
         }
         return file;
+    }
+
+    public VirtualFile newDirectory(URL url) throws IOException {
+        URL normalizedUrl = url;
+        if (!url.getPath().endsWith("/"))
+            normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
+        return newFile(normalizedUrl);
     }
 
     public void replaceFileUrl(URL oldUrl, URL newUrl) throws IOException {

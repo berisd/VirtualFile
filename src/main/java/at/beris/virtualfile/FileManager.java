@@ -64,11 +64,11 @@ public class FileManager {
      * @return New File Instance
      */
     public static VirtualFile newLocalDirectory(String path) throws IOException {
-        return fileContext.newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
+        return fileContext.newLocalDirectory(path);
     }
 
-    public static VirtualFile newFile(String url) throws IOException {
-        return fileContext.newFile(url);
+    public static VirtualFile newFile(String urlString) throws IOException {
+        return fileContext.newFile(urlString);
     }
 
     public static VirtualFile newFile(URL url) throws IOException {
@@ -76,10 +76,7 @@ public class FileManager {
     }
 
     public static VirtualFile newDirectory(URL url) throws IOException {
-        URL normalizedUrl = url;
-        if (!url.getPath().endsWith("/"))
-            normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
-        return fileContext.newFile(normalizedUrl);
+        return fileContext.newDirectory(url);
     }
 
     public static void dispose(VirtualFile file) throws IOException {
