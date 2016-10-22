@@ -14,7 +14,7 @@ import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
-import at.beris.virtualfile.util.VoidOperation;
+import at.beris.virtualfile.util.Consumer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -85,9 +85,9 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() throws IOException {
-        super.getFileAttributes(new VoidOperation<VirtualFile>() {
+        super.getFileAttributes(new Consumer<VirtualFile>() {
             @Override
-            public void execute(VirtualFile file) throws IOException {
+            public void accept(VirtualFile file) throws IOException {
                 assertTrue(file.getAttributes().contains(BasicFilePermission.READ));
                 assertTrue(file.getAttributes().contains(BasicFilePermission.WRITE));
             }

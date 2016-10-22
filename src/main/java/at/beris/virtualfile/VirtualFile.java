@@ -28,6 +28,7 @@ import java.util.Set;
 public interface VirtualFile extends DisposableObject {
     void add(VirtualFile file) throws IOException;
 
+    //TODO use Set instead of Varargs
     void addAttributes(FileAttribute... attributes) throws IOException;
 
     Byte[] checksum() throws IOException;
@@ -136,10 +137,12 @@ public interface VirtualFile extends DisposableObject {
      */
     void refresh() throws IOException;
 
+    //TODO use Set instead of Varargs
     void removeAttributes(FileAttribute... attributes) throws IOException;
 
     void setAcl(List<AclEntry> acl) throws IOException;
 
+    //TODO use Set instead of Varargs
     void setAttributes(FileAttribute... attributes) throws IOException;
 
     void setCreationTime(FileTime time) throws IOException;

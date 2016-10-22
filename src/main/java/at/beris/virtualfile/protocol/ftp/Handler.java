@@ -17,6 +17,7 @@ import java.net.URLStreamHandler;
 public class Handler extends URLStreamHandler {
     @Override
     protected URLConnection openConnection(URL u) throws IOException {
+        //TODO Properly implement this Handler
         return null;
     }
 }

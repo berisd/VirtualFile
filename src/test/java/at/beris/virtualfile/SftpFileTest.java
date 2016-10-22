@@ -12,7 +12,7 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.UrlUtils;
-import at.beris.virtualfile.util.VoidOperation;
+import at.beris.virtualfile.util.Consumer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -55,18 +55,15 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void createFile() throws IOException {
-        super.createFile(new VoidOperation<VirtualFile>() {
-            @Override
-            public void execute(VirtualFile file) throws IOException {
-                assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
-                assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
-                assertTrue(FileTestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
-                assertTrue(file.getOwner() instanceof UserPrincipal);
-                assertTrue(file.getGroup() instanceof GroupPrincipal);
-                assertTrue(file.getAttributes().size() > 0);
-                assertEquals(0, file.getSize());
-                assertFalse(file.isDirectory());
-            }
+        super.createFile(file -> {
+            assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
+            assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
+            assertTrue(FileTestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
+            assertTrue(file.getOwner() instanceof UserPrincipal);
+            assertTrue(file.getGroup() instanceof GroupPrincipal);
+            assertTrue(file.getAttributes().size() > 0);
+            assertEquals(0, file.getSize());
+            assertFalse(file.isDirectory());
         });
     }
 
@@ -97,9 +94,9 @@ public class SftpFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() throws IOException {
-        super.getFileAttributes(new VoidOperation<VirtualFile>() {
+        super.getFileAttributes(new Consumer<VirtualFile>() {
             @Override
-            public void execute(VirtualFile file) throws IOException {
+            public void accept(VirtualFile file) throws IOException {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));

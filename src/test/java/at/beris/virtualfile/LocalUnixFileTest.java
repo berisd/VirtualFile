@@ -14,7 +14,7 @@ import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
-import at.beris.virtualfile.util.VoidOperation;
+import at.beris.virtualfile.util.Consumer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -84,9 +84,9 @@ public class LocalUnixFileTest extends AbstractFileTest {
 
     @Test
     public void getFileAttributes() throws IOException {
-        super.getFileAttributes(new VoidOperation<VirtualFile>() {
+        super.getFileAttributes(new Consumer<VirtualFile>() {
             @Override
-            public void execute(VirtualFile file) throws IOException {
+            public void accept(VirtualFile file) throws IOException {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));

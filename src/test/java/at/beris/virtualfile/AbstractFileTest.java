@@ -12,10 +12,7 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.provider.operation.CopyListener;
-import at.beris.virtualfile.util.OsUtils;
-import at.beris.virtualfile.util.SingleValueOperation;
-import at.beris.virtualfile.util.UrlUtils;
-import at.beris.virtualfile.util.VoidOperation;
+import at.beris.virtualfile.util.*;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.ArgumentCaptor;
@@ -51,12 +48,12 @@ public abstract class AbstractFileTest {
         createFile(null);
     }
 
-    protected void createFile(VoidOperation<VirtualFile> assertHook) throws IOException {
+    protected void createFile(Consumer<VirtualFile> assertHook) throws IOException {
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
 
         if (assertHook != null) {
-            assertHook.execute(file);
+            assertHook.accept(file);
         } else {
             assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
             // FileStore.readAttributes for Windows might return old value, so don't check
@@ -144,10 +141,10 @@ public abstract class AbstractFileTest {
         assertFalse(targetDirectory.exists());
     }
 
-    protected void getFileAttributes(VoidOperation assertHook) throws IOException {
+    protected void getFileAttributes(Consumer<VirtualFile> assertHook) throws IOException {
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
-        assertHook.execute(file);
+        assertHook.accept(file);
     }
 
     protected void setFileAttributes(Set<FileAttribute> attributes) throws IOException {
@@ -206,45 +203,18 @@ public abstract class AbstractFileTest {
     }
 
     protected void setCreationTime() throws IOException {
-        setTime(new SingleValueOperation<VirtualFile, FileTime>() {
-            @Override
-            public void setValue(VirtualFile object, FileTime value) throws IOException {
-                object.setCreationTime(value);
-            }
-
-            @Override
-            public FileTime getValue(VirtualFile object) throws IOException {
-                return object.getCreationTime();
-            }
-        });
+        setTime((object, value) -> object.setCreationTime(value),
+                virtualFile -> virtualFile.getCreationTime());
     }
 
     protected void setLastModifiedTime() throws IOException {
-        setTime(new SingleValueOperation<VirtualFile, FileTime>() {
-            @Override
-            public void setValue(VirtualFile object, FileTime value) throws IOException {
-                object.setLastModifiedTime(value);
-            }
-
-            @Override
-            public FileTime getValue(VirtualFile object) throws IOException {
-                return object.getLastModifiedTime();
-            }
-        });
+        setTime((object, value) -> object.setLastModifiedTime(value),
+                virtualFile -> virtualFile.getLastModifiedTime());
     }
 
     protected void setLastAccessTime() throws IOException {
-        setTime(new SingleValueOperation<VirtualFile, FileTime>() {
-            @Override
-            public void setValue(VirtualFile object, FileTime value) throws IOException {
-                object.setLastAccessTime(value);
-            }
-
-            @Override
-            public FileTime getValue(VirtualFile object) throws IOException {
-                return object.getLastAccessTime();
-            }
-        });
+        setTime((object, value) -> object.setLastAccessTime(value),
+                virtualFile -> virtualFile.getLastAccessTime());
     }
 
     protected void assertCopyListener(CopyListener copyListener) {
@@ -301,7 +271,7 @@ public abstract class AbstractFileTest {
         }
     }
 
-    private void setTime(SingleValueOperation<VirtualFile, FileTime> operation) throws IOException {
+    private void setTime(BiConsumer<VirtualFile, FileTime> biconsumer, Function<VirtualFile, FileTime> function) throws IOException {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         calendar.roll(Calendar.YEAR, false);
@@ -312,11 +282,11 @@ public abstract class AbstractFileTest {
 
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
-        operation.setValue(file, fileTime);
+        biconsumer.accept(file, fileTime);
         fileContext.dispose(file);
 
         file = fileContext.newFile(sourceFileUrl);
-        assertEquals(dateFormat.format(new Date(fileTime.toMillis())), dateFormat.format(new Date(operation.getValue(file).toMillis())));
+        assertEquals(dateFormat.format(new Date(fileTime.toMillis())), dateFormat.format(new Date(function.apply(file).toMillis())));
         file.delete();
         fileContext.dispose(file);
     }

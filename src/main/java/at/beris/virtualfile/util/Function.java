@@ -11,8 +11,7 @@ package at.beris.virtualfile.util;
 
 import java.io.IOException;
 
-public interface SingleValueOperation<O, T> {
-    void setValue(O object, T value) throws IOException;
-
-    T getValue(O object) throws IOException;
+@FunctionalInterface
+public interface Function<T,R> {
+    R apply(T t) throws IOException;
 }
