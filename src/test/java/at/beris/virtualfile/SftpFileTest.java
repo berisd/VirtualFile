@@ -26,8 +26,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.HashSet;
 import java.util.Set;
 
-import static at.beris.virtualfile.TestFileHelper.initIntegrationTest;
-import static at.beris.virtualfile.TestFileHelper.readSftpPassword;
+import static at.beris.virtualfile.FileTestHelper.*;
 import static org.junit.Assert.*;
 
 public class SftpFileTest extends AbstractFileTest {
@@ -38,16 +37,18 @@ public class SftpFileTest extends AbstractFileTest {
     }
 
     @Before
+    @Override
     public void beforeTestCase() throws Exception {
         super.beforeTestCase();
-        URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestFileHelper.SSH_HOME_DIRECTORY);
-        sourceFileUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_FILE_NAME);
-        targetFileUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_TARGET_FILE_NAME);
-        sourceDirectoryUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_DIRECTORY_NAME + "/");
-        targetDirectoryUrl = UrlUtils.newUrl(siteUrl, TestFileHelper.SSH_HOME_DIRECTORY + TEST_TARGET_DIRECTORY_NAME + "/");
+        URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + FileTestHelper.SSH_HOME_DIRECTORY);
+        sourceFileUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_FILE_NAME);
+        targetFileUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_TARGET_FILE_NAME);
+        sourceDirectoryUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_DIRECTORY_NAME + "/");
+        targetDirectoryUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
     @After
+    @Override
     public void afterTestCase() throws IOException {
         super.afterTestCase();
     }
@@ -58,8 +59,8 @@ public class SftpFileTest extends AbstractFileTest {
             @Override
             public void execute(VirtualFile file) throws IOException {
                 assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
-                assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
-                assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
+                assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
+                assertTrue(FileTestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
                 assertTrue(file.getOwner() instanceof UserPrincipal);
                 assertTrue(file.getGroup() instanceof GroupPrincipal);
                 assertTrue(file.getAttributes().size() > 0);

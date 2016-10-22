@@ -9,7 +9,10 @@
 
 package at.beris.virtualfile;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,16 +24,14 @@ public class LocalArchiveTest extends AbstractFileTest {
     private static final String ZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.zip";
     private static final int NUMBER_OF_ARCHIVE_ENTRIES = 33;
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-    }
-
     @Before
+    @Override
     public void beforeTestCase() throws Exception {
         super.beforeTestCase();
     }
 
     @After
+    @Override
     public void afterTestCase() throws IOException {
         super.afterTestCase();
     }

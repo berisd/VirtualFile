@@ -223,6 +223,10 @@ public class FileContext {
         }
     }
 
+    public FileModel createFileModel() {
+        return new FileModel();
+    }
+
     private Client createClientInstance(URL url) throws IOException {
         LOGGER.debug("createClientInstance (url: {})", maskedUrlString(url));
 

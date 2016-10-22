@@ -10,7 +10,7 @@
 package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.TestFileHelper;
+import at.beris.virtualfile.FileTestHelper;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.ftp.FtpFileTranslator;
 import at.beris.virtualfile.config.Configuration;
@@ -52,7 +52,7 @@ public class FtpClientIntegrationTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        TestFileHelper.initIntegrationTest();
+        FileTestHelper.initIntegrationTest();
 
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
         UserManager userManager = userManagerFactory.createUserManager();

@@ -16,6 +16,8 @@ import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.SingleValueOperation;
 import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
+import org.junit.After;
+import org.junit.Before;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -24,35 +26,26 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static at.beris.virtualfile.TestFileHelper.createFilenamesTree;
+import static at.beris.virtualfile.FileTestHelper.*;
 import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 
-/**
- * Abstract class to test file operations for a protocol
- * An abstract class was chosen because not every protocol supports all operations
- */
 public abstract class AbstractFileTest {
-    public static String TEST_SOURCE_FILE_NAME = "testfile1.txt";
-    public static String TEST_TARGET_FILE_NAME = "targetfile1.txt";
-    public static int TEST_SOURCE_FILE_SIZE = COPY_BUFFER_SIZE + 10;
-
-    public static String TEST_SOURCE_DIRECTORY_NAME = "testdirectory";
-    public static String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory";
 
     private FileContext fileContext;
 
-    protected static URL sourceFileUrl;
-    protected static URL targetFileUrl;
-    protected static URL sourceDirectoryUrl;
-    protected static URL targetDirectoryUrl;
+    protected URL sourceFileUrl;
+    protected URL targetFileUrl;
+    protected URL sourceDirectoryUrl;
+    protected URL targetDirectoryUrl;
 
     protected void createFile() throws IOException {
         createFile(null);
@@ -68,14 +61,13 @@ public abstract class AbstractFileTest {
             assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
             // FileStore.readAttributes for Windows might return old value, so don't check
             if (OsUtils.detectOSFamily() != OsFamily.WINDOWS)
-                assertTrue(TestFileHelper.isDateCloseToNow(file.getCreationTime(), 10));
-            assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
-            assertTrue(TestFileHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
+                assertTrue(FileTestHelper.isDateCloseToNow(file.getCreationTime(), 10));
+            assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
+            assertTrue(FileTestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
             assertTrue(file.getOwner() != null);
             assertEquals(0, file.getSize());
             assertFalse(file.isDirectory());
         }
-        file.delete();
     }
 
     protected void createDirectory() throws IOException {
@@ -83,7 +75,7 @@ public abstract class AbstractFileTest {
         file.create();
 
         assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
-        assertTrue(TestFileHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
+        assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
         assertTrue(file.isDirectory());
     }
 
@@ -106,21 +98,19 @@ public abstract class AbstractFileTest {
     }
 
     protected void copyFile() throws IOException {
-        VirtualFile sourceFile = TestFileHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile sourceFile = FileTestHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
         VirtualFile targetFile = fileContext.newFile(targetFileUrl);
         CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
         sourceFile.copy(targetFile, copyListenerMock);
         assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
         assertCopyListener(copyListenerMock);
-        sourceFile.delete();
-        targetFile.delete();
     }
 
     protected void copyDirectory() throws IOException {
         List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         List<String> targetFileUrlList = createFilenamesTree(targetDirectoryUrl.toString());
 
-        TestFileHelper.createFileTreeData(sourceFileUrlList);
+        FileTestHelper.createFileTreeData(sourceFileUrlList);
 
         VirtualFile sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
         VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
@@ -130,9 +120,6 @@ public abstract class AbstractFileTest {
 
         sourceDirectory.copy(targetDirectory, copyListener);
         assertDirectory(sourceFileUrlList, targetFileUrlList);
-
-        sourceDirectory.delete();
-        targetDirectory.delete();
     }
 
     protected void deleteFile() throws IOException {
@@ -145,7 +132,7 @@ public abstract class AbstractFileTest {
 
     protected void deleteDirectory() throws IOException {
         List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
-        TestFileHelper.createFileTreeData(sourceFileUrlList);
+        FileTestHelper.createFileTreeData(sourceFileUrlList);
 
         VirtualFile sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
         VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
@@ -155,15 +142,12 @@ public abstract class AbstractFileTest {
         assertTrue(targetDirectory.exists());
         targetDirectory.delete();
         assertFalse(targetDirectory.exists());
-
-        sourceDirectory.delete();
     }
 
     protected void getFileAttributes(VoidOperation assertHook) throws IOException {
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         assertHook.execute(file);
-        file.delete();
     }
 
     protected void setFileAttributes(Set<FileAttribute> attributes) throws IOException {
@@ -177,8 +161,6 @@ public abstract class AbstractFileTest {
 
         assertTrue(attributes.containsAll(actualAttributes));
         assertEquals(attributes.size(), actualAttributes.size());
-
-        file.delete();
     }
 
     protected void setOwner(UserPrincipal owner) throws IOException {
@@ -190,7 +172,6 @@ public abstract class AbstractFileTest {
 
         file = fileContext.newFile(sourceFileUrl);
         assertEquals(owner.getName(), file.getOwner().getName());
-        file.delete();
     }
 
     protected void setGroup() throws IOException {
@@ -208,6 +189,19 @@ public abstract class AbstractFileTest {
 
         file = fileContext.newFile(sourceFileUrl);
         assertEquals(group.getName(), file.getGroup().getName());
+    }
+
+    protected void setAcl() throws IOException {
+        VirtualFile file = getFileContext().newFile(sourceFileUrl);
+        file.create();
+        List<AclEntry> acl = file.getAcl();
+        List<AclEntry> newAcl = new ArrayList<>(acl);
+        newAcl.remove(0);
+        file.setAcl(newAcl);
+        getFileContext().dispose(file);
+
+        file = getFileContext().newFile(sourceFileUrl);
+        assertEquals(newAcl.size(), file.getAcl().size());
         file.delete();
     }
 
@@ -286,11 +280,13 @@ public abstract class AbstractFileTest {
         return fileContext;
     }
 
-    protected void beforeTestCase() throws Exception {
+    @Before
+    public void beforeTestCase() throws Exception {
         fileContext = createFileContext();
     }
 
-    protected void afterTestCase() throws IOException {
+    @After
+    public void afterTestCase() throws IOException {
         cleanupFiles();
         fileContext.dispose();
     }

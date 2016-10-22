@@ -15,7 +15,10 @@ import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.VoidOperation;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -24,28 +27,24 @@ import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.HashSet;
 import java.util.Set;
 
+import static at.beris.virtualfile.FileTestHelper.*;
 import static org.junit.Assert.assertTrue;
 
 public class LocalUnixFileTest extends AbstractFileTest {
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void beforeTest() throws Exception {
         org.junit.Assume.assumeTrue("Host operating system isn't Unix. Skipping test..", OsUtils.detectOSFamily() != OsFamily.WINDOWS);
+    }
 
+    @Before
+    @Override
+    public void beforeTestCase() throws Exception {
+        super.beforeTestCase();
         sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
         targetFileUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);
         sourceDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/");
         targetDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/");
-    }
-
-    @Before
-    public void beforeTestCase() throws Exception {
-        super.beforeTestCase();
-    }
-
-    @After
-    public void afterTestCase() throws IOException {
-        super.afterTestCase();
     }
 
     @Test

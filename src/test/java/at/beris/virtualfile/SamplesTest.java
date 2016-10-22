@@ -55,7 +55,7 @@ public class SamplesTest {
 
     @Test
     public void copyFileToDirectory() throws IOException {
-        VirtualFile file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
+        VirtualFile file = FileManager.newFile("sftp://sshtest:" + FileTestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
         file.copy(FileManager.newLocalFile("."));
         VirtualFile copiedFile = FileManager.newLocalFile("dokuwiki-stable.tgz");
         Assert.assertArrayEquals(file.checksum(), copiedFile.checksum());
@@ -64,18 +64,18 @@ public class SamplesTest {
 
     @Test
     public void AuthWithPublicKey() throws IOException {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         FileManager.getConfiguration().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
-                .setPrivateKeyFile(TestFileHelper.TEST_CREDENTIALS_DIRECTORY + File.separator + "id_dsa");
-        VirtualFile file = FileManager.newFile("sftp://sshtest:" + TestFileHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
+                .setPrivateKeyFile(FileTestHelper.TEST_CREDENTIALS_DIRECTORY + File.separator + "id_dsa");
+        VirtualFile file = FileManager.newFile("sftp://sshtest:" + FileTestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
         assertTrue(file.isDirectory());
     }
 
     @Test
     public void AuthWithPasswordNoStrictHost() throws IOException {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         VirtualFile file = FileManager.newFile("sftp://sshtest:@www.beris.at:22/home/sshtest/.ssh");
-        FileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(TestFileHelper.readSftpPassword());
+        FileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(FileTestHelper.readSftpPassword());
         assertTrue(file.isDirectory());
     }
 

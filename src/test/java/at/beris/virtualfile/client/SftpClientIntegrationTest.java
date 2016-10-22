@@ -10,7 +10,7 @@
 package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.TestFileHelper;
+import at.beris.virtualfile.FileTestHelper;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.client.sftp.SftpFile;
 import at.beris.virtualfile.client.sftp.SftpFileTranslator;
@@ -29,15 +29,15 @@ import java.nio.file.AccessDeniedException;
 import static org.junit.Assert.*;
 
 public class SftpClientIntegrationTest {
-    private static final String TEST_FILE = TestFileHelper.SSH_HOME_DIRECTORY + TestFileHelper.TEST_SOURCE_FILE_NAME;
-    private static final String TEST_DIRECTORY = TestFileHelper.SSH_HOME_DIRECTORY + TestFileHelper.TEST_SOURCE_DIRECTORY_NAME;
+    private static final String TEST_FILE = FileTestHelper.SSH_HOME_DIRECTORY + FileTestHelper.TEST_SOURCE_FILE_NAME;
+    private static final String TEST_DIRECTORY = FileTestHelper.SSH_HOME_DIRECTORY + FileTestHelper.TEST_SOURCE_DIRECTORY_NAME;
     private static final String TEST_STRING = "This is a test string";
 
     private static SftpClient sftpClient;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        TestFileHelper.initIntegrationTest();
+        FileTestHelper.initIntegrationTest();
         UrlUtils.registerProtocolURLStreamHandlers();
         sftpClient = createSftpClient();
         sftpClient.connect();
@@ -104,7 +104,7 @@ public class SftpClientIntegrationTest {
 
     @Test
     public void fileNotExists() throws IOException {
-        assertFalse(sftpClient.exists(TestFileHelper.SSH_HOME_DIRECTORY + "abcdef.txt"));
+        assertFalse(sftpClient.exists(FileTestHelper.SSH_HOME_DIRECTORY + "abcdef.txt"));
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -115,7 +115,7 @@ public class SftpClientIntegrationTest {
     private static SftpClient createSftpClient() throws Exception {
         Configuration configuration = new Configuration();
         configuration.initValues();
-        char[] password = TestFileHelper.readSftpPassword().toCharArray();
+        char[] password = FileTestHelper.readSftpPassword().toCharArray();
         URL url = new URL("sftp://sshtest:" + String.valueOf(password) + "@www.beris.at:22");
         return new SftpClient(url, configuration);
     }

@@ -9,9 +9,6 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.sftp.SftpClient;
-import at.beris.virtualfile.config.Configuration;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,22 +22,22 @@ import java.util.List;
 
 import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
 
-public class TestFileHelper {
+public class FileTestHelper {
     public static final String HOME_DIRECTORY = System.getProperty("user.home") + File.separator + ".VirtualFile";
     public static final String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public static final String TEST_TARGET_FILE_NAME = "targetfile1.txt";
     public static final Date TEST_SOURCE_FILE_LAST_MODIFIED = new Date();
     public static final int TEST_SOURCE_FILE_SIZE = COPY_BUFFER_SIZE + 10;
 
-    public static final String TEST_SOURCE_DIRECTORY_NAME = "testdirectory/";
-    public static final String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory/";
+    public static final String TEST_SOURCE_DIRECTORY_NAME = "testdirectory";
+    public static final String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory";
 
     public static final String TEST_CREDENTIALS_DIRECTORY = HOME_DIRECTORY + File.separator + "test" + File.separator;
 
     public static final String SSH_HOME_DIRECTORY = "/home/sshtest/";
 
     public static void initIntegrationTest() throws Exception {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestFileHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
     }
 
     public static String readSftpPassword() {
@@ -51,13 +48,6 @@ public class TestFileHelper {
             return "";
         }
         return stringList.get(0);
-    }
-
-    public static SftpClient createSftpClient(URL url) throws IOException {
-        SftpClient sftpClient = new SftpClient(url, new Configuration());
-        sftpClient.connect();
-
-        return sftpClient;
     }
 
     public static boolean isDateCloseToNow(FileTime fileTime, int seconds) {

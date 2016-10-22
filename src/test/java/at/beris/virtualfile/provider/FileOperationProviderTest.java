@@ -24,7 +24,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static at.beris.virtualfile.TestFileHelper.initIntegrationTest;
+import static at.beris.virtualfile.FileTestHelper.initIntegrationTest;
 
 @RunWith(Parameterized.class)
 public class FileOperationProviderTest {

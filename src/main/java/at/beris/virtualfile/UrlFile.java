@@ -529,7 +529,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
 
     private void createModel() throws IOException {
         logger.debug("Create model for {}", this);
-        model = new FileModel();
+        model = context.createFileModel();
         VirtualFile parent = context.getParentFile(this);
         if (parent != null)
             model.setParent(parent.getModel());

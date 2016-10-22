@@ -11,7 +11,6 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
-import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
@@ -23,35 +22,33 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static at.beris.virtualfile.FileTestHelper.*;
 import static org.junit.Assert.assertTrue;
 
 public class LocalWindowsFileTest extends AbstractFileTest {
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void beforeTest() throws Exception {
         org.junit.Assume.assumeTrue("Host operating system isn't Windows. Skipping test..", OsUtils.detectOSFamily() == OsFamily.WINDOWS);
+    }
 
+    @Before
+    @Override
+    public void beforeTestCase() throws Exception {
+        super.beforeTestCase();
         sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
         targetFileUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);
         sourceDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + java.io.File.separator);
         targetDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + java.io.File.separator);
     }
 
-    @Before
-    public void beforeTestCase() throws Exception {
-        super.beforeTestCase();
-    }
-
     @After
+    @Override
     public void afterTestCase() throws IOException {
         super.afterTestCase();
     }
@@ -99,19 +96,7 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void setFileAttributes() throws IOException {
-        Set<FileAttribute> attributes = new HashSet<>();
-        attributes.add(BasicFilePermission.EXECUTE);
-        attributes.add(DosFileAttribute.HIDDEN);
-        VirtualFile file = getFileContext().newFile(sourceFileUrl);
-        file.create();
-        file.setAttributes(attributes.toArray(new FileAttribute[0]));
-        getFileContext().dispose(file);
-
-        file = getFileContext().newFile(sourceFileUrl);
-        Set<FileAttribute> actualAttributes = file.getAttributes();
-        assertTrue(actualAttributes.containsAll(attributes));
-        file.delete();
-        getFileContext().dispose(file);
+        super.setFileAttributes(new HashSet(Arrays.asList(BasicFilePermission.EXECUTE, DosFileAttribute.HIDDEN)));
     }
 
     @Test
@@ -123,17 +108,7 @@ public class LocalWindowsFileTest extends AbstractFileTest {
 
     @Test
     public void setAcl() throws IOException {
-        VirtualFile file = getFileContext().newFile(sourceFileUrl);
-        file.create();
-        List<AclEntry> acl = file.getAcl();
-        List<AclEntry> newAcl = new ArrayList<>(acl);
-        newAcl.remove(0);
-        file.setAcl(newAcl);
-        getFileContext().dispose(file);
-
-        file = getFileContext().newFile(sourceFileUrl);
-        assertEquals(newAcl.size(), file.getAcl().size());
-        file.delete();
+        super.setAcl();
     }
 
     @Test

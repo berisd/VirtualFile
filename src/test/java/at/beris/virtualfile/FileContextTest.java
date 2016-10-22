@@ -57,7 +57,7 @@ public class FileContextTest {
         assertEquals(TEST_SOURCE_FILE_SIZE, file.getSize());
         Assert.assertFalse(file.isDirectory());
         assertEquals(sourceFile.getAbsolutePath(), file.getPath());
-        assertTrue(TestFileHelper.isDateClose(new Date(file.getLastModifiedTime().toMillis()), new Date(), 60));
+        assertTrue(FileTestHelper.isDateClose(new Date(file.getLastModifiedTime().toMillis()), new Date(), 60));
         assertNotNull(file.getParent());
         Assert.assertArrayEquals(expectedChecksum, file.checksum());
         Assert.assertFalse(file.isArchive());
