@@ -39,8 +39,9 @@ public class UrlFileTest extends AbstractFileTest {
         Mockito.when(getFileContext().getFileOperationProvider(sourceFileUrl.toString())).thenReturn(provider);
         file = new UrlFile(sourceFileUrl, getFileContext());
         Mockito.when(getFileContext().newFile(Matchers.eq(sourceFileUrl))).thenReturn(file);
-        FileModel fileModel = createFileModel();
-        Mockito.when(getFileContext().createFileModel()).thenReturn(fileModel);
+        Mockito.when(getFileContext().createFileModel()).thenReturn(createFileModel());
+        // Fix: Sometimes an empty FileModel my be returned and the maven build fails
+        Thread.currentThread().sleep(50);
     }
 
     @Test
