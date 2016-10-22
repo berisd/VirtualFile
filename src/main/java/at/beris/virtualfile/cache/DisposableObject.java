@@ -9,8 +9,6 @@
 
 package at.beris.virtualfile.cache;
 
-import java.io.IOException;
-
 public interface DisposableObject {
-    void dispose() throws IOException;
+    void dispose();
 }

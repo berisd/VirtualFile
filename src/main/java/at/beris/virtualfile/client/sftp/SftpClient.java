@@ -15,17 +15,16 @@ import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.AbstractClient;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.value.AuthenticationType;
+import at.beris.virtualfile.exception.Message;
+import at.beris.virtualfile.exception.VirtualFileException;
 import com.jcraft.jsch.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
@@ -42,11 +41,11 @@ public class SftpClient extends AbstractClient<SftpFile> {
     private ChannelSftp sftpChannel;
     private boolean isInitialized = false;
 
-    public SftpClient(URL url, Configuration config) throws IOException {
+    public SftpClient(URL url, Configuration config) {
         super(url, config);
     }
 
-    private void init() throws IOException {
+    private void init() {
         LOGGER.debug("init");
         java.util.Properties sessionConfig = new java.util.Properties();
         sessionConfig.put("StrictHostKeyChecking", config.isStrictHostKeyChecking() ? "yes" : "no");
@@ -83,7 +82,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void connect() throws IOException {
+    public void connect() {
         LOGGER.info("Connecting to " + username() + "@" + host() + ":" + String.valueOf(port()));
         try {
             if (!isInitialized)
@@ -108,7 +107,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void deleteFile(String path) throws IOException {
+    public void deleteFile(String path) {
         LOGGER.debug("deleteFile (path : {})", path);
         try {
             checkChannel();
@@ -119,7 +118,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void createFile(String path) throws IOException {
+    public void createFile(String path) {
         LOGGER.debug("createFile (path : {})", path);
         try {
             checkChannel();
@@ -130,7 +129,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public boolean exists(String path) throws IOException {
+    public boolean exists(String path) {
         LOGGER.debug("exists (path : {})", path);
         try {
             checkChannel();
@@ -145,7 +144,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void createDirectory(String path) throws IOException {
+    public void createDirectory(String path) {
         LOGGER.debug("createDirectory (path : {})", path);
         try {
             checkChannel();
@@ -156,7 +155,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void deleteDirectory(String path) throws IOException {
+    public void deleteDirectory(String path) {
         LOGGER.debug("deleteDirectory (path : {})", path);
         try {
             checkChannel();
@@ -180,7 +179,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public InputStream getInputStream(String path) throws IOException {
+    public InputStream getInputStream(String path) {
         LOGGER.debug("getInputStream (path : {})", path);
         InputStream inputStream = null;
         try {
@@ -193,7 +192,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public OutputStream getOutputStream(String path) throws IOException {
+    public OutputStream getOutputStream(String path) {
         LOGGER.debug("getOutputStream (path : {})", path);
         OutputStream outputStream = null;
         try {
@@ -206,7 +205,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public SftpFile getFileInfo(String path) throws IOException {
+    public SftpFile getFileInfo(String path) {
         LOGGER.debug("getFileInfo (path : {})", path);
         SftpFile fileInfo = new SftpFile();
         try {
@@ -221,7 +220,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public List<SftpFile> list(String path) throws IOException {
+    public List<SftpFile> list(String path) {
         LOGGER.debug("list (path : {})", path);
         List<SftpFile> IFileInfoList = new ArrayList<>();
 
@@ -241,7 +240,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void setLastModifiedTime(String path, FileTime time) throws IOException {
+    public void setLastModifiedTime(String path, FileTime time) {
         LOGGER.debug("setLastModifiedTime (path : {}, time: {})", path, time);
         try {
             checkChannel();
@@ -252,7 +251,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void setAttributes(String path, Set<FileAttribute> attributes) throws IOException {
+    public void setAttributes(String path, Set<FileAttribute> attributes) {
         LOGGER.debug("setAttributes (path : {}, attributes: {})", path, attributes);
         try {
             checkChannel();
@@ -271,7 +270,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void setOwner(String path, UserPrincipal owner) throws IOException {
+    public void setOwner(String path, UserPrincipal owner) {
         LOGGER.debug("setOwner (path : {}, owner: {})", path, owner);
         try {
             UnixUserPrincipal user = (UnixUserPrincipal) owner;
@@ -285,7 +284,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void setGroup(String path, GroupPrincipal group) throws IOException {
+    public void setGroup(String path, GroupPrincipal group) {
         LOGGER.debug("setGroup (path : {}, group: {})", path, group);
         try {
             UnixGroupPrincipal unixGroup = (UnixGroupPrincipal) group;
@@ -299,14 +298,14 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public void dispose() throws IOException {
+    public void dispose() {
         disconnect();
         sftpChannel = null;
         session = null;
         jsch = null;
     }
 
-    private void checkChannel() throws IOException {
+    private void checkChannel() {
         try {
             if (session == null)
                 init();
@@ -319,20 +318,16 @@ public class SftpClient extends AbstractClient<SftpFile> {
         }
     }
 
-    private void handleSftpException(SftpException e) throws IOException {
+    private void handleSftpException(SftpException e) {
         if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-            throw new AccessDeniedException(e.getMessage());
+            throw new VirtualFileException(Message.ACCESS_DENIED(), e);
         else if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-            throw new NoSuchFileException(e.getMessage());
-        else
-            throw new IOException(e);
+            throw new VirtualFileException(Message.NO_SUCH_FILE(e.getMessage()), e);
     }
 
-    private void handleJSchException(JSchException e, String path) throws IOException {
+    private void handleJSchException(JSchException e, String path) {
         if (e.getMessage().equals("Auth fail"))
-            throw new AccessDeniedException(path, null, e.getMessage());
-        else
-            throw new IOException(e);
+            throw new VirtualFileException(Message.ACCESS_DENIED(), e);
     }
 
     private boolean isDir(String path) throws SftpException {

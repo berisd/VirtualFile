@@ -15,16 +15,15 @@ import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.client.sftp.SftpFile;
 import at.beris.virtualfile.client.sftp.SftpFileTranslator;
 import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.AccessDeniedException;
 
 import static org.junit.Assert.*;
 
@@ -44,7 +43,7 @@ public class SftpClientIntegrationTest {
     }
 
     @AfterClass
-    public static void tearDown() throws IOException {
+    public static void tearDown() {
         cleanUp();
         if (sftpClient != null)
             sftpClient.disconnect();
@@ -59,7 +58,7 @@ public class SftpClientIntegrationTest {
     }
 
     @Test
-    public void makeDirectory() throws IOException {
+    public void makeDirectory() {
         sftpClient.createDirectory(TEST_DIRECTORY);
         assertTrue(sftpClient.exists(TEST_DIRECTORY));
         sftpClient.deleteDirectory(TEST_DIRECTORY);
@@ -103,11 +102,11 @@ public class SftpClientIntegrationTest {
     }
 
     @Test
-    public void fileNotExists() throws IOException {
+    public void fileNotExists() {
         assertFalse(sftpClient.exists(FileTestHelper.SSH_HOME_DIRECTORY + "abcdef.txt"));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test(expected = VirtualFileException.class)
     public void permissionDenied() throws Exception {
         sftpClient.createFile("../abc.txt");
     }
@@ -120,7 +119,7 @@ public class SftpClientIntegrationTest {
         return new SftpClient(url, configuration);
     }
 
-    private static void cleanUp() throws IOException {
+    private static void cleanUp() {
         if (sftpClient != null && sftpClient.exists(TEST_FILE))
             sftpClient.deleteFile(TEST_FILE);
         if (sftpClient != null && sftpClient.exists(TEST_DIRECTORY))

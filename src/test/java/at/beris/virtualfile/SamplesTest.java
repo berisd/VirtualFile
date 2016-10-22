@@ -15,7 +15,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -27,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 public class SamplesTest {
     @Test
     @Ignore
-    public void addFilesToDirectory() throws IOException {
+    public void addFilesToDirectory() {
         VirtualFile dir = FileManager.newLocalDirectory("testdir");
         dir.create();
         VirtualFile file = FileManager.newLocalFile("abc.txt");
@@ -37,7 +36,7 @@ public class SamplesTest {
     }
 
     @Test
-    public void extractArchive() throws IOException {
+    public void extractArchive() {
         VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
                 "resources" + File.separator + "testarchive.zip");
         VirtualFile directory = FileManager.newLocalDirectory("extracted");
@@ -47,14 +46,14 @@ public class SamplesTest {
     }
 
     @Test
-    public void listArchive() throws IOException {
+    public void listArchive() {
         VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
                 "resources" + File.separator + "testarchive.zip");
         Assert.assertEquals(33, archive.list().size());
     }
 
     @Test
-    public void copyFileToDirectory() throws IOException {
+    public void copyFileToDirectory() {
         VirtualFile file = FileManager.newFile("sftp://sshtest:" + FileTestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
         file.copy(FileManager.newLocalFile("."));
         VirtualFile copiedFile = FileManager.newLocalFile("dokuwiki-stable.tgz");
@@ -63,7 +62,7 @@ public class SamplesTest {
     }
 
     @Test
-    public void AuthWithPublicKey() throws IOException {
+    public void AuthWithPublicKey() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         FileManager.getConfiguration().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
                 .setPrivateKeyFile(FileTestHelper.TEST_CREDENTIALS_DIRECTORY + File.separator + "id_dsa");
@@ -72,7 +71,7 @@ public class SamplesTest {
     }
 
     @Test
-    public void AuthWithPasswordNoStrictHost() throws IOException {
+    public void AuthWithPasswordNoStrictHost() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
         VirtualFile file = FileManager.newFile("sftp://sshtest:@www.beris.at:22/home/sshtest/.ssh");
         FileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(FileTestHelper.readSftpPassword());
@@ -81,7 +80,7 @@ public class SamplesTest {
 
     @Test
     @Ignore
-    public void ftpListFiles() throws IOException {
+    public void ftpListFiles() {
         VirtualFile file = FileManager.newFile("ftp://gd.tuwien.ac.at/");
         assertTrue(file.list().size() > 0);
     }

@@ -14,7 +14,7 @@ import at.beris.virtualfile.FileTestHelper;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.ftp.FtpFileTranslator;
 import at.beris.virtualfile.config.Configuration;
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
@@ -84,7 +84,7 @@ public class FtpClientIntegrationTest {
     }
 
     @AfterClass
-    public static void tearDown() throws IOException {
+    public static void tearDown() {
         if (ftpClient.exists(TEST_FILE))
             ftpClient.deleteFile(TEST_FILE);
         if (ftpClient.exists(TEST_DIRECTORY))
@@ -95,7 +95,7 @@ public class FtpClientIntegrationTest {
     }
 
     @Test
-    public void createFile() throws IOException {
+    public void createFile() {
         ftpClient.createFile(TEST_FILE);
         Assert.assertTrue(ftpClient.exists(TEST_FILE));
         ftpClient.deleteFile(TEST_FILE);
@@ -103,7 +103,7 @@ public class FtpClientIntegrationTest {
     }
 
     @Test
-    public void makeDirectory() throws IOException {
+    public void makeDirectory() {
         ftpClient.createDirectory(TEST_DIRECTORY);
         assertTrue(ftpClient.exists(TEST_DIRECTORY));
         ftpClient.deleteDirectory(TEST_DIRECTORY);
@@ -145,31 +145,31 @@ public class FtpClientIntegrationTest {
     }
 
     @Test
-    public void list() throws IOException {
+    public void list() {
         List<FTPFile> fileInfoList = ftpClient.list("/");
         Assert.assertTrue(fileInfoList.size() > 0);
     }
 
     @Test
-    public void reconnectAfterIdleTimeout() throws IOException, InterruptedException {
+    public void reconnectAfterIdleTimeout() throws InterruptedException {
         try {
             ftpClient.createFile(TEST_FILE);
             Thread.currentThread().sleep(3000);
             Assert.assertTrue(ftpClient.list("/").size() > 0);
-        } catch (FTPConnectionClosedException e) {
+        } catch (VirtualFileException e) {
             fail(e.getClass().getSimpleName() + " not handled.");
         }
     }
 
     @Test
-    public void reconnectAfterServerClosedConnection() throws IOException {
+    public void reconnectAfterServerClosedConnection() {
         try {
             ftpClient.createFile(TEST_FILE);
             for (FtpIoSession session : ftpServerListener.getActiveSessions()) {
                 session.close();
             }
             Assert.assertTrue(ftpClient.list("/").size() > 0);
-        } catch (FTPConnectionClosedException e) {
+        } catch (VirtualFileException e) {
             fail(e.getClass().getSimpleName() + " not handled.");
         }
     }

@@ -18,7 +18,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -34,12 +33,12 @@ public class CollectionFilterTest {
     }
 
     @AfterClass
-    public static void tearDown() throws IOException {
+    public static void tearDown() {
         testDirectory.delete();
     }
 
     @Test
-    public void filterEqual() throws IOException {
+    public void filterEqual() {
         List<VirtualFile> filteredList = testDirectory.find(new FileAttributesFilter().equalTo(
                 new HashSet<FileAttribute>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE))));
         Assert.assertEquals(1, filteredList.size());
@@ -48,7 +47,7 @@ public class CollectionFilterTest {
     }
 
     @Test
-    public void filterContains() throws IOException {
+    public void filterContains() {
         List<VirtualFile> filteredList = testDirectory.find(new FileAttributesFilter().contains(PosixFilePermission.GROUP_READ));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -57,7 +56,7 @@ public class CollectionFilterTest {
     }
 
     @Test
-    public void filterContainsAll() throws IOException {
+    public void filterContainsAll() {
         List<VirtualFile> filteredList = testDirectory.find(new FileAttributesFilter().containsAll(
                 new HashSet<FileAttribute>(Arrays.asList(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ))));
         Assert.assertEquals(2, filteredList.size());

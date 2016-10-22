@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.UserPrincipal;
@@ -45,12 +44,7 @@ public class UrlFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void createFile() throws IOException {
-        super.createFile();
-    }
-
-    @Test
-    public void deleteFile() throws IOException {
+    public void deleteFile() {
         super.deleteFile();
     }
 

@@ -17,7 +17,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 public class BasicFilterTest {
@@ -31,12 +30,12 @@ public class BasicFilterTest {
     }
 
     @AfterClass
-    public static void tearDown() throws IOException {
+    public static void tearDown() {
         testDirectory.delete();
     }
 
     @Test
-    public void filterEqual() throws IOException {
+    public void filterEqual() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().equalTo("testfile1.txt"));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -44,7 +43,7 @@ public class BasicFilterTest {
     }
 
     @Test
-    public void filterAnd() throws IOException {
+    public void filterAnd() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().equalTo("testfile1.txt").and(new IsDirectoryFilter().equalTo(false)));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -52,7 +51,7 @@ public class BasicFilterTest {
     }
 
     @Test
-    public void filterAndNot() throws IOException {
+    public void filterAndNot() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt").andNot(new FileAttributesFilter().contains(PosixFilePermission.OTHERS_READ)));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -60,7 +59,7 @@ public class BasicFilterTest {
     }
 
     @Test
-    public void filterOr() throws IOException {
+    public void filterOr() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().equalTo("testfile1.txt").or(new FileNameFilter().equalTo("subdir")));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -69,7 +68,7 @@ public class BasicFilterTest {
     }
 
     @Test
-    public void filterOrNot() throws IOException {
+    public void filterOrNot() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt").orNot(new FileSizeFilter().lessThan(800L)));
         Assert.assertEquals(3, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -79,7 +78,7 @@ public class BasicFilterTest {
     }
 
     @Test
-    public void filterNot() throws IOException {
+    public void filterNot() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().not().equalTo("testfile1.txt"));
         Assert.assertEquals(3, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);

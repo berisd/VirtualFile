@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CopyListener;
@@ -19,7 +19,6 @@ import at.beris.virtualfile.provider.operation.CopyOperation;
 import at.beris.virtualfile.provider.operation.CustomFileOperation;
 import at.beris.virtualfile.provider.operation.FileOperation;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
@@ -42,52 +41,52 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
     }
 
     @Override
-    public abstract Byte[] checksum(FileModel model) throws IOException;
+    public abstract Byte[] checksum(FileModel model);
 
     @Override
-    public abstract void create(FileModel model) throws IOException;
+    public abstract void create(FileModel model);
 
     @Override
-    public abstract void delete(FileModel model) throws IOException;
+    public abstract void delete(FileModel model);
 
     @Override
-    public abstract Boolean exists(FileModel model) throws IOException;
+    public abstract Boolean exists(FileModel model);
 
     @Override
-    public abstract InputStream getInputStream(FileModel model) throws IOException;
+    public abstract InputStream getInputStream(FileModel model);
 
     @Override
-    public abstract OutputStream getOutputStream(FileModel model) throws IOException;
+    public abstract OutputStream getOutputStream(FileModel model);
 
     @Override
-    public abstract List<VirtualFile> list(FileModel model, Filter filter) throws IOException;
+    public abstract List<VirtualFile> list(FileModel model, Filter filter);
 
     @Override
-    public abstract void updateModel(FileModel model) throws IOException;
+    public abstract void updateModel(FileModel model);
 
     @Override
-    public abstract void setAcl(FileModel model) throws IOException;
+    public abstract void setAcl(FileModel model);
 
     @Override
-    public abstract void setAttributes(FileModel model) throws IOException;
+    public abstract void setAttributes(FileModel model);
 
     @Override
-    public abstract void setCreationTime(FileModel model) throws IOException;
+    public abstract void setCreationTime(FileModel model);
 
     @Override
-    public abstract void setGroup(FileModel model) throws IOException;
+    public abstract void setGroup(FileModel model);
 
     @Override
-    public abstract void setLastAccessTime(FileModel model) throws IOException;
+    public abstract void setLastAccessTime(FileModel model);
 
     @Override
-    public abstract void setLastModifiedTime(FileModel model) throws IOException;
+    public abstract void setLastModifiedTime(FileModel model);
 
     @Override
-    public abstract void setOwner(FileModel model) throws IOException;
+    public abstract void setOwner(FileModel model);
 
     @Override
-    public List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException {
+    public List<VirtualFile> extract(FileModel model, VirtualFile target) {
         throw new OperationNotSupportedException();
     }
 
@@ -97,12 +96,12 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
     }
 
     @Override
-    public void addAttributes(FileModel model) throws IOException {
+    public void addAttributes(FileModel model) {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void removeAttributes(FileModel model) throws IOException {
+    public void removeAttributes(FileModel model) {
         throw new OperationNotSupportedException();
     }
 
@@ -117,7 +116,7 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
     }
 
     @Override
-    public void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) throws IOException {
+    public void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
         ((CustomFileOperation<Void, Void>) customFileOperationMap.get(FileOperation.COPY)).execute(sourceFile, targetFile, listener, (Void) null);
     }
 

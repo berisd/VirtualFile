@@ -11,8 +11,6 @@ package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.VirtualFile;
 
-import java.io.IOException;
-
 public interface CustomFileOperation<T, P> {
-    T execute(VirtualFile source, VirtualFile target, Listener listener, P... params) throws IOException;
+    T execute(VirtualFile source, VirtualFile target, Listener listener, P... params);
 }

@@ -91,7 +91,7 @@ public class FileTestHelper {
         return fileList;
     }
 
-    public static List<VirtualFile> createFileTreeData(List<String> fileUrlList) throws IOException {
+    public static List<VirtualFile> createFileTreeData(List<String> fileUrlList) throws IOException, URISyntaxException {
         String testString = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttest";
         StringBuilder dataString = new StringBuilder(testString);
 
@@ -99,11 +99,7 @@ public class FileTestHelper {
         List<VirtualFile> fileList = new ArrayList<>();
         for (String fileUrl : fileUrlList) {
             File file = null;
-            try {
-                file = new File(new URL(fileUrl).toURI());
-            } catch (URISyntaxException e) {
-                throw new IOException(e);
-            }
+            file = new File(new URL(fileUrl).toURI());
             if (fileUrl.indexOf('.') == -1) {
                 // directory
                 file.mkdirs();

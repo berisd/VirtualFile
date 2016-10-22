@@ -9,15 +9,14 @@
 
 package at.beris.virtualfile.config;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileType;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.*;
 import at.beris.virtualfile.util.UrlUtils;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +89,7 @@ public class Configurator {
         return fileProviderClassMap;
     }
 
-    public Configuration createConfiguration(URL url) throws IOException {
+    public Configuration createConfiguration(URL url) {
         Protocol protocol = UrlUtils.getProtocol(url);
 
         Configuration protocolConfig = configurationPerProtocolMap.get(protocol);
@@ -117,7 +116,7 @@ public class Configurator {
         return configurationPerProtocolMap.get(protocol);
     }
 
-    public Configuration getConfiguration(VirtualFile file) throws IOException {
+    public Configuration getConfiguration(VirtualFile file) {
         URL siteUrl = UrlUtils.newUrl(UrlUtils.getSiteUrlString(file.getUrl().toString()));
         return configurationPerUrlMap.get(siteUrl);
     }

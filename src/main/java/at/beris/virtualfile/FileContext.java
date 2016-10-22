@@ -15,6 +15,8 @@ import at.beris.virtualfile.cache.FileCacheCallbackHandler;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
+import at.beris.virtualfile.exception.Message;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -67,7 +70,7 @@ public class FileContext {
      * @param path Path
      * @return New VirtualFile
      */
-    public VirtualFile newLocalFile(String path) throws IOException {
+    public VirtualFile newLocalFile(String path) {
         return newFile(UrlUtils.getUrlForLocalPath(path));
     }
 
@@ -77,7 +80,7 @@ public class FileContext {
      * @param path path
      * @return New VirtualFile
      */
-    public VirtualFile newLocalDirectory(String path) throws IOException {
+    public VirtualFile newLocalDirectory(String path) {
         return newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
     }
 
@@ -87,8 +90,12 @@ public class FileContext {
      * @param urlString URL String
      * @return New File
      */
-    public VirtualFile newFile(String urlString) throws IOException {
-        return newFile(new URL(urlString));
+    public VirtualFile newFile(String urlString) {
+        try {
+            return newFile(new URL(urlString));
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     /**
@@ -98,7 +105,7 @@ public class FileContext {
      * @return New File Instance
      * @throws IOException IOException
      */
-    public VirtualFile newFile(URL url) throws IOException {
+    public VirtualFile newFile(URL url) {
         LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         if ("".equals(normalizedUrl.getPath()))
@@ -115,12 +122,15 @@ public class FileContext {
                 stringBuilder.append('/');
 
             String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl.toString()) + stringBuilder.toString();
-            URL pathUrl = UrlUtils.normalizeUrl(new URL(pathUrlString));
-
-            file = fileCache.get(pathUrl);
-            if (file == null) {
-                file = createFile(pathUrl);
-                fileCache.put(pathUrl.toString(), file);
+            try {
+                URL pathUrl = UrlUtils.normalizeUrl(new URL(pathUrlString));
+                file = fileCache.get(pathUrl);
+                if (file == null) {
+                    file = createFile(pathUrl);
+                    fileCache.put(pathUrl.toString(), file);
+                }
+            } catch (MalformedURLException e) {
+                throw new VirtualFileException(e);
             }
 
             if (parentFile != null) {
@@ -132,14 +142,14 @@ public class FileContext {
         return file;
     }
 
-    public VirtualFile newDirectory(URL url) throws IOException {
+    public VirtualFile newDirectory(URL url) {
         URL normalizedUrl = url;
         if (!url.getPath().endsWith("/"))
             normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
         return newFile(normalizedUrl);
     }
 
-    public void replaceFileUrl(URL oldUrl, URL newUrl) throws IOException {
+    public void replaceFileUrl(URL oldUrl, URL newUrl) {
         VirtualFile file = fileCache.get(oldUrl.toString());
         removeEntriesByValueFromMap(fileToParentFileMap, file);
         fileToParentFileMap.remove(file.getUrl().toString());
@@ -148,7 +158,7 @@ public class FileContext {
         fileCache.put(newUrl.toString(), file);
     }
 
-    public void dispose(VirtualFile file) throws IOException {
+    public void dispose(VirtualFile file) {
         LOGGER.debug("dispose (file : {})", file);
         removeEntriesByValueFromMap(fileToParentFileMap, file);
         fileToParentFileMap.remove(file.getUrl().toString());
@@ -156,7 +166,7 @@ public class FileContext {
         file.dispose();
     }
 
-    public void dispose() throws IOException {
+    public void dispose() {
         fileToParentFileMap.clear();
         disposeMap(fileCache);
         disposeClientToFileOperationProvidersMap();
@@ -186,7 +196,7 @@ public class FileContext {
         return Collections.unmodifiableSet(enabledProtocols);
     }
 
-    VirtualFile getParentFile(VirtualFile file) throws IOException {
+    VirtualFile getParentFile(VirtualFile file) {
         VirtualFile parentFile = fileToParentFileMap.get(file);
 
         if (parentFile == null) {
@@ -218,12 +228,12 @@ public class FileContext {
         return null;
     }
 
-    private VirtualFile createFile(URL url) throws IOException {
+    private VirtualFile createFile(URL url) {
         LOGGER.debug("createFile (url : {})", maskedUrlString(url));
 
         Protocol protocol = UrlUtils.getProtocol(url);
         if (configurator.getFileOperationProviderClassMap(protocol) == null)
-            throw new IOException("No configuration found for protocol: " + protocol);
+            throw new VirtualFileException(Message.PROTOCOL_NOT_CONFIGURED(protocol));
 
         try {
             FileType fileType = UrlUtils.getFileTypeForUrl(url.toString());
@@ -240,7 +250,7 @@ public class FileContext {
         return new FileModel();
     }
 
-    private Client createClientInstance(URL url) throws IOException {
+    private Client createClientInstance(URL url) {
         LOGGER.debug("createClientInstance (url: {})", maskedUrlString(url));
 
         Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
@@ -279,7 +289,7 @@ public class FileContext {
         }
     }
 
-    private void initClient(URL url) throws IOException {
+    private void initClient(URL url) {
         LOGGER.debug("initClient(url: {}", maskedUrlString(url));
         String siteUrlString = UrlUtils.getSiteUrlString(url.toString());
         Client client = getClient(siteUrlString);
@@ -305,7 +315,7 @@ public class FileContext {
         }
     }
 
-    private <K, V extends DisposableObject> void disposeMap(Map<K, V> map) throws IOException {
+    private <K, V extends DisposableObject> void disposeMap(Map<K, V> map) {
         Iterator<Map.Entry<K, V>> it = map.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<K, V> entry = it.next();
@@ -314,7 +324,7 @@ public class FileContext {
         }
     }
 
-    private void disposeClientToFileOperationProvidersMap() throws IOException {
+    private void disposeClientToFileOperationProvidersMap() {
         Iterator<Map.Entry<Client, Map<FileType, FileOperationProvider>>> it = clientToFileOperationProvidersMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Client, Map<FileType, FileOperationProvider>> entry = it.next();

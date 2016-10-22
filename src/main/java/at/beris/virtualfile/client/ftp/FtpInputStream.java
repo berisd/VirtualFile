@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.client.ftp;
 
+import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.IOException;
@@ -24,35 +25,60 @@ public class FtpInputStream extends InputStream {
     }
 
     @Override
-    public int read() throws IOException {
-        return inputStream.read();
+    public int read() {
+        try {
+            return inputStream.read();
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public int read(byte[] b) throws IOException {
-        return inputStream.read(b);
+    public int read(byte[] b) {
+        try {
+            return inputStream.read(b);
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        return inputStream.read(b, off, len);
+    public int read(byte[] b, int off, int len) {
+        try {
+            return inputStream.read(b, off, len);
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public long skip(long n) throws IOException {
-        return inputStream.skip(n);
+    public long skip(long n) {
+
+        try {
+            return inputStream.skip(n);
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public int available() throws IOException {
-        return inputStream.available();
+    public int available() {
+        try {
+            return inputStream.available();
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public void close() throws IOException {
-        inputStream.close();
-        ftpClient.completePendingCommand();
-        ftpClient = null;
+    public void close() {
+        try {
+            inputStream.close();
+            ftpClient.completePendingCommand();
+            ftpClient = null;
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
@@ -61,8 +87,12 @@ public class FtpInputStream extends InputStream {
     }
 
     @Override
-    public void reset() throws IOException {
-        inputStream.reset();
+    public void reset() {
+        try {
+            inputStream.reset();
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override

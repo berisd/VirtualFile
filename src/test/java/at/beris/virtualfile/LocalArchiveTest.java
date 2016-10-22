@@ -9,13 +9,13 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.exception.NotImplementedException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -32,13 +32,18 @@ public class LocalArchiveTest extends AbstractFileTest {
 
     @After
     @Override
-    public void afterTestCase() throws IOException {
+    public void afterTestCase() {
         super.afterTestCase();
+    }
+
+    @Test(expected = NotImplementedException.class)
+    public void createFile() {
+        throw new NotImplementedException();
     }
 
     @Test
     @Ignore
-    public void createArchive() throws IOException {
+    public void createArchive() {
 
         VirtualFile archiveFile = getFileContext().newLocalFile(ZIP_FILENAME);
 
@@ -66,7 +71,7 @@ public class LocalArchiveTest extends AbstractFileTest {
     }
 
     @Test
-    public void listArchive() throws IOException {
+    public void listArchive() {
         VirtualFile file = getFileContext().newLocalFile(ZIP_FILENAME);
         assertTrue(file.getSize() > 0);
         List<VirtualFile> list = file.list();

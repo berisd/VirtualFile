@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.operation;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.UrlFile;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.provider.operation.CopyOperation;
@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -93,7 +92,7 @@ public class CopyOperationTest {
         return targetFile;
     }
 
-    private VirtualFile createFileMock(URL url, boolean isDirectory) throws IOException {
+    private VirtualFile createFileMock(URL url, boolean isDirectory) {
         String[] pathParts = url.toString().split("/");
         VirtualFile sourceFile = Mockito.mock(UrlFile.class);
         Mockito.when(sourceFile.getUrl()).thenReturn(url);

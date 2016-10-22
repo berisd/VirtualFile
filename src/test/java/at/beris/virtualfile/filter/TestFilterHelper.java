@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -57,7 +56,7 @@ public class TestFilterHelper {
         return fileList;
     }
 
-    public static List<String> getNameListFromFileList(List<VirtualFile> fileList) throws IOException {
+    public static List<String> getNameListFromFileList(List<VirtualFile> fileList) {
         List<String> nameList = new ArrayList<>();
         for (VirtualFile file : fileList)
             nameList.add(file.getName());

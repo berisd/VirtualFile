@@ -9,12 +9,13 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.UrlUtils;
@@ -49,34 +50,26 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
 
 
     @Override
-    public void create(FileModel model) throws IOException {
+    public void create(FileModel model) {
         try {
-            // if not exists create UrlArchive
-            // insert or update ArchiveEntry
             FileOutputStream fileOutputStream = new FileOutputStream(new File(model.getUrl().toURI()));
             ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
             ArchiveOutputStream archiveOutputStream = archiveStreamFactory.createArchiveOutputStream(ArchiveStreamFactory.ZIP, fileOutputStream);
             archiveOutputStream.close();
 
-        } catch (ArchiveException | URISyntaxException e) {
-            throw new IOException(e);
+        } catch (ArchiveException | URISyntaxException | IOException e) {
+            throw new VirtualFileException(e);
         }
     }
 
     @Override
-    public Boolean exists(FileModel model) throws IOException {
+    public Boolean exists(FileModel model) {
         String archivePath = getArchivePath(model);
         String targetArchiveEntryPath = model.getUrl().getPath().substring(archivePath.length() + 1);
-
-        ArchiveInputStream ais = null;
-        InputStream fis = null;
-
-        try {
-            ArchiveStreamFactory factory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new File(archivePath)));
-            ais = factory.createArchiveInputStream(fis);
+        ArchiveStreamFactory factory = new ArchiveStreamFactory();
+        try (InputStream fis = new BufferedInputStream(new FileInputStream(new File(archivePath)));
+             ArchiveInputStream ais = factory.createArchiveInputStream(fis)) {
             ArchiveEntry archiveEntry;
-
             while ((archiveEntry = ais.getNextEntry()) != null) {
                 String archiveEntryPath = archiveEntry.getName();
 
@@ -94,13 +87,8 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
                     break;
                 }
             }
-        } catch (ArchiveException e) {
-            throw new IOException(e);
-        } finally {
-            if (ais != null)
-                ais.close();
-            if (fis != null)
-                fis.close();
+        } catch (ArchiveException | IOException e) {
+            throw new VirtualFileException(e);
         }
         return false;
     }
@@ -166,7 +154,7 @@ public class LocalArchivedFileOperationProvider extends AbstractFileOperationPro
     }
 
     @Override
-    public List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException {
+    public List<VirtualFile> extract(FileModel model, VirtualFile target) {
         throw new OperationNotSupportedException();
     }
 

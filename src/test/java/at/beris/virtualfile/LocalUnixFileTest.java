@@ -14,13 +14,13 @@ import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
-import at.beris.virtualfile.util.Consumer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
@@ -48,12 +48,7 @@ public class LocalUnixFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void createFile() throws IOException {
-        super.createFile();
-    }
-
-    @Test
-    public void createDirectory() throws IOException {
+    public void createDirectory() {
         super.createDirectory();
     }
 
@@ -63,40 +58,37 @@ public class LocalUnixFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void copyFile() throws IOException {
+    public void copyFile() {
         super.copyFile();
     }
 
     @Test
-    public void copyDirectory() throws IOException {
+    public void copyDirectory() throws IOException, URISyntaxException {
         super.copyDirectory();
     }
 
     @Test
-    public void deleteFile() throws IOException {
+    public void deleteFile() {
         super.deleteFile();
     }
 
     @Test
-    public void deleteDirectory() throws IOException {
+    public void deleteDirectory() throws IOException, URISyntaxException {
         super.deleteDirectory();
     }
 
     @Test
-    public void getFileAttributes() throws IOException {
-        super.getFileAttributes(new Consumer<VirtualFile>() {
-            @Override
-            public void accept(VirtualFile file) throws IOException {
-                assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
-                assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
-                assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
-                assertTrue(file.getAttributes().contains(PosixFilePermission.OTHERS_READ));
-            }
+    public void getFileAttributes() {
+        super.getFileAttributes(file -> {
+            assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
+            assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
+            assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
+            assertTrue(file.getAttributes().contains(PosixFilePermission.OTHERS_READ));
         });
     }
 
     @Test
-    public void setFileAttributes() throws IOException {
+    public void setFileAttributes() {
         Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(PosixFilePermission.OTHERS_EXECUTE);
         attributes.add(PosixFilePermission.GROUP_EXECUTE);
@@ -111,23 +103,23 @@ public class LocalUnixFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void setGroup() throws IOException {
+    public void setGroup() {
         super.setGroup();
     }
 
     @Test
     @Ignore("IgnoreTest: On Linux creationTime doesn't seem to be set")
-    public void setCreationTime() throws IOException {
+    public void setCreationTime() {
         super.setCreationTime();
     }
 
     @Test
-    public void setLastModifiedTime() throws IOException {
+    public void setLastModifiedTime() {
         super.setLastModifiedTime();
     }
 
     @Test
-    public void setLastAccessTime() throws IOException {
+    public void setLastAccessTime() {
         super.setLastAccessTime();
     }
 

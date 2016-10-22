@@ -9,11 +9,12 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.FileOperation;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -47,48 +48,34 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     }
 
     @Override
-    public List<VirtualFile> list(FileModel model, Filter filter) throws IOException {
+    public List<VirtualFile> list(FileModel model, Filter filter) {
         List<VirtualFile> fileList = new ArrayList<>();
-        ArchiveInputStream ais = null;
-        InputStream fis = null;
-
+        ArchiveStreamFactory factory = new ArchiveStreamFactory();
         URL rootUrl = model.getUrl();
 
-        try {
-            ArchiveStreamFactory factory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
-            ais = factory.createArchiveInputStream(fis);
+        try (InputStream fis = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
+             ArchiveInputStream ais = factory.createArchiveInputStream(fis)) {
             ArchiveEntry archiveEntry;
-
             while ((archiveEntry = ais.getNextEntry()) != null) {
                 Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
                 VirtualFile file = fileContext.newFile(urlMap.get(URL));
                 if (filter == null || filter.filter(file))
                     fileList.add(file);
             }
-        } catch (ArchiveException | URISyntaxException e) {
-            throw new IOException(e);
-        } finally {
-            if (ais != null)
-                ais.close();
-            if (fis != null)
-                fis.close();
+        } catch (ArchiveException | URISyntaxException | IOException e) {
+            throw new VirtualFileException(e);
         }
         return fileList;
     }
 
     @Override
-    public List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException {
+    public List<VirtualFile> extract(FileModel model, VirtualFile target) {
         List<VirtualFile> fileList = new ArrayList<>();
-        ArchiveInputStream ais = null;
-        InputStream fis = null;
+        ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
 
-        try {
+        try (InputStream fis = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
+             ArchiveInputStream ais = archiveStreamFactory.createArchiveInputStream(fis)) {
             target.create();
-
-            ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
-            fis = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
-            ais = archiveStreamFactory.createArchiveInputStream(fis);
             ArchiveEntry archiveEntry;
 
             while ((archiveEntry = ais.getNextEntry()) != null) {
@@ -105,13 +92,8 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
                 VirtualFile file = fileContext.newFile(urlMap.get(URL));
                 fileList.add(file);
             }
-        } catch (ArchiveException | URISyntaxException e) {
-            throw new IOException(e);
-        } finally {
-            if (ais != null)
-                ais.close();
-            if (fis != null)
-                fis.close();
+        } catch (ArchiveException | URISyntaxException | IOException e) {
+            throw new VirtualFileException(e);
         }
         return fileList;
     }
@@ -125,7 +107,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
         String path = StringUtils.join(pathParts, "/", 0, pathParts.length - 1);
 
         String parentUrlString = rootUrl.toString() + (rootUrl.toString().endsWith("/") ? "" : "/")
-                + path + (path.equals("")  ? "" : "/");
+                + path + (path.equals("") ? "" : "/");
         String urlString = parentUrlString + pathParts[pathParts.length - 1]
                 + (archiveEntryPath.endsWith("/") ? "/" : "");
 

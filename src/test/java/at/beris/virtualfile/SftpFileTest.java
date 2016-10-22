@@ -11,20 +11,22 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.util.UrlUtils;
-import at.beris.virtualfile.util.Consumer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static at.beris.virtualfile.FileTestHelper.*;
 import static org.junit.Assert.*;
@@ -49,13 +51,14 @@ public class SftpFileTest extends AbstractFileTest {
 
     @After
     @Override
-    public void afterTestCase() throws IOException {
+    public void afterTestCase() {
         super.afterTestCase();
     }
 
     @Test
-    public void createFile() throws IOException {
-        super.createFile(file -> {
+    @Override
+    public void createFile() {
+        super.createFile(Optional.of(file -> {
             assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
             assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
             assertTrue(FileTestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
@@ -64,39 +67,39 @@ public class SftpFileTest extends AbstractFileTest {
             assertTrue(file.getAttributes().size() > 0);
             assertEquals(0, file.getSize());
             assertFalse(file.isDirectory());
-        });
+        }));
     }
 
     @Test
-    public void createDirectory() throws IOException {
+    public void createDirectory() {
         super.createDirectory();
     }
 
     @Test
-    public void copyFile() throws IOException {
+    public void copyFile() {
         super.copyFile();
     }
 
     @Test
-    public void copyDirectory() throws IOException {
+    public void copyDirectory() throws IOException, URISyntaxException {
         super.copyDirectory();
     }
 
     @Test
-    public void deleteFile() throws IOException {
+    public void deleteFile() {
         super.deleteFile();
     }
 
     @Test
-    public void deleteDirectory() throws IOException {
+    public void deleteDirectory() throws IOException, URISyntaxException {
         super.deleteDirectory();
     }
 
     @Test
-    public void getFileAttributes() throws IOException {
+    public void getFileAttributes() {
         super.getFileAttributes(new Consumer<VirtualFile>() {
             @Override
-            public void accept(VirtualFile file) throws IOException {
+            public void accept(VirtualFile file) {
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_READ));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
                 assertTrue(file.getAttributes().contains(PosixFilePermission.GROUP_READ));
@@ -106,21 +109,21 @@ public class SftpFileTest extends AbstractFileTest {
     }
 
     @Test
-    public void setFileAttributes() throws IOException {
+    public void setFileAttributes() {
         Set<FileAttribute> attributes = new HashSet<>();
         attributes.add(PosixFilePermission.OTHERS_EXECUTE);
         attributes.add(PosixFilePermission.GROUP_EXECUTE);
         super.setFileAttributes(attributes);
     }
 
-    @Test(expected = AccessDeniedException.class)
-    public void setOwner() throws IOException {
+    @Test(expected = VirtualFileException.class)
+    public void setOwner() {
         UnixUserPrincipal user = new UnixUserPrincipal(1002, 1002);
         super.setOwner(user);
     }
 
-    @Test(expected = AccessDeniedException.class)
-    public void setGroup() throws IOException {
+    @Test(expected = VirtualFileException.class)
+    public void setGroup() {
         UnixGroupPrincipal group = new UnixGroupPrincipal(1002);
         super.setGroup(group);
     }

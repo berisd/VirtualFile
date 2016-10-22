@@ -10,11 +10,12 @@
 package at.beris.virtualfile.util;
 
 import at.beris.virtualfile.FileType;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -48,28 +49,48 @@ public class UrlUtils {
         return fileType;
     }
 
-    public static URL normalizeUrl(URL url) throws IOException {
+    public static URL normalizeUrl(URL url) {
         URI uri = URI.create(url.toString());
-        return uri.normalize().toURL();
+        try {
+            return uri.normalize().toURL();
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
-    public static URL newUrl(String urlString) throws IOException {
-        return new URL(urlString);
+    public static URL newUrl(String urlString) {
+        try {
+            return new URL(urlString);
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
-    public static URL newUrl(URL context, String spec) throws IOException {
-        return new URL(context, spec);
+    public static URL newUrl(URL context, String spec) {
+        try {
+            return new URL(context, spec);
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
-    public static URL newUrlReplacePath(URL context, String path) throws IOException {
+    public static URL newUrlReplacePath(URL context, String path) {
         String contextUrlString = context.toString();
         String newUrlString = contextUrlString.substring(0, contextUrlString.length() - context.getPath().length());
         newUrlString += path;
-        return new URL(newUrlString);
+        try {
+            return new URL(newUrlString);
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
-    public static URL getUrlForLocalPath(String path) throws IOException {
-        return new URL(new File(path).toURI().toURL().toString() + (path.endsWith(File.separator) ? "/" : ""));
+    public static URL getUrlForLocalPath(String path) {
+        try {
+            return new URL(new File(path).toURI().toURL().toString() + (path.endsWith(File.separator) ? "/" : ""));
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     /**
@@ -109,7 +130,7 @@ public class UrlUtils {
         return stringBuilder.toString();
     }
 
-    public static URL getParentUrl(URL url) throws IOException {
+    public static URL getParentUrl(URL url) {
         String path = url.getPath();
         int indexPathBegin = path.indexOf("/", path.indexOf("//") + 2);
         if (indexPathBegin == -1)

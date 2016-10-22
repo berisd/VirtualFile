@@ -9,10 +9,12 @@
 
 package at.beris.virtualfile.shell;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.PosixFilePermission;
+import at.beris.virtualfile.exception.Message;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.UrlUtils;
@@ -20,9 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.text.DateFormat;
@@ -43,7 +44,7 @@ public class Shell {
     private VirtualFile workingFile;
     private Scanner scanner;
 
-    public Shell() throws IOException {
+    public Shell() {
         fileContext = new FileContext();
         localFile = fileContext.newLocalFile(System.getProperty("user.dir"));
         scanner = new Scanner(System.in);
@@ -53,7 +54,7 @@ public class Shell {
     public static void main(String args[]) {
         try {
             new Shell().run();
-        } catch (IOException e) {
+        } catch (RuntimeException e) {
             logException(e);
         }
     }
@@ -70,7 +71,7 @@ public class Shell {
                 cmd = parseCommandLine(line);
                 if (commandArgumentsValid(cmd))
                     processCommand(cmd);
-            } catch (IOException e) {
+            } catch (RuntimeException e) {
                 logException(e);
                 System.out.println("Error: " + e.getMessage());
             }
@@ -90,55 +91,59 @@ public class Shell {
         return Pair.of(Command.UNKNOWN, Collections.<String>emptyList());
     }
 
-    private void processCommand(Pair<Command, List<String>> cmd) throws IOException {
-        switch (cmd.getLeft()) {
-            case CD:
-                change(cmd.getRight().get(0), false);
-                break;
-            case CON:
-                connect(new URL(cmd.getRight().get(0)));
-                break;
-            case DIS:
-                disconnect();
-                break;
-            case GET:
-                get(cmd.getRight().get(0));
-                break;
-            case HELP:
-                displayHelp();
-                break;
-            case LCD:
-                change(cmd.getRight().get(0), true);
-                break;
-            case LPWD:
-                System.out.println(localFile.getPath());
-                break;
-            case LLS:
-                list(true);
-                break;
-            case LRM:
-                remove(true, cmd.getRight().get(0));
-                break;
-            case LS:
-                list(false);
-                break;
-            case PUT:
-                put(cmd.getRight().get(0));
-                break;
-            case PWD:
-                System.out.println(workingFile != null ? maskedUrlString(workingFile.getUrl()) : NOT_CONNECTED_MSG);
-                break;
-            case RM:
-                remove(false, cmd.getRight().get(0));
-                break;
-            case STAT:
-                displayStatistics();
-                break;
-            case QUIT:
-                quit();
-                break;
-            default:
-                System.out.println("Unknown command.");
+    private void processCommand(Pair<Command, List<String>> cmd) {
+        try {
+            switch (cmd.getLeft()) {
+                case CD:
+                    change(cmd.getRight().get(0), false);
+                    break;
+                case CON:
+                    connect(new URL(cmd.getRight().get(0)));
+                    break;
+                case DIS:
+                    disconnect();
+                    break;
+                case GET:
+                    get(cmd.getRight().get(0));
+                    break;
+                case HELP:
+                    displayHelp();
+                    break;
+                case LCD:
+                    change(cmd.getRight().get(0), true);
+                    break;
+                case LPWD:
+                    System.out.println(localFile.getPath());
+                    break;
+                case LLS:
+                    list(true);
+                    break;
+                case LRM:
+                    remove(true, cmd.getRight().get(0));
+                    break;
+                case LS:
+                    list(false);
+                    break;
+                case PUT:
+                    put(cmd.getRight().get(0));
+                    break;
+                case PWD:
+                    System.out.println(workingFile != null ? maskedUrlString(workingFile.getUrl()) : NOT_CONNECTED_MSG);
+                    break;
+                case RM:
+                    remove(false, cmd.getRight().get(0));
+                    break;
+                case STAT:
+                    displayStatistics();
+                    break;
+                case QUIT:
+                    quit();
+                    break;
+                default:
+                    System.out.println("Unknown command.");
+            }
+        } catch (MalformedURLException e) {
+            logException(e);
         }
     }
 
@@ -189,15 +194,15 @@ public class Shell {
         System.out.println(String.format("Max Memory: %,d", runtime.maxMemory() / 1024));
     }
 
-    private void quit() throws IOException {
+    private void quit() {
         fileContext.dispose();
     }
 
-    private void connect(URL url) throws IOException {
+    private void connect(URL url) {
         workingFile = fileContext.newFile(url);
     }
 
-    private void list(boolean local) throws IOException {
+    private void list(boolean local) {
         VirtualFile file = local ? localFile : workingFile;
 
         if (file == null && !local) {
@@ -272,7 +277,7 @@ public class Shell {
         fileModelList.clear();
     }
 
-    private void change(String directoryName, boolean local) throws IOException {
+    private void change(String directoryName, boolean local) {
         if (!local && workingFile == null) {
             System.out.println(NOT_CONNECTED_MSG);
             return;
@@ -303,10 +308,10 @@ public class Shell {
             else
                 workingFile = actionFile;
         } else
-            throw new NoSuchFileException(actionFile.getUrl().toString());
+            throw new RuntimeException(Message.NO_SUCH_FILE(actionFile.getUrl().toString()).toString());
     }
 
-    private void get(String fileName) throws IOException {
+    private void get(String fileName) {
         if (workingFile == null) {
             System.out.println(NOT_CONNECTED_MSG);
             return;
@@ -318,7 +323,7 @@ public class Shell {
         System.out.println("");
     }
 
-    private void put(String fileName) throws IOException {
+    private void put(String fileName) {
         if (workingFile == null) {
             System.out.println(NOT_CONNECTED_MSG);
             return;
@@ -333,7 +338,7 @@ public class Shell {
         System.out.println("");
     }
 
-    private void remove(boolean local, String fileName) throws IOException {
+    private void remove(boolean local, String fileName) {
         if (!local && workingFile == null) {
             System.out.println(NOT_CONNECTED_MSG);
             return;
@@ -356,9 +361,9 @@ public class Shell {
         @Override
         public void startFile(VirtualFile file, long currentFileNumber) {
             try {
-                System.out.println(String.format("Copying %s [%,d KB]", file.getPath(), Math.round(file.getSize()/1024)));
+                System.out.println(String.format("Copying %s [%,d KB]", file.getPath(), Math.round(file.getSize() / 1024)));
                 progressCharsPrinted = 0;
-            } catch (IOException e) {
+            } catch (VirtualFileException e) {
                 logException(e);
             }
         }
@@ -397,7 +402,7 @@ public class Shell {
                     file.delete();
                     return true;
                 }
-            } catch (IOException e) {
+            } catch (VirtualFileException e) {
                 logException(e);
             }
             return false;

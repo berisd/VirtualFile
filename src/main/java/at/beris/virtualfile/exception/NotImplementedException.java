@@ -9,12 +9,8 @@
 
 package at.beris.virtualfile.exception;
 
-public class NotImplementedException extends RuntimeException {
+public class NotImplementedException extends VirtualFileException {
     public NotImplementedException() {
         super();
-    }
-
-    public NotImplementedException(String message) {
-        super(message);
     }
 }

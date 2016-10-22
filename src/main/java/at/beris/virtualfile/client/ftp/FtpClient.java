@@ -13,6 +13,7 @@ import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.AbstractClient;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.*;
@@ -49,10 +50,14 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public void connect() throws IOException {
+    public void connect() {
         LOGGER.info("Connecting to " + username() + "@" + host() + ":" + String.valueOf(port()));
         reconnect = true;
-        ftpClient.connect(host(), port());
+        try {
+            ftpClient.connect(host(), port());
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
         if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
             disconnect();
             return;
@@ -62,7 +67,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public void disconnect() throws IOException {
+    public void disconnect() {
         LOGGER.info("Disconnecting from " + username() + "@" + host() + ":" + String.valueOf(port()));
         executionHandler(new Callable<Void>() {
             @Override
@@ -78,7 +83,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public void deleteFile(final String path) throws IOException {
+    public void deleteFile(final String path) {
         LOGGER.debug("deleteFile (path : {})", path);
         executionHandler(new Callable<Void>() {
             @Override
@@ -93,7 +98,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public void createFile(final String path) throws IOException {
+    public void createFile(final String path) {
         LOGGER.debug("createFile (path : {})", path);
         executionHandler(new Callable<Void>() {
             @Override
@@ -108,7 +113,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public boolean exists(final String path) throws IOException {
+    public boolean exists(final String path) {
         LOGGER.debug("exists (path : {})", path);
         Boolean exists = executionHandler(new Callable<Boolean>() {
             @Override
@@ -140,7 +145,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public void createDirectory(final String path) throws IOException {
+    public void createDirectory(final String path) {
         LOGGER.debug("createDirectory (path : {})", path);
         executionHandler(new Callable<Void>() {
             @Override
@@ -160,7 +165,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public void deleteDirectory(final String path) throws IOException {
+    public void deleteDirectory(final String path) {
         LOGGER.debug("deleteDirectory (path : {})", path);
         executionHandler(new Callable<Void>() {
             @Override
@@ -176,7 +181,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public InputStream getInputStream(final String path) throws IOException {
+    public InputStream getInputStream(final String path) {
         LOGGER.debug("getInputStream (path : {})", path);
         return executionHandler(new Callable<FtpInputStream>() {
             @Override
@@ -187,7 +192,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public OutputStream getOutputStream(final String path) throws IOException {
+    public OutputStream getOutputStream(final String path) {
         LOGGER.debug("getOutputStream (path : {})", path);
         return executionHandler(new Callable<FtpOutputStream>() {
             @Override
@@ -198,7 +203,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public FTPFile getFileInfo(final String path) throws IOException {
+    public FTPFile getFileInfo(final String path) {
         LOGGER.debug("getFileInfo (path: {})", path);
         return executionHandler(new Callable<FTPFile>() {
             @Override
@@ -234,7 +239,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
         return 21;
     }
 
-    public List<FTPFile> list(final String path) throws IOException {
+    public List<FTPFile> list(final String path) {
         LOGGER.debug("list (path: {})", path);
 
         return executionHandler(new Callable<List<FTPFile>>() {
@@ -274,17 +279,17 @@ public class FtpClient extends AbstractClient<FTPFile> {
     }
 
     @Override
-    public void dispose() throws IOException {
+    public void dispose() {
         disconnect();
         ftpClient = null;
     }
 
-    private void checkConnection() throws IOException {
+    private void checkConnection() {
         if (!ftpClient.isConnected())
             connect();
     }
 
-    private void login() throws IOException {
+    private void login() {
         LOGGER.debug("login");
         executionHandler(new Callable<Void>() {
             @Override
@@ -295,7 +300,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
         });
     }
 
-    private void setFileType(final int fileType) throws IOException {
+    private void setFileType(final int fileType) {
         LOGGER.debug("setFileType (fileType: {})", fileType);
         executionHandler(new Callable<Void>() {
             @Override
@@ -306,7 +311,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
         });
     }
 
-    public String getPhysicalRootPath() throws IOException {
+    public String getPhysicalRootPath() {
         if (physicalRootPath == null) {
             physicalRootPath = executionHandler(new Callable<String>() {
                 @Override
@@ -324,7 +329,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
         return physicalRootPath;
     }
 
-    private <T> T executionHandler(Callable<T> action) throws IOException {
+    private <T> T executionHandler(Callable<T> action) {
         int connectionAttempts = MAX_CONNECTION_ATTEMPTS;
         while (connectionAttempts > 0) {
             try {
@@ -337,12 +342,9 @@ public class FtpClient extends AbstractClient<FTPFile> {
                     connectionAttempts--;
                     connect();
                 }
-            } catch (IOException e) {
-                LOGGER.debug("Exception", e);
-                throw e;
             } catch (Exception e) {
                 LOGGER.debug("Exception", e);
-                throw new RuntimeException(e);
+                throw new VirtualFileException(e);
             }
         }
         return null;

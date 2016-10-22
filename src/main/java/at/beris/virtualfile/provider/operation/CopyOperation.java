@@ -9,17 +9,19 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileContext;
+import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.NoSuchFileException;
 
 public class CopyOperation extends AbstractFileOperation<Void, Void> {
     public final static int COPY_BUFFER_SIZE = 1024 * 16;
@@ -31,10 +33,10 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
     }
 
     @Override
-    public Void execute(VirtualFile source, VirtualFile target, Listener listener, Void... params) throws IOException {
+    public Void execute(VirtualFile source, VirtualFile target, Listener listener, Void... params) {
         filesProcessed = 0L;
         if (!source.exists())
-            throw new NoSuchFileException(source.getPath());
+            throw new VirtualFileException(Message.NO_SUCH_FILE(source.getPath()));
         if (source.isDirectory() && !target.isDirectory())
             throw new OperationNotSupportedException("Can't copy directory to a file!");
         if (!source.isDirectory() && target.isDirectory())
@@ -44,7 +46,7 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
         return null;
     }
 
-    private void copyRecursive(VirtualFile source, VirtualFile target, CopyListener listener) throws IOException {
+    private void copyRecursive(VirtualFile source, VirtualFile target, CopyListener listener) {
         boolean createFile = true;
         if (target.exists()) {
             if (listener != null)
@@ -58,7 +60,12 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
 
                 for (VirtualFile sourceChildFile : source.list()) {
                     URL targetUrl = target.getUrl();
-                    URL targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
+                    URL targetChildUrl = null;
+                    try {
+                        targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
+                    } catch (MalformedURLException e) {
+                        throw new VirtualFileException(e);
+                    }
                     VirtualFile targetChildFile = fileContext.newFile(targetChildUrl);
                     copyRecursive(sourceChildFile, targetChildFile, listener);
                 }
@@ -76,7 +83,7 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
         target.refresh();
     }
 
-    private void copyFile(VirtualFile source, VirtualFile target, CopyListener listener) throws IOException {
+    private void copyFile(VirtualFile source, VirtualFile target, CopyListener listener) {
         byte[] buffer = new byte[COPY_BUFFER_SIZE];
 
         long bytesWrittenTotal = 0;
@@ -92,6 +99,8 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
                 if (listener != null && listener.interrupt())
                     break;
             }
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
         }
     }
 }

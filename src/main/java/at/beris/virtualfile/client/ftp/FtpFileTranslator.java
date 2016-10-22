@@ -17,7 +17,6 @@ import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.net.ftp.FTPFile;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
@@ -25,7 +24,7 @@ import java.util.Set;
 
 public final class FtpFileTranslator {
 
-    public static void fillModel(FileModel model, FTPFile ftpFile, FtpClient client) throws IOException {
+    public static void fillModel(FileModel model, FTPFile ftpFile, FtpClient client) {
         String physicalRootPath = client.getPhysicalRootPath();
         String parentPath = model.getParent() != null ? model.getParent().getUrl().getPath() : "";
 

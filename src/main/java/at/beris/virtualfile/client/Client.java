@@ -12,7 +12,6 @@ package at.beris.virtualfile.client;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.cache.DisposableObject;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -27,35 +26,35 @@ public interface Client<T> extends DisposableObject {
 
     void setUrl(URL url);
 
-    void connect() throws IOException;
+    void connect();
 
-    void disconnect() throws IOException;
+    void disconnect();
 
-    void deleteFile(String path) throws IOException;
+    void deleteFile(String path);
 
-    void createFile(String path) throws IOException;
+    void createFile(String path);
 
-    boolean exists(String path) throws IOException;
+    boolean exists(String path);
 
-    void createDirectory(String path) throws IOException;
+    void createDirectory(String path);
 
-    void deleteDirectory(String path) throws IOException;
+    void deleteDirectory(String path);
 
-    InputStream getInputStream(String path) throws IOException;
+    InputStream getInputStream(String path);
 
-    OutputStream getOutputStream(String path) throws IOException;
+    OutputStream getOutputStream(String path);
 
-    T getFileInfo(String path) throws IOException;
+    T getFileInfo(String path);
 
-    List<T> list(String path) throws IOException;
+    List<T> list(String path);
 
-    void setLastModifiedTime(String path, FileTime time) throws IOException;
+    void setLastModifiedTime(String path, FileTime time);
 
-    void setAttributes(String path, Set<FileAttribute> attributes) throws IOException;
+    void setAttributes(String path, Set<FileAttribute> attributes);
 
-    void setOwner(String path, UserPrincipal owner) throws IOException;
+    void setOwner(String path, UserPrincipal owner);
 
-    void setGroup(String path, GroupPrincipal group) throws IOException;
+    void setGroup(String path, GroupPrincipal group);
 
-    void dispose() throws IOException;
+    void dispose();
 }

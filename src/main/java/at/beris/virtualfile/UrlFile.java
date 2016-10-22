@@ -19,7 +19,6 @@ import at.beris.virtualfile.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -54,7 +53,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public FileModel getModel() throws IOException {
+    public FileModel getModel() {
         logger.debug("Get model for {}", this);
         checkModel();
         logger.debug("Returns: ", model);
@@ -62,7 +61,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public String getName() throws IOException {
+    public String getName() {
         logger.debug("Get name for {}", this);
         checkModel();
         String name = FileUtils.getName(model.getUrl().getPath());
@@ -71,7 +70,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public FileTime getCreationTime() throws IOException {
+    public FileTime getCreationTime() {
         logger.debug("Get creationTime for {}", this);
         checkModel();
         FileTime creationTime = model.getCreationTime();
@@ -80,7 +79,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public FileTime getLastModifiedTime() throws IOException {
+    public FileTime getLastModifiedTime() {
         logger.debug("Get lastModifiedTime for {}", this);
         checkModel();
         FileTime lastModifiedTime = model.getLastModifiedTime();
@@ -89,7 +88,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public URL getLinkTarget() throws IOException {
+    public URL getLinkTarget() {
         logger.debug("Get linkTarget for {}", this);
         checkModel();
         URL linkTarget = model.getLinkTarget();
@@ -98,7 +97,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public FileTime getLastAccessTime() throws IOException {
+    public FileTime getLastAccessTime() {
         logger.debug("Get lastAccessTime for {}", this);
         checkModel();
         FileTime lastAccessTime = model.getLastAccessTime();
@@ -107,7 +106,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public long getSize() throws IOException {
+    public long getSize() {
         logger.debug("Get size for {}", this);
         checkModel();
         long size = model.getSize();
@@ -116,7 +115,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public String getPath() throws IOException {
+    public String getPath() {
         logger.debug("Get path for {}", this);
         checkModel();
         String path = model.getUrl().getPath();
@@ -125,14 +124,14 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void delete() throws IOException {
+    public void delete() {
         logger.info("Delete {}", this);
         checkModel();
         fileOperationProvider.delete(model);
     }
 
     @Override
-    public void delete(VirtualFile file) throws IOException {
+    public void delete(VirtualFile file) {
         logger.info("Delete {} from {}", file, this);
         checkModel();
         throw new NotImplementedException();
@@ -151,7 +150,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public Byte[] checksum() throws IOException {
+    public Byte[] checksum() {
         logger.info("Calculate checksum for {}", this);
         checkModel();
         Byte[] checksum = fileOperationProvider.checksum(model);
@@ -165,7 +164,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isDirectory() throws IOException {
+    public boolean isDirectory() {
         logger.debug("Check isDirectory for {}", this);
         checkModel();
         Boolean isDirectory = model.isDirectory();
@@ -174,7 +173,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isSymbolicLink() throws IOException {
+    public boolean isSymbolicLink() {
         logger.debug("Check isSymbolicLink for {}", this);
         checkModel();
         boolean isSymbolicLink = model.isSymbolicLink();
@@ -183,7 +182,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isContainer() throws IOException {
+    public boolean isContainer() {
         logger.debug("Check isContainer for {}", this);
         checkModel();
         boolean isContainer = isArchive() || isDirectory();
@@ -192,7 +191,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public VirtualFile getParent() throws IOException {
+    public VirtualFile getParent() {
         logger.debug("Get parent for {}", this);
         VirtualFile parent = context.getParentFile(this);
         logger.debug("Returns: {}", parent);
@@ -200,7 +199,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public VirtualFile getRoot() throws IOException {
+    public VirtualFile getRoot() {
         logger.debug("Get root for {}", this);
         checkModel();
         VirtualFile root = this;
@@ -211,7 +210,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isRoot() throws IOException {
+    public boolean isRoot() {
         logger.debug("Check isRoot for {}", this);
         checkModel();
         boolean isRoot = this.toString().equals(getRoot() != null ? getRoot().toString() : "");
@@ -220,7 +219,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public Boolean exists() throws IOException {
+    public Boolean exists() {
         logger.info("Check exists for {}", this);
         checkModel();
         Boolean exists = fileOperationProvider.exists(model);
@@ -229,14 +228,14 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public List<VirtualFile> extract(VirtualFile target) throws IOException {
+    public List<VirtualFile> extract(VirtualFile target) {
         logger.info("Extract {} to {}", this, target);
         checkModel();
         return fileOperationProvider.extract(model, target);
     }
 
     @Override
-    public void create() throws IOException {
+    public void create() {
         logger.info("Create {}", this);
         checkModel();
         fileOperationProvider.create(model);
@@ -244,21 +243,21 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         logger.debug("Get Inputstream for {}", this);
         checkModel();
         return fileOperationProvider.getInputStream(model);
     }
 
     @Override
-    public OutputStream getOutputStream() throws IOException {
+    public OutputStream getOutputStream() {
         logger.debug("Get Outputstream for {}", this);
         checkModel();
         return fileOperationProvider.getOutputStream(model);
     }
 
     @Override
-    public List<AclEntry> getAcl() throws IOException {
+    public List<AclEntry> getAcl() {
         logger.debug("Get ACL for {}", this);
         checkModel();
         List<AclEntry> acl = model.getAcl();
@@ -267,7 +266,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setAcl(List<AclEntry> acl) throws IOException {
+    public void setAcl(List<AclEntry> acl) {
         logger.info("Set ACL to {} for {}", acl, this);
         checkModel();
         model.setAcl(acl);
@@ -276,7 +275,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public UserPrincipal getOwner() throws IOException {
+    public UserPrincipal getOwner() {
         logger.debug("Get owner for {}", this);
         checkModel();
         UserPrincipal owner = model.getOwner();
@@ -285,7 +284,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setOwner(UserPrincipal owner) throws IOException {
+    public void setOwner(UserPrincipal owner) {
         logger.info("Set owner to {} for {}", owner, this);
         checkModel();
         model.setOwner(owner);
@@ -294,13 +293,13 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setUrl(URL url) throws IOException {
+    public void setUrl(URL url) {
         logger.info("Set url to {} for {}", url, this);
         this.url = url;
     }
 
     @Override
-    public GroupPrincipal getGroup() throws IOException {
+    public GroupPrincipal getGroup() {
         logger.debug("Get group for {}", this);
         checkModel();
         GroupPrincipal group = model.getGroup();
@@ -309,7 +308,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setGroup(GroupPrincipal group) throws IOException {
+    public void setGroup(GroupPrincipal group) {
         logger.info("Set group to {} for {}", group, this);
         checkModel();
         model.setGroup(group);
@@ -318,7 +317,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setLastAccessTime(FileTime time) throws IOException {
+    public void setLastAccessTime(FileTime time) {
         logger.info("Set lastAccessTime to {} for {}", time, this);
         checkModel();
         model.setLastAccessTime(time);
@@ -327,7 +326,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setLastModifiedTime(FileTime time) throws IOException {
+    public void setLastModifiedTime(FileTime time) {
         logger.info("Set lastModifiedTime to {} for {}", time, this);
         checkModel();
         model.setLastModifiedTime(time);
@@ -336,7 +335,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setAttributes(FileAttribute... attributes) throws IOException {
+    public void setAttributes(FileAttribute... attributes) {
         logger.info("Set attributes for {}", this);
         checkModel();
         model.setAttributes(new HashSet<>(Arrays.asList(attributes)));
@@ -345,7 +344,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setCreationTime(FileTime time) throws IOException {
+    public void setCreationTime(FileTime time) {
         logger.info("Set creationTime to {} for {}", time, this);
         checkModel();
         model.setCreationTime(time);
@@ -354,7 +353,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public Set<FileAttribute> getAttributes() throws IOException {
+    public Set<FileAttribute> getAttributes() {
         logger.debug("Get attributes for {}", this);
         checkModel();
         Set<FileAttribute> attributes = model.getAttributes();
@@ -363,14 +362,14 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void add(VirtualFile file) throws IOException {
+    public void add(VirtualFile file) {
         logger.info("Add {} to {}", file, this);
         checkModel();
         fileOperationProvider.add(model, file);
     }
 
     @Override
-    public void addAttributes(FileAttribute... attributes) throws IOException {
+    public void addAttributes(FileAttribute... attributes) {
         logger.info("Add attributes {} to {}", FileUtils.getAttributesString(attributes), this);
         checkModel();
         if (attributes.length < 1)
@@ -384,7 +383,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void removeAttributes(FileAttribute... attributes) throws IOException {
+    public void removeAttributes(FileAttribute... attributes) {
         logger.info("Remove attributes {} from {}", FileUtils.getAttributesString(attributes), this);
         checkModel();
         if (attributes.length < 1)
@@ -398,7 +397,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public List<VirtualFile> find(Filter filter) throws IOException {
+    public List<VirtualFile> find(Filter filter) {
         logger.info("Find children for {} with filter {}", this, filter);
         checkModel();
         Filter directoriesFilter = new IsDirectoryFilter().equalTo(true);
@@ -421,7 +420,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public List<VirtualFile> list() throws IOException {
+    public List<VirtualFile> list() {
         logger.info("List children for {}", this);
         checkModel();
         List<VirtualFile> fileList = fileOperationProvider.list(model, null);
@@ -430,7 +429,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public List<VirtualFile> list(Filter filter) throws IOException {
+    public List<VirtualFile> list(Filter filter) {
         logger.info("List children for {} with filter {}", this, filter);
         checkModel();
         List<VirtualFile> fileList = fileOperationProvider.list(model, filter);
@@ -439,7 +438,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isArchive() throws IOException {
+    public boolean isArchive() {
         logger.debug("Check isArchive for {}", this);
         checkModel();
         Boolean isArchive = model.isArchive();
@@ -448,7 +447,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isArchived() throws IOException {
+    public boolean isArchived() {
         logger.debug("Check isArchived for {}", this);
         checkModel();
         boolean isArchived = model.isArchived();
@@ -457,21 +456,21 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void copy(VirtualFile targetFile) throws IOException {
+    public void copy(VirtualFile targetFile) {
         logger.info("Copy {} to {}", this, targetFile);
         checkModel();
         fileOperationProvider.copy(this, targetFile, null);
     }
 
     @Override
-    public void copy(VirtualFile targetFile, CopyListener listener) throws IOException {
+    public void copy(VirtualFile targetFile, CopyListener listener) {
         logger.info("Copy {} to {} with Listener", this, targetFile);
         checkModel();
         fileOperationProvider.copy(this, targetFile, listener);
     }
 
     @Override
-    public void refresh() throws IOException {
+    public void refresh() {
         logger.info("Refresh {}", this);
         checkModel();
         updateModel();
@@ -504,7 +503,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void setModel(FileModel model) throws IOException {
+    public void setModel(FileModel model) {
         logger.debug("Set model to {} for {}", model, this);
         this.model = model;
         VirtualFile parent = context.getParentFile(this);
@@ -513,12 +512,12 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
         model.setUrl(url);
     }
 
-    void updateModel() throws IOException {
+    void updateModel() {
         logger.debug("Update model for {}", this);
         fileOperationProvider.updateModel(model);
     }
 
-    private void checkModel() throws IOException {
+    private void checkModel() {
         logger.debug("Check model for {}", this);
         if (model == null)
             createModel();
@@ -527,7 +526,7 @@ public class UrlFile implements VirtualFile, Comparable<UrlFile> {
         }
     }
 
-    private void createModel() throws IOException {
+    private void createModel() {
         logger.debug("Create model for {}", this);
         model = context.createFileModel();
         VirtualFile parent = context.getParentFile(this);

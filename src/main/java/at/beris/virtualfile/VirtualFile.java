@@ -26,31 +26,31 @@ import java.util.List;
 import java.util.Set;
 
 public interface VirtualFile extends DisposableObject {
-    void add(VirtualFile file) throws IOException;
+    void add(VirtualFile file);
 
     //TODO use Set instead of Varargs
-    void addAttributes(FileAttribute... attributes) throws IOException;
+    void addAttributes(FileAttribute... attributes);
 
-    Byte[] checksum() throws IOException;
+    Byte[] checksum();
 
-    void copy(VirtualFile targetFile) throws IOException;
+    void copy(VirtualFile targetFile);
 
-    void copy(VirtualFile targetFile, CopyListener listener) throws IOException;
+    void copy(VirtualFile targetFile, CopyListener listener);
 
     /**
      * Creates an empty file
      *
      * @throws IOException IOException
      */
-    void create() throws IOException;
+    void create();
 
-    void delete() throws IOException;
+    void delete();
 
-    void delete(VirtualFile file) throws IOException;
+    void delete(VirtualFile file);
 
-    Boolean exists() throws IOException;
+    Boolean exists();
 
-    List<VirtualFile> extract(VirtualFile target) throws IOException;
+    List<VirtualFile> extract(VirtualFile target);
 
     /**
      * Find files recursively matching a filter
@@ -58,106 +58,106 @@ public interface VirtualFile extends DisposableObject {
      * @param filter A filter
      * @return A list of files
      */
-    List<VirtualFile> find(Filter filter) throws IOException;
+    List<VirtualFile> find(Filter filter);
 
-    List<AclEntry> getAcl() throws IOException;
+    List<AclEntry> getAcl();
 
     //TODO create a move method that combines copy and delete
-    Set<FileAttribute> getAttributes() throws IOException;
+    Set<FileAttribute> getAttributes();
 
-    FileTime getCreationTime() throws IOException;
+    FileTime getCreationTime();
 
-    GroupPrincipal getGroup() throws IOException;
+    GroupPrincipal getGroup();
 
-    InputStream getInputStream() throws IOException;
+    InputStream getInputStream();
 
-    FileTime getLastAccessTime() throws IOException;
+    FileTime getLastAccessTime();
 
-    FileTime getLastModifiedTime() throws IOException;
+    FileTime getLastModifiedTime();
 
-    URL getLinkTarget() throws IOException;
+    URL getLinkTarget();
 
-    FileModel getModel() throws IOException;
+    FileModel getModel();
 
-    String getName() throws IOException;
+    String getName();
 
-    OutputStream getOutputStream() throws IOException;
+    OutputStream getOutputStream();
 
-    UserPrincipal getOwner() throws IOException;
+    UserPrincipal getOwner();
 
-    VirtualFile getParent() throws IOException;
+    VirtualFile getParent();
 
-    String getPath() throws IOException;
+    String getPath();
 
-    VirtualFile getRoot() throws IOException;
+    VirtualFile getRoot();
 
     /**
      * Returns the size in bytes for a file and the number of contained items for a directory
      *
      * @return File size
      */
-    long getSize() throws IOException;
+    long getSize();
 
-    URL getUrl() throws IOException;
+    URL getUrl();
 
     /**
      * VirtualFile is an archive
      */
-    boolean isArchive() throws IOException;
+    boolean isArchive();
 
     /**
      * VirtualFile is archived within an archive
      */
-    boolean isArchived() throws IOException;
+    boolean isArchived();
 
-    boolean isContainer() throws IOException;
+    boolean isContainer();
 
-    boolean isDirectory() throws IOException;
+    boolean isDirectory();
 
-    boolean isRoot() throws IOException;
+    boolean isRoot();
 
-    boolean isSymbolicLink() throws IOException;
+    boolean isSymbolicLink();
 
     /**
      * List contained files non-recursively
      *
      * @return A list of files
      */
-    List<VirtualFile> list() throws IOException;
+    List<VirtualFile> list();
 
     /**
      * List contained files non-recursively filtered by a filter
      *
      * @return A list of files
      */
-    List<VirtualFile> list(Filter filter) throws IOException;
+    List<VirtualFile> list(Filter filter);
 
     /**
      * Updates the model with information from the physical file
      */
-    void refresh() throws IOException;
+    void refresh();
 
     //TODO use Set instead of Varargs
-    void removeAttributes(FileAttribute... attributes) throws IOException;
+    void removeAttributes(FileAttribute... attributes);
 
-    void setAcl(List<AclEntry> acl) throws IOException;
+    void setAcl(List<AclEntry> acl);
 
     //TODO use Set instead of Varargs
-    void setAttributes(FileAttribute... attributes) throws IOException;
+    void setAttributes(FileAttribute... attributes);
 
-    void setCreationTime(FileTime time) throws IOException;
+    void setCreationTime(FileTime time);
 
-    void setGroup(GroupPrincipal group) throws IOException;
+    void setGroup(GroupPrincipal group);
 
-    void setLastAccessTime(FileTime time) throws IOException;
+    void setLastAccessTime(FileTime time);
 
-    void setLastModifiedTime(FileTime time) throws IOException;
+    void setLastModifiedTime(FileTime time);
 
-    void setModel(FileModel model) throws IOException;
+    void setModel(FileModel model);
 
-    void setOwner(UserPrincipal owner) throws IOException;
+    void setOwner(UserPrincipal owner);
 
-    void setUrl(URL url) throws IOException;
+    void setUrl(URL url);
 
-    void dispose() throws IOException;
+    void dispose();
 }

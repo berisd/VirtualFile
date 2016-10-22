@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -55,14 +54,14 @@ public class LocalArchivedFileTest {
     }
 
     @Test
-    public void directoryInfo() throws IOException {
+    public void directoryInfo() {
         VirtualFile file = FileManager.newLocalFile(directoryPath);
         assertEquals(extractName(directoryPath), file.getName());
         assertTrue(file.isDirectory());
     }
 
     @Test
-    public void fileInfo() throws IOException {
+    public void fileInfo() {
         VirtualFile file = FileManager.newLocalFile(filePath);
         assertEquals(extractName(filePath), file.getName());
         assertEquals(fileSize, file.getSize());

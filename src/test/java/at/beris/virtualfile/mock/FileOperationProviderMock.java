@@ -16,7 +16,6 @@ import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.provider.operation.FileOperation;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -26,82 +25,82 @@ public class FileOperationProviderMock implements FileOperationProvider {
     private boolean exists;
 
     @Override
-    public Byte[] checksum(FileModel model) throws IOException {
+    public Byte[] checksum(FileModel model) {
         return new Byte[0];
     }
 
     @Override
-    public void create(FileModel model) throws IOException {
+    public void create(FileModel model) {
         exists = true;
     }
 
     @Override
-    public void delete(FileModel model) throws IOException {
+    public void delete(FileModel model) {
         exists = false;
     }
 
     @Override
-    public Boolean exists(FileModel model) throws IOException {
+    public Boolean exists(FileModel model) {
         return exists;
     }
 
     @Override
-    public InputStream getInputStream(FileModel model) throws IOException {
+    public InputStream getInputStream(FileModel model) {
         return null;
     }
 
     @Override
-    public OutputStream getOutputStream(FileModel model) throws IOException {
+    public OutputStream getOutputStream(FileModel model) {
         return null;
     }
 
     @Override
-    public List<VirtualFile> list(FileModel model, Filter filter) throws IOException {
+    public List<VirtualFile> list(FileModel model, Filter filter) {
         return null;
     }
 
     @Override
-    public void updateModel(FileModel model) throws IOException {
+    public void updateModel(FileModel model) {
 
     }
 
     @Override
-    public void setAcl(FileModel model) throws IOException {
+    public void setAcl(FileModel model) {
 
     }
 
     @Override
-    public void setAttributes(FileModel model) throws IOException {
+    public void setAttributes(FileModel model) {
 
     }
 
     @Override
-    public void setCreationTime(FileModel model) throws IOException {
+    public void setCreationTime(FileModel model) {
 
     }
 
     @Override
-    public void setGroup(FileModel model) throws IOException {
+    public void setGroup(FileModel model) {
 
     }
 
     @Override
-    public void setLastAccessTime(FileModel model) throws IOException {
+    public void setLastAccessTime(FileModel model) {
 
     }
 
     @Override
-    public void setLastModifiedTime(FileModel model) throws IOException {
+    public void setLastModifiedTime(FileModel model) {
 
     }
 
     @Override
-    public void setOwner(FileModel model) throws IOException {
+    public void setOwner(FileModel model) {
 
     }
 
     @Override
-    public List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException {
+    public List<VirtualFile> extract(FileModel model, VirtualFile target) {
         return null;
     }
 
@@ -116,22 +115,22 @@ public class FileOperationProviderMock implements FileOperationProvider {
     }
 
     @Override
-    public void add(FileModel model, VirtualFile file) throws IOException {
+    public void add(FileModel model, VirtualFile file) {
 
     }
 
     @Override
-    public void addAttributes(FileModel model) throws IOException {
+    public void addAttributes(FileModel model) {
 
     }
 
     @Override
-    public void removeAttributes(FileModel model) throws IOException {
+    public void removeAttributes(FileModel model) {
 
     }
 
     @Override
-    public void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) throws IOException {
+    public void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
 
     }
 

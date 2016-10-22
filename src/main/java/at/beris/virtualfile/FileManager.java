@@ -12,10 +12,7 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.ContextConfiguration;
 import at.beris.virtualfile.protocol.Protocol;
-import at.beris.virtualfile.util.UrlUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.Set;
@@ -43,7 +40,7 @@ public class FileManager {
         return fileContext.getConfigurator().getConfiguration(protocol);
     }
 
-    public static Configuration getConfiguration(VirtualFile file) throws IOException {
+    public static Configuration getConfiguration(VirtualFile file) {
         return fileContext.getConfigurator().getConfiguration(file);
     }
 
@@ -53,7 +50,7 @@ public class FileManager {
      * @param path Path
      * @return New File instance
      */
-    public static VirtualFile newLocalFile(String path) throws IOException {
+    public static VirtualFile newLocalFile(String path) {
         return fileContext.newLocalFile(path);
     }
 
@@ -63,23 +60,23 @@ public class FileManager {
      * @param path Path
      * @return New File Instance
      */
-    public static VirtualFile newLocalDirectory(String path) throws IOException {
+    public static VirtualFile newLocalDirectory(String path) {
         return fileContext.newLocalDirectory(path);
     }
 
-    public static VirtualFile newFile(String urlString) throws IOException {
+    public static VirtualFile newFile(String urlString) {
         return fileContext.newFile(urlString);
     }
 
-    public static VirtualFile newFile(URL url) throws IOException {
+    public static VirtualFile newFile(URL url) {
         return fileContext.newFile(url);
     }
 
-    public static VirtualFile newDirectory(URL url) throws IOException {
+    public static VirtualFile newDirectory(URL url) {
         return fileContext.newDirectory(url);
     }
 
-    public static void dispose(VirtualFile file) throws IOException {
+    public static void dispose(VirtualFile file) {
         fileContext.dispose(file);
     }
 

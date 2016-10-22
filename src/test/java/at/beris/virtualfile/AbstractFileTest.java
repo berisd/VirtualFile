@@ -12,14 +12,17 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.provider.operation.CopyListener;
-import at.beris.virtualfile.util.*;
+import at.beris.virtualfile.util.OsUtils;
+import at.beris.virtualfile.util.UrlUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +32,9 @@ import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static at.beris.virtualfile.FileTestHelper.*;
 import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
@@ -44,16 +50,17 @@ public abstract class AbstractFileTest {
     protected URL sourceDirectoryUrl;
     protected URL targetDirectoryUrl;
 
-    protected void createFile() throws IOException {
-        createFile(null);
+    @Test
+    public void createFile() {
+        createFile(Optional.empty());
     }
 
-    protected void createFile(Consumer<VirtualFile> assertHook) throws IOException {
+    protected void createFile(Optional<Consumer<VirtualFile>> assertHook) {
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
 
-        if (assertHook != null) {
-            assertHook.accept(file);
+        if (assertHook.isPresent()) {
+            assertHook.get().accept(file);
         } else {
             assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
             // FileStore.readAttributes for Windows might return old value, so don't check
@@ -67,7 +74,7 @@ public abstract class AbstractFileTest {
         }
     }
 
-    protected void createDirectory() throws IOException {
+    protected void createDirectory() {
         VirtualFile file = fileContext.newFile(sourceDirectoryUrl);
         file.create();
 
@@ -94,7 +101,7 @@ public abstract class AbstractFileTest {
         Files.delete(dir);
     }
 
-    protected void copyFile() throws IOException {
+    protected void copyFile() {
         VirtualFile sourceFile = FileTestHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
         VirtualFile targetFile = fileContext.newFile(targetFileUrl);
         CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
@@ -103,7 +110,7 @@ public abstract class AbstractFileTest {
         assertCopyListener(copyListenerMock);
     }
 
-    protected void copyDirectory() throws IOException {
+    protected void copyDirectory() throws IOException, URISyntaxException {
         List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         List<String> targetFileUrlList = createFilenamesTree(targetDirectoryUrl.toString());
 
@@ -119,7 +126,7 @@ public abstract class AbstractFileTest {
         assertDirectory(sourceFileUrlList, targetFileUrlList);
     }
 
-    protected void deleteFile() throws IOException {
+    protected void deleteFile() {
         VirtualFile sourceFile = fileContext.newFile(sourceFileUrl);
         sourceFile.create();
         assertTrue(sourceFile.exists());
@@ -127,7 +134,7 @@ public abstract class AbstractFileTest {
         assertFalse(sourceFile.exists());
     }
 
-    protected void deleteDirectory() throws IOException {
+    protected void deleteDirectory() throws IOException, URISyntaxException {
         List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         FileTestHelper.createFileTreeData(sourceFileUrlList);
 
@@ -141,13 +148,13 @@ public abstract class AbstractFileTest {
         assertFalse(targetDirectory.exists());
     }
 
-    protected void getFileAttributes(Consumer<VirtualFile> assertHook) throws IOException {
+    protected void getFileAttributes(Consumer<VirtualFile> assertHook) {
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         assertHook.accept(file);
     }
 
-    protected void setFileAttributes(Set<FileAttribute> attributes) throws IOException {
+    protected void setFileAttributes(Set<FileAttribute> attributes) {
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         file.setAttributes(attributes.toArray(new FileAttribute[0]));
@@ -160,7 +167,7 @@ public abstract class AbstractFileTest {
         assertEquals(attributes.size(), actualAttributes.size());
     }
 
-    protected void setOwner(UserPrincipal owner) throws IOException {
+    protected void setOwner(UserPrincipal owner) {
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         file.setOwner(owner);
@@ -171,11 +178,11 @@ public abstract class AbstractFileTest {
         assertEquals(owner.getName(), file.getOwner().getName());
     }
 
-    protected void setGroup() throws IOException {
+    protected void setGroup() {
         setGroup(null);
     }
 
-    protected void setGroup(GroupPrincipal group) throws IOException {
+    protected void setGroup(GroupPrincipal group) {
         VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         if (group == null)
@@ -188,7 +195,7 @@ public abstract class AbstractFileTest {
         assertEquals(group.getName(), file.getGroup().getName());
     }
 
-    protected void setAcl() throws IOException {
+    protected void setAcl() {
         VirtualFile file = getFileContext().newFile(sourceFileUrl);
         file.create();
         List<AclEntry> acl = file.getAcl();
@@ -202,17 +209,17 @@ public abstract class AbstractFileTest {
         file.delete();
     }
 
-    protected void setCreationTime() throws IOException {
+    protected void setCreationTime() {
         setTime((object, value) -> object.setCreationTime(value),
                 virtualFile -> virtualFile.getCreationTime());
     }
 
-    protected void setLastModifiedTime() throws IOException {
+    protected void setLastModifiedTime() {
         setTime((object, value) -> object.setLastModifiedTime(value),
                 virtualFile -> virtualFile.getLastModifiedTime());
     }
 
-    protected void setLastAccessTime() throws IOException {
+    protected void setLastAccessTime() {
         setTime((object, value) -> object.setLastAccessTime(value),
                 virtualFile -> virtualFile.getLastAccessTime());
     }
@@ -234,7 +241,7 @@ public abstract class AbstractFileTest {
         assertEquals(TEST_SOURCE_FILE_SIZE, bytesCopiedTotalList.get(1).intValue());
     }
 
-    protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) throws IOException {
+    protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) {
         for (int i = 0; i < sourceFileUrlList.size(); i++) {
             VirtualFile sourceFile = fileContext.newFile(sourceFileUrlList.get(i));
             VirtualFile targetFile = fileContext.newFile(targetFileUrlList.get(i));
@@ -256,12 +263,12 @@ public abstract class AbstractFileTest {
     }
 
     @After
-    public void afterTestCase() throws IOException {
+    public void afterTestCase() {
         cleanupFiles();
         fileContext.dispose();
     }
 
-    private void cleanupFiles() throws IOException {
+    private void cleanupFiles() {
         for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
             if (url != null) {
                 VirtualFile file = fileContext.newFile(url);
@@ -271,7 +278,7 @@ public abstract class AbstractFileTest {
         }
     }
 
-    private void setTime(BiConsumer<VirtualFile, FileTime> biconsumer, Function<VirtualFile, FileTime> function) throws IOException {
+    private void setTime(BiConsumer<VirtualFile, FileTime> biconsumer, Function<VirtualFile, FileTime> function) {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(new Date());
         calendar.roll(Calendar.YEAR, false);

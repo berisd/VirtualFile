@@ -9,12 +9,11 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileModel;
+import at.beris.virtualfile.VirtualFile;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface ArchiveOperationProvider {
-    List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException;
+    List<VirtualFile> extract(FileModel model, VirtualFile target);
 }

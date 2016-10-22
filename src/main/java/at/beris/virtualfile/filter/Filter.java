@@ -11,8 +11,6 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.VirtualFile;
 
-import java.io.IOException;
-
 public interface Filter<T> {
     Filter and(Filter filter);
 
@@ -22,7 +20,7 @@ public interface Filter<T> {
 
     Filter equalTo(T value);
 
-    boolean filter(VirtualFile file) throws IOException;
+    boolean filter(VirtualFile file);
 
     Filter not();
 

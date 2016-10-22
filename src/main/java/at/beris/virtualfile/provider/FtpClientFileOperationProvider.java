@@ -16,6 +16,7 @@ import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.ftp.FtpFileTranslator;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.net.ftp.FTPFile;
@@ -32,7 +33,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     }
 
     @Override
-    public void create(FileModel model) throws IOException {
+    public void create(FileModel model) {
         if (model.isDirectory())
             client.createDirectory(model.getUrl().getPath());
         else {
@@ -41,12 +42,12 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     }
 
     @Override
-    public Boolean exists(FileModel model) throws IOException {
+    public Boolean exists(FileModel model) {
         return client.exists(model.getUrl().getPath());
     }
 
     @Override
-    public void delete(FileModel model) throws IOException {
+    public void delete(FileModel model) {
         if (model.isDirectory())
             client.deleteDirectory(model.getUrl().getPath());
         else
@@ -54,7 +55,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     }
 
     @Override
-    public Byte[] checksum(FileModel model) throws IOException {
+    public Byte[] checksum(FileModel model) {
         String tempDir = System.getProperty("java.io.tmpdir");
         String tempFilePath = tempDir + File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
         VirtualFile tempFile = copyToLocalFile(model, tempFilePath);
@@ -62,7 +63,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     }
 
     @Override
-    public List<VirtualFile> list(FileModel model, Filter filter) throws IOException {
+    public List<VirtualFile> list(FileModel model, Filter filter) {
         List<FTPFile> ftpFileList = client.list(resolveUrl(model).getPath());
         List<VirtualFile> fileList = new ArrayList<>();
 
@@ -82,7 +83,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     }
 
     @Override
-    public void updateModel(FileModel model) throws IOException {
+    public void updateModel(FileModel model) {
         model.setFileExists(client.exists(model.getUrl().getPath()));
         if (!model.isFileExists())
             return;
@@ -97,46 +98,46 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     }
 
     @Override
-    public InputStream getInputStream(FileModel model) throws IOException {
+    public InputStream getInputStream(FileModel model) {
         return client.getInputStream(model.getUrl().getPath());
     }
 
     @Override
-    public OutputStream getOutputStream(FileModel model) throws IOException {
+    public OutputStream getOutputStream(FileModel model) {
         return client.getOutputStream(model.getUrl().getPath());
     }
 
     @Override
-    public void setAttributes(FileModel model) throws IOException {
+    public void setAttributes(FileModel model) {
         client.setAttributes(model.getUrl().getPath(), model.getAttributes());
     }
 
     @Override
-    public void setCreationTime(FileModel model) throws IOException {
+    public void setCreationTime(FileModel model) {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void setGroup(FileModel model) throws IOException {
+    public void setGroup(FileModel model) {
         client.setGroup(model.getUrl().getPath(), model.getGroup());
     }
 
     @Override
-    public void setLastAccessTime(FileModel model) throws IOException {
+    public void setLastAccessTime(FileModel model) {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void setLastModifiedTime(FileModel model) throws IOException {
+    public void setLastModifiedTime(FileModel model) {
         client.setLastModifiedTime(model.getUrl().getPath(), model.getLastModifiedTime());
     }
 
     @Override
-    public void setOwner(FileModel model) throws IOException {
+    public void setOwner(FileModel model) {
         client.setOwner(model.getUrl().getPath(), model.getOwner());
     }
 
-    private VirtualFile copyToLocalFile(FileModel model, String path) throws IOException {
+    private VirtualFile copyToLocalFile(FileModel model, String path) {
         byte[] buffer = new byte[1024];
         int length;
 
@@ -147,6 +148,8 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
             while ((length = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, length);
             }
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
         }
 
         return fileContext.newLocalFile(path);

@@ -11,7 +11,6 @@ package at.beris.virtualfile.filter;
 
 import at.beris.virtualfile.VirtualFile;
 
-import java.io.IOException;
 import java.util.*;
 
 public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
@@ -83,7 +82,7 @@ public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
     }
 
     @Override
-    public boolean filter(VirtualFile file) throws IOException {
+    public boolean filter(VirtualFile file) {
         boolean valid = true;
         T value = getValue(file);
 
@@ -105,7 +104,7 @@ public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
         return valid;
     }
 
-    private boolean combineFilter(boolean valid, VirtualFile file, Operation operation, Filter filter) throws IOException {
+    private boolean combineFilter(boolean valid, VirtualFile file, Operation operation, Filter filter) {
         switch (operation) {
             case NOT:
                 return valid && (!filter.filter(file));
@@ -165,5 +164,5 @@ public abstract class BasicFilter<T> implements Filter<T>, Cloneable {
         return valid;
     }
 
-    abstract protected T getValue(VirtualFile file) throws IOException;
+    abstract protected T getValue(VirtualFile file);
 }

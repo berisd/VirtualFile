@@ -16,73 +16,72 @@ import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.provider.operation.FileOperation;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
 
 public interface FileOperationProvider extends DisposableObject {
-    Byte[] checksum(FileModel model) throws IOException;
+    Byte[] checksum(FileModel model);
 
     /**
      * Creates a new  physical representation
      *
      * @param model FileModel
      */
-    void create(FileModel model) throws IOException;
+    void create(FileModel model);
 
-    void delete(FileModel model) throws IOException;
+    void delete(FileModel model);
 
-    Boolean exists(FileModel model) throws IOException;
+    Boolean exists(FileModel model);
 
-    InputStream getInputStream(FileModel model) throws IOException;
+    InputStream getInputStream(FileModel model);
 
-    OutputStream getOutputStream(FileModel model) throws IOException;
+    OutputStream getOutputStream(FileModel model);
 
     /**
      * List files in this file
      *
-     * @param model FileModel
+     * @param model  FileModel
      * @param filter Filter
      * @return List of files
      */
-    List<VirtualFile> list(FileModel model, Filter filter) throws IOException;
+    List<VirtualFile> list(FileModel model, Filter filter);
 
     /**
      * Updates the Model with information from the physical file.
      *
      * @param model FileModel
      */
-    void updateModel(FileModel model) throws IOException;
+    void updateModel(FileModel model);
 
-    void setAcl(FileModel model) throws IOException;
+    void setAcl(FileModel model);
 
-    void setAttributes(FileModel model) throws IOException;
+    void setAttributes(FileModel model);
 
-    void setCreationTime(FileModel model) throws IOException;
+    void setCreationTime(FileModel model);
 
-    void setGroup(FileModel model) throws IOException;
+    void setGroup(FileModel model);
 
-    void setLastAccessTime(FileModel model) throws IOException;
+    void setLastAccessTime(FileModel model);
 
-    void setLastModifiedTime(FileModel model) throws IOException;
+    void setLastModifiedTime(FileModel model);
 
-    void setOwner(FileModel model) throws IOException;
+    void setOwner(FileModel model);
 
-    List<VirtualFile> extract(FileModel model, VirtualFile target) throws IOException;
+    List<VirtualFile> extract(FileModel model, VirtualFile target);
 
     boolean isOperationSupported(FileOperation fileOperation);
 
     Set<FileOperation> supportedOperations();
 
-    void add(FileModel model, VirtualFile file) throws IOException;
+    void add(FileModel model, VirtualFile file);
 
-    void addAttributes(FileModel model) throws IOException;
+    void addAttributes(FileModel model);
 
-    void removeAttributes(FileModel model) throws IOException;
+    void removeAttributes(FileModel model);
 
-    void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) throws IOException;
+    void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener);
 
     void dispose();
 }

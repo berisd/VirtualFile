@@ -9,14 +9,13 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.VirtualFile;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 public class StringFilterTest {
@@ -30,12 +29,12 @@ public class StringFilterTest {
     }
 
     @AfterClass
-    public static void tearDown() throws IOException {
+    public static void tearDown() {
         testDirectory.delete();
     }
 
     @Test
-    public void filterContains() throws IOException {
+    public void filterContains() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().contains("good"));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -43,7 +42,7 @@ public class StringFilterTest {
     }
 
     @Test
-    public void filterStartsWith() throws IOException {
+    public void filterStartsWith() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().startsWith("test"));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -52,7 +51,7 @@ public class StringFilterTest {
     }
 
     @Test
-    public void filterEndsWith() throws IOException {
+    public void filterEndsWith() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().endsWith(".txt"));
         Assert.assertEquals(2, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);
@@ -61,7 +60,7 @@ public class StringFilterTest {
     }
 
     @Test
-    public void filterMatches() throws IOException {
+    public void filterMatches() {
         List<VirtualFile> filteredList = testDirectory.find(new FileNameFilter().matches(".*odm.*$"));
         Assert.assertEquals(1, filteredList.size());
         List<String> filteredFileNameList = TestFilterHelper.getNameListFromFileList(filteredList);

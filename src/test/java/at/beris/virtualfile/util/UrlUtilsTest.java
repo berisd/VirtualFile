@@ -15,7 +15,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -44,27 +43,27 @@ public class UrlUtilsTest {
     }
 
     @Test
-    public void normalizeUrl() throws IOException {
+    public void normalizeUrl() throws MalformedURLException {
         Assert.assertEquals("ftp://www.example.com/release/file.zip", UrlUtils.normalizeUrl(new URL("ftp://www.example.com/test/../release/file.zip")).toString());
     }
 
     @Test
-    public void newUrl() throws IOException {
+    public void newUrl() {
         Assert.assertEquals(FILE_URL_STRING, UrlUtils.newUrl(FILE_URL_STRING).toString());
     }
 
     @Test
-    public void newUrlWithSpec() throws IOException {
+    public void newUrlWithSpec() throws MalformedURLException {
         Assert.assertEquals("ftp://www.example.com/mydir/newsubdir", UrlUtils.newUrl(new URL("ftp://www.example.com/mydir/oldsubdir"), "newsubdir").toString());
     }
 
     @Test
-    public void newUrlReplacePath() throws IOException {
+    public void newUrlReplacePath() throws MalformedURLException {
         Assert.assertEquals("ftp://www.example.com/newsubdir", UrlUtils.newUrlReplacePath(new URL("ftp://www.example.com/mydir/oldsubdir"), "/newsubdir").toString());
     }
 
     @Test
-    public void getUrlForLocalPath() throws IOException {
+    public void getUrlForLocalPath() throws MalformedURLException {
         Assert.assertEquals(new File("home/test").toURI().toURL().toString(), UrlUtils.getUrlForLocalPath("home/test").toString());
     }
 
@@ -74,7 +73,7 @@ public class UrlUtilsTest {
     }
 
     @Test
-    public void getParentUrl() throws IOException {
+    public void getParentUrl() throws MalformedURLException {
         Assert.assertEquals("file://home/tester/", UrlUtils.getParentUrl(new URL("file://home/tester/test.txt")).toString());
         Assert.assertNull(UrlUtils.getParentUrl(new URL("file:///")));
         Assert.assertNull(UrlUtils.getParentUrl(new URL("ftp://ftp.test.com")));
@@ -82,7 +81,7 @@ public class UrlUtilsTest {
     }
 
     @Test
-    public void getParentPath() throws IOException {
+    public void getParentPath() throws MalformedURLException {
         Assert.assertEquals("file://home/tester/", UrlUtils.getParentPath("file://home/tester/test.txt"));
         Assert.assertNull(UrlUtils.getParentUrl(new URL("ftp://ftp.test.com/")));
     }

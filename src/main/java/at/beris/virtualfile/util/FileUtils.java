@@ -13,7 +13,6 @@ import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.filter.Filter;
 
-import java.io.IOException;
 import java.util.*;
 
 public class FileUtils {
@@ -43,7 +42,7 @@ public class FileUtils {
         return Arrays.asList("ZIP", "JAR", "TAR", "7Z", "ARJ");
     }
 
-    public static Map<Filter, List<VirtualFile>> groupFileListByFilters(List<VirtualFile> fileList, List<Filter> filterList) throws IOException {
+    public static Map<Filter, List<VirtualFile>> groupFileListByFilters(List<VirtualFile> fileList, List<Filter> filterList) {
         Map<Filter, List<VirtualFile>> partitionedFileList = new HashMap<>();
 
         for (Filter filter : filterList) {

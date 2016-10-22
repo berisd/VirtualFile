@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.client.ftp;
 
+import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.IOException;
@@ -24,29 +25,49 @@ public class FtpOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
-        outputStream.write(b);
+    public void write(int b) {
+        try {
+            outputStream.write(b);
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
-        outputStream.write(b);
+    public void write(byte[] b) {
+        try {
+            outputStream.write(b);
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        outputStream.write(b, off, len);
+    public void write(byte[] b, int off, int len) {
+        try {
+            outputStream.write(b, off, len);
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public void flush() throws IOException {
-        outputStream.flush();
+    public void flush() {
+        try {
+            outputStream.flush();
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
-    public void close() throws IOException {
-        outputStream.close();
-        ftpClient.completePendingCommand();
-        ftpClient = null;
+    public void close() {
+        try {
+            outputStream.close();
+            ftpClient.completePendingCommand();
+            ftpClient = null;
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 }
