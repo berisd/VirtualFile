@@ -30,7 +30,7 @@ import java.util.*;
 
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
-public class UrlFile implements VirtualFile, Comparable<UrlFile> {
+class UrlFile implements VirtualFile, Comparable<UrlFile> {
 
     private static Logger logger = LoggerFactory.getLogger(UrlFile.class);
 
