@@ -17,74 +17,61 @@ import java.net.URL;
 import java.util.EnumSet;
 import java.util.Set;
 
-public class FileManager {
-    private static final FileContext fileContext;
-
-    static {
-        fileContext = new FileContext();
-    }
+/**
+ * Public interface to the VirtualFile library
+ */
+public final class FileManager {
+    private static final UrlFileManager fileManager = new UrlFileManager();
 
     private FileManager() {
         super();
     }
 
     public static ContextConfiguration getContextConfiguration() {
-        return fileContext.getConfigurator().getContextConfiguration();
+        return fileManager.getFileContext().getConfigurator().getContextConfiguration();
     }
 
     public static Configuration getConfiguration() {
-        return fileContext.getConfigurator().getConfiguration();
+        return fileManager.getFileContext().getConfigurator().getConfiguration();
     }
 
     public static Configuration getConfiguration(Protocol protocol) {
-        return fileContext.getConfigurator().getConfiguration(protocol);
+        return fileManager.getFileContext().getConfigurator().getConfiguration(protocol);
     }
 
     public static Configuration getConfiguration(VirtualFile file) {
-        return fileContext.getConfigurator().getConfiguration(file);
+        return fileManager.getFileContext().getConfigurator().getConfiguration(file);
     }
 
-    /**
-     * Creates a local file with with the given path. (Convenience method)
-     *
-     * @param path Path
-     * @return New File instance
-     */
     public static VirtualFile newLocalFile(String path) {
-        return fileContext.newLocalFile(path);
+        return fileManager.newLocalFile(path);
     }
 
-    /**
-     * Creates a local directory with with the given path. (Convenience method)
-     *
-     * @param path Path
-     * @return New File Instance
-     */
     public static VirtualFile newLocalDirectory(String path) {
-        return fileContext.newLocalDirectory(path);
+        return fileManager.newLocalDirectory(path);
     }
 
     public static VirtualFile newFile(String urlString) {
-        return fileContext.newFile(urlString);
+        return fileManager.newFile(urlString);
     }
 
     public static VirtualFile newFile(URL url) {
-        return fileContext.newFile(url);
+        return fileManager.newFile(url);
     }
 
     public static VirtualFile newDirectory(URL url) {
-        return fileContext.newDirectory(url);
+        return fileManager.newDirectory(url);
     }
 
     public static void dispose(VirtualFile file) {
-        fileContext.dispose(file);
+        fileManager.dispose(file);
     }
 
     public static Set<Protocol> enabledProtocols() {
-        return fileContext.enabledProtocols();
+        return fileManager.enabledProtocols();
     }
 
-    public static Set<Protocol> allProtocols() {
+    public static Set<Protocol> supportedProtocols() {
         return EnumSet.allOf(Protocol.class);
     }
 }
