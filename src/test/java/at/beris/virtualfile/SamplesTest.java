@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.value.AuthenticationType;
+import at.beris.virtualfile.exception.OperationNotSupportedException;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,6 +44,16 @@ public class SamplesTest {
         List<VirtualFile> extractedFiles = archive.extract(directory);
         Assert.assertEquals(33, extractedFiles.size());
         directory.delete();
+    }
+
+    @Test(expected = OperationNotSupportedException.class)
+    public void extractFile() {
+        VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
+                "resources" + File.separator + "testarchive.zip/TreeDb/file.xml");
+        VirtualFile targetFile = FileManager.newLocalFile("file.xml");
+        List<VirtualFile> extractedFiles = archive.extract(targetFile);
+        Assert.assertEquals(920, extractedFiles.get(0).getSize());
+        targetFile.delete();
     }
 
     @Test
