@@ -120,18 +120,6 @@ public class FileModel {
         return FileUtils.isArchive(pathParts[pathParts.length - 1]);
     }
 
-    public boolean isArchived() {
-        FileModel parentModel = parent;
-        while (parentModel != null) {
-            if (parentModel.isArchive())
-                return true;
-            if (parentModel.isArchived())
-                return true;
-            parentModel = parentModel.getParent();
-        }
-        return false;
-    }
-
     public boolean isFileExists() {
         return fileExists;
     }

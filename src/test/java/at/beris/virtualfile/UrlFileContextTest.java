@@ -45,7 +45,7 @@ public class UrlFileContextTest {
         assertNotNull(file.getParent());
         Assert.assertArrayEquals(expectedChecksum, file.checksum());
         Assert.assertFalse(file.isArchive());
-        Assert.assertFalse(file.isArchived());
+//        Assert.assertFalse(file.isArchived());
         file.delete();
     }
 

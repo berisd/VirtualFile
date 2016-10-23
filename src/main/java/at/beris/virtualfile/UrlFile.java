@@ -10,7 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.exception.NotImplementedException;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -19,8 +19,10 @@ import at.beris.virtualfile.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.FileTime;
@@ -34,10 +36,10 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
 
     private static Logger logger = LoggerFactory.getLogger(UrlFile.class);
 
-    private FileModel model;
-    private URL url;
-    private FileOperationProvider fileOperationProvider;
-    private VirtualFileContext context;
+    protected FileModel model;
+    protected URL url;
+    protected FileOperationProvider fileOperationProvider;
+    protected UrlFileContext context;
 
     public UrlFile(URL url, UrlFileContext context) {
         this.url = url;
@@ -131,13 +133,6 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void delete(VirtualFile file) {
-        logger.info("Delete {} from {}", file, this);
-        checkModel();
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void dispose() {
         logger.debug("Dispose {}", this);
         if (model != null) {
@@ -182,15 +177,6 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isContainer() {
-        logger.debug("Check isContainer for {}", this);
-        checkModel();
-        boolean isContainer = isArchive() || isDirectory();
-        logger.debug("Returns: {}", isContainer);
-        return isContainer;
-    }
-
-    @Override
     public VirtualFile getParent() {
         logger.debug("Get parent for {}", this);
         VirtualFile parent = context.getParentFile(this);
@@ -225,13 +211,6 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
         Boolean exists = fileOperationProvider.exists(model);
         logger.info("Returns: {}", exists);
         return exists;
-    }
-
-    @Override
-    public List<VirtualFile> extract(VirtualFile target) {
-        logger.info("Extract {} to {}", this, target);
-        checkModel();
-        return fileOperationProvider.extract(model, target);
     }
 
     @Override
@@ -362,10 +341,18 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void add(VirtualFile file) {
-        logger.info("Add {} to {}", file, this);
-        checkModel();
-        fileOperationProvider.add(model, file);
+    public VirtualArchive asArchive() {
+        //TODO if archive is not local then copy from remote
+        return new UrlArchive(url, context);
+    }
+
+    @Override
+    public File asFile() {
+        try {
+            return new File(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
@@ -447,15 +434,6 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public boolean isArchived() {
-        logger.debug("Check isArchived for {}", this);
-        checkModel();
-        boolean isArchived = model.isArchived();
-        logger.debug("Returns: {}", isArchived);
-        return isArchived;
-    }
-
-    @Override
     public void copy(VirtualFile targetFile) {
         logger.info("Copy {} to {}", this, targetFile);
         checkModel();
@@ -517,7 +495,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
         fileOperationProvider.updateModel(model);
     }
 
-    private void checkModel() {
+    protected void checkModel() {
         logger.debug("Check model for {}", this);
         if (model == null)
             createModel();

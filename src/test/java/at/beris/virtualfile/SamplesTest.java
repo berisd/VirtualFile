@@ -25,21 +25,11 @@ import static org.junit.Assert.assertTrue;
  * This class contains real world code samples
  */
 public class SamplesTest {
-    @Test
-    @Ignore
-    public void addFilesToDirectory() {
-        VirtualFile dir = FileManager.newLocalDirectory("testdir");
-        dir.create();
-        VirtualFile file = FileManager.newLocalFile("abc.txt");
-        dir.add(file);
-        file.create();
-        dir.delete();
-    }
 
-    @Test
+    @Test(expected = OperationNotSupportedException.class)
     public void extractArchive() {
-        VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "testarchive.zip");
+        VirtualArchive archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
+                "resources" + File.separator + "testarchive.zip").asArchive();
         VirtualFile directory = FileManager.newLocalDirectory("extracted");
         List<VirtualFile> extractedFiles = archive.extract(directory);
         Assert.assertEquals(33, extractedFiles.size());
@@ -48,8 +38,8 @@ public class SamplesTest {
 
     @Test(expected = OperationNotSupportedException.class)
     public void extractFile() {
-        VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "testarchive.zip/TreeDb/file.xml");
+        VirtualArchive archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
+                "resources" + File.separator + "testarchive.zip/TreeDb/file.xml").asArchive();
         VirtualFile targetFile = FileManager.newLocalFile("file.xml");
         List<VirtualFile> extractedFiles = archive.extract(targetFile);
         Assert.assertEquals(920, extractedFiles.get(0).getSize());
@@ -58,6 +48,7 @@ public class SamplesTest {
 
     @Test
     public void listArchive() {
+        //TODO Must use VirtualArchive
         VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
                 "resources" + File.separator + "testarchive.zip");
         Assert.assertEquals(33, archive.list().size());

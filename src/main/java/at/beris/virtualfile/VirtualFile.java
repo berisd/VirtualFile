@@ -14,6 +14,7 @@ import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CopyListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,7 +27,10 @@ import java.util.List;
 import java.util.Set;
 
 public interface VirtualFile extends DisposableObject {
-    void add(VirtualFile file);
+
+    VirtualArchive asArchive();
+
+    File asFile();
 
     //TODO use Set instead of Varargs
     void addAttributes(FileAttribute... attributes);
@@ -46,11 +50,7 @@ public interface VirtualFile extends DisposableObject {
 
     void delete();
 
-    void delete(VirtualFile file);
-
     Boolean exists();
-
-    List<VirtualFile> extract(VirtualFile target);
 
     /**
      * Find files recursively matching a filter
@@ -104,13 +104,6 @@ public interface VirtualFile extends DisposableObject {
      * VirtualFile is an archive
      */
     boolean isArchive();
-
-    /**
-     * VirtualFile is archived within an archive
-     */
-    boolean isArchived();
-
-    boolean isContainer();
 
     boolean isDirectory();
 
