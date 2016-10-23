@@ -11,18 +11,26 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.ContextConfiguration;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
+import at.beris.virtualfile.util.UrlUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 
 class UrlFileManager implements VirtualFileManager {
-    private FileContext fileContext;
+
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileManager.class);
+
+    private VirtualFileContext fileContext;
 
     public UrlFileManager() {
         super();
-        fileContext = new FileContext();
+        fileContext = new UrlFileContext();
     }
 
     @Override
@@ -46,17 +54,21 @@ class UrlFileManager implements VirtualFileManager {
 
     @Override
     public VirtualFile newLocalFile(String path) {
-        return fileContext.newLocalFile(path);
+        return fileContext.newFile(UrlUtils.getUrlForLocalPath(path));
     }
 
     @Override
     public VirtualFile newLocalDirectory(String path) {
-        return fileContext.newLocalDirectory(path);
+        return newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
     }
 
     @Override
     public VirtualFile newFile(String urlString) {
-        return fileContext.newFile(urlString);
+        try {
+            return fileContext.newFile(new URL(urlString));
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override
@@ -66,7 +78,10 @@ class UrlFileManager implements VirtualFileManager {
 
     @Override
     public VirtualFile newDirectory(URL url) {
-        return fileContext.newDirectory(url);
+        URL normalizedUrl = url;
+        if (!url.getPath().endsWith("/"))
+            normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
+        return fileContext.newFile(normalizedUrl);
     }
 
     @Override
@@ -75,16 +90,38 @@ class UrlFileManager implements VirtualFileManager {
     }
 
     @Override
-    public Set<Protocol> enabledProtocols() {
-        return fileContext.enabledProtocols();
+    public void dispose() {
+        fileContext.dispose();
     }
+
+    @Override
+    public Set<Protocol> enabledProtocols() {
+        Map<Protocol, Pair<String, String>> protocolClassMap = new HashMap<>();
+        protocolClassMap.put(Protocol.SFTP, Pair.of("JSch", "com.jcraft.jsch.JSch"));
+        protocolClassMap.put(Protocol.FTP, Pair.of("Apache Commons Net", "org.apache.commons.net.ftp.FTP"));
+
+        Set<Protocol> enabledProtocols = new HashSet<>();
+        enabledProtocols.add(Protocol.FILE);
+
+        for (Map.Entry<Protocol, Pair<String, String>> entry : protocolClassMap.entrySet()) {
+            Protocol protocol = entry.getKey();
+            Pair<String, String> protocolLibrary = entry.getValue();
+            try {
+                if (Class.forName(protocolLibrary.getRight()) != null)
+                    enabledProtocols.add(protocol);
+            } catch (ClassNotFoundException ignored) {
+            }
+            if (!enabledProtocols.contains(protocol))
+                LOGGER.info(protocolLibrary.getLeft() + " not installed. No support for protocol " + protocol);
+        }
+
+        return Collections.unmodifiableSet(enabledProtocols);
+    }
+
 
     @Override
     public Set<Protocol> supportedProtocols() {
         return EnumSet.allOf(Protocol.class);
     }
 
-    public FileContext getFileContext() {
-        return fileContext;
-    }
 }

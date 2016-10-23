@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -36,7 +36,7 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
     private final static String URL = "url";
     private final static String PARENT_URL = "parentUrl";
 
-    public LocalArchiveOperationProvider(FileContext fileContext, Client client) {
+    public LocalArchiveOperationProvider(VirtualFileContext fileContext, Client client) {
         super(fileContext, client);
         this.supportedOperations = new HashSet<>(BASIC_FILE_OPERATIONS);
         this.supportedOperations.add(FileOperation.EXTRACT);

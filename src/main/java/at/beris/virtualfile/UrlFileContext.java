@@ -20,21 +20,20 @@ import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import static at.beris.virtualfile.util.CollectionUtils.removeEntriesByValueFromMap;
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
-public class FileContext {
-    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FileContext.class);
+class UrlFileContext implements VirtualFileContext {
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileContext.class);
 
     private Configurator configurator;
 
@@ -43,11 +42,11 @@ public class FileContext {
     private Map<String, VirtualFile> fileCache;
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
 
-    public FileContext() {
+    public UrlFileContext() {
         this(new Configurator(), new FileCache(1024));
     }
 
-    public FileContext(Configurator configurator, FileCache fileCache) {
+    public UrlFileContext(Configurator configurator, FileCache fileCache) {
         UrlUtils.registerProtocolURLStreamHandlers();
 
         this.configurator = configurator;
@@ -60,51 +59,12 @@ public class FileContext {
         this.fileCache = fileCache;
     }
 
+    @Override
     public Configurator getConfigurator() {
         return configurator;
     }
 
-    /**
-     * Creates a local file. (Convenience method)
-     *
-     * @param path Path
-     * @return New VirtualFile
-     */
-    public VirtualFile newLocalFile(String path) {
-        return newFile(UrlUtils.getUrlForLocalPath(path));
-    }
-
-    /**
-     * Creates a local direcoty. (Convenience method)
-     *
-     * @param path path
-     * @return New VirtualFile
-     */
-    public VirtualFile newLocalDirectory(String path) {
-        return newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
-    }
-
-    /**
-     * Creates a file. (Convenience method)
-     *
-     * @param urlString URL String
-     * @return New File
-     */
-    public VirtualFile newFile(String urlString) {
-        try {
-            return newFile(new URL(urlString));
-        } catch (MalformedURLException e) {
-            throw new VirtualFileException(e);
-        }
-    }
-
-    /**
-     * Creates a file instance for the corresponding url
-     *
-     * @param url URL
-     * @return New File Instance
-     * @throws IOException IOException
-     */
+    @Override
     public VirtualFile newFile(URL url) {
         LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
@@ -142,13 +102,7 @@ public class FileContext {
         return file;
     }
 
-    public VirtualFile newDirectory(URL url) {
-        URL normalizedUrl = url;
-        if (!url.getPath().endsWith("/"))
-            normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
-        return newFile(normalizedUrl);
-    }
-
+    @Override
     public void replaceFileUrl(URL oldUrl, URL newUrl) {
         VirtualFile file = fileCache.get(oldUrl.toString());
         removeEntriesByValueFromMap(fileToParentFileMap, file);
@@ -158,6 +112,7 @@ public class FileContext {
         fileCache.put(newUrl.toString(), file);
     }
 
+    @Override
     public void dispose(VirtualFile file) {
         LOGGER.debug("dispose (file : {})", file);
         removeEntriesByValueFromMap(fileToParentFileMap, file);
@@ -166,6 +121,7 @@ public class FileContext {
         file.dispose();
     }
 
+    @Override
     public void dispose() {
         fileToParentFileMap.clear();
         disposeMap(fileCache);
@@ -173,30 +129,8 @@ public class FileContext {
         disposeMap(siteUrlToClientMap);
     }
 
-    public Set<Protocol> enabledProtocols() {
-        Map<Protocol, Pair<String, String>> protocolClassMap = new HashMap<>();
-        protocolClassMap.put(Protocol.SFTP, Pair.of("JSch", "com.jcraft.jsch.JSch"));
-        protocolClassMap.put(Protocol.FTP, Pair.of("Apache Commons Net", "org.apache.commons.net.ftp.FTP"));
-
-        Set<Protocol> enabledProtocols = new HashSet<>();
-        enabledProtocols.add(Protocol.FILE);
-
-        for (Map.Entry<Protocol, Pair<String, String>> entry : protocolClassMap.entrySet()) {
-            Protocol protocol = entry.getKey();
-            Pair<String, String> protocolLibrary = entry.getValue();
-            try {
-                if (Class.forName(protocolLibrary.getRight()) != null)
-                    enabledProtocols.add(protocol);
-            } catch (ClassNotFoundException ignored) {
-            }
-            if (!enabledProtocols.contains(protocol))
-                LOGGER.info(protocolLibrary.getLeft() + " not installed. No support for protocol " + protocol);
-        }
-
-        return Collections.unmodifiableSet(enabledProtocols);
-    }
-
-    VirtualFile getParentFile(VirtualFile file) {
+    @Override
+    public VirtualFile getParentFile(VirtualFile file) {
         VirtualFile parentFile = fileToParentFileMap.get(file);
 
         if (parentFile == null) {
@@ -214,17 +148,40 @@ public class FileContext {
         return fileToParentFileMap.get(file);
     }
 
-    Client getClient(String siteUrlString) {
+    @Override
+    public Client getClient(String siteUrlString) {
         return siteUrlToClientMap.get(siteUrlString);
     }
 
-    FileOperationProvider getFileOperationProvider(String urlString) {
+    @Override
+    public FileOperationProvider getFileOperationProvider(String urlString) {
         Client client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(urlString));
         FileType fileType = UrlUtils.getFileTypeForUrl(urlString);
 
         Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
         if (fileOperationProviderMap != null)
             return this.clientToFileOperationProvidersMap.get(client).get(fileType);
+        return null;
+    }
+
+    @Override
+    public FileModel createFileModel() {
+        return new FileModel();
+    }
+
+    private Client createClientInstance(URL url) {
+        LOGGER.debug("createClientInstance (url: {})", maskedUrlString(url));
+
+        Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
+        if (clientClass != null) {
+            try {
+                Configuration configuration = configurator.createConfiguration(url);
+                Constructor constructor = clientClass.getConstructor(URL.class, Configuration.class);
+                return (Client) constructor.newInstance(url, configuration);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return null;
     }
 
@@ -246,31 +203,11 @@ public class FileContext {
         }
     }
 
-    public FileModel createFileModel() {
-        return new FileModel();
-    }
-
-    private Client createClientInstance(URL url) {
-        LOGGER.debug("createClientInstance (url: {})", maskedUrlString(url));
-
-        Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
-        if (clientClass != null) {
-            try {
-                Configuration configuration = configurator.createConfiguration(url);
-                Constructor constructor = clientClass.getConstructor(URL.class, Configuration.class);
-                return (Client) constructor.newInstance(url, configuration);
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
-    }
-
     private VirtualFile createFileInstance(URL url) {
         LOGGER.debug("createFileInstance (url: {})", maskedUrlString(url));
 
         try {
-            Constructor constructor = UrlFile.class.getConstructor(URL.class, FileContext.class);
+            Constructor constructor = UrlFile.class.getConstructor(URL.class, UrlFileContext.class);
             return (UrlFile) constructor.newInstance(url, this);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
@@ -279,10 +216,9 @@ public class FileContext {
 
     private FileOperationProvider createFileOperationProviderInstance(Class instanceClass, Client client) throws InstantiationException, IllegalAccessException {
         LOGGER.debug("createFileOperationProviderInstance (instanceClass: {}, client: {})", instanceClass, client);
-
         try {
             Class clientClass = client != null ? client.getClass() : Client.class;
-            Constructor constructor = instanceClass.getConstructor(this.getClass(), clientClass);
+            Constructor constructor = instanceClass.getConstructor(VirtualFileContext.class, clientClass);
             return (FileOperationProvider) constructor.newInstance(this, client);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

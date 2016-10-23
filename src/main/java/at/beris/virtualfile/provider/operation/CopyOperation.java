@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -28,7 +28,7 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
 
     private long filesProcessed;
 
-    public CopyOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
+    public CopyOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
     }
 

@@ -37,9 +37,9 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     private FileModel model;
     private URL url;
     private FileOperationProvider fileOperationProvider;
-    private FileContext context;
+    private VirtualFileContext context;
 
-    public UrlFile(URL url, FileContext context) {
+    public UrlFile(URL url, UrlFileContext context) {
         this.url = url;
         this.context = context;
         this.fileOperationProvider = context.getFileOperationProvider(url.toString());

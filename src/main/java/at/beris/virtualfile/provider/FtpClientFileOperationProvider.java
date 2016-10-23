@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.ftp.FtpFileTranslator;
 import at.beris.virtualfile.exception.NotImplementedException;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class FtpClientFileOperationProvider extends AbstractFileOperationProvider<FtpClient> {
 
-    public FtpClientFileOperationProvider(FileContext fileContext, FtpClient client) {
+    public FtpClientFileOperationProvider(VirtualFileContext fileContext, FtpClient client) {
         super(fileContext, client);
     }
 
@@ -152,7 +152,8 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
             throw new VirtualFileException(e);
         }
 
-        return fileContext.newLocalFile(path);
+
+        return fileContext.newFile(UrlUtils.getUrlForLocalPath(path));
     }
 
     private URL resolveUrl(FileModel model) {

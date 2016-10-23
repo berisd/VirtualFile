@@ -9,15 +9,15 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
 public abstract class AbstractFileOperation<T, P> implements CustomFileOperation<T, P> {
-    protected FileContext fileContext;
+    protected VirtualFileContext fileContext;
     protected FileOperationProvider fileOperationProvider;
 
-    public AbstractFileOperation(FileContext fileContext, FileOperationProvider fileOperationProvider) {
+    public AbstractFileOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super();
         this.fileContext = fileContext;
         this.fileOperationProvider = fileOperationProvider;

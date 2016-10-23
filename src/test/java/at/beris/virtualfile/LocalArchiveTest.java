@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.exception.NotImplementedException;
+import at.beris.virtualfile.util.UrlUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -20,7 +21,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class LocalArchiveTest extends AbstractFileTest {
+public class LocalArchiveTest extends AbstractUrlFileTest {
     private static final String ZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.zip";
     private static final int NUMBER_OF_ARCHIVE_ENTRIES = 33;
 
@@ -44,9 +45,7 @@ public class LocalArchiveTest extends AbstractFileTest {
     @Test
     @Ignore
     public void createArchive() {
-
-        VirtualFile archiveFile = getFileContext().newLocalFile(ZIP_FILENAME);
-
+        VirtualFile archiveFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(ZIP_FILENAME));
         archiveFile.create();
 
         assertTrue(new File(archiveFile.getPath()).exists());
@@ -72,14 +71,14 @@ public class LocalArchiveTest extends AbstractFileTest {
 
     @Test
     public void listArchive() {
-        VirtualFile file = getFileContext().newLocalFile(ZIP_FILENAME);
+        VirtualFile file = getFileContext().newFile(UrlUtils.getUrlForLocalPath(ZIP_FILENAME));
         assertTrue(file.getSize() > 0);
         List<VirtualFile> list = file.list();
         assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, list.size());
     }
 
     @Override
-    protected FileContext createFileContext() {
-        return new FileContext();
+    protected UrlFileContext createFileContext() {
+        return new UrlFileContext();
     }
 }

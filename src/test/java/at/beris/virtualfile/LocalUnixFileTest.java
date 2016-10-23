@@ -30,7 +30,7 @@ import java.util.Set;
 import static at.beris.virtualfile.FileTestHelper.*;
 import static org.junit.Assert.assertTrue;
 
-public class LocalUnixFileTest extends AbstractFileTest {
+public class LocalUnixFileTest extends AbstractUrlFileTest {
 
     @BeforeClass
     public static void beforeTest() throws Exception {
@@ -124,7 +124,7 @@ public class LocalUnixFileTest extends AbstractFileTest {
     }
 
     @Override
-    protected FileContext createFileContext() {
-        return new FileContext();
+    protected UrlFileContext createFileContext() {
+        return new UrlFileContext();
     }
 }

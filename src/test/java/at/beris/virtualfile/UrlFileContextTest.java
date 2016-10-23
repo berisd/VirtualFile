@@ -9,7 +9,6 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.protocol.Protocol;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,29 +18,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
 import static org.junit.Assert.*;
 
-public class FileContextTest {
+public class UrlFileContextTest {
     public final static String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public final static long TEST_SOURCE_FILE_SIZE = COPY_BUFFER_SIZE + 10;
 
-    @Test
-    public void enabledProtocols() {
-        Set<Protocol> expectedProtocols = new HashSet<>();
-        expectedProtocols.add(Protocol.FILE);
-        expectedProtocols.add(Protocol.FTP);
-        expectedProtocols.add(Protocol.SFTP);
-
-        FileContext context = new FileContext();
-        Set<Protocol> actualProtocols = context.enabledProtocols();
-
-        Assert.assertTrue(actualProtocols.containsAll(expectedProtocols));
-        Assert.assertEquals(expectedProtocols.size(), actualProtocols.size());
-    }
 
     @Test
     public void createLocalFile() throws Exception {

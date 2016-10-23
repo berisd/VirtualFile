@@ -41,9 +41,9 @@ import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 
-public abstract class AbstractFileTest {
+public abstract class AbstractUrlFileTest {
 
-    private FileContext fileContext;
+    private UrlFileContext fileContext;
 
     protected URL sourceFileUrl;
     protected URL targetFileUrl;
@@ -116,7 +116,8 @@ public abstract class AbstractFileTest {
 
         FileTestHelper.createFileTreeData(sourceFileUrlList);
 
-        VirtualFile sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+
+        VirtualFile sourceDirectory = fileContext.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
         VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
         CopyListener copyListener = Mockito.mock(CopyListener.class);
@@ -138,7 +139,7 @@ public abstract class AbstractFileTest {
         List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         FileTestHelper.createFileTreeData(sourceFileUrlList);
 
-        VirtualFile sourceDirectory = fileContext.newLocalFile(TEST_SOURCE_DIRECTORY_NAME);
+        VirtualFile sourceDirectory = fileContext.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
         VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
         sourceDirectory.copy(targetDirectory, Mockito.mock(CopyListener.class));
@@ -196,7 +197,7 @@ public abstract class AbstractFileTest {
     }
 
     protected void setAcl() {
-        VirtualFile file = getFileContext().newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(sourceFileUrl);
         file.create();
         List<AclEntry> acl = file.getAcl();
         List<AclEntry> newAcl = new ArrayList<>(acl);
@@ -243,17 +244,18 @@ public abstract class AbstractFileTest {
 
     protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) {
         for (int i = 0; i < sourceFileUrlList.size(); i++) {
-            VirtualFile sourceFile = fileContext.newFile(sourceFileUrlList.get(i));
-            VirtualFile targetFile = fileContext.newFile(targetFileUrlList.get(i));
+
+            VirtualFile sourceFile = fileContext.newFile(UrlUtils.newUrl(sourceFileUrlList.get(i)));
+            VirtualFile targetFile = fileContext.newFile(UrlUtils.newUrl(targetFileUrlList.get(i)));
 
             if (!sourceFile.isDirectory())
                 assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
         }
     }
 
-    protected abstract FileContext createFileContext();
+    protected abstract UrlFileContext createFileContext();
 
-    public FileContext getFileContext() {
+    public UrlFileContext getFileContext() {
         return fileContext;
     }
 

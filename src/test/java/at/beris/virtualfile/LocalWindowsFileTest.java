@@ -30,7 +30,7 @@ import java.util.HashSet;
 import static at.beris.virtualfile.FileTestHelper.*;
 import static org.junit.Assert.assertTrue;
 
-public class LocalWindowsFileTest extends AbstractFileTest {
+public class LocalWindowsFileTest extends AbstractUrlFileTest {
 
     @BeforeClass
     public static void beforeTest() throws Exception {
@@ -119,7 +119,7 @@ public class LocalWindowsFileTest extends AbstractFileTest {
     }
 
     @Override
-    protected FileContext createFileContext() {
-        return new FileContext();
+    protected UrlFileContext createFileContext() {
+        return new UrlFileContext();
     }
 }

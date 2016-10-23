@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.client.sftp.SftpFile;
 import at.beris.virtualfile.client.sftp.SftpFileTranslator;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SftpClientFileOperationProvider extends AbstractFileOperationProvider<SftpClient> {
-    public SftpClientFileOperationProvider(FileContext fileContext, SftpClient client) {
+    public SftpClientFileOperationProvider(VirtualFileContext fileContext, SftpClient client) {
         super(fileContext, client);
     }
 
@@ -150,6 +150,6 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
             throw new VirtualFileException(e);
         }
 
-        return fileContext.newLocalFile(path);
+        return fileContext.newFile(UrlUtils.getUrlForLocalPath(path));
     }
 }

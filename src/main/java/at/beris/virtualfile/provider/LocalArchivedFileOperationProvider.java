@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
@@ -30,7 +30,7 @@ import java.util.List;
 
 public class LocalArchivedFileOperationProvider extends AbstractFileOperationProvider {
 
-    public LocalArchivedFileOperationProvider(FileContext fileContext, Client client) {
+    public LocalArchivedFileOperationProvider(VirtualFileContext fileContext, Client client) {
         super(fileContext, client);
     }
 

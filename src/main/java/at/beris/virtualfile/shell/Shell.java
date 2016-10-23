@@ -9,9 +9,10 @@
 
 package at.beris.virtualfile.shell;
 
-import at.beris.virtualfile.FileContext;
+import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -39,14 +40,14 @@ public class Shell {
     private final static DateFormat TIME_FORMATTER = DateFormat.getTimeInstance();
 
 
-    private FileContext fileContext;
+    private VirtualFileManager fileManager;
     private VirtualFile localFile;
     private VirtualFile workingFile;
     private Scanner scanner;
 
     public Shell() {
-        fileContext = new FileContext();
-        localFile = fileContext.newLocalFile(System.getProperty("user.dir"));
+        fileManager = FileManager.newManager();
+        localFile = fileManager.newLocalFile(System.getProperty("user.dir"));
         scanner = new Scanner(System.in);
         scanner.useDelimiter("\n");
     }
@@ -195,11 +196,11 @@ public class Shell {
     }
 
     private void quit() {
-        fileContext.dispose();
+        fileManager.dispose();
     }
 
     private void connect(URL url) {
-        workingFile = fileContext.newFile(url);
+        workingFile = fileManager.newFile(url);
     }
 
     private void list(boolean local) {
@@ -297,10 +298,10 @@ public class Shell {
             newUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(file.getUrl().toString() + directoryName + (directoryName.endsWith("/") ? "" : "/")));
         }
 
-        VirtualFile actionFile = fileContext.newFile(newUrl);
+        VirtualFile actionFile = fileManager.newFile(newUrl);
 
         if (actionFile.isSymbolicLink())
-            actionFile = fileContext.newFile(actionFile.getLinkTarget());
+            actionFile = fileManager.newFile(actionFile.getLinkTarget());
 
         if (actionFile.exists()) {
             if (local)
@@ -318,7 +319,7 @@ public class Shell {
         }
 
         URL actionUrl = UrlUtils.newUrl(workingFile.getUrl(), fileName);
-        VirtualFile actionFile = fileContext.newFile(actionUrl);
+        VirtualFile actionFile = fileManager.newFile(actionUrl);
         actionFile.copy(localFile, new CustomCopyListener());
         System.out.println("");
     }
@@ -330,9 +331,9 @@ public class Shell {
         }
 
         URL sourceUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(localFile.getUrl(), fileName));
-        VirtualFile sourceFile = fileContext.newFile(sourceUrl);
+        VirtualFile sourceFile = fileManager.newFile(sourceUrl);
         URL targetUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(workingFile.getUrl(), fileName));
-        VirtualFile targetFile = fileContext.newFile(targetUrl);
+        VirtualFile targetFile = fileManager.newFile(targetUrl);
 
         sourceFile.copy(targetFile, new CustomCopyListener());
         System.out.println("");
@@ -345,7 +346,7 @@ public class Shell {
         }
 
         URL actionUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl((local ? localFile : workingFile).getUrl(), fileName));
-        fileContext.newFile(actionUrl).delete();
+        fileManager.newFile(actionUrl).delete();
     }
 
     private static void logException(Exception e) {

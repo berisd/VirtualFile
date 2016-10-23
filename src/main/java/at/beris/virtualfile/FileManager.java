@@ -15,63 +15,78 @@ import at.beris.virtualfile.protocol.Protocol;
 
 import java.net.URL;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
  * Public interface to the VirtualFile library
  */
 public final class FileManager {
-    private static final UrlFileManager fileManager = new UrlFileManager();
+    private static Optional<UrlFileManager> fileManager = Optional.empty();
 
     private FileManager() {
         super();
     }
 
     public static ContextConfiguration getContextConfiguration() {
-        return fileManager.getFileContext().getConfigurator().getContextConfiguration();
+        return fileManager().getContextConfiguration();
     }
 
     public static Configuration getConfiguration() {
-        return fileManager.getFileContext().getConfigurator().getConfiguration();
+        return fileManager().getConfiguration();
     }
 
     public static Configuration getConfiguration(Protocol protocol) {
-        return fileManager.getFileContext().getConfigurator().getConfiguration(protocol);
+        return fileManager().getConfiguration(protocol);
     }
 
     public static Configuration getConfiguration(VirtualFile file) {
-        return fileManager.getFileContext().getConfigurator().getConfiguration(file);
+        return fileManager().getConfiguration(file);
     }
 
     public static VirtualFile newLocalFile(String path) {
-        return fileManager.newLocalFile(path);
+        return fileManager().newLocalFile(path);
     }
 
     public static VirtualFile newLocalDirectory(String path) {
-        return fileManager.newLocalDirectory(path);
+        return fileManager().newLocalDirectory(path);
     }
 
     public static VirtualFile newFile(String urlString) {
-        return fileManager.newFile(urlString);
+        return fileManager().newFile(urlString);
     }
 
     public static VirtualFile newFile(URL url) {
-        return fileManager.newFile(url);
+        return fileManager().newFile(url);
     }
 
     public static VirtualFile newDirectory(URL url) {
-        return fileManager.newDirectory(url);
+        return fileManager().newDirectory(url);
+    }
+
+    public static VirtualFileManager newManager() {
+        return new UrlFileManager();
+    }
+
+    public static void dispose() {
+        fileManager().dispose();
     }
 
     public static void dispose(VirtualFile file) {
-        fileManager.dispose(file);
+        fileManager().dispose(file);
     }
 
     public static Set<Protocol> enabledProtocols() {
-        return fileManager.enabledProtocols();
+        return fileManager().enabledProtocols();
     }
 
     public static Set<Protocol> supportedProtocols() {
         return EnumSet.allOf(Protocol.class);
+    }
+
+    private static UrlFileManager fileManager() {
+        if (!fileManager.isPresent())
+            fileManager = Optional.of(new UrlFileManager());
+        return fileManager.get();
     }
 }

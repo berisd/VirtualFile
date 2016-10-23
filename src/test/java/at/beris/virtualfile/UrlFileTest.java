@@ -24,7 +24,7 @@ import java.util.Date;
 import static at.beris.virtualfile.FileTestHelper.TEST_SOURCE_DIRECTORY_NAME;
 import static at.beris.virtualfile.FileTestHelper.TEST_SOURCE_FILE_NAME;
 
-public class UrlFileTest extends AbstractFileTest {
+public class UrlFileTest extends AbstractUrlFileTest {
     private FileOperationProvider provider;
 
     private UrlFile file;
@@ -50,8 +50,8 @@ public class UrlFileTest extends AbstractFileTest {
 
 
     @Override
-    protected FileContext createFileContext() {
-        return Mockito.mock(FileContext.class);
+    protected UrlFileContext createFileContext() {
+        return Mockito.mock(UrlFileContext.class);
     }
 
     private FileModel createFileModel() {

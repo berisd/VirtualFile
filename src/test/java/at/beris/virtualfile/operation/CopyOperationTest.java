@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile.operation;
 
-import at.beris.virtualfile.FileContext;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.provider.operation.CopyOperation;
@@ -33,7 +33,7 @@ public class CopyOperationTest {
         VirtualFile targetFile = createTargetFileMock(new URL("file:/target/foo"), false);
 
         CopyListener listener = Mockito.mock(CopyListener.class);
-        FileContext fileContext = Mockito.mock(FileContext.class);
+        VirtualFileContext fileContext = Mockito.mock(VirtualFileContext.class);
         FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
 
         new CopyOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
@@ -60,7 +60,7 @@ public class CopyOperationTest {
         VirtualFile targetChildFile = createTargetFileMock(new URL("file:/target/foo/file.txt"), false);
         VirtualFile targetChildDirectory = createTargetFileMock(new URL("file:/target/foo/subdir/"), true);
 
-        FileContext fileContext = Mockito.mock(FileContext.class);
+        VirtualFileContext fileContext = Mockito.mock(VirtualFileContext.class);
         Mockito.when(fileContext.newFile(Matchers.any(URL.class))).thenReturn(targetChildFile);
         Mockito.when(fileContext.newFile(Matchers.any(URL.class))).thenReturn(targetChildDirectory);
 

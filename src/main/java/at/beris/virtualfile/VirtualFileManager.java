@@ -66,21 +66,26 @@ public interface VirtualFileManager {
     VirtualFile newDirectory(URL url);
 
     /**
-     * Remove and clean up the VirtualFile
+     * Remove and clean up the VirtualFile.
      *
      * @param file VirtualFile
      */
     void dispose(VirtualFile file);
 
     /**
-     * Get the protocols currently enabled
+     * Free all resources allocated by the VirtualFileManager.
+     */
+    void dispose();
+
+    /**
+     * Get the protocols currently enabled.
      *
      * @return Enabled protocols
      */
     Set<Protocol> enabledProtocols();
 
     /**
-     * Get the protocols supported by this version of the VirtualFile library
+     * Get the protocols supported by this version of the VirtualFile library.
      *
      * @return Supported Protocols
      */

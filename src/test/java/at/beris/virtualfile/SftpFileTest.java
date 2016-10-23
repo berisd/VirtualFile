@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 import static at.beris.virtualfile.FileTestHelper.*;
 import static org.junit.Assert.*;
 
-public class SftpFileTest extends AbstractFileTest {
+public class SftpFileTest extends AbstractUrlFileTest {
 
     @BeforeClass
     public static void beforeTest() throws Exception {
@@ -129,7 +129,7 @@ public class SftpFileTest extends AbstractFileTest {
     }
 
     @Override
-    protected FileContext createFileContext() {
-        return new FileContext();
+    protected UrlFileContext createFileContext() {
+        return new UrlFileContext();
     }
 }
