@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class LocalArchiveOperationProvider extends LocalFileOperationProvider implements ArchiveOperationProvider {
 
@@ -49,53 +50,77 @@ public class LocalArchiveOperationProvider extends LocalFileOperationProvider im
 
     @Override
     public List<VirtualFile> list(FileModel model, Filter filter) {
-        List<VirtualFile> fileList = new ArrayList<>();
-        ArchiveStreamFactory factory = new ArchiveStreamFactory();
-        URL rootUrl = model.getUrl();
-
-        try (InputStream fis = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
-             ArchiveInputStream ais = factory.createArchiveInputStream(fis)) {
-            ArchiveEntry archiveEntry;
-            while ((archiveEntry = ais.getNextEntry()) != null) {
-                Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
-                VirtualFile file = fileContext.newFile(urlMap.get(URL));
-                if (filter == null || filter.filter(file))
-                    fileList.add(file);
-            }
-        } catch (ArchiveException | URISyntaxException | IOException e) {
+        try {
+            List<VirtualFile> fileList = new ArrayList<>();
+            ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
+            InputStream fileInputStream = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
+            ArchiveInputStream archiveInputStream = archiveStreamFactory.createArchiveInputStream(fileInputStream);
+            URL rootUrl = model.getUrl();
+            iterateArchiveEntries(archiveInputStream, listFileFromArchive(rootUrl, filter, fileList));
+            return fileList;
+        } catch (URISyntaxException | ArchiveException | FileNotFoundException e) {
             throw new VirtualFileException(e);
         }
-        return fileList;
     }
 
     @Override
     public List<VirtualFile> extract(FileModel model, VirtualFile target) {
-        List<VirtualFile> fileList = new ArrayList<>();
-        ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
-
-        try (InputStream fis = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
-             ArchiveInputStream ais = archiveStreamFactory.createArchiveInputStream(fis)) {
+        try {
+            List<VirtualFile> fileList = new ArrayList<>();
             target.create();
-            ArchiveEntry archiveEntry;
+            ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
+            InputStream fileInputStream = new BufferedInputStream(new FileInputStream(new File(model.getUrl().toURI())));
+            ArchiveInputStream archiveInputStream = archiveStreamFactory.createArchiveInputStream(fileInputStream);
+            iterateArchiveEntries(archiveInputStream, copyFileFromArchive(archiveInputStream, target, fileList));
+            return fileList;
+        } catch (URISyntaxException | IOException | ArchiveException e) {
+            throw new VirtualFileException(e);
+        }
+    }
 
-            while ((archiveEntry = ais.getNextEntry()) != null) {
+    private Consumer<ArchiveEntry> listFileFromArchive(URL rootUrl, Filter filter, final List<VirtualFile> fileList) {
+        return archiveEntry -> {
+            try {
+                Map<String, URL> urlMap = getArchiveEntryURLMap(rootUrl, archiveEntry);
+                VirtualFile file = fileContext.newFile(urlMap.get(URL));
+                if (filter == null || filter.filter(file))
+                    fileList.add(file);
+            } catch (MalformedURLException e) {
+                throw new VirtualFileException(e);
+            }
+        };
+    }
+
+    private Consumer<ArchiveEntry> copyFileFromArchive(ArchiveInputStream archiveInputStream, final VirtualFile target, final List<VirtualFile> fileList) {
+        return archiveEntry -> {
+            try {
                 Map<String, URL> urlMap = getArchiveEntryURLMap(target.getUrl(), archiveEntry);
 
                 if (archiveEntry.isDirectory()) {
                     Files.createDirectory(new File(urlMap.get(URL).toURI()).toPath());
                 } else {
                     OutputStream out = new FileOutputStream(new File(urlMap.get(URL).toURI()));
-                    IOUtils.copy(ais, out);
+                    IOUtils.copy(archiveInputStream, out);
                     out.close();
                 }
 
                 VirtualFile file = fileContext.newFile(urlMap.get(URL));
                 fileList.add(file);
+            } catch (URISyntaxException | IOException e) {
+                throw new VirtualFileException(e);
             }
-        } catch (ArchiveException | URISyntaxException | IOException e) {
+        };
+    }
+
+    private void iterateArchiveEntries(ArchiveInputStream archiveInputStream, Consumer<ArchiveEntry> operation) {
+        try {
+            ArchiveEntry archiveEntry;
+            while ((archiveEntry = archiveInputStream.getNextEntry()) != null) {
+                operation.accept(archiveEntry);
+            }
+        } catch (IOException e) {
             throw new VirtualFileException(e);
         }
-        return fileList;
     }
 
     private Map<String, URL> getArchiveEntryURLMap(URL rootUrl, ArchiveEntry archiveEntry) throws MalformedURLException {
