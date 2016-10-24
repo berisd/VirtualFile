@@ -18,9 +18,10 @@ public interface VirtualArchive {
 
     /**
      * Get archive file
+     *
      * @return
      */
-    VirtualFile getFile();
+    VirtualFile getVirtualFile();
 
     /**
      * Add a file to the archive
@@ -55,12 +56,14 @@ public interface VirtualArchive {
 
     /**
      * List all archive entries
+     *
      * @return List of archive entries
      */
     List<VirtualArchiveEntry> list();
 
     /**
      * List archive entries inside the path
+     *
      * @param path Path
      * @return
      */

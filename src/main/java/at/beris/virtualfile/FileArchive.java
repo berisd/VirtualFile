@@ -34,7 +34,7 @@ class FileArchive implements VirtualArchive {
     }
 
     @Override
-    public VirtualFile getFile() {
+    public VirtualFile getVirtualFile() {
         return file;
     }
 

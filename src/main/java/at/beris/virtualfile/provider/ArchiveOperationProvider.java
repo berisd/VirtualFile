@@ -14,10 +14,12 @@ import at.beris.virtualfile.VirtualArchiveEntry;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.exception.VirtualFileException;
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.*;
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
+import org.apache.commons.compress.archivers.sevenz.SevenZFile;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +27,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -62,12 +63,54 @@ public class ArchiveOperationProvider {
     }
 
     private void processArchiveEntries(IOSructure ioSructure, Consumer<IOSructure> consumer) {
-        VirtualArchive archive = ioSructure.getArchive();
-        ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
-        try (InputStream fileInputStream = new BufferedInputStream(archive.getFile().getInputStream()); ArchiveInputStream archiveInputStream = archiveStreamFactory.createArchiveInputStream(fileInputStream)) {
-            ioSructure.setArchiveInputStream(archiveInputStream);
-            iterateArchiveEntries(ioSructure, consumer);
-        } catch (ArchiveException | IOException e) {
+        InputStream fileInputStream = null;
+        CompressorInputStream compressorInputStream = null;
+
+        try {
+            VirtualArchive archive = ioSructure.getArchive();
+            fileInputStream = new BufferedInputStream(archive.getVirtualFile().getInputStream());
+            InputStream inputStream = fileInputStream;
+            CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
+
+            try {
+                compressorInputStream = compressorStreamFactory.createCompressorInputStream(inputStream);
+                inputStream = new BufferedInputStream(compressorInputStream);
+            } catch (CompressorException e) {
+                if (compressorInputStream != null)
+                    compressorInputStream.close();
+
+                if (!"No Compressor found for the stream signature.".equals(e.getMessage())) {
+                    throw new VirtualFileException(e);
+                }
+            }
+
+            ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
+            try (ArchiveInputStream archiveInputStream = archiveStreamFactory.createArchiveInputStream(inputStream)) {
+                ioSructure.setArchiveInputStream(archiveInputStream);
+                iterateArchiveEntries(ioSructure, consumer);
+            } catch (StreamingNotSupportedException e) {
+                if (ArchiveStreamFactory.SEVEN_Z.equals(e.getFormat())) {
+                    closeInputStreams(fileInputStream, compressorInputStream);
+                    iterateSevenZipArchiveEntries(ioSructure, consumer);
+                } else
+                    throw new VirtualFileException(e);
+            } catch (ArchiveException | IOException e) {
+                throw new VirtualFileException(e);
+            }
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        } finally {
+            closeInputStreams(fileInputStream, compressorInputStream);
+        }
+    }
+
+    private void closeInputStreams(InputStream fileInputStream, CompressorInputStream compressorInputStream) {
+        try {
+            if (compressorInputStream != null)
+                compressorInputStream.close();
+            if (fileInputStream != null)
+                fileInputStream.close();
+        } catch (IOException e) {
             throw new VirtualFileException(e);
         }
     }
@@ -82,6 +125,32 @@ public class ArchiveOperationProvider {
             }
         } catch (IOException e) {
             throw new VirtualFileException(e);
+        }
+    }
+
+    private void iterateSevenZipArchiveEntries(IOSructure ioSructure, Consumer<IOSructure> operation) {
+        SevenZFile sevenZFile = null;
+        try {
+            VirtualArchive virtualArchive = ioSructure.getArchive();
+            sevenZFile = new SevenZFile(virtualArchive.getVirtualFile().asFile());
+            SevenZArchiveEntry sevenZipEntry = sevenZFile.getNextEntry();
+            while (sevenZipEntry != null) {
+                ioSructure.setCommonsArchiveEntry(sevenZipEntry);
+                byte[] content = new byte[(int) sevenZipEntry.getSize()];
+                sevenZFile.read(content, 0, content.length);
+                ioSructure.setCommonsArchiveEntryContent(content);
+                operation.accept(ioSructure);
+                sevenZipEntry = sevenZFile.getNextEntry();
+            }
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        } finally {
+            try {
+                if (sevenZFile != null)
+                    sevenZFile.close();
+            } catch (IOException e) {
+                throw new VirtualFileException(e);
+            }
         }
     }
 
@@ -107,18 +176,24 @@ public class ArchiveOperationProvider {
     private Consumer<IOSructure> copyFileFromArchive() {
         return ioSructure -> {
             try {
-                VirtualArchive archive = ioSructure.getArchive();
                 ArchiveEntry archiveEntry = ioSructure.getCommonsArchiveEntry();
                 List<VirtualFile> fileList = ioSructure.getFileList();
                 VirtualFile target = ioSructure.getTarget();
+
                 ArchiveInputStream archiveInputStream = ioSructure.getArchiveInputStream();
                 Map<String, URL> urlMap = getArchiveEntryURLMap(target.getUrl(), archiveEntry);
 
                 if (archiveEntry.isDirectory()) {
-                    Files.createDirectory(new File(urlMap.get(URL).toURI()).toPath());
+                    new File(urlMap.get(URL).toURI()).mkdirs();
                 } else {
+                    if (urlMap.get(PARENT_URL) != null) {
+                        new File(urlMap.get(PARENT_URL).toURI()).mkdirs();
+                    }
                     OutputStream out = new FileOutputStream(new File(urlMap.get(URL).toURI()));
-                    IOUtils.copy(archiveInputStream, out);
+                    if (archiveEntry instanceof SevenZArchiveEntry)
+                        out.write(ioSructure.getCommonsArchiveEntryContent());
+                    else
+                        IOUtils.copy(archiveInputStream, out);
                     out.close();
                 }
 
@@ -155,6 +230,7 @@ public class ArchiveOperationProvider {
         private List<VirtualFile> fileList;
         private List<VirtualArchiveEntry> archiveEntryList;
         private ArchiveEntry commonsArchiveEntry;
+        private byte[] commonsArchiveEntryContent;
 
         public ArchiveInputStream getArchiveInputStream() {
             return archiveInputStream;
@@ -202,6 +278,14 @@ public class ArchiveOperationProvider {
 
         public void setCommonsArchiveEntry(ArchiveEntry archiveEntry) {
             this.commonsArchiveEntry = archiveEntry;
+        }
+
+        public byte[] getCommonsArchiveEntryContent() {
+            return commonsArchiveEntryContent;
+        }
+
+        public void setCommonsArchiveEntryContent(byte[] commonsArchiveEntryContent) {
+            this.commonsArchiveEntryContent = commonsArchiveEntryContent;
         }
     }
 }
