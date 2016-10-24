@@ -9,9 +9,10 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.Archive;
-import at.beris.virtualfile.CustomArchiveEntry;
+import at.beris.virtualfile.VirtualArchive;
+import at.beris.virtualfile.VirtualArchiveEntry;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -25,10 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ArchiveOperationProvider {
@@ -36,8 +34,14 @@ public class ArchiveOperationProvider {
     private final static String URL = "url";
     private final static String PARENT_URL = "parentUrl";
 
-    public List<CustomArchiveEntry> list(Archive archive) {
-        List<CustomArchiveEntry> archiveEntryList = new ArrayList<>();
+    private VirtualFileContext context;
+
+    public ArchiveOperationProvider(VirtualFileContext context) {
+        this.context = context;
+    }
+
+    public List<VirtualArchiveEntry> list(VirtualArchive archive) {
+        List<VirtualArchiveEntry> archiveEntryList = new ArrayList<>();
 
         IOSructure ioSructure = new IOSructure();
         ioSructure.setArchive(archive);
@@ -46,7 +50,7 @@ public class ArchiveOperationProvider {
         return archiveEntryList;
     }
 
-    public List<VirtualFile> extract(Archive archive, VirtualFile target) {
+    public List<VirtualFile> extract(VirtualArchive archive, VirtualFile target) {
         List<VirtualFile> fileList = new ArrayList<>();
         target.create();
         IOSructure ioSructure = new IOSructure();
@@ -58,7 +62,7 @@ public class ArchiveOperationProvider {
     }
 
     private void processArchiveEntries(IOSructure ioSructure, Consumer<IOSructure> consumer) {
-        Archive archive = ioSructure.getArchive();
+        VirtualArchive archive = ioSructure.getArchive();
         ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
         try (InputStream fileInputStream = new BufferedInputStream(archive.getFile().getInputStream()); ArchiveInputStream archiveInputStream = archiveStreamFactory.createArchiveInputStream(fileInputStream)) {
             ioSructure.setArchiveInputStream(archiveInputStream);
@@ -73,7 +77,7 @@ public class ArchiveOperationProvider {
             ArchiveInputStream archiveInputStream = ioSructure.getArchiveInputStream();
             ArchiveEntry archiveEntry;
             while ((archiveEntry = archiveInputStream.getNextEntry()) != null) {
-                ioSructure.setArchiveEntry(archiveEntry);
+                ioSructure.setCommonsArchiveEntry(archiveEntry);
                 operation.accept(ioSructure);
             }
         } catch (IOException e) {
@@ -83,10 +87,19 @@ public class ArchiveOperationProvider {
 
     private Consumer<IOSructure> listFileFromArchive() {
         return ioSructure -> {
-            ArchiveEntry archiveEntry = ioSructure.getArchiveEntry();
-            List<CustomArchiveEntry> archiveEntryList = ioSructure.getArchiveEntryList();
-            CustomArchiveEntry entry = new CustomArchiveEntry();
-            entry.setName(archiveEntry.getName());
+            ArchiveEntry commonsArchiveEntry = ioSructure.getCommonsArchiveEntry();
+            List<VirtualArchiveEntry> archiveEntryList = ioSructure.getArchiveEntryList();
+            VirtualArchiveEntry entry = context.createArchiveEntry();
+
+            List<String> pathParts = new ArrayList<>(Arrays.asList(StringUtils.split(commonsArchiveEntry.getName(), '/')));
+            String name = pathParts.remove(pathParts.size() - 1);
+            String path = StringUtils.join(pathParts, '/');
+
+            entry.setName(name);
+            entry.setPath(path);
+            entry.setLastModified(commonsArchiveEntry.getLastModifiedDate().toInstant());
+            entry.setSize(commonsArchiveEntry.getSize());
+            entry.setDirectory(commonsArchiveEntry.isDirectory());
             archiveEntryList.add(entry);
         };
     }
@@ -94,8 +107,8 @@ public class ArchiveOperationProvider {
     private Consumer<IOSructure> copyFileFromArchive() {
         return ioSructure -> {
             try {
-                Archive archive = ioSructure.getArchive();
-                ArchiveEntry archiveEntry = ioSructure.getArchiveEntry();
+                VirtualArchive archive = ioSructure.getArchive();
+                ArchiveEntry archiveEntry = ioSructure.getCommonsArchiveEntry();
                 List<VirtualFile> fileList = ioSructure.getFileList();
                 VirtualFile target = ioSructure.getTarget();
                 ArchiveInputStream archiveInputStream = ioSructure.getArchiveInputStream();
@@ -109,7 +122,7 @@ public class ArchiveOperationProvider {
                     out.close();
                 }
 
-                VirtualFile file = archive.getContext().newFile(urlMap.get(URL));
+                VirtualFile file = context.newFile(urlMap.get(URL));
                 fileList.add(file);
             } catch (URISyntaxException | IOException e) {
                 throw new VirtualFileException(e);
@@ -137,11 +150,11 @@ public class ArchiveOperationProvider {
 
     private class IOSructure {
         private ArchiveInputStream archiveInputStream;
-        private Archive archive;
+        private VirtualArchive archive;
         private VirtualFile target;
         private List<VirtualFile> fileList;
-        private List<CustomArchiveEntry> archiveEntryList;
-        private ArchiveEntry archiveEntry;
+        private List<VirtualArchiveEntry> archiveEntryList;
+        private ArchiveEntry commonsArchiveEntry;
 
         public ArchiveInputStream getArchiveInputStream() {
             return archiveInputStream;
@@ -151,11 +164,11 @@ public class ArchiveOperationProvider {
             this.archiveInputStream = archiveInputStream;
         }
 
-        public Archive getArchive() {
+        public VirtualArchive getArchive() {
             return archive;
         }
 
-        public void setArchive(Archive archive) {
+        public void setArchive(VirtualArchive archive) {
             this.archive = archive;
         }
 
@@ -175,20 +188,20 @@ public class ArchiveOperationProvider {
             this.fileList = fileList;
         }
 
-        public List<CustomArchiveEntry> getArchiveEntryList() {
+        public List<VirtualArchiveEntry> getArchiveEntryList() {
             return archiveEntryList;
         }
 
-        public void setArchiveEntryList(List<CustomArchiveEntry> archiveEntryList) {
+        public void setArchiveEntryList(List<VirtualArchiveEntry> archiveEntryList) {
             this.archiveEntryList = archiveEntryList;
         }
 
-        public ArchiveEntry getArchiveEntry() {
-            return archiveEntry;
+        public ArchiveEntry getCommonsArchiveEntry() {
+            return commonsArchiveEntry;
         }
 
-        public void setArchiveEntry(ArchiveEntry archiveEntry) {
-            this.archiveEntry = archiveEntry;
+        public void setCommonsArchiveEntry(ArchiveEntry archiveEntry) {
+            this.commonsArchiveEntry = archiveEntry;
         }
     }
 }

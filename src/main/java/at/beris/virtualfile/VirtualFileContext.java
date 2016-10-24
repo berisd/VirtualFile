@@ -18,6 +18,7 @@ import java.net.URL;
 /**
  * Manage and cache virtual files and their relations.
  */
+//TODO Consider removing the interface because it's not visible outside the library
 public interface VirtualFileContext {
 
     /**
@@ -85,4 +86,7 @@ public interface VirtualFileContext {
      * @return
      */
     FileModel createFileModel();
+
+    VirtualArchiveEntry createArchiveEntry();
+
 }

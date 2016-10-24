@@ -36,13 +36,6 @@ public class UrlUtilsTest {
     }
 
     @Test
-    public void getFileTypeForUrl() {
-        Assert.assertEquals(FileType.DEFAULT, UrlUtils.getFileTypeForUrl(FILE_URL_STRING));
-        Assert.assertEquals(FileType.ARCHIVE, UrlUtils.getFileTypeForUrl("ftp://www.example.com/test.zip"));
-        Assert.assertEquals(FileType.ARCHIVED, UrlUtils.getFileTypeForUrl("ftp://www.example.com/test.zip/test.txt"));
-    }
-
-    @Test
     public void normalizeUrl() throws MalformedURLException {
         Assert.assertEquals("ftp://www.example.com/release/file.zip", UrlUtils.normalizeUrl(new URL("ftp://www.example.com/test/../release/file.zip")).toString());
     }

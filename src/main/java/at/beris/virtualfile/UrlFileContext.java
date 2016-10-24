@@ -38,7 +38,7 @@ class UrlFileContext implements VirtualFileContext {
     private Configurator configurator;
 
     private Map<String, Client> siteUrlToClientMap;
-    private Map<Client, Map<FileType, FileOperationProvider>> clientToFileOperationProvidersMap;
+    private Map<Client, FileOperationProvider> clientToFileOperationProviderMap;
     private Map<String, VirtualFile> fileCache;
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
 
@@ -51,7 +51,7 @@ class UrlFileContext implements VirtualFileContext {
 
         this.configurator = configurator;
         this.siteUrlToClientMap = new HashMap<>();
-        this.clientToFileOperationProvidersMap = new HashMap<>();
+        this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
 
         fileCache.setSize(configurator.getContextConfiguration().getFileCacheSize());
@@ -125,7 +125,7 @@ class UrlFileContext implements VirtualFileContext {
     public void dispose() {
         fileToParentFileMap.clear();
         disposeMap(fileCache);
-        disposeClientToFileOperationProvidersMap();
+        clientToFileOperationProviderMap.clear();
         disposeMap(siteUrlToClientMap);
     }
 
@@ -156,17 +156,18 @@ class UrlFileContext implements VirtualFileContext {
     @Override
     public FileOperationProvider getFileOperationProvider(String urlString) {
         Client client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(urlString));
-        FileType fileType = UrlUtils.getFileTypeForUrl(urlString);
-
-        Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
-        if (fileOperationProviderMap != null)
-            return this.clientToFileOperationProvidersMap.get(client).get(fileType);
-        return null;
+        FileOperationProvider fileOperationProvider = clientToFileOperationProviderMap.get(client);
+        return fileOperationProvider;
     }
 
     @Override
     public FileModel createFileModel() {
         return new FileModel();
+    }
+
+    @Override
+    public VirtualArchiveEntry createArchiveEntry() {
+        return new FileArchiveEntry();
     }
 
     private Client createClientInstance(URL url) {
@@ -189,14 +190,13 @@ class UrlFileContext implements VirtualFileContext {
         LOGGER.debug("createFile (url : {})", maskedUrlString(url));
 
         Protocol protocol = UrlUtils.getProtocol(url);
-        if (configurator.getFileOperationProviderClassMap(protocol) == null)
+        if (configurator.getFileOperationProviderClass(protocol) == null)
             throw new VirtualFileException(Message.PROTOCOL_NOT_CONFIGURED(protocol));
 
         try {
-            FileType fileType = UrlUtils.getFileTypeForUrl(url.toString());
             if (protocol != Protocol.FILE)
                 initClient(url);
-            initFileOperationProvider(url, protocol, fileType, getClient(UrlUtils.getSiteUrlString(url.toString())));
+            initFileOperationProvider(url, protocol, getClient(UrlUtils.getSiteUrlString(url.toString())));
             return createFileInstance(url);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -235,19 +235,13 @@ class UrlFileContext implements VirtualFileContext {
         }
     }
 
-    private void initFileOperationProvider(URL url, Protocol protocol, FileType fileType, Client client) throws InstantiationException, IllegalAccessException {
-        LOGGER.debug("initFileOperationProvider(url: {}, protocol: {}, fileType: {}, client: {})", maskedUrlString(url), protocol, fileType, client);
+    private void initFileOperationProvider(URL url, Protocol protocol, Client client) throws InstantiationException, IllegalAccessException {
+        LOGGER.debug("initFileOperationProvider(url: {}, protocol: {}, client: {})", maskedUrlString(url), protocol, client);
         FileOperationProvider fileOperationProvider = getFileOperationProvider(url.toString());
         if (fileOperationProvider == null) {
-            Map<FileType, FileOperationProvider> fileOperationProviderMap = clientToFileOperationProvidersMap.get(client);
-            if (fileOperationProviderMap == null) {
-                fileOperationProviderMap = new HashMap<>();
-                clientToFileOperationProvidersMap.put(client, fileOperationProviderMap);
-            }
-
-            Class instanceClass = configurator.getFileOperationProviderClassMap(protocol).get(fileType);
+            Class instanceClass = configurator.getFileOperationProviderClass(protocol);
             fileOperationProvider = createFileOperationProviderInstance(instanceClass, client);
-            fileOperationProviderMap.put(fileType, fileOperationProvider);
+            clientToFileOperationProviderMap.put(client, fileOperationProvider);
         }
     }
 
@@ -261,10 +255,9 @@ class UrlFileContext implements VirtualFileContext {
     }
 
     private void disposeClientToFileOperationProvidersMap() {
-        Iterator<Map.Entry<Client, Map<FileType, FileOperationProvider>>> it = clientToFileOperationProvidersMap.entrySet().iterator();
+        Iterator<Map.Entry<Client, FileOperationProvider>> it = clientToFileOperationProviderMap.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<Client, Map<FileType, FileOperationProvider>> entry = it.next();
-            disposeMap(entry.getValue());
+            Map.Entry<Client, FileOperationProvider> entry = it.next();
             it.remove();
         }
     }

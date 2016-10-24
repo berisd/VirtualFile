@@ -10,7 +10,6 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.value.AuthenticationType;
-import at.beris.virtualfile.exception.OperationNotSupportedException;
 import org.junit.*;
 
 import java.io.File;
@@ -41,7 +40,7 @@ public class SamplesTest {
 
     @Test
     public void extractArchive() {
-        Archive archive = FileManager.newLocalFile(ZIP_FILENAME).asArchive();
+        VirtualArchive archive = FileManager.newLocalFile(ZIP_FILENAME).asArchive();
         VirtualFile directory = FileManager.newLocalDirectory("extracted");
         List<VirtualFile> extractedFiles = archive.extract(directory);
         Assert.assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, extractedFiles.size());
@@ -50,7 +49,7 @@ public class SamplesTest {
     @Test
     @Ignore
     public void extractFile() {
-        Archive archive = FileManager.newLocalFile(ZIP_FILENAME + "/TreeDb/file.xml").asArchive();
+        VirtualArchive archive = FileManager.newLocalFile(ZIP_FILENAME + "/TreeDb/file.xml").asArchive();
         VirtualFile targetFile = FileManager.newLocalFile("file.xml");
         List<VirtualFile> extractedFiles = archive.extract(targetFile);
         Assert.assertEquals(920, extractedFiles.get(0).getSize());
@@ -58,8 +57,7 @@ public class SamplesTest {
 
     @Test
     public void listArchive() {
-        //TODO Must use VirtualArchive
-        VirtualFile archive = FileManager.newLocalFile(ZIP_FILENAME);
+        VirtualArchive archive = FileManager.newLocalArchive(ZIP_FILENAME);
         Assert.assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, archive.list().size());
     }
 

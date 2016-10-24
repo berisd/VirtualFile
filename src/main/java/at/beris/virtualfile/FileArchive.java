@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class Archive {
+class FileArchive implements VirtualArchive {
 
-    private static Logger logger = LoggerFactory.getLogger(Archive.class);
+    private static Logger logger = LoggerFactory.getLogger(FileArchive.class);
 
     private VirtualFile file;
 
@@ -26,40 +26,49 @@ public class Archive {
 
     private ArchiveOperationProvider archiveOperationProvider;
 
-    public Archive(VirtualFile file, VirtualFileContext context) {
+    public FileArchive(VirtualFile file, VirtualFileContext context) {
         this.file = file;
         this.context = context;
         //TODO ArchiveOperationProvider muss vom context kommen
-        this.archiveOperationProvider = new ArchiveOperationProvider();
+        this.archiveOperationProvider = new ArchiveOperationProvider(context);
     }
 
+    @Override
     public VirtualFile getFile() {
         return file;
     }
 
-    public void add(VirtualFile file) {
-        logger.info("Add {} to {}", file, this);
+    @Override
+    public void add(String path, VirtualFile file) {
+        logger.info("Add {} to path {}", file, path);
         throw new NotImplementedException();
     }
 
-    public void delete(VirtualFile file) {
+    @Override
+    public void createDirectory(String path, String name) {
+        logger.info("Create directory {} at path {}", name, path);
         throw new NotImplementedException();
     }
 
+    @Override
+    public void delete(VirtualArchiveEntry archiveEntry) {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public List<VirtualFile> extract(VirtualFile target) {
         logger.info("Extract {} to {}", this, target);
         return archiveOperationProvider.extract(this, target);
     }
 
-    public List<CustomArchiveEntry> list() {
+    @Override
+    public List<VirtualArchiveEntry> list() {
         return archiveOperationProvider.list(this);
     }
 
-    public List<CustomArchiveEntry> list(String path) {
+    @Override
+    public List<VirtualArchiveEntry> list(String path) {
         return null;
     }
 
-    public VirtualFileContext getContext() {
-        return context;
-    }
 }

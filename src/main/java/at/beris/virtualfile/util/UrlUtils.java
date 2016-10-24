@@ -38,17 +38,6 @@ public class UrlUtils {
             return urlString.substring(0, indexPathBegin);
     }
 
-    public static FileType getFileTypeForUrl(String urlString) {
-        FileType fileType = FileType.DEFAULT;
-        String[] pathParts = urlString.split("/");
-
-        if (FileUtils.isArchive(pathParts[pathParts.length - 1]))
-            fileType = FileType.ARCHIVE;
-        else if (FileUtils.isArchived(urlString))
-            fileType = FileType.ARCHIVED;
-        return fileType;
-    }
-
     public static URL normalizeUrl(URL url) {
         URI uri = URI.create(url.toString());
         try {

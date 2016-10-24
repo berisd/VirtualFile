@@ -66,6 +66,21 @@ public interface VirtualFileManager {
     VirtualFile newDirectory(URL url);
 
     /**
+     * Creates an FileArchive with the given URL.
+     *
+     * @param urlString URL String
+     * @return
+     */
+    VirtualArchive newArchive(String urlString);
+
+    /**
+     * Creates a VirtualArchive representing a local archive with the given path.
+     * @param path Path
+     * @return VirtualArchive
+     */
+    VirtualArchive newLocalArchive(String path);
+
+    /**
      * Remove and clean up the VirtualFile.
      *
      * @param file VirtualFile

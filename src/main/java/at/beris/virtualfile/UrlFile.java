@@ -341,8 +341,8 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public Archive asArchive() {
-        return new Archive(this, context);
+    public VirtualArchive asArchive() {
+        return new FileArchive(this, context);
     }
 
     @Override

@@ -9,12 +9,13 @@
 
 package at.beris.virtualfile.config;
 
-import at.beris.virtualfile.FileType;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.protocol.Protocol;
-import at.beris.virtualfile.provider.*;
+import at.beris.virtualfile.provider.FtpClientFileOperationProvider;
+import at.beris.virtualfile.provider.LocalFileOperationProvider;
+import at.beris.virtualfile.provider.SftpClientFileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
 
 import java.net.URL;
@@ -22,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Configurator {
-    private Map<Protocol, Map<FileType, Class>> fileOperationProviderClassMap;
+    private Map<Protocol, Class> fileOperationProviderClassMap;
     private Map<Protocol, Class> clientClassMap;
 
     private ContextConfiguration contextConfiguration;
@@ -43,15 +44,20 @@ public class Configurator {
         defaultConfiguration = new Configuration();
         defaultConfiguration.initValues();
 
-        put(Protocol.FILE, createLocalFileOperationProviderClassMap(), null);
+        clientClassMap.put(Protocol.FILE, null);
+        clientClassMap.put(Protocol.SFTP, SftpClient.class);
+        clientClassMap.put(Protocol.FTP, FtpClient.class);
+
+        fileOperationProviderClassMap.put(Protocol.FILE, LocalFileOperationProvider.class);
+        fileOperationProviderClassMap.put(Protocol.SFTP, SftpClientFileOperationProvider.class);
+        fileOperationProviderClassMap.put(Protocol.FTP, FtpClientFileOperationProvider.class);
+
         configurationPerProtocolMap.put(Protocol.FILE, new Configuration(defaultConfiguration));
-        put(Protocol.SFTP, createSftpClientFileOperationProviderClassMap(), SftpClient.class);
         configurationPerProtocolMap.put(Protocol.SFTP, new Configuration(defaultConfiguration));
-        put(Protocol.FTP, createFtpClientFileOperationProviderClassMap(), FtpClient.class);
         configurationPerProtocolMap.put(Protocol.FTP, new Configuration(defaultConfiguration));
     }
 
-    public Map<FileType, Class> getFileOperationProviderClassMap(Protocol protocol) {
+    public Class getFileOperationProviderClass(Protocol protocol) {
         return fileOperationProviderClassMap.get(protocol);
     }
 
@@ -59,34 +65,9 @@ public class Configurator {
         return clientClassMap.get(protocol);
     }
 
-    void put(Protocol protocol, Map<FileType, Class> fileOperationProviderClassForFileExt, Class clientClass) {
-        fileOperationProviderClassMap.put(protocol, fileOperationProviderClassForFileExt);
+    void put(Protocol protocol, Class fileOperationProviderClass, Class clientClass) {
+        fileOperationProviderClassMap.put(protocol, fileOperationProviderClass);
         clientClassMap.put(protocol, clientClass);
-    }
-
-    private Map<FileType, Class> createLocalFileOperationProviderClassMap() {
-        Map<FileType, Class> localFileProviderForExtMap = new HashMap<>();
-        localFileProviderForExtMap.put(FileType.DEFAULT, LocalFileOperationProvider.class);
-        localFileProviderForExtMap.put(FileType.ARCHIVED, LocalArchivedFileOperationProvider.class);
-        localFileProviderForExtMap.put(FileType.ARCHIVE, LocalArchiveOperationProvider.class);
-        return localFileProviderForExtMap;
-    }
-
-
-    private Map<FileType, Class> createSftpClientFileOperationProviderClassMap() {
-        Map<FileType, Class> fileProviderClassMap = new HashMap<>();
-        fileProviderClassMap.put(FileType.DEFAULT, SftpClientFileOperationProvider.class);
-        fileProviderClassMap.put(FileType.ARCHIVED, LocalArchivedFileOperationProvider.class);
-        fileProviderClassMap.put(FileType.ARCHIVE, SftpClientFileOperationProvider.class);
-        return fileProviderClassMap;
-    }
-
-    private Map<FileType, Class> createFtpClientFileOperationProviderClassMap() {
-        Map<FileType, Class> fileProviderClassMap = new HashMap<>();
-        fileProviderClassMap.put(FileType.DEFAULT, FtpClientFileOperationProvider.class);
-        fileProviderClassMap.put(FileType.ARCHIVED, LocalArchivedFileOperationProvider.class);
-        fileProviderClassMap.put(FileType.ARCHIVE, FtpClientFileOperationProvider.class);
-        return fileProviderClassMap;
     }
 
     public Configuration createConfiguration(URL url) {

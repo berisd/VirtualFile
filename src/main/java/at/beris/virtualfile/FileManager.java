@@ -48,6 +48,10 @@ public final class FileManager {
         return fileManager().newLocalFile(path);
     }
 
+    public static VirtualArchive newLocalArchive(String path) {
+        return fileManager().newLocalArchive(path);
+    }
+
     public static VirtualFile newLocalDirectory(String path) {
         return fileManager().newLocalDirectory(path);
     }
@@ -62,6 +66,10 @@ public final class FileManager {
 
     public static VirtualFile newDirectory(URL url) {
         return fileManager().newDirectory(url);
+    }
+
+    public static VirtualArchive newArchive(String urlString) {
+        return fileManager().newArchive(urlString);
     }
 
     public static VirtualFileManager newManager() {
