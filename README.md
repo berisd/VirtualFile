@@ -1,6 +1,6 @@
 # VirtualFile
 Simple URL based file management library.<br/>
-Supported file systems: local, ftp, sftp.
+Supported file systems: local, ftp, sftp.<br/>
 Supported archives: zip, tar, 7zip.
 
 Note on building project:<br/>
