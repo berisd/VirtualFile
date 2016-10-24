@@ -15,6 +15,9 @@ import at.beris.virtualfile.provider.FileOperationProvider;
 
 import java.net.URL;
 
+/**
+ * Manage and cache virtual files and their relations.
+ */
 public interface VirtualFileContext {
 
     /**

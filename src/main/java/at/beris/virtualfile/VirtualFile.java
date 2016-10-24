@@ -28,7 +28,7 @@ import java.util.Set;
 
 public interface VirtualFile extends DisposableObject {
 
-    VirtualArchive asArchive();
+    Archive asArchive();
 
     File asFile();
 

@@ -341,9 +341,8 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public VirtualArchive asArchive() {
-        //TODO if archive is not local then copy from remote
-        return new UrlArchive(url, context);
+    public Archive asArchive() {
+        return new Archive(this, context);
     }
 
     @Override

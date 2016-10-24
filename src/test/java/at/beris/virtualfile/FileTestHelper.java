@@ -36,6 +36,9 @@ public class FileTestHelper {
 
     public static final String SSH_HOME_DIRECTORY = "/home/sshtest/";
 
+    public static final int NUMBER_OF_ARCHIVE_ENTRIES = 34;
+    public static final String ZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.zip";
+
     public static void initIntegrationTest() {
         org.junit.Assume.assumeTrue("Ignore Integration Tests.", Boolean.parseBoolean(System.getProperty("runintegrationtests")));
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));

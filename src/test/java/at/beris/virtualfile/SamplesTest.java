@@ -11,15 +11,14 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
+import static at.beris.virtualfile.FileTestHelper.NUMBER_OF_ARCHIVE_ENTRIES;
+import static at.beris.virtualfile.FileTestHelper.ZIP_FILENAME;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -31,32 +30,37 @@ public class SamplesTest {
         FileTestHelper.initIntegrationTest();
     }
 
-    @Test(expected = OperationNotSupportedException.class)
-    public void extractArchive() {
-        VirtualArchive archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "testarchive.zip").asArchive();
-        VirtualFile directory = FileManager.newLocalDirectory("extracted");
-        List<VirtualFile> extractedFiles = archive.extract(directory);
-        Assert.assertEquals(33, extractedFiles.size());
-        directory.delete();
+    @After
+    public void afterTestCase() {
+        VirtualFile[] resources = {FileManager.newLocalDirectory("extracted"), FileManager.newLocalFile("file.xml")};
+        for (VirtualFile resource : resources) {
+            if (resource.exists())
+                resource.delete();
+        }
     }
 
-    @Test(expected = OperationNotSupportedException.class)
+    @Test
+    public void extractArchive() {
+        Archive archive = FileManager.newLocalFile(ZIP_FILENAME).asArchive();
+        VirtualFile directory = FileManager.newLocalDirectory("extracted");
+        List<VirtualFile> extractedFiles = archive.extract(directory);
+        Assert.assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, extractedFiles.size());
+    }
+
+    @Test
+    @Ignore
     public void extractFile() {
-        VirtualArchive archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "testarchive.zip/TreeDb/file.xml").asArchive();
+        Archive archive = FileManager.newLocalFile(ZIP_FILENAME + "/TreeDb/file.xml").asArchive();
         VirtualFile targetFile = FileManager.newLocalFile("file.xml");
         List<VirtualFile> extractedFiles = archive.extract(targetFile);
         Assert.assertEquals(920, extractedFiles.get(0).getSize());
-        targetFile.delete();
     }
 
     @Test
     public void listArchive() {
         //TODO Must use VirtualArchive
-        VirtualFile archive = FileManager.newLocalFile("src" + File.separator + "test" + File.separator +
-                "resources" + File.separator + "testarchive.zip");
-        Assert.assertEquals(33, archive.list().size());
+        VirtualFile archive = FileManager.newLocalFile(ZIP_FILENAME);
+        Assert.assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, archive.list().size());
     }
 
     @Test

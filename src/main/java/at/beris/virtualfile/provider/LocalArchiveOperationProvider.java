@@ -31,7 +31,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class LocalArchiveOperationProvider extends LocalFileOperationProvider implements ArchiveOperationProvider {
+public class LocalArchiveOperationProvider extends LocalFileOperationProvider {
 
     private final static String URL = "url";
     private final static String PARENT_URL = "parentUrl";
