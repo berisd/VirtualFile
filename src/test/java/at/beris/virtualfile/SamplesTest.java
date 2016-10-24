@@ -12,6 +12,7 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -25,6 +26,10 @@ import static org.junit.Assert.assertTrue;
  * This class contains real world code samples
  */
 public class SamplesTest {
+    @BeforeClass
+    public static void beforeTest() {
+        FileTestHelper.initIntegrationTest();
+    }
 
     @Test(expected = OperationNotSupportedException.class)
     public void extractArchive() {

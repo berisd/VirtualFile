@@ -35,15 +35,14 @@ public class SftpClientIntegrationTest {
     private static SftpClient sftpClient;
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void beforeTest() throws Exception {
         FileTestHelper.initIntegrationTest();
-        UrlUtils.registerProtocolURLStreamHandlers();
         sftpClient = createSftpClient();
         sftpClient.connect();
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void afterTest() {
         cleanUp();
         if (sftpClient != null)
             sftpClient.disconnect();

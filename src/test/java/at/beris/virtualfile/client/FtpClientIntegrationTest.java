@@ -51,7 +51,7 @@ public class FtpClientIntegrationTest {
     private static FtpClient ftpClient;
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void beforeTest() throws Exception {
         FileTestHelper.initIntegrationTest();
 
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
@@ -84,14 +84,18 @@ public class FtpClientIntegrationTest {
     }
 
     @AfterClass
-    public static void tearDown() {
-        if (ftpClient.exists(TEST_FILE))
-            ftpClient.deleteFile(TEST_FILE);
-        if (ftpClient.exists(TEST_DIRECTORY))
-            ftpClient.deleteDirectory(TEST_DIRECTORY);
-        if (ftpClient != null)
-            ftpClient.disconnect();
-        ftpServer.stop();
+    public static void afterTest() {
+        if (ftpClient != null) {
+            if (ftpClient.exists(TEST_FILE))
+                ftpClient.deleteFile(TEST_FILE);
+            if (ftpClient.exists(TEST_DIRECTORY))
+                ftpClient.deleteDirectory(TEST_DIRECTORY);
+            if (ftpClient != null)
+                ftpClient.disconnect();
+        }
+        if (ftpServer != null) {
+            ftpServer.stop();
+        }
     }
 
     @Test
