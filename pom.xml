@@ -70,7 +70,6 @@
             <groupId>org.tukaani</groupId>
             <artifactId>xz</artifactId>
             <version>1.5</version>
-            <optional>true</optional>
         </dependency>
     </dependencies>
     <build>
