@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 import static at.beris.virtualfile.FileTestHelper.NUMBER_OF_ARCHIVE_ENTRIES;
+import static at.beris.virtualfile.FileTestHelper.SEVEN_ZIP_FILENAME;
 import static at.beris.virtualfile.FileTestHelper.ZIP_FILENAME;
 import static org.junit.Assert.assertTrue;
 
@@ -39,8 +40,16 @@ public class SamplesTest {
     }
 
     @Test
-    public void extractArchive() {
+    public void extractZipArchive() {
         VirtualArchive archive = FileManager.newLocalFile(ZIP_FILENAME).asArchive();
+        VirtualFile directory = FileManager.newLocalDirectory("extracted");
+        List<VirtualFile> extractedFiles = archive.extract(directory);
+        Assert.assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, extractedFiles.size());
+    }
+
+    @Test
+    public void extractSevenZipArchive() {
+        VirtualArchive archive = FileManager.newLocalArchive(SEVEN_ZIP_FILENAME);
         VirtualFile directory = FileManager.newLocalDirectory("extracted");
         List<VirtualFile> extractedFiles = archive.extract(directory);
         Assert.assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, extractedFiles.size());
