@@ -55,8 +55,8 @@ public abstract class AbstractFileArchiveTest {
     @Test
     public void archiveEntry() {
         List<VirtualArchiveEntry> findEntryList = new ArrayList<>();
-        findEntryList.add(createArchiveEntry("", "TreeDb", 0, LocalDateTime.of(2015, 12, 24, 10, 48, 55), true));
-        findEntryList.add(createArchiveEntry("TreeDb/.idea", "uiDesigner.xml", 8792, LocalDateTime.of(2015, 12, 23, 22, 45, 53), false));
+        findEntryList.add(createArchiveEntry("", "MyProject", 0, LocalDateTime.of(2016, 10, 25, 17, 42, 28), true));
+        findEntryList.add(createArchiveEntry("MyProject/target/classes", "App.class", 3879, LocalDateTime.of(2015, 12, 24, 10, 25, 24), false));
 
         for (VirtualArchiveEntry archiveEntry : sourceArchive.list()) {
             for (VirtualArchiveEntry matchEntry : findEntryList) {

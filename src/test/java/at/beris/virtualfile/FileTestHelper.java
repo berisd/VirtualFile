@@ -36,10 +36,10 @@ public class FileTestHelper {
 
     public static final String SSH_HOME_DIRECTORY = "/home/sshtest/";
 
-    public static final int NUMBER_OF_ARCHIVE_ENTRIES = 34;
+    public static final int NUMBER_OF_ARCHIVE_ENTRIES = 20;
     public static final String SEVEN_ZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.7z";
     public static final String ZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.zip";
-    public static final String TAR_GZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.tgz";
+    public static final String TAR_GZIP_FILENAME = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "testarchive.tar.gz";
 
     public static void initIntegrationTest() {
         org.junit.Assume.assumeTrue("Ignore Integration Tests.", Boolean.parseBoolean(System.getProperty("runintegrationtests")));
