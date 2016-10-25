@@ -101,11 +101,6 @@ class UrlFileManager implements VirtualFileManager {
     }
 
     @Override
-    public void dispose(VirtualFile file) {
-        fileContext.dispose(file);
-    }
-
-    @Override
     public void dispose() {
         fileContext.dispose();
     }

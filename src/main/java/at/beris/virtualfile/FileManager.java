@@ -80,10 +80,6 @@ public final class FileManager {
         fileManager().dispose();
     }
 
-    public static void dispose(VirtualFile file) {
-        fileManager().dispose(file);
-    }
-
     public static Set<Protocol> enabledProtocols() {
         return fileManager().enabledProtocols();
     }

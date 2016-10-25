@@ -81,13 +81,6 @@ public interface VirtualFileManager {
     VirtualArchive newLocalArchive(String path);
 
     /**
-     * Remove and clean up the VirtualFile.
-     *
-     * @param file VirtualFile
-     */
-    void dispose(VirtualFile file);
-
-    /**
      * Free all resources allocated by the VirtualFileManager.
      */
     void dispose();
