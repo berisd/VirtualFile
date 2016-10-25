@@ -1,5 +1,5 @@
 # VirtualFile
-Simple URL based file management library.<br/>
+Userfriendly URL based file management library for Java 8.<br/>
 Supported file systems: local, ftp, sftp.<br/>
 Supported archives: zip, tar, 7zip.
 
