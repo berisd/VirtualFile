@@ -41,6 +41,14 @@ public interface VirtualFile extends DisposableObject {
 
     void copy(VirtualFile targetFile, CopyListener listener);
 
+    void compare(VirtualFile targetFile);
+
+    //TODO Add compare method with a CompareListener
+
+    void compress();
+
+    void decompress();
+
     /**
      * Creates an empty file
      *
@@ -107,9 +115,15 @@ public interface VirtualFile extends DisposableObject {
 
     boolean isDirectory();
 
-    boolean isRoot();
-
     boolean isSymbolicLink();
+
+    boolean isReadable();
+
+    boolean isWritable();
+
+    boolean isExecutable();
+
+    boolean isHidden();
 
     /**
      * List contained files non-recursively

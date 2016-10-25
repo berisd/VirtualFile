@@ -10,6 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
@@ -177,6 +178,42 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
+    public boolean isReadable() {
+        logger.debug("Check isReadable for {}", this);
+        checkModel();
+        boolean isReadable = fileOperationProvider.isReadable(model);
+        logger.debug("Returns: {}", isReadable);
+        return isReadable;
+    }
+
+    @Override
+    public boolean isWritable() {
+        logger.debug("Check isWritable for {}", this);
+        checkModel();
+        boolean isWritable = fileOperationProvider.isWritable(model);
+        logger.debug("Returns: {}", isWritable);
+        return isWritable;
+    }
+
+    @Override
+    public boolean isExecutable() {
+        logger.debug("Check isExecutable for {}", this);
+        checkModel();
+        boolean isExecutable = fileOperationProvider.isExecutable(model);
+        logger.debug("Returns: {}", isExecutable);
+        return isExecutable;
+    }
+
+    @Override
+    public boolean isHidden() {
+        logger.debug("Check isHidden for {}", this);
+        checkModel();
+        boolean isHidden = fileOperationProvider.isHidden(model);
+        logger.debug("Returns: {}", isHidden);
+        return isHidden;
+    }
+
+    @Override
     public VirtualFile getParent() {
         logger.debug("Get parent for {}", this);
         VirtualFile parent = context.getParentFile(this);
@@ -193,15 +230,6 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
             root = root.getParent();
         logger.debug("Returns: {}", root);
         return root;
-    }
-
-    @Override
-    public boolean isRoot() {
-        logger.debug("Check isRoot for {}", this);
-        checkModel();
-        boolean isRoot = this.toString().equals(getRoot() != null ? getRoot().toString() : "");
-        logger.debug("Returns: {}", isRoot);
-        return isRoot;
     }
 
     @Override
@@ -444,6 +472,21 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
         logger.info("Copy {} to {} with Listener", this, targetFile);
         checkModel();
         fileOperationProvider.copy(this, targetFile, listener);
+    }
+
+    @Override
+    public void compare(VirtualFile targetFile) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void compress() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void decompress() {
+        throw new NotImplementedException();
     }
 
     @Override

@@ -137,6 +137,26 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
         client.setOwner(model.getUrl().getPath(), model.getOwner());
     }
 
+    @Override
+    public boolean isReadable(FileModel model) {
+        throw new OperationNotSupportedException();
+    }
+
+    @Override
+    public boolean isWritable(FileModel model) {
+        throw new OperationNotSupportedException();
+    }
+
+    @Override
+    public boolean isExecutable(FileModel model) {
+        throw new OperationNotSupportedException();
+    }
+
+    @Override
+    public boolean isHidden(FileModel model) {
+        throw new OperationNotSupportedException();
+    }
+
     private VirtualFile copyToLocalFile(FileModel model, String path) {
         byte[] buffer = new byte[1024];
         int length;

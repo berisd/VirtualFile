@@ -40,11 +40,19 @@ public interface VirtualArchive {
     void createDirectory(String path, String name);
 
     /**
-     * Delete an archiveEntry from the archive
+     * Remove an archiveEntry from the archive
      *
      * @param archiveEntry ArchiveEntry
      */
-    void delete(VirtualArchiveEntry archiveEntry);
+    void remove(VirtualArchiveEntry archiveEntry);
+
+    /**
+     * * Remove an archiveEntry from the archive
+     *
+     * @param path Path
+     * @param name Name
+     */
+    void remove(String path, String name);
 
     /**
      * Extract archive contents to directory

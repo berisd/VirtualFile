@@ -9,15 +9,11 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -28,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import static at.beris.virtualfile.FileTestHelper.*;
-import static org.junit.Assert.assertTrue;
 
 public class LocalWindowsFileTest extends AbstractUrlFileTest {
 
@@ -81,14 +76,13 @@ public class LocalWindowsFileTest extends AbstractUrlFileTest {
     @Test
     public void getFileAttributes() {
         super.getFileAttributes(file -> {
-            assertTrue(file.getAttributes().contains(BasicFilePermission.READ));
-            assertTrue(file.getAttributes().contains(BasicFilePermission.WRITE));
+            Assert.assertEquals(0, file.getAttributes().size());
         });
     }
 
     @Test
     public void setFileAttributes() {
-        super.setFileAttributes(new HashSet(Arrays.asList(BasicFilePermission.EXECUTE, DosFileAttribute.HIDDEN)));
+        super.setFileAttributes(new HashSet(Arrays.asList(DosFileAttribute.HIDDEN)));
     }
 
     @Test

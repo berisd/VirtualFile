@@ -138,4 +138,24 @@ public class FileOperationProviderMock implements FileOperationProvider {
     public void dispose() {
 
     }
+
+    @Override
+    public boolean isReadable(FileModel model) {
+        return false;
+    }
+
+    @Override
+    public boolean isWritable(FileModel model) {
+        return false;
+    }
+
+    @Override
+    public boolean isExecutable(FileModel model) {
+        return false;
+    }
+
+    @Override
+    public boolean isHidden(FileModel model) {
+        return false;
+    }
 }

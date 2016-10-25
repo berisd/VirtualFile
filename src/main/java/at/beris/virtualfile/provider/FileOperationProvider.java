@@ -84,4 +84,12 @@ public interface FileOperationProvider extends DisposableObject {
     void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener);
 
     void dispose();
+
+    boolean isReadable(FileModel model);
+
+    boolean isWritable(FileModel model);
+
+    boolean isExecutable(FileModel model);
+
+    boolean isHidden(FileModel model);
 }

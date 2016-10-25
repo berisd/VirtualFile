@@ -51,7 +51,12 @@ class FileArchive implements VirtualArchive {
     }
 
     @Override
-    public void delete(VirtualArchiveEntry archiveEntry) {
+    public void remove(VirtualArchiveEntry archiveEntry) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void remove(String path, String name) {
         throw new NotImplementedException();
     }
 

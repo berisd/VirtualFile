@@ -12,7 +12,6 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileContext;
-import at.beris.virtualfile.attribute.BasicFilePermission;
 import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
@@ -162,8 +161,6 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
 
             if (posixFileAttributeViewSupported) {
                 fillPosixFileAttributes(file, model);
-            } else {
-                fillDefaultFileAttributes(file, model);
             }
 
         } catch (IOException | URISyntaxException e) {
@@ -210,21 +207,17 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         try {
             File file = new File(model.getUrl().toURI());
 
-            Set<BasicFilePermission> basicFilePermissionSet = new HashSet<>();
             Set<DosFileAttribute> dosAttributeSet = new HashSet<>();
             Set<PosixFilePermission> posixFilePermissionSet = new HashSet<>();
 
             for (FileAttribute attribute : model.getAttributes()) {
-                if (attribute instanceof BasicFilePermission)
-                    basicFilePermissionSet.add((BasicFilePermission) attribute);
-                else if (attribute instanceof DosFileAttribute)
+                if (attribute instanceof DosFileAttribute)
                     dosAttributeSet.add((DosFileAttribute) attribute);
                 else if (attribute instanceof PosixFilePermission)
                     posixFilePermissionSet.add((PosixFilePermission) attribute);
             }
 
             FileStore fileStore = Files.getFileStore(file.toPath());
-            setBasicFileAttributes(file, basicFilePermissionSet);
 
             if (fileStore.supportsFileAttributeView(DosFileAttributeView.class)) {
                 setDosFileAttributes(file, dosAttributeSet);
@@ -292,6 +285,42 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         throw new OperationNotSupportedException();
     }
 
+    @Override
+    public boolean isReadable(FileModel model) {
+        try {
+            return new File(model.getUrl().toURI()).canRead();
+        } catch (URISyntaxException e) {
+            throw new VirtualFileException(e);
+        }
+    }
+
+    @Override
+    public boolean isWritable(FileModel model) {
+        try {
+            return new File(model.getUrl().toURI()).canWrite();
+        } catch (URISyntaxException e) {
+            throw new VirtualFileException(e);
+        }
+    }
+
+    @Override
+    public boolean isExecutable(FileModel model) {
+        try {
+            return new File(model.getUrl().toURI()).canExecute();
+        } catch (URISyntaxException e) {
+            throw new VirtualFileException(e);
+        }
+    }
+
+    @Override
+    public boolean isHidden(FileModel model) {
+        try {
+            return new File(model.getUrl().toURI()).isHidden();
+        } catch (URISyntaxException e) {
+            throw new VirtualFileException(e);
+        }
+    }
+
     private class LocalFileDeletingVisitor extends SimpleFileVisitor<Path> {
 
         @Override
@@ -354,19 +383,6 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         }
     }
 
-    private void fillDefaultFileAttributes(File file, FileModel model) {
-        Set<FileAttribute> attributes = model.getAttributes();
-        if (file.canRead()) {
-            attributes.add(BasicFilePermission.READ);
-        }
-        if (file.canWrite()) {
-            attributes.add(BasicFilePermission.WRITE);
-        }
-        if (file.canExecute()) {
-            attributes.add(BasicFilePermission.EXECUTE);
-        }
-    }
-
     private void fillPosixFileAttributes(File file, FileModel model) {
         try {
             Set<FileAttribute> attributes = model.getAttributes();
@@ -383,12 +399,6 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         } catch (IOException e) {
             throw new VirtualFileException(e);
         }
-    }
-
-    private void setBasicFileAttributes(File file, Set<BasicFilePermission> basicFilePermissionSet) {
-        file.setExecutable(basicFilePermissionSet.contains(BasicFilePermission.EXECUTE));
-        file.setReadable(basicFilePermissionSet.contains(BasicFilePermission.READ));
-        file.setWritable(basicFilePermissionSet.contains(BasicFilePermission.WRITE));
     }
 
     private void setDosFileAttributes(File file, Set<DosFileAttribute> dosAttributeSet) {
