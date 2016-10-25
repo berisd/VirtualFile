@@ -7,8 +7,8 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.protocol;
+package at.beris.virtualfile;
 
-public enum Protocol {
-    FILE, SFTP, FTP, HTTP, HTTPS
+public class HttpsFileTest {
+    //TODO create Https Environment and implement Test
 }

@@ -73,6 +73,8 @@ public interface VirtualFile extends DisposableObject {
     //TODO create a move method that combines copy and delete
     Set<FileAttribute> getAttributes();
 
+    ContentType getContentType();
+
     FileTime getCreationTime();
 
     GroupPrincipal getGroup();

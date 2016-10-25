@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.UserPrincipal;
@@ -31,16 +32,20 @@ public class UrlFileTest extends AbstractUrlFileTest {
 
     @Before
     @Override
-    public void beforeTestCase() throws Exception {
-        super.beforeTestCase();
-        provider = new FileOperationProviderMock();
-        sourceFileUrl = new URL(String.format("file:/%s/%s", TEST_SOURCE_DIRECTORY_NAME, TEST_SOURCE_FILE_NAME));
-        Mockito.when(getFileContext().getFileOperationProvider(sourceFileUrl.toString())).thenReturn(provider);
-        file = new UrlFile(sourceFileUrl, getFileContext());
-        Mockito.when(getFileContext().newFile(Matchers.eq(sourceFileUrl))).thenReturn(file);
-        Mockito.when(getFileContext().createFileModel()).thenReturn(createFileModel());
-        // Fix: Sometimes an empty FileModel my be returned and the maven build fails
-        Thread.currentThread().sleep(50);
+    public void beforeTestCase() {
+        try {
+            super.beforeTestCase();
+            provider = new FileOperationProviderMock();
+            sourceFileUrl = new URL(String.format("file:/%s/%s", TEST_SOURCE_DIRECTORY_NAME, TEST_SOURCE_FILE_NAME));
+            Mockito.when(getFileContext().getFileOperationProvider(sourceFileUrl.toString())).thenReturn(provider);
+            file = new UrlFile(sourceFileUrl, getFileContext());
+            Mockito.when(getFileContext().newFile(Matchers.eq(sourceFileUrl))).thenReturn(file);
+            Mockito.when(getFileContext().createFileModel()).thenReturn(createFileModel());
+            // Fix: Sometimes an empty FileModel my be returned and the maven build fails
+            Thread.currentThread().sleep(50);
+        } catch (MalformedURLException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

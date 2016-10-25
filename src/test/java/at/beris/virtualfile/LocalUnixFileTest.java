@@ -39,7 +39,7 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
 
     @Before
     @Override
-    public void beforeTestCase() throws Exception {
+    public void beforeTestCase() {
         super.beforeTestCase();
         sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
         targetFileUrl = UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME);

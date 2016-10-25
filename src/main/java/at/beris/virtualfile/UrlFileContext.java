@@ -13,6 +13,7 @@ import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.cache.FileCache;
 import at.beris.virtualfile.cache.FileCacheCallbackHandler;
 import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.client.VirtualClient;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.exception.Message;
@@ -20,11 +21,13 @@ import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
+import org.apache.tika.detect.DefaultDetector;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,9 +39,10 @@ class UrlFileContext implements VirtualFileContext {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileContext.class);
 
     private Configurator configurator;
+    private DefaultDetector contentDetector;
 
-    private Map<String, Client> siteUrlToClientMap;
-    private Map<Client, FileOperationProvider> clientToFileOperationProviderMap;
+    private Map<String, VirtualClient> siteUrlToClientMap;
+    private Map<VirtualClient, FileOperationProvider> clientToFileOperationProviderMap;
     private Map<String, VirtualFile> fileCache;
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
 
@@ -57,6 +61,8 @@ class UrlFileContext implements VirtualFileContext {
         fileCache.setSize(configurator.getContextConfiguration().getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
         this.fileCache = fileCache;
+
+        contentDetector = new DefaultDetector();
     }
 
     @Override
@@ -149,13 +155,13 @@ class UrlFileContext implements VirtualFileContext {
     }
 
     @Override
-    public Client getClient(String siteUrlString) {
+    public VirtualClient getClient(String siteUrlString) {
         return siteUrlToClientMap.get(siteUrlString);
     }
 
     @Override
     public FileOperationProvider getFileOperationProvider(String urlString) {
-        Client client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(urlString));
+        VirtualClient client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(urlString));
         FileOperationProvider fileOperationProvider = clientToFileOperationProviderMap.get(client);
         return fileOperationProvider;
     }
@@ -170,7 +176,12 @@ class UrlFileContext implements VirtualFileContext {
         return new FileArchiveEntry();
     }
 
-    private Client createClientInstance(URL url) {
+    @Override
+    public DefaultDetector getContentDetector() {
+        return contentDetector;
+    }
+
+    private VirtualClient createClientInstance(URL url) {
         LOGGER.debug("createClientInstance (url: {})", maskedUrlString(url));
 
         Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
@@ -178,7 +189,7 @@ class UrlFileContext implements VirtualFileContext {
             try {
                 Configuration configuration = configurator.createConfiguration(url);
                 Constructor constructor = clientClass.getConstructor(URL.class, Configuration.class);
-                return (Client) constructor.newInstance(url, configuration);
+                return (VirtualClient) constructor.newInstance(url, configuration);
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }
@@ -194,7 +205,7 @@ class UrlFileContext implements VirtualFileContext {
             throw new VirtualFileException(Message.PROTOCOL_NOT_CONFIGURED(protocol));
 
         try {
-            if (protocol != Protocol.FILE)
+            if (!EnumSet.of(Protocol.FILE).contains(protocol))
                 initClient(url);
             initFileOperationProvider(url, protocol, getClient(UrlUtils.getSiteUrlString(url.toString())));
             return createFileInstance(url);
@@ -214,7 +225,7 @@ class UrlFileContext implements VirtualFileContext {
         }
     }
 
-    private FileOperationProvider createFileOperationProviderInstance(Class instanceClass, Client client) throws InstantiationException, IllegalAccessException {
+    private FileOperationProvider createFileOperationProviderInstance(Class instanceClass, VirtualClient client) throws InstantiationException, IllegalAccessException {
         LOGGER.debug("createFileOperationProviderInstance (instanceClass: {}, client: {})", instanceClass, client);
         try {
             Class clientClass = client != null ? client.getClass() : Client.class;
@@ -228,14 +239,14 @@ class UrlFileContext implements VirtualFileContext {
     private void initClient(URL url) {
         LOGGER.debug("initClient(url: {}", maskedUrlString(url));
         String siteUrlString = UrlUtils.getSiteUrlString(url.toString());
-        Client client = getClient(siteUrlString);
+        VirtualClient client = getClient(siteUrlString);
         if (client == null) {
             client = createClientInstance(UrlUtils.newUrl(siteUrlString));
             siteUrlToClientMap.put(siteUrlString, client);
         }
     }
 
-    private void initFileOperationProvider(URL url, Protocol protocol, Client client) throws InstantiationException, IllegalAccessException {
+    private void initFileOperationProvider(URL url, Protocol protocol, VirtualClient client) throws InstantiationException, IllegalAccessException {
         LOGGER.debug("initFileOperationProvider(url: {}, protocol: {}, client: {})", maskedUrlString(url), protocol, client);
         FileOperationProvider fileOperationProvider = getFileOperationProvider(url.toString());
         if (fileOperationProvider == null) {
@@ -250,14 +261,6 @@ class UrlFileContext implements VirtualFileContext {
         while (it.hasNext()) {
             Map.Entry<K, V> entry = it.next();
             entry.getValue().dispose();
-            it.remove();
-        }
-    }
-
-    private void disposeClientToFileOperationProvidersMap() {
-        Iterator<Map.Entry<Client, FileOperationProvider>> it = clientToFileOperationProviderMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Client, FileOperationProvider> entry = it.next();
             it.remove();
         }
     }

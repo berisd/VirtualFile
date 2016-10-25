@@ -260,7 +260,7 @@ public abstract class AbstractUrlFileTest {
     }
 
     @Before
-    public void beforeTestCase() throws Exception {
+    public void beforeTestCase() {
         fileContext = createFileContext();
     }
 

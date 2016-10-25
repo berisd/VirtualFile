@@ -11,11 +11,11 @@ package at.beris.virtualfile.config;
 
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.client.ftp.FtpClient;
+import at.beris.virtualfile.client.http.HttpClient;
+import at.beris.virtualfile.client.https.HttpsClient;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.protocol.Protocol;
-import at.beris.virtualfile.provider.FtpClientFileOperationProvider;
-import at.beris.virtualfile.provider.LocalFileOperationProvider;
-import at.beris.virtualfile.provider.SftpClientFileOperationProvider;
+import at.beris.virtualfile.provider.*;
 import at.beris.virtualfile.util.UrlUtils;
 
 import java.net.URL;
@@ -47,14 +47,18 @@ public class Configurator {
         clientClassMap.put(Protocol.FILE, null);
         clientClassMap.put(Protocol.SFTP, SftpClient.class);
         clientClassMap.put(Protocol.FTP, FtpClient.class);
+        clientClassMap.put(Protocol.HTTP, HttpClient.class);
+        clientClassMap.put(Protocol.HTTPS, HttpsClient.class);
 
         fileOperationProviderClassMap.put(Protocol.FILE, LocalFileOperationProvider.class);
         fileOperationProviderClassMap.put(Protocol.SFTP, SftpClientFileOperationProvider.class);
         fileOperationProviderClassMap.put(Protocol.FTP, FtpClientFileOperationProvider.class);
+        fileOperationProviderClassMap.put(Protocol.HTTP, HttpClientFileOperationProvider.class);
+        fileOperationProviderClassMap.put(Protocol.HTTPS, HttpsClientFileOperationProvider.class);
 
-        configurationPerProtocolMap.put(Protocol.FILE, new Configuration(defaultConfiguration));
-        configurationPerProtocolMap.put(Protocol.SFTP, new Configuration(defaultConfiguration));
-        configurationPerProtocolMap.put(Protocol.FTP, new Configuration(defaultConfiguration));
+        for (Protocol protocol : Protocol.values()) {
+            configurationPerProtocolMap.put(protocol, new Configuration(defaultConfiguration));
+        }
     }
 
     public Class getFileOperationProviderClass(Protocol protocol) {

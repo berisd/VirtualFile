@@ -17,12 +17,13 @@ import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
+import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.attribute.AclEntry;
@@ -366,6 +367,17 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
         Set<FileAttribute> attributes = model.getAttributes();
         logger.debug("Returns: {}", FileUtils.getAttributesString(attributes.toArray(new FileAttribute[0])));
         return attributes;
+    }
+
+    @Override
+    public ContentType getContentType() {
+        try (InputStream inputStream = new BufferedInputStream(getInputStream())) {
+            DefaultDetector detector = context.getContentDetector();
+            MediaType mediaType = detector.detect(inputStream, new Metadata());
+            return new ContentType(mediaType);
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override

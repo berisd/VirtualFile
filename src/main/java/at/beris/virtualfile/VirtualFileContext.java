@@ -9,9 +9,10 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.client.VirtualClient;
 import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.provider.FileOperationProvider;
+import org.apache.tika.detect.DefaultDetector;
 
 import java.net.URL;
 
@@ -70,7 +71,7 @@ public interface VirtualFileContext {
      * @param siteUrlString
      * @return
      */
-    Client getClient(String siteUrlString);
+    VirtualClient getClient(String siteUrlString);
 
     /**
      * Get FileOperationProvider for the URL string.
@@ -88,5 +89,7 @@ public interface VirtualFileContext {
     FileModel createFileModel();
 
     VirtualArchiveEntry createArchiveEntry();
+
+    DefaultDetector getContentDetector();
 
 }

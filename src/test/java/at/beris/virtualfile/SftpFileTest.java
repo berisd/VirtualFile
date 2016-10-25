@@ -40,7 +40,7 @@ public class SftpFileTest extends AbstractUrlFileTest {
 
     @Before
     @Override
-    public void beforeTestCase() throws Exception {
+    public void beforeTestCase() {
         super.beforeTestCase();
         URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + FileTestHelper.SSH_HOME_DIRECTORY);
         sourceFileUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_FILE_NAME);

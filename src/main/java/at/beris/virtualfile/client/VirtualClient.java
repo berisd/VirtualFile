@@ -7,8 +7,9 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.protocol;
+package at.beris.virtualfile.client;
 
-public enum Protocol {
-    FILE, SFTP, FTP, HTTP, HTTPS
+import at.beris.virtualfile.cache.DisposableObject;
+
+public interface VirtualClient extends DisposableObject {
 }
