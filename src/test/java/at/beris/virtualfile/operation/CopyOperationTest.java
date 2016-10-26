@@ -12,8 +12,8 @@ package at.beris.virtualfile.operation;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
-import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.provider.operation.CopyOperation;
+import at.beris.virtualfile.provider.operation.FileOperationListener;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -32,14 +32,14 @@ public class CopyOperationTest {
         VirtualFile sourceFile = createSourceFileMock(new URL("file:/source/foo"), false);
         VirtualFile targetFile = createTargetFileMock(new URL("file:/target/foo"), false);
 
-        CopyListener listener = Mockito.mock(CopyListener.class);
+        FileOperationListener listener = Mockito.mock(FileOperationListener.class);
         VirtualFileContext fileContext = Mockito.mock(VirtualFileContext.class);
         FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
 
         new CopyOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
 
-        Mockito.verify(listener, times(1)).startFile(Matchers.any(VirtualFile.class), Matchers.any(Long.class));
-        Mockito.verify(listener, times(1)).afterBlockCopied(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
+        Mockito.verify(listener, times(1)).startProcessingFile(Matchers.any(VirtualFile.class), Matchers.any(Long.class));
+        Mockito.verify(listener, times(1)).afterStreamBufferProcessed(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class CopyOperationTest {
         VirtualFile sourceFile = createSourceFileMock(new URL("file:/source/foo/"), true);
         VirtualFile targetFile = createTargetFileMock(new URL("file:/target/foo/"), true);
 
-        CopyListener listener = Mockito.mock(CopyListener.class);
+        FileOperationListener listener = Mockito.mock(FileOperationListener.class);
 
         VirtualFile sourceChildFile = createSourceFileMock(new URL("file:/source/foo/file.txt"), false);
         VirtualFile sourceChildDirectory = createSourceFileMock(new URL("file:/source/foo/subdir/"), true);
@@ -68,8 +68,8 @@ public class CopyOperationTest {
 
         new CopyOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
 
-        Mockito.verify(listener, times(1)).startFile(Matchers.any(VirtualFile.class), Matchers.any(Long.class));
-        Mockito.verify(listener, times(1)).afterBlockCopied(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
+        Mockito.verify(listener, times(1)).startProcessingFile(Matchers.any(VirtualFile.class), Matchers.any(Long.class));
+        Mockito.verify(listener, times(1)).afterStreamBufferProcessed(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
     }
 
     private VirtualFile createSourceFileMock(URL url, boolean isDirectory) throws Exception {

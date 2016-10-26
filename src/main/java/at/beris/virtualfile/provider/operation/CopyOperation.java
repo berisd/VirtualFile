@@ -19,59 +19,57 @@ import at.beris.virtualfile.util.UrlUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.function.Consumer;
 
-public class CopyOperation extends AbstractFileOperation<Integer, CopyListener> {
+public class CopyOperation extends AbstractFileOperation<Integer> {
 
     public CopyOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
     }
 
     @Override
-    public Integer execute(VirtualFile source, VirtualFile target, CopyListener listener) {
+    public Integer execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
         super.execute(source, target, listener);
         if (source.isDirectory() && !target.isDirectory())
             throw new OperationNotSupportedException("Can't copy directory to a file!");
         if (!source.isDirectory() && target.isDirectory())
             target = fileContext.newFile(UrlUtils.newUrl(target.getUrl(), source.getName()));
         CopyFileIterationLogic iterationLogic = new CopyFileIterationLogic(source, target, listener);
-        iterateRecursively(iterationLogic);
+        iterateFilesRecursively(iterationLogic);
         return iterationLogic.getFilesProcessed();
     }
 
-    private class CopyFileIterationLogic extends FileIterationLogic<CopyListener> {
+    private class CopyFileIterationLogic extends FileIterationLogic<FileOperationListener> {
 
-        public CopyFileIterationLogic(VirtualFile source, VirtualFile target, CopyListener listener) {
+        public CopyFileIterationLogic(VirtualFile source, VirtualFile target, FileOperationListener listener) {
             super(source, target, listener);
         }
 
         @Override
         public void executeOperation() {
-            if (listener != null)
-                listener.startFile(source, filesProcessed + 1);
             copyFile(source, target, listener);
-            if (listener != null)
-                listener.finishedFile(source);
+        }
+
+        private void copyFile(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+            try (InputStream inputStream = source.getInputStream(); OutputStream outputStream = target.getOutputStream()) {
+                processStreams(new StreamBufferOperationData<>(inputStream, outputStream, source.getSize(), listener), new CopyStreamBufferOperation());
+            } catch (IOException e) {
+                throw new VirtualFileException(e);
+            }
         }
     }
 
-    private void copyFile(VirtualFile source, VirtualFile target, CopyListener listener) {
-        byte[] buffer = new byte[COPY_BUFFER_SIZE];
+    private class CopyStreamBufferOperation implements Consumer<StreamBufferOperationData<OutputStream>> {
 
-        long bytesWrittenTotal = 0;
-        long bytesWrittenBlock = 0;
-        int length;
-        try (InputStream inputStream = source.getInputStream(); OutputStream outputStream = target.getOutputStream()) {
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
-                bytesWrittenBlock = length;
-                bytesWrittenTotal += bytesWrittenBlock;
-                if (listener != null)
-                    listener.afterBlockCopied(source.getSize(), bytesWrittenBlock, bytesWrittenTotal);
-                if (listener != null && listener.interrupt())
-                    break;
+        @Override
+        public void accept(StreamBufferOperationData<OutputStream> data) {
+            try {
+                data.getTargetStream().write(data.getBuffer(), 0, data.getBytesRead());
+                data.setBytesWrittenBlock(data.getBytesRead());
+                data.setBytesWrittenTotal(data.getBytesWrittenTotal() + data.getBytesWrittenBlock());
+            } catch (IOException e) {
+                throw new VirtualFileException(e);
             }
-        } catch (IOException e) {
-            throw new VirtualFileException(e);
         }
     }
 }

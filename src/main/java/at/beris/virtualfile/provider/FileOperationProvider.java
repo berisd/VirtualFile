@@ -13,10 +13,9 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.provider.operation.CompareListener;
 import at.beris.virtualfile.provider.operation.CompareResult;
-import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.provider.operation.FileOperation;
+import at.beris.virtualfile.provider.operation.FileOperationListener;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -83,9 +82,9 @@ public interface FileOperationProvider extends DisposableObject {
 
     void removeAttributes(FileModel model);
 
-    Integer copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener);
+    Integer copy(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener);
 
-    CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, CompareListener listener);
+    CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener);
 
     void dispose();
 

@@ -10,7 +10,7 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.exception.OperationNotSupportedException;
-import at.beris.virtualfile.provider.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.FileOperationListener;
 import at.beris.virtualfile.util.DateUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.Assert;
@@ -49,7 +49,7 @@ public class HttpFileTest extends AbstractUrlFileTest {
         try {
             VirtualFile sourceFile = getFileContext().newFile(new URL("https://images-3.gog.com/d6fe0ebe40ef6117c1c8979c00777ce64f8a521302fd95ec13afdb8ebfa4349a_196.jpg"));
             VirtualFile targetFile = getFileContext().newFile(targetFileUrl);
-            CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
+            FileOperationListener copyListenerMock = Mockito.mock(FileOperationListener.class);
             sourceFile.copy(targetFile, copyListenerMock);
             Assert.assertTrue(targetFile.getSize() > 0);
         } catch (MalformedURLException e) {

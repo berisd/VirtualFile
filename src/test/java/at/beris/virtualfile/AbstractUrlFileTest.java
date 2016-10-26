@@ -11,7 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.os.OsFamily;
-import at.beris.virtualfile.provider.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.FileOperationListener;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.After;
@@ -105,7 +105,7 @@ public abstract class AbstractUrlFileTest {
     protected void copyFile() {
         VirtualFile sourceFile = FileTestHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
         VirtualFile targetFile = fileContext.newFile(targetFileUrl);
-        CopyListener copyListenerMock = Mockito.mock(CopyListener.class);
+        FileOperationListener copyListenerMock = Mockito.mock(FileOperationListener.class);
         sourceFile.copy(targetFile, copyListenerMock);
         assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
         assertCopyListener(copyListenerMock);
@@ -120,7 +120,7 @@ public abstract class AbstractUrlFileTest {
         VirtualFile sourceDirectory = fileContext.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
         VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
-        CopyListener copyListener = Mockito.mock(CopyListener.class);
+        FileOperationListener copyListener = Mockito.mock(FileOperationListener.class);
         Mockito.when(copyListener.interrupt()).thenReturn(false);
 
         Integer filesCopied = sourceDirectory.copy(targetDirectory, copyListener);
@@ -143,7 +143,7 @@ public abstract class AbstractUrlFileTest {
         VirtualFile sourceDirectory = fileContext.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
         VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
-        sourceDirectory.copy(targetDirectory, Mockito.mock(CopyListener.class));
+        sourceDirectory.copy(targetDirectory, Mockito.mock(FileOperationListener.class));
 
         assertTrue(targetDirectory.exists());
         targetDirectory.delete();
@@ -226,11 +226,11 @@ public abstract class AbstractUrlFileTest {
                 virtualFile -> virtualFile.getLastAccessTime());
     }
 
-    protected void assertCopyListener(CopyListener copyListener) {
+    protected void assertCopyListener(FileOperationListener copyListener) {
         ArgumentCaptor<Long> bytesCopiedBlockArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<Long> bytesCopiedTotalArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<Long> fileSizeArgumentCaptor = ArgumentCaptor.forClass(Long.class);
-        Mockito.verify(copyListener, times(2)).afterBlockCopied(fileSizeArgumentCaptor.capture(), bytesCopiedBlockArgumentCaptor.capture(), bytesCopiedTotalArgumentCaptor.capture());
+        Mockito.verify(copyListener, times(2)).afterStreamBufferProcessed(fileSizeArgumentCaptor.capture(), bytesCopiedBlockArgumentCaptor.capture(), bytesCopiedTotalArgumentCaptor.capture());
 
         List<Long> bytesCopiedBlockList = bytesCopiedBlockArgumentCaptor.getAllValues();
         List<Long> bytesCopiedTotalList = bytesCopiedTotalArgumentCaptor.getAllValues();

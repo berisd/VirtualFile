@@ -13,14 +13,14 @@ import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
-public class CompareOperation extends AbstractFileOperation<CompareResult, CompareListener> {
+public class CompareOperation extends AbstractFileOperation<CompareResult> {
 
     public CompareOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
     }
 
     @Override
-    public CompareResult execute(VirtualFile source, VirtualFile target, CompareListener listener) {
+    public CompareResult execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
         super.execute(source, target, listener);
         return null;
     }

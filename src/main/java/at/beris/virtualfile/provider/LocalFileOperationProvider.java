@@ -20,7 +20,6 @@ import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.provider.operation.CopyListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

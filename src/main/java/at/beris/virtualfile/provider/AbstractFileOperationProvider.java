@@ -111,12 +111,12 @@ public abstract class AbstractFileOperationProvider<C> implements FileOperationP
     }
 
     @Override
-    public Integer copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
+    public Integer copy(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
         return new CopyOperation(fileContext, this).execute(sourceFile, targetFile, listener);
     }
 
     @Override
-    public CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, CompareListener listener) {
+    public CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
         return new CompareOperation(fileContext, this).execute(sourceFile, targetFile, listener);
     }
 

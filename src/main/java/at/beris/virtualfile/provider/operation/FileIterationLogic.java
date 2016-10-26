@@ -11,7 +11,7 @@ package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.VirtualFile;
 
-abstract class FileIterationLogic<L extends Listener> {
+abstract class FileIterationLogic<L extends FileOperationListener> {
     protected VirtualFile source;
     protected VirtualFile target;
     protected L listener;
@@ -38,7 +38,11 @@ abstract class FileIterationLogic<L extends Listener> {
                     target.create();
                 }
             } else {
+                if (listener != null)
+                    listener.startProcessingFile(source, filesProcessed + 1);
                 executeOperation();
+                if (listener != null)
+                    listener.finishedProcessingFile(source);
             }
         }
         filesProcessed++;

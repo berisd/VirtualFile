@@ -15,9 +15,8 @@ import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.provider.FileOperationProvider;
-import at.beris.virtualfile.provider.operation.CompareListener;
 import at.beris.virtualfile.provider.operation.CompareResult;
-import at.beris.virtualfile.provider.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.FileOperationListener;
 import at.beris.virtualfile.util.FileUtils;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.metadata.Metadata;
@@ -484,8 +483,8 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public Integer copy(VirtualFile targetFile, CopyListener listener) {
-        logger.info("Copy {} to {} with Listener", this, targetFile);
+    public Integer copy(VirtualFile targetFile, FileOperationListener listener) {
+        logger.info("Copy {} to {} with FileOperationListener", this, targetFile);
         checkModel();
         Integer filesCopied = fileOperationProvider.copy(this, targetFile, listener);
         logger.debug("Returns: {}", filesCopied);
@@ -502,8 +501,8 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public CompareResult compare(VirtualFile targetFile, CompareListener listener) {
-        logger.info("Compare {} with {} with Listener", this, targetFile);
+    public CompareResult compare(VirtualFile targetFile, FileOperationListener listener) {
+        logger.info("Compare {} with {} with FileOperationListener", this, targetFile);
         checkModel();
         CompareResult result = fileOperationProvider.compare(this, targetFile, listener);
         logger.debug("Returns: equal={}", result.isEqual());

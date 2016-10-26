@@ -16,7 +16,7 @@ import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.provider.operation.CopyListener;
+import at.beris.virtualfile.provider.operation.FileOperationListener;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -353,14 +353,14 @@ public class Shell {
         LOGGER.error("Exception occured.", e);
     }
 
-    private class CustomCopyListener implements CopyListener {
+    private class CustomCopyListener implements FileOperationListener {
         private final static char PROGRESS_CHAR = '*';
         private final static int NUM_PROGRESS_CHARS_100_PERC = 80;
 
         private int progressCharsPrinted;
 
         @Override
-        public void startFile(VirtualFile file, long currentFileNumber) {
+        public void startProcessingFile(VirtualFile file, long currentFileNumber) {
             try {
                 System.out.println(String.format("Copying %s [%,d KB]", file.getPath(), Math.round(file.getSize() / 1024)));
                 progressCharsPrinted = 0;
@@ -370,15 +370,15 @@ public class Shell {
         }
 
         @Override
-        public void finishedFile(VirtualFile file) {
+        public void finishedProcessingFile(VirtualFile file) {
             if (NUM_PROGRESS_CHARS_100_PERC - progressCharsPrinted > 0)
                 System.out.print(StringUtils.repeat(PROGRESS_CHAR, (NUM_PROGRESS_CHARS_100_PERC - progressCharsPrinted)));
             System.out.println("");
         }
 
         @Override
-        public void afterBlockCopied(long fileSize, long bytesCopiedBlock, long bytesCopiedTotal) {
-            int percent = (int) ((bytesCopiedTotal * 100) / fileSize);
+        public void afterStreamBufferProcessed(long fileSize, long bytesProcessed, long bytesProcessedTotal) {
+            int percent = (int) ((bytesProcessedTotal * 100) / fileSize);
 //            int currentNumProgressCharsToPrint = percent / (100 / NUM_PROGRESS_CHARS_100_PERC);
             int currentNumProgressCharsToPrint = (int) Math.floor(percent / (100 / (float) NUM_PROGRESS_CHARS_100_PERC));
 
