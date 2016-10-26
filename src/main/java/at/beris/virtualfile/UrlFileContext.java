@@ -43,11 +43,11 @@ class UrlFileContext implements VirtualFileContext {
 
     private Map<String, VirtualClient> siteUrlToClientMap;
     private Map<VirtualClient, FileOperationProvider> clientToFileOperationProviderMap;
-    private Map<String, VirtualFile> fileCache;
+    private FileCache fileCache;
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
 
     public UrlFileContext() {
-        this(new Configurator(), new FileCache(1024));
+        this(new Configurator(), new FileCache(8 * 1024));
     }
 
     public UrlFileContext(Configurator configurator, FileCache fileCache) {
@@ -58,7 +58,7 @@ class UrlFileContext implements VirtualFileContext {
         this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
 
-        fileCache.setSize(configurator.getContextConfiguration().getFileCacheSize());
+        fileCache.setMaxSize(configurator.getContextConfiguration().getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
         this.fileCache = fileCache;
 
@@ -130,7 +130,7 @@ class UrlFileContext implements VirtualFileContext {
     @Override
     public void dispose() {
         fileToParentFileMap.clear();
-        disposeMap(fileCache);
+        fileCache.clear();
         clientToFileOperationProviderMap.clear();
         disposeMap(siteUrlToClientMap);
     }

@@ -22,10 +22,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 @RunWith(MockitoJUnitRunner.class)
 public class FileCacheTest {
 
-    public static final int CACHE_SIZE = 64;
+    public static final int CACHE_SIZE = 100;
     public static final String TEST_URL = "file://test.txt";
     private FileCache fileCache;
 
@@ -52,7 +56,7 @@ public class FileCacheTest {
     }
 
     @Test
-    public void removeEldestEntry() {
+    public void purgeCache() {
         List<VirtualFile> entries = new ArrayList<>();
         for (int i = 0; i < CACHE_SIZE + 1; i++) {
             VirtualFile file = Mockito.mock(VirtualFile.class);
@@ -60,8 +64,22 @@ public class FileCacheTest {
             putValue(TEST_URL + String.valueOf(i), file);
         }
 
-        Assert.assertEquals(CACHE_SIZE, fileCache.size());
-        Mockito.verify(callbackHandlerMock).beforeEntryRemoved(entries.get(0));
+        Assert.assertEquals(91, fileCache.size());
+        verify(callbackHandlerMock, times(10)).beforeEntryRemoved(any(VirtualFile.class));
+        assertOldestEntriesNotExist();
+        newestNewestEntriesExist();
+    }
+
+    private void assertOldestEntriesNotExist() {
+        for (int i = 0; i < 10; i++) {
+            Assert.assertNull(fileCache.get(TEST_URL + String.valueOf(i)));
+        }
+    }
+
+    private void newestNewestEntriesExist() {
+        for (int i = 90; i < 100; i++) {
+            Assert.assertNotNull(fileCache.get(TEST_URL + String.valueOf(i)));
+        }
     }
 
     private void putValue(String key, VirtualFile file) {

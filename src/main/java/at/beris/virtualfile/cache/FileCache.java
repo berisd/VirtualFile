@@ -11,111 +11,76 @@ package at.beris.virtualfile.cache;
 
 import at.beris.virtualfile.VirtualFile;
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class FileCache implements Map<String, VirtualFile> {
+public class FileCache {
+    public static final float LOAD_FACTOR = 0.75F;
+    // Percent of cache entries purged when cache is full
+    public static final float PURGE_FACTOR = 0.1F;
     private float loadFactor;
     private int capacity;
-    private int size;
+    private int maxSize;
     private FileCacheCallbackHandler callbackHandler;
 
     private Map<String, VirtualFile> cacheMap;
 
-    public FileCache(int size) {
-        this.size = size;
-        this.loadFactor = 0.75F;
+    public FileCache(int maxSize) {
+        this.maxSize = maxSize;
+        this.loadFactor = LOAD_FACTOR;
         calculateFields();
         createMap();
     }
 
-    @Override
     public VirtualFile put(String key, VirtualFile value) {
+        if (isCacheFull()) {
+            purgeCache();
+        }
         cacheMap.put(key, value);
         return value;
     }
 
-    @Override
     public VirtualFile remove(Object key) {
-        VirtualFile previousValue = cacheMap.get(key);
-        if (previousValue != null) {
-            cacheMap.remove(key);
-            return previousValue;
-        }
-        return null;
-    }
-
-    @Override
-    public void putAll(Map<? extends String, ? extends VirtualFile> m) {
-        for (Map.Entry<? extends String, ? extends VirtualFile> entry : m.entrySet())
-            put(entry.getKey(), entry.getValue());
+        return cacheMap.remove(key);
     }
 
     public int size() {
         return cacheMap.size();
     }
 
-    @Override
-    public boolean isEmpty() {
-        return cacheMap.isEmpty();
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-        return cacheMap.containsKey(key);
-    }
-
-    @Override
-    public boolean containsValue(Object value) {
-        return cacheMap.containsValue(value);
-    }
-
-    @Override
     public VirtualFile get(Object key) {
         return cacheMap.get(key);
     }
 
-    @Override
     public void clear() {
         cacheMap.clear();
     }
 
-    @Override
-    public Set<String> keySet() {
-        return cacheMap.keySet();
-    }
-
-    @Override
-    public Collection<VirtualFile> values() {
-        return cacheMap.values();
-    }
-
-    @Override
-    public Set<Entry<String, VirtualFile>> entrySet() {
-        return cacheMap.entrySet();
-    }
-
     private void createMap() {
-        cacheMap = new LinkedHashMap<String, VirtualFile>(capacity, loadFactor, true) {
+        cacheMap = new LinkedHashMap<String, VirtualFile>(capacity, loadFactor) {
             private static final long serialVersionUID = 1;
 
             @Override
             protected boolean removeEldestEntry(Map.Entry<String, VirtualFile> eldest) {
-                boolean removeEntry = size() > FileCache.this.size;
-                if (removeEntry)
+                boolean isCacheFull = size() > FileCache.this.maxSize;
+                if (isCacheFull) {
                     callbackHandler.beforeEntryRemoved(eldest.getValue());
-                return removeEntry;
+                }
+                return isCacheFull;
             }
         };
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setMaxSize(int maxSize) {
+        this.maxSize = maxSize;
         calculateFields();
         disposeMap();
         createMap();
+    }
+
+    public int getPurgeSize() {
+        return (int) (maxSize * PURGE_FACTOR);
     }
 
     public void setCallbackHandler(FileCacheCallbackHandler callbackHandler) {
@@ -123,11 +88,32 @@ public class FileCache implements Map<String, VirtualFile> {
     }
 
     private void calculateFields() {
-        this.capacity = (int) Math.ceil(size / loadFactor) + 1;
+        this.capacity = (int) Math.ceil(maxSize / (100 * loadFactor)) + 1;
     }
 
     private void disposeMap() {
         cacheMap.clear();
         cacheMap = null;
+    }
+
+    private boolean isCacheFull() {
+        return cacheMap.size() == maxSize;
+    }
+
+    private void purgeCache() {
+        int numOfEntriesToPurge = getPurgeSize();
+        int numOfEntriesPurged = 0;
+
+        Iterator<Map.Entry<String, VirtualFile>> it = cacheMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, VirtualFile> entry = it.next();
+            VirtualFile file = entry.getValue();
+            if (numOfEntriesPurged < numOfEntriesToPurge) {
+                callbackHandler.beforeEntryRemoved(file);
+                file.dispose();
+                it.remove();
+                numOfEntriesPurged++;
+            }
+        }
     }
 }
