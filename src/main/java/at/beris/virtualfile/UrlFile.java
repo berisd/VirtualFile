@@ -475,19 +475,19 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public Long copy(VirtualFile targetFile) {
+    public Integer copy(VirtualFile targetFile) {
         logger.info("Copy {} to {}", this, targetFile);
         checkModel();
-        Long filesCopied = fileOperationProvider.copy(this, targetFile, null);
+        Integer filesCopied = fileOperationProvider.copy(this, targetFile, null);
         logger.debug("Returns: {}", filesCopied);
         return filesCopied;
     }
 
     @Override
-    public Long copy(VirtualFile targetFile, CopyListener listener) {
+    public Integer copy(VirtualFile targetFile, CopyListener listener) {
         logger.info("Copy {} to {} with Listener", this, targetFile);
         checkModel();
-        Long filesCopied = fileOperationProvider.copy(this, targetFile, listener);
+        Integer filesCopied = fileOperationProvider.copy(this, targetFile, listener);
         logger.debug("Returns: {}", filesCopied);
         return filesCopied;
     }

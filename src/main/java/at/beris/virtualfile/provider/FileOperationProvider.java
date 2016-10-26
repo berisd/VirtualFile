@@ -83,7 +83,7 @@ public interface FileOperationProvider extends DisposableObject {
 
     void removeAttributes(FileModel model);
 
-    Long copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener);
+    Integer copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener);
 
     CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, CompareListener listener);
 

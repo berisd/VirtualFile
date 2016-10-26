@@ -9,5 +9,12 @@
 
 package at.beris.virtualfile.provider.operation;
 
+import at.beris.virtualfile.VirtualFile;
+
 public interface Listener {
+    /**
+     * @param file File
+     * @return true: continue with current file, false: continue with next file
+     */
+    boolean fileExists(VirtualFile file);
 }

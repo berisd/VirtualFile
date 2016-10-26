@@ -20,15 +20,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
-public abstract class AbstractFileOperationProvider<CLIENT> implements FileOperationProvider {
+public abstract class AbstractFileOperationProvider<C> implements FileOperationProvider {
 
     protected static final Set<FileOperation> BASIC_FILE_OPERATIONS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(FileOperation.values())));
 
     protected VirtualFileContext fileContext;
-    protected CLIENT client;
+    protected C client;
     protected Set<FileOperation> supportedOperations;
 
-    public AbstractFileOperationProvider(VirtualFileContext fileContext, CLIENT client) {
+    public AbstractFileOperationProvider(VirtualFileContext fileContext, C client) {
         super();
         this.fileContext = fileContext;
         this.client = client;
@@ -111,7 +111,7 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
     }
 
     @Override
-    public Long copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
+    public Integer copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
         return new CopyOperation(fileContext, this).execute(sourceFile, targetFile, listener);
     }
 

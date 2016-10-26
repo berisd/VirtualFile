@@ -132,8 +132,8 @@ public class FileOperationProviderMock implements FileOperationProvider {
     }
 
     @Override
-    public Long copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
-        return 0L;
+    public Integer copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
+        return 0;
     }
 
     @Override

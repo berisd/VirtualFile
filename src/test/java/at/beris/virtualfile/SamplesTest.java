@@ -16,9 +16,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
-import static at.beris.virtualfile.FileTestHelper.NUMBER_OF_ARCHIVE_ENTRIES;
-import static at.beris.virtualfile.FileTestHelper.SEVEN_ZIP_FILENAME;
-import static at.beris.virtualfile.FileTestHelper.ZIP_FILENAME;
+import static at.beris.virtualfile.FileTestHelper.*;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -73,8 +71,8 @@ public class SamplesTest {
     @Test
     public void copyFileToDirectory() {
         VirtualFile file = FileManager.newFile("sftp://sshtest:" + FileTestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
-        Long filesCopied = file.copy(FileManager.newLocalFile("."));
-        Assert.assertEquals(Long.valueOf(1), filesCopied);
+        Integer filesCopied = file.copy(FileManager.newLocalFile("."));
+        Assert.assertEquals(Integer.valueOf(1), filesCopied);
         VirtualFile copiedFile = FileManager.newLocalFile("dokuwiki-stable.tgz");
         Assert.assertArrayEquals(file.checksum(), copiedFile.checksum());
         copiedFile.delete();

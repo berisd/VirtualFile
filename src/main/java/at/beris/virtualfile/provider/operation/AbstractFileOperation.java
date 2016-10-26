@@ -18,7 +18,7 @@ import at.beris.virtualfile.provider.FileOperationProvider;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public abstract class AbstractFileOperation<R, L> {
+public abstract class AbstractFileOperation<R, L extends Listener> {
 
     public final static int COPY_BUFFER_SIZE = 1024 * 16;
 
@@ -37,8 +37,8 @@ public abstract class AbstractFileOperation<R, L> {
         return null;
     }
 
-    protected <L> void iterateRecursively(FileIterationLogic<L> iterationLogic) {
-        iterationLogic.before();
+    protected void iterateRecursively(FileIterationLogic iterationLogic) {
+        iterationLogic.executeIteration();
         if (iterationLogic.getSource().isDirectory()) {
             for (VirtualFile sourceChildFile : iterationLogic.getSource().list()) {
                 iterationLogic.setSource(sourceChildFile);
@@ -54,8 +54,6 @@ public abstract class AbstractFileOperation<R, L> {
                 iterateRecursively(iterationLogic);
                 iterationLogic.setTarget(parentTarget);
             }
-        } else {
-            iterationLogic.execute();
         }
         iterationLogic.getTarget().refresh();
     }

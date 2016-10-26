@@ -11,7 +11,6 @@ package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileContext;
-import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -21,14 +20,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class CopyOperation extends AbstractFileOperation<Long, CopyListener> {
+public class CopyOperation extends AbstractFileOperation<Integer, CopyListener> {
 
     public CopyOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
     }
 
     @Override
-    public Long execute(VirtualFile source, VirtualFile target, CopyListener listener) {
+    public Integer execute(VirtualFile source, VirtualFile target, CopyListener listener) {
         super.execute(source, target, listener);
         if (source.isDirectory() && !target.isDirectory())
             throw new OperationNotSupportedException("Can't copy directory to a file!");
@@ -41,34 +40,17 @@ public class CopyOperation extends AbstractFileOperation<Long, CopyListener> {
 
     private class CopyFileIterationLogic extends FileIterationLogic<CopyListener> {
 
-        private boolean createFile;
-
         public CopyFileIterationLogic(VirtualFile source, VirtualFile target, CopyListener listener) {
             super(source, target, listener);
         }
 
         @Override
-        public void before() {
-            createFile = true;
-            if (target.exists()) {
-                if (listener != null)
-                    createFile = listener.fileExists(target);
-            }
-            if (source.isDirectory() && createFile && !target.exists()) {
-                target.create();
-            }
-        }
-
-        @Override
-        public void execute() {
-            if (createFile) {
-                if (listener != null)
-                    listener.startFile(source, filesProcessed + 1);
-                copyFile(source, target, listener);
-                if (listener != null)
-                    listener.finishedFile(source);
-            }
-            filesProcessed++;
+        public void executeOperation() {
+            if (listener != null)
+                listener.startFile(source, filesProcessed + 1);
+            copyFile(source, target, listener);
+            if (listener != null)
+                listener.finishedFile(source);
         }
     }
 

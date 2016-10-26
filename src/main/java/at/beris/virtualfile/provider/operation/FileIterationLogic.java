@@ -11,11 +11,13 @@ package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.VirtualFile;
 
-abstract class FileIterationLogic<L> {
+abstract class FileIterationLogic<L extends Listener> {
     protected VirtualFile source;
     protected VirtualFile target;
     protected L listener;
-    protected Long filesProcessed = 0L;
+    protected Integer filesProcessed = 0;
+
+    private boolean createFile;
 
     public FileIterationLogic(VirtualFile source, VirtualFile target, L listener) {
         this.source = source;
@@ -23,9 +25,26 @@ abstract class FileIterationLogic<L> {
         this.listener = listener;
     }
 
-    public abstract void before();
+    public void executeIteration() {
+        createFile = true;
+        if (target.exists()) {
+            if (listener != null)
+                createFile = listener.fileExists(target);
+        }
 
-    public abstract void execute();
+        if (createFile) {
+            if (source.isDirectory()) {
+                if (!target.exists()) {
+                    target.create();
+                }
+            } else {
+                executeOperation();
+            }
+        }
+        filesProcessed++;
+    }
+
+    public abstract void executeOperation();
 
     public VirtualFile getSource() {
         return source;
@@ -43,7 +62,7 @@ abstract class FileIterationLogic<L> {
         this.target = target;
     }
 
-    public long getFilesProcessed() {
+    public Integer getFilesProcessed() {
         return filesProcessed;
     }
 }

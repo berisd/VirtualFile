@@ -19,10 +19,4 @@ public interface CopyListener extends Listener {
     void afterBlockCopied(long fileSize, long bytesCopiedBlock, long bytesCopiedTotal);
 
     boolean interrupt();
-
-    /**
-     * @param file File
-     * @return true: continue with current file, false: continue with next file
-     */
-    boolean fileExists(VirtualFile file);
 }

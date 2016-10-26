@@ -15,6 +15,7 @@ import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -116,14 +117,14 @@ public abstract class AbstractUrlFileTest {
 
         FileTestHelper.createFileTreeData(sourceFileUrlList);
 
-
         VirtualFile sourceDirectory = fileContext.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
         VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
 
         CopyListener copyListener = Mockito.mock(CopyListener.class);
         Mockito.when(copyListener.interrupt()).thenReturn(false);
 
-        sourceDirectory.copy(targetDirectory, copyListener);
+        Integer filesCopied = sourceDirectory.copy(targetDirectory, copyListener);
+        Assert.assertEquals(Integer.valueOf(sourceFileUrlList.size()), filesCopied);
         assertDirectory(sourceFileUrlList, targetFileUrlList);
     }
 

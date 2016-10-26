@@ -38,9 +38,9 @@ public interface VirtualFile extends DisposableObject {
 
     Byte[] checksum();
 
-    Long copy(VirtualFile targetFile);
+    Integer copy(VirtualFile targetFile);
 
-    Long copy(VirtualFile targetFile, CopyListener listener);
+    Integer copy(VirtualFile targetFile, CopyListener listener);
 
     CompareResult compare(VirtualFile targetFile);
 
