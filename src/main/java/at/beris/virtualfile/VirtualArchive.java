@@ -19,7 +19,7 @@ public interface VirtualArchive {
     /**
      * Get archive file
      *
-     * @return
+     * @return File
      */
     VirtualFile getVirtualFile();
 
@@ -58,7 +58,7 @@ public interface VirtualArchive {
      * Extract archive contents to directory
      *
      * @param target Target Directory
-     * @return
+     * @return List of files
      */
     List<VirtualFile> extract(VirtualFile target);
 
@@ -73,7 +73,7 @@ public interface VirtualArchive {
      * List archive entries inside the path
      *
      * @param path Path
-     * @return
+     * @return List of archive entries
      */
     List<VirtualArchiveEntry> list(String path);
 

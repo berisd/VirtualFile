@@ -66,10 +66,10 @@ public interface VirtualFileManager {
     VirtualFile newDirectory(URL url);
 
     /**
-     * Creates an FileArchive with the given URL.
+     * Creates an Archive represented by the given URL.
      *
      * @param urlString URL String
-     * @return
+     * @return Archive
      */
     VirtualArchive newArchive(String urlString);
 

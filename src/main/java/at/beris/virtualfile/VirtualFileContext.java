@@ -60,31 +60,31 @@ public interface VirtualFileContext {
     /**
      * Get parent file of the VirtualFile.
      *
-     * @param file
-     * @return
+     * @param file File
+     * @return Parent file
      */
     VirtualFile getParentFile(VirtualFile file);
 
     /**
      * Get client for a siteUrlString.
      *
-     * @param siteUrlString
-     * @return
+     * @param siteUrlString Site UrlString
+     * @return Client
      */
     VirtualClient getClient(String siteUrlString);
 
     /**
      * Get FileOperationProvider for the URL string.
      *
-     * @param urlString
-     * @return
+     * @param urlString UrlString
+     * @return FileOperationProvider
      */
     FileOperationProvider getFileOperationProvider(String urlString);
 
     /**
      * Create an empty file model.
      *
-     * @return
+     * @return FileModel
      */
     FileModel createFileModel();
 

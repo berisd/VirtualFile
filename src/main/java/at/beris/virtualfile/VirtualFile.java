@@ -15,7 +15,6 @@ import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CopyListener;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -51,8 +50,6 @@ public interface VirtualFile extends DisposableObject {
 
     /**
      * Creates an empty file
-     *
-     * @throws IOException IOException
      */
     void create();
 
@@ -111,7 +108,9 @@ public interface VirtualFile extends DisposableObject {
     URL getUrl();
 
     /**
-     * VirtualFile is an archive
+     * Check if file is an archive
+     *
+     * @return True if file is an archive
      */
     boolean isArchive();
 
@@ -137,7 +136,8 @@ public interface VirtualFile extends DisposableObject {
     /**
      * List contained files non-recursively filtered by a filter
      *
-     * @return A list of files
+     * @param filter Filter
+     * @return List of files
      */
     List<VirtualFile> list(Filter filter);
 
