@@ -20,57 +20,47 @@ import at.beris.virtualfile.util.UrlUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
-public class CopyOperation extends AbstractFileOperation<Void, Void> {
-    public final static int COPY_BUFFER_SIZE = 1024 * 16;
-
-    private long filesProcessed;
+public class CopyOperation extends AbstractFileOperation<Long, CopyListener> {
 
     public CopyOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
     }
 
     @Override
-    public Void execute(VirtualFile source, VirtualFile target, Listener listener, Void... params) {
-        filesProcessed = 0L;
-        if (!source.exists())
-            throw new VirtualFileException(Message.NO_SUCH_FILE(source.getPath()));
+    public Long execute(VirtualFile source, VirtualFile target, CopyListener listener) {
+        super.execute(source, target, listener);
         if (source.isDirectory() && !target.isDirectory())
             throw new OperationNotSupportedException("Can't copy directory to a file!");
         if (!source.isDirectory() && target.isDirectory())
-
             target = fileContext.newFile(UrlUtils.newUrl(target.getUrl(), source.getName()));
-        copyRecursive(source, target, (CopyListener) listener);
-        return null;
+        CopyFileIterationLogic iterationLogic = new CopyFileIterationLogic(source, target, listener);
+        iterateRecursively(iterationLogic);
+        return iterationLogic.getFilesProcessed();
     }
 
-    private void copyRecursive(VirtualFile source, VirtualFile target, CopyListener listener) {
-        boolean createFile = true;
-        if (target.exists()) {
-            if (listener != null)
-                createFile = listener.fileExists(target);
+    private class CopyFileIterationLogic extends FileIterationLogic<CopyListener> {
+
+        private boolean createFile;
+
+        public CopyFileIterationLogic(VirtualFile source, VirtualFile target, CopyListener listener) {
+            super(source, target, listener);
         }
 
-        if (source.isDirectory()) {
-            if (createFile) {
-                if (!target.exists())
-                    target.create();
-
-                for (VirtualFile sourceChildFile : source.list()) {
-                    URL targetUrl = target.getUrl();
-                    URL targetChildUrl = null;
-                    try {
-                        targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
-                    } catch (MalformedURLException e) {
-                        throw new VirtualFileException(e);
-                    }
-                    VirtualFile targetChildFile = fileContext.newFile(targetChildUrl);
-                    copyRecursive(sourceChildFile, targetChildFile, listener);
-                }
+        @Override
+        public void before() {
+            createFile = true;
+            if (target.exists()) {
+                if (listener != null)
+                    createFile = listener.fileExists(target);
             }
-        } else {
+            if (source.isDirectory() && createFile && !target.exists()) {
+                target.create();
+            }
+        }
+
+        @Override
+        public void execute() {
             if (createFile) {
                 if (listener != null)
                     listener.startFile(source, filesProcessed + 1);
@@ -80,7 +70,6 @@ public class CopyOperation extends AbstractFileOperation<Void, Void> {
             }
             filesProcessed++;
         }
-        target.refresh();
     }
 
     private void copyFile(VirtualFile source, VirtualFile target, CopyListener listener) {

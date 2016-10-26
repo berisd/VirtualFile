@@ -14,30 +14,25 @@ import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.provider.operation.CopyListener;
-import at.beris.virtualfile.provider.operation.CopyOperation;
-import at.beris.virtualfile.provider.operation.CustomFileOperation;
-import at.beris.virtualfile.provider.operation.FileOperation;
+import at.beris.virtualfile.provider.operation.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
 public abstract class AbstractFileOperationProvider<CLIENT> implements FileOperationProvider {
+
+    protected static final Set<FileOperation> BASIC_FILE_OPERATIONS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(FileOperation.values())));
+
     protected VirtualFileContext fileContext;
     protected CLIENT client;
     protected Set<FileOperation> supportedOperations;
-    protected Map<FileOperation, CustomFileOperation> customFileOperationMap;
-
-    protected static final Set<FileOperation> BASIC_FILE_OPERATIONS = createBasicOperations();
 
     public AbstractFileOperationProvider(VirtualFileContext fileContext, CLIENT client) {
         super();
         this.fileContext = fileContext;
         this.client = client;
         this.supportedOperations = BASIC_FILE_OPERATIONS;
-        this.customFileOperationMap = new HashMap<>();
-        customFileOperationMap.put(FileOperation.COPY, new CopyOperation(fileContext, this));
     }
 
     @Override
@@ -116,8 +111,13 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
     }
 
     @Override
-    public void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
-        ((CustomFileOperation<Void, Void>) customFileOperationMap.get(FileOperation.COPY)).execute(sourceFile, targetFile, listener, (Void) null);
+    public Long copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
+        return new CopyOperation(fileContext, this).execute(sourceFile, targetFile, listener);
+    }
+
+    @Override
+    public CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, CompareListener listener) {
+        return new CompareOperation(fileContext, this).execute(sourceFile, targetFile, listener);
     }
 
     @Override
@@ -126,30 +126,6 @@ public abstract class AbstractFileOperationProvider<CLIENT> implements FileOpera
         client = null;
         supportedOperations.clear();
         supportedOperations = null;
-        customFileOperationMap.clear();
-        customFileOperationMap = null;
     }
 
-    private static Set<FileOperation> createBasicOperations() {
-        Set<FileOperation> operations = new HashSet<>();
-        operations.add(FileOperation.ADD_ATTRIBUTES);
-        operations.add(FileOperation.CHECKSUM);
-        operations.add(FileOperation.COPY);
-        operations.add(FileOperation.CREATE);
-        operations.add(FileOperation.DELETE);
-        operations.add(FileOperation.EXISTS);
-        operations.add(FileOperation.GET_INPUT_STREAM);
-        operations.add(FileOperation.GET_OUTPUT_STREAM);
-        operations.add(FileOperation.LIST);
-        operations.add(FileOperation.REMOVE_ATTRIBUTES);
-        operations.add(FileOperation.SET_ACL);
-        operations.add(FileOperation.SET_ATTRIBUTES);
-        operations.add(FileOperation.SET_CREATION_TIME);
-        operations.add(FileOperation.SET_GROUP);
-        operations.add(FileOperation.SET_LAST_ACCESS_TIME);
-        operations.add(FileOperation.SET_LAST_MODIFIED_TIME);
-        operations.add(FileOperation.SET_OWNER);
-        operations.add(FileOperation.UPDATE_MODEL);
-        return operations;
-    }
 }

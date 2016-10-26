@@ -13,6 +13,8 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.FileOperationProvider;
+import at.beris.virtualfile.provider.operation.CompareListener;
+import at.beris.virtualfile.provider.operation.CompareResult;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.provider.operation.FileOperation;
 
@@ -130,8 +132,13 @@ public class FileOperationProviderMock implements FileOperationProvider {
     }
 
     @Override
-    public void copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
+    public Long copy(VirtualFile sourceFile, VirtualFile targetFile, CopyListener listener) {
+        return 0L;
+    }
 
+    @Override
+    public CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, CompareListener listener) {
+        return null;
     }
 
     @Override

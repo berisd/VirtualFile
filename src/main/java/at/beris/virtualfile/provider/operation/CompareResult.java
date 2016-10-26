@@ -9,8 +9,12 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.VirtualFile;
+public class CompareResult {
+    private boolean isEqual;
 
-public interface CustomFileOperation<T, P> {
-    T execute(VirtualFile source, VirtualFile target, Listener listener, P... params);
+    public boolean isEqual() {
+        return isEqual;
+    }
+
+    //TODO Implement Differences. Left and Right side. what has been added, deleted, modified.
 }

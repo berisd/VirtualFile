@@ -12,6 +12,8 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.filter.Filter;
+import at.beris.virtualfile.provider.operation.CompareListener;
+import at.beris.virtualfile.provider.operation.CompareResult;
 import at.beris.virtualfile.provider.operation.CopyListener;
 
 import java.io.File;
@@ -36,13 +38,13 @@ public interface VirtualFile extends DisposableObject {
 
     Byte[] checksum();
 
-    void copy(VirtualFile targetFile);
+    Long copy(VirtualFile targetFile);
 
-    void copy(VirtualFile targetFile, CopyListener listener);
+    Long copy(VirtualFile targetFile, CopyListener listener);
 
-    void compare(VirtualFile targetFile);
+    CompareResult compare(VirtualFile targetFile);
 
-    //TODO Add compare method with a CompareListener
+    CompareResult compare(VirtualFile targetFile, CompareListener listener);
 
     void compress();
 

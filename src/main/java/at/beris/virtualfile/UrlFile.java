@@ -15,6 +15,8 @@ import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.provider.FileOperationProvider;
+import at.beris.virtualfile.provider.operation.CompareListener;
+import at.beris.virtualfile.provider.operation.CompareResult;
 import at.beris.virtualfile.provider.operation.CopyListener;
 import at.beris.virtualfile.util.FileUtils;
 import org.apache.tika.detect.DefaultDetector;
@@ -473,22 +475,39 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public void copy(VirtualFile targetFile) {
+    public Long copy(VirtualFile targetFile) {
         logger.info("Copy {} to {}", this, targetFile);
         checkModel();
-        fileOperationProvider.copy(this, targetFile, null);
+        Long filesCopied = fileOperationProvider.copy(this, targetFile, null);
+        logger.debug("Returns: {}", filesCopied);
+        return filesCopied;
     }
 
     @Override
-    public void copy(VirtualFile targetFile, CopyListener listener) {
+    public Long copy(VirtualFile targetFile, CopyListener listener) {
         logger.info("Copy {} to {} with Listener", this, targetFile);
         checkModel();
-        fileOperationProvider.copy(this, targetFile, listener);
+        Long filesCopied = fileOperationProvider.copy(this, targetFile, listener);
+        logger.debug("Returns: {}", filesCopied);
+        return filesCopied;
     }
 
     @Override
-    public void compare(VirtualFile targetFile) {
-        throw new NotImplementedException();
+    public CompareResult compare(VirtualFile targetFile) {
+        logger.info("Compare {} with {}", this, targetFile);
+        checkModel();
+        CompareResult result = fileOperationProvider.compare(this, targetFile, null);
+        logger.debug("Returns: equal={}", result.isEqual());
+        return result;
+    }
+
+    @Override
+    public CompareResult compare(VirtualFile targetFile, CompareListener listener) {
+        logger.info("Compare {} with {} with Listener", this, targetFile);
+        checkModel();
+        CompareResult result = fileOperationProvider.compare(this, targetFile, listener);
+        logger.debug("Returns: equal={}", result.isEqual());
+        return result;
     }
 
     @Override

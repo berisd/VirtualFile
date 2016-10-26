@@ -73,7 +73,8 @@ public class SamplesTest {
     @Test
     public void copyFileToDirectory() {
         VirtualFile file = FileManager.newFile("sftp://sshtest:" + FileTestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
-        file.copy(FileManager.newLocalFile("."));
+        Long filesCopied = file.copy(FileManager.newLocalFile("."));
+        Assert.assertEquals(Long.valueOf(1), filesCopied);
         VirtualFile copiedFile = FileManager.newLocalFile("dokuwiki-stable.tgz");
         Assert.assertArrayEquals(file.checksum(), copiedFile.checksum());
         copiedFile.delete();

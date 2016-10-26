@@ -14,6 +14,7 @@ public enum FileOperation {
     CHECKSUM,
     COPY,
     CREATE,
+    COMPARE,
     DELETE,
     EXISTS,
     EXTRACT,
