@@ -3,8 +3,17 @@ Userfriendly URL based file management library for Java 8.<br/>
 Supported protocols: local, ftp, sftp.<br/>
 Supported archives: zip, tar, 7zip.
 
+## Building the project ##
+VirtualFile is built using Apache Maven.<br/>
+Change to the VirtualFile directory (containing the pom.xml) and type:<br/>
+```mvn clean install```<br/>
+
+You can generate the Java API docs with:<br/>
+```mvn javadoc:jar```<br/>
+
 Note on building project:<br/>
-I'm developing on Linux, sometimes not all tests pass on Windows.
+I'm developing on Linux, sometimes not all tests pass on Windows.<br/>
+The switch ```-Drunintegrationtests=true``` will run IntegrationTests which reqire a special setup that currently only exists on my PC.
 
 ## Examples ##
 
