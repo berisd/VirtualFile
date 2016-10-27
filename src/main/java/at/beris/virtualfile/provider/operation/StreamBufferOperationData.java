@@ -13,15 +13,17 @@ import java.io.InputStream;
 
 import static at.beris.virtualfile.provider.operation.AbstractFileOperation.COPY_BUFFER_SIZE;
 
-class StreamBufferOperationData<T> {
-    InputStream sourceStream;
-    T targetStream;
-    FileOperationListener listener;
-    byte[] buffer;
-    int bytesRead;
-    long fileSize;
-    long bytesWrittenBlock;
-    long BytesWrittenTotal;
+class StreamBufferOperationData<T, R> {
+    private InputStream sourceStream;
+    private T targetStream;
+    private FileOperationListener listener;
+    private byte[] sourceBuffer;
+    private byte[] targetBuffer;
+    private int sourceBytesRead;
+    private long fileSize;
+    private long bytesProcessedBuffer;
+    private long bytesProcessedTotal;
+    private R result;
 
 
     public StreamBufferOperationData(InputStream sourceStream, T targetStream, long fileSize, FileOperationListener listener) {
@@ -29,7 +31,8 @@ class StreamBufferOperationData<T> {
         this.targetStream = targetStream;
         this.fileSize = fileSize;
         this.listener = listener;
-        this.buffer = new byte[COPY_BUFFER_SIZE];
+        this.sourceBuffer = new byte[COPY_BUFFER_SIZE];
+        this.targetBuffer = new byte[COPY_BUFFER_SIZE];
     }
 
     public InputStream getSourceStream() {
@@ -44,39 +47,51 @@ class StreamBufferOperationData<T> {
         return listener;
     }
 
-    public void setBuffer(byte[] buffer) {
-        this.buffer = buffer;
+    public void setSourceBuffer(byte[] sourceBuffer) {
+        this.sourceBuffer = sourceBuffer;
     }
 
-    public void setBytesRead(int bytesRead) {
-        this.bytesRead = bytesRead;
+    public void setSourceBytesRead(int sourceBytesRead) {
+        this.sourceBytesRead = sourceBytesRead;
     }
 
     public long getFileSize() {
         return fileSize;
     }
 
-    public byte[] getBuffer() {
-        return buffer;
+    public byte[] getSourceBuffer() {
+        return sourceBuffer;
     }
 
-    public int getBytesRead() {
-        return bytesRead;
+    public int getSourceBytesRead() {
+        return sourceBytesRead;
     }
 
-    public long getBytesWrittenBlock() {
-        return bytesWrittenBlock;
+    public long getBytesProcessedBuffer() {
+        return bytesProcessedBuffer;
     }
 
-    public void setBytesWrittenBlock(long bytesWrittenBlock) {
-        this.bytesWrittenBlock = bytesWrittenBlock;
+    public void setBytesProcessedBuffer(long bytesProcessedBuffer) {
+        this.bytesProcessedBuffer = bytesProcessedBuffer;
     }
 
-    public long getBytesWrittenTotal() {
-        return BytesWrittenTotal;
+    public long getBytesProcessedTotal() {
+        return bytesProcessedTotal;
     }
 
-    public void setBytesWrittenTotal(long bytesWrittenTotal) {
-        BytesWrittenTotal = bytesWrittenTotal;
+    public void setBytesProcessedTotal(long bytesProcessedTotal) {
+        this.bytesProcessedTotal = bytesProcessedTotal;
+    }
+
+    public byte[] getTargetBuffer() {
+        return targetBuffer;
+    }
+
+    public R getResult() {
+        return result;
+    }
+
+    public void setResult(R result) {
+        this.result = result;
     }
 }

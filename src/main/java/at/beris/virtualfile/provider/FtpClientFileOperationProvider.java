@@ -138,6 +138,16 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     }
 
     @Override
+    public void rename(FileModel model, String newName) {
+        throw new OperationNotSupportedException();
+    }
+
+    @Override
+    public void move(FileModel model, VirtualFile targetFile) {
+        throw new OperationNotSupportedException();
+    }
+
+    @Override
     public boolean isReadable(FileModel model) {
         throw new OperationNotSupportedException();
     }

@@ -21,10 +21,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.function.Consumer;
 
-public class CopyOperation extends AbstractFileOperation<Integer> {
+public class CopyOperation extends AbstractFileOperation<OutputStream, Integer, Boolean> {
 
     public CopyOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
+        fileOperationResult = 0;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class CopyOperation extends AbstractFileOperation<Integer> {
             target = fileContext.newFile(UrlUtils.newUrl(target.getUrl(), source.getName()));
         CopyFileIterationLogic iterationLogic = new CopyFileIterationLogic(source, target, listener);
         iterateFilesRecursively(iterationLogic);
-        return iterationLogic.getFilesProcessed();
+        return fileOperationResult;
     }
 
     private class CopyFileIterationLogic extends FileIterationLogic<FileOperationListener> {
@@ -48,26 +49,37 @@ public class CopyOperation extends AbstractFileOperation<Integer> {
         @Override
         public void executeOperation() {
             copyFile(source, target, listener);
+            calculateFileOperationResult();
         }
 
         private void copyFile(VirtualFile source, VirtualFile target, FileOperationListener listener) {
-            try (InputStream inputStream = source.getInputStream(); OutputStream outputStream = target.getOutputStream()) {
-                processStreams(new StreamBufferOperationData<>(inputStream, outputStream, source.getSize(), listener), new CopyStreamBufferOperation());
+            try (InputStream sourceStream = source.getInputStream(); OutputStream targetStream = target.getOutputStream()) {
+                processStreams(new StreamBufferOperationData<>(sourceStream, targetStream, source.getSize(), listener), new CopyStreamBufferOperation());
             } catch (IOException e) {
                 throw new VirtualFileException(e);
             }
         }
+
+        private void calculateFileOperationResult() {
+            Boolean isFileCopySuccessful = true;
+            for (Boolean streamBufferOperationResult : streamBufferOperationResultList) {
+                isFileCopySuccessful &= streamBufferOperationResult;
+            }
+
+            if (isFileCopySuccessful)
+                fileOperationResult++;
+        }
     }
 
-    private class CopyStreamBufferOperation implements Consumer<StreamBufferOperationData<OutputStream>> {
+    private class CopyStreamBufferOperation implements Consumer<StreamBufferOperationData<OutputStream, Boolean>> {
 
         @Override
-        public void accept(StreamBufferOperationData<OutputStream> data) {
+        public void accept(StreamBufferOperationData<OutputStream, Boolean> data) {
             try {
-                data.getTargetStream().write(data.getBuffer(), 0, data.getBytesRead());
-                data.setBytesWrittenBlock(data.getBytesRead());
-                data.setBytesWrittenTotal(data.getBytesWrittenTotal() + data.getBytesWrittenBlock());
+                data.setResult(true);
+                data.getTargetStream().write(data.getSourceBuffer(), 0, data.getSourceBytesRead());
             } catch (IOException e) {
+                data.setResult(false);
                 throw new VirtualFileException(e);
             }
         }

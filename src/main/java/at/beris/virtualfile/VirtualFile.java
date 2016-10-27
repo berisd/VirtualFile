@@ -12,7 +12,6 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.provider.operation.CompareResult;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
 
 import java.io.File;
@@ -41,9 +40,9 @@ public interface VirtualFile extends DisposableObject {
 
     Integer copy(VirtualFile targetFile, FileOperationListener listener);
 
-    CompareResult compare(VirtualFile targetFile);
+    Boolean compare(VirtualFile targetFile);
 
-    CompareResult compare(VirtualFile targetFile, FileOperationListener listener);
+    Boolean compare(VirtualFile targetFile, FileOperationListener listener);
 
     void compress();
 
@@ -142,6 +141,8 @@ public interface VirtualFile extends DisposableObject {
      */
     List<VirtualFile> list(Filter filter);
 
+    void move(VirtualFile target);
+
     /**
      * Updates the model with information from the physical file
      */
@@ -149,6 +150,8 @@ public interface VirtualFile extends DisposableObject {
 
     //TODO use Set instead of Varargs
     void removeAttributes(FileAttribute... attributes);
+
+    void rename(String newName);
 
     void setAcl(List<AclEntry> acl);
 

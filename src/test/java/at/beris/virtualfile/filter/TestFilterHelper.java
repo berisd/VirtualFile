@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ import java.util.List;
 public class TestFilterHelper {
     private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
 
-    public static List<VirtualFile> createFiles(String rootDir) throws Exception {
+    public static List<VirtualFile> createFiles(String rootDir) {
         List<VirtualFile> fileList = new ArrayList<>();
         String dataString = "0123456789ABCDEF";
 
@@ -50,6 +52,8 @@ public class TestFilterHelper {
                 fileList.add(file);
             } catch (AccessDeniedException e) {
                 LOGGER.warn("Permission denied - " + file.toString());
+            } catch (IOException | URISyntaxException e) {
+                throw new RuntimeException(e);
             }
         }
 

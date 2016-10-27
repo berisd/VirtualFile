@@ -20,6 +20,7 @@ import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
+import at.beris.virtualfile.util.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -283,6 +284,30 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     @Override
     public List<VirtualFile> extract(FileModel model, VirtualFile target) {
         throw new OperationNotSupportedException();
+    }
+
+    @Override
+    public void rename(FileModel model, String newName) {
+        try {
+            URL sourceUrl = model.getUrl();
+            File sourceFile = new File(sourceUrl.toURI());
+            URL targetUrl = UrlUtils.newUrl(UrlUtils.getParentUrl(sourceUrl), newName);
+            File targetFile = new File(targetUrl.toURI());
+            Files.move(sourceFile.toPath(), targetFile.toPath());
+        } catch (URISyntaxException | IOException e) {
+            throw new VirtualFileException(e);
+        }
+    }
+
+    @Override
+    public void move(FileModel model, VirtualFile file) {
+        try {
+            File sourceFile = new File(model.getUrl().toURI());
+            File targetFile = new File(file.getUrl().toURI());
+            Files.move(sourceFile.toPath(), targetFile.toPath());
+        } catch (URISyntaxException | IOException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     @Override

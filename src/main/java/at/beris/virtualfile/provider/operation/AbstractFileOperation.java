@@ -18,19 +18,25 @@ import at.beris.virtualfile.provider.FileOperationProvider;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class AbstractFileOperation<R> {
+public abstract class AbstractFileOperation<T, R, RB> {
 
     public final static int COPY_BUFFER_SIZE = 1024 * 16;
 
     protected VirtualFileContext fileContext;
     protected FileOperationProvider fileOperationProvider;
 
+    protected R fileOperationResult;
+    protected List<RB> streamBufferOperationResultList;
+
     public AbstractFileOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super();
         this.fileContext = fileContext;
         this.fileOperationProvider = fileOperationProvider;
+        this.streamBufferOperationResultList = new ArrayList<>();
     }
 
     public R execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
@@ -60,17 +66,21 @@ public abstract class AbstractFileOperation<R> {
         iterationLogic.getTarget().refresh();
     }
 
-    protected <T> void processStreams(StreamBufferOperationData streamBufferOperationData, Consumer<StreamBufferOperationData<T>> consumer) throws IOException {
+    protected void processStreams(StreamBufferOperationData<T, RB> data, Consumer<StreamBufferOperationData<T, RB>> consumer) throws IOException {
         byte[] buffer = new byte[COPY_BUFFER_SIZE];
-        streamBufferOperationData.setBuffer(buffer);
+        data.setSourceBuffer(buffer);
         int bytesRead;
 
-        while ((bytesRead = streamBufferOperationData.getSourceStream().read(buffer)) > 0) {
-            streamBufferOperationData.setBytesRead(bytesRead);
-            consumer.accept(streamBufferOperationData);
-            if (streamBufferOperationData.getListener() != null) {
-                streamBufferOperationData.getListener().afterStreamBufferProcessed(streamBufferOperationData.getFileSize(), streamBufferOperationData.getBytesWrittenBlock(), streamBufferOperationData.getBytesWrittenTotal());
-                if (streamBufferOperationData.getListener().interrupt())
+        while ((bytesRead = data.getSourceStream().read(buffer)) > 0) {
+            data.setSourceBytesRead(bytesRead);
+            consumer.accept(data);
+            data.setBytesProcessedBuffer(data.getSourceBytesRead());
+            data.setBytesProcessedTotal(data.getBytesProcessedTotal() + data.getBytesProcessedBuffer());
+            streamBufferOperationResultList.add(data.getResult());
+
+            if (data.getListener() != null) {
+                data.getListener().afterStreamBufferProcessed(data.getFileSize(), data.getBytesProcessedBuffer(), data.getBytesProcessedTotal());
+                if (data.getListener().interrupt())
                     break;
             }
         }

@@ -11,6 +11,7 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
+import at.beris.virtualfile.filter.TestFilterHelper;
 import at.beris.virtualfile.os.OsFamily;
 import at.beris.virtualfile.util.OsUtils;
 import at.beris.virtualfile.util.UrlUtils;
@@ -22,12 +23,16 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static at.beris.virtualfile.FileTestHelper.*;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class LocalUnixFileTest extends AbstractUrlFileTest {
@@ -65,6 +70,68 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
     @Test
     public void copyDirectory() throws IOException, URISyntaxException {
         super.copyDirectory();
+    }
+
+    @Test
+    public void compareFileEqual() throws IOException {
+        String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
+        Files.write(Paths.get(TEST_SOURCE_FILE_NAME), msg.getBytes());
+        Files.write(Paths.get(TEST_TARGET_FILE_NAME), msg.getBytes());
+        VirtualFile sourceFile = getFileContext().newFile(sourceFileUrl);
+        VirtualFile targetFile = getFileContext().newFile(targetFileUrl);
+        assertTrue(sourceFile.compare(targetFile));
+    }
+
+    @Test
+    public void compareFileNotEqual() throws IOException {
+        String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
+        Files.write(Paths.get(TEST_SOURCE_FILE_NAME), msg.getBytes());
+        msg = "xyzfsjhusdfuijfdsuidfsuidfsuifxyzijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
+        Files.write(Paths.get(TEST_TARGET_FILE_NAME), msg.getBytes());
+        VirtualFile sourceFile = getFileContext().newFile(sourceFileUrl);
+        VirtualFile targetFile = getFileContext().newFile(targetFileUrl);
+        assertFalse(sourceFile.compare(targetFile));
+    }
+
+    @Test
+    @Ignore
+    public void compareDirectoryEqual() throws IOException {
+        List<VirtualFile> sourceFileList = TestFilterHelper.createFiles(TEST_SOURCE_DIRECTORY_NAME);
+        List<VirtualFile> targetFileList = TestFilterHelper.createFiles(TEST_TARGET_DIRECTORY_NAME);
+
+        String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
+        Files.write(sourceFileList.get(1).asFile().toPath(), msg.getBytes());
+        Files.write(targetFileList.get(1).asFile().toPath(), msg.getBytes());
+        Files.write(sourceFileList.get(2).asFile().toPath(), msg.getBytes());
+        msg = "xyzfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
+        Files.write(targetFileList.get(2).asFile().toPath(), msg.getBytes());
+        targetFileList.get(3).rename("subdirnew");
+
+        sourceFileList.get(0).compare(targetFileList.get(0));
+    }
+
+    @Test
+    public void rename() {
+        VirtualFile sourceFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile targetFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
+        sourceFile.create();
+        assertTrue(sourceFile.exists());
+        assertFalse(targetFile.exists());
+        sourceFile.rename(TEST_TARGET_FILE_NAME);
+        assertFalse(sourceFile.exists());
+        assertTrue(targetFile.exists());
+    }
+
+    @Test
+    public void move() {
+        VirtualFile sourceFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile targetFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
+        sourceFile.create();
+        assertTrue(sourceFile.exists());
+        assertFalse(targetFile.exists());
+        sourceFile.move(targetFile);
+        assertFalse(sourceFile.exists());
+        assertTrue(targetFile.exists());
     }
 
     @Test

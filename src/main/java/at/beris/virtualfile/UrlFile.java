@@ -15,7 +15,6 @@ import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.provider.FileOperationProvider;
-import at.beris.virtualfile.provider.operation.CompareResult;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
 import at.beris.virtualfile.util.FileUtils;
 import org.apache.tika.detect.DefaultDetector;
@@ -424,6 +423,13 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
+    public void rename(String newName) {
+        logger.info("Rename {} to {}", this, newName);
+        checkModel();
+        fileOperationProvider.rename(model, newName);
+    }
+
+    @Override
     public List<VirtualFile> find(Filter filter) {
         logger.info("Find children for {} with filter {}", this, filter);
         checkModel();
@@ -465,6 +471,13 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
+    public void move(VirtualFile target) {
+        logger.info("Move {} to {}", this, target);
+        checkModel();
+        fileOperationProvider.move(model, target);
+    }
+
+    @Override
     public boolean isArchive() {
         logger.debug("Check isArchive for {}", this);
         checkModel();
@@ -492,20 +505,20 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
-    public CompareResult compare(VirtualFile targetFile) {
+    public Boolean compare(VirtualFile targetFile) {
         logger.info("Compare {} with {}", this, targetFile);
         checkModel();
-        CompareResult result = fileOperationProvider.compare(this, targetFile, null);
-        logger.debug("Returns: equal={}", result.isEqual());
+        Boolean result = fileOperationProvider.compare(this, targetFile, null);
+        logger.debug("Returns: equal={}", result);
         return result;
     }
 
     @Override
-    public CompareResult compare(VirtualFile targetFile, FileOperationListener listener) {
+    public Boolean compare(VirtualFile targetFile, FileOperationListener listener) {
         logger.info("Compare {} with {} with FileOperationListener", this, targetFile);
         checkModel();
-        CompareResult result = fileOperationProvider.compare(this, targetFile, listener);
-        logger.debug("Returns: equal={}", result.isEqual());
+        Boolean result = fileOperationProvider.compare(this, targetFile, listener);
+        logger.debug("Returns: equal={}", result);
         return result;
     }
 

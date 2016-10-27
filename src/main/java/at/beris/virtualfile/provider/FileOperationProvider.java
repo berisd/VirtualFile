@@ -13,7 +13,6 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.provider.operation.CompareResult;
 import at.beris.virtualfile.provider.operation.FileOperation;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
 
@@ -82,9 +81,13 @@ public interface FileOperationProvider extends DisposableObject {
 
     void removeAttributes(FileModel model);
 
+    void rename(FileModel model, String newName);
+
+    void move(FileModel model, VirtualFile targetFile);
+
     Integer copy(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener);
 
-    CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener);
+    Boolean compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener);
 
     void dispose();
 

@@ -11,9 +11,9 @@ package at.beris.virtualfile.mock;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.FileOperationProvider;
-import at.beris.virtualfile.provider.operation.CompareResult;
 import at.beris.virtualfile.provider.operation.FileOperation;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
 
@@ -131,12 +131,22 @@ public class FileOperationProviderMock implements FileOperationProvider {
     }
 
     @Override
+    public void rename(FileModel model, String newName) {
+
+    }
+
+    @Override
+    public void move(FileModel model, VirtualFile targetFile) {
+        throw new OperationNotSupportedException();
+    }
+
+    @Override
     public Integer copy(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
         return 0;
     }
 
     @Override
-    public CompareResult compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
+    public Boolean compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
         return null;
     }
 
