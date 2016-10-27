@@ -65,7 +65,7 @@ public class FileCacheTest {
         }
 
         Assert.assertEquals(91, fileCache.size());
-        verify(callbackHandlerMock, times(10)).beforeEntryRemoved(any(VirtualFile.class));
+        verify(callbackHandlerMock, times(10)).afterEntryPurged(any(VirtualFile.class));
         assertOldestEntriesNotExist();
         newestNewestEntriesExist();
     }

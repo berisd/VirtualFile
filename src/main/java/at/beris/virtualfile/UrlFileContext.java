@@ -90,7 +90,7 @@ class UrlFileContext implements VirtualFileContext {
             String pathUrlString = UrlUtils.getSiteUrlString(normalizedUrl.toString()) + stringBuilder.toString();
             try {
                 URL pathUrl = UrlUtils.normalizeUrl(new URL(pathUrlString));
-                file = fileCache.get(pathUrl);
+                file = fileCache.get(pathUrl.toString());
                 if (file == null) {
                     file = createFile(pathUrl);
                     fileCache.put(pathUrl.toString(), file);
@@ -122,7 +122,6 @@ class UrlFileContext implements VirtualFileContext {
     public void dispose(VirtualFile file) {
         LOGGER.debug("dispose (file : {})", file);
         removeEntriesByValueFromMap(fileToParentFileMap, file);
-        fileToParentFileMap.remove(file.getUrl().toString());
         fileCache.remove(file.getUrl().toString());
         file.dispose();
     }
@@ -268,8 +267,8 @@ class UrlFileContext implements VirtualFileContext {
     private class CustomFileCacheCallbackHandlerHandler implements FileCacheCallbackHandler {
 
         @Override
-        public void beforeEntryRemoved(VirtualFile value) {
-            removeEntriesByValueFromMap(fileToParentFileMap, value);
+        public void afterEntryPurged(VirtualFile file) {
+            dispose(file);
         }
     }
 }

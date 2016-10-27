@@ -9,69 +9,34 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.cache.FileCache;
+import at.beris.virtualfile.config.Configurator;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.security.MessageDigest;
-import java.util.Date;
-
-import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
-import static org.junit.Assert.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class UrlFileContextTest {
-    public final static String TEST_SOURCE_FILE_NAME = "testfile1.txt";
-    public final static long TEST_SOURCE_FILE_SIZE = COPY_BUFFER_SIZE + 10;
 
+    private UrlFileContext fileContext;
+
+    @Before
+    public void beforeTestCase() {
+        Configurator configurator = new Configurator();
+        configurator.getContextConfiguration().setFileCacheSize(10);
+        fileContext = new UrlFileContext(configurator, new FileCache(10));
+    }
 
     @Test
-    public void createLocalFile() throws Exception {
-        File sourceFile = createFile();
-        byte[] checkSumBytes = generate_checksum(sourceFile);
-
-        Byte[] expectedChecksum = new Byte[checkSumBytes.length];
-        for (int i = 0; i < checkSumBytes.length; i++)
-            expectedChecksum[i] = checkSumBytes[i];
-
-        VirtualFile file = FileManager.newFile(new File(TEST_SOURCE_FILE_NAME).toURI().toURL());
-        assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
-        assertEquals(TEST_SOURCE_FILE_SIZE, file.getSize());
-        Assert.assertFalse(file.isDirectory());
-        assertEquals(sourceFile.getAbsolutePath(), file.getPath());
-        assertTrue(FileTestHelper.isDateClose(new Date(file.getLastModifiedTime().toMillis()), new Date(), 60));
-        assertNotNull(file.getParent());
-        Assert.assertArrayEquals(expectedChecksum, file.checksum());
-        Assert.assertFalse(file.isArchive());
-//        Assert.assertFalse(file.isArchived());
-        file.delete();
-    }
-
-
-    private File createFile() throws IOException {
-        File file = new File(TEST_SOURCE_FILE_NAME);
-
-        StringBuilder dataString = new StringBuilder("t");
-
-        while (dataString.length() < TEST_SOURCE_FILE_SIZE)
-            dataString.append("t");
-
-        Files.write(file.toPath(), dataString.toString().getBytes());
-//        Files.setLastModifiedTime(file.toPath(), FileTime.fromMillis(new Date().getTime()));
-        return file;
-    }
-
-    private byte[] generate_checksum(File file) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("SHA1");
-        FileInputStream fis = new FileInputStream(file.getPath());
-        byte[] dataBytes = new byte[1024];
-
-        int nread = 0;
-        while ((nread = fis.read(dataBytes)) != -1) {
-            md.update(dataBytes, 0, nread);
-        }
-        return md.digest();
+    public void getParentFile() throws MalformedURLException {
+        fileContext.newFile(new URL("file:/this/is/a/file/test"));
+        VirtualFile parentFile1 = fileContext.newFile(new URL("file:/this/"));
+        VirtualFile parentFile2 = fileContext.newFile(new URL("file:/this/is/")).getParent();
+        Assert.assertSame(parentFile1, parentFile2);
+        fileContext.newFile(new URL("file:/this/here/is/another/file/test"));
+        VirtualFile parentFile3 = fileContext.newFile(new URL("file:/this/"));
+        Assert.assertNotSame(parentFile1, parentFile3);
     }
 }

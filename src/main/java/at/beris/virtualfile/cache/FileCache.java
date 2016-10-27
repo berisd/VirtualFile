@@ -41,7 +41,7 @@ public class FileCache {
         return value;
     }
 
-    public VirtualFile remove(Object key) {
+    public VirtualFile remove(String key) {
         return cacheMap.remove(key);
     }
 
@@ -49,7 +49,7 @@ public class FileCache {
         return cacheMap.size();
     }
 
-    public VirtualFile get(Object key) {
+    public VirtualFile get(String key) {
         return cacheMap.get(key);
     }
 
@@ -58,18 +58,7 @@ public class FileCache {
     }
 
     private void createMap() {
-        cacheMap = new LinkedHashMap<String, VirtualFile>(capacity, loadFactor) {
-            private static final long serialVersionUID = 1;
-
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<String, VirtualFile> eldest) {
-                boolean isCacheFull = size() > FileCache.this.maxSize;
-                if (isCacheFull) {
-                    callbackHandler.beforeEntryRemoved(eldest.getValue());
-                }
-                return isCacheFull;
-            }
-        };
+        cacheMap = new LinkedHashMap<>(capacity, loadFactor);
     }
 
     public void setMaxSize(int maxSize) {
@@ -109,9 +98,8 @@ public class FileCache {
             Map.Entry<String, VirtualFile> entry = it.next();
             VirtualFile file = entry.getValue();
             if (numOfEntriesPurged < numOfEntriesToPurge) {
-                callbackHandler.beforeEntryRemoved(file);
-                file.dispose();
                 it.remove();
+                callbackHandler.afterEntryPurged(file);
                 numOfEntriesPurged++;
             }
         }
