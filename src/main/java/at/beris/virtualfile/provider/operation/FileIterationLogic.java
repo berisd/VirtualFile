@@ -26,25 +26,11 @@ abstract class FileIterationLogic<L extends FileOperationListener> {
     }
 
     public void executeIteration() {
-        createFile = true;
-        if (target.exists()) {
-            if (listener != null)
-                createFile = listener.fileExists(target);
-        }
-
-        if (createFile) {
-            if (source.isDirectory()) {
-                if (!target.exists()) {
-                    target.create();
-                }
-            } else {
-                if (listener != null)
-                    listener.startProcessingFile(source, filesProcessed + 1);
-                executeOperation();
-                if (listener != null)
-                    listener.finishedProcessingFile(source);
-            }
-        }
+        if (listener != null)
+            listener.startProcessingFile(source, filesProcessed + 1);
+        executeOperation();
+        if (listener != null)
+            listener.finishedProcessingFile(source);
         filesProcessed++;
     }
 

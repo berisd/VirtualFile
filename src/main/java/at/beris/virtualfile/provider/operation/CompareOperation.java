@@ -23,14 +23,13 @@ public class CompareOperation extends AbstractFileOperation<InputStream, Boolean
 
     public CompareOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
-        fileOperationResult = false;
+        fileOperationResult = true;
     }
 
     @Override
     public Boolean execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
         super.execute(source, target, listener);
-        CompareFileIterationLogic iterationLogic = new CompareFileIterationLogic(source, target, listener);
-        iterateFilesRecursively(iterationLogic);
+        iterateFilesRecursively(new CompareFileIterationLogic(source, target, listener));
         return fileOperationResult;
     }
 
@@ -42,8 +41,19 @@ public class CompareOperation extends AbstractFileOperation<InputStream, Boolean
 
         @Override
         public void executeOperation() {
-            compareFile(source, target, listener);
-            calculateFileOperationResult();
+            if (source.isDirectory()) {
+                if (target.isDirectory())
+                    fileOperationResult = source.getName().equals(target.getName());
+                else
+                    fileOperationResult = false;
+            } else {
+                if (target.isDirectory())
+                    fileOperationResult = false;
+                else {
+                    compareFile(source, target, listener);
+                    fileOperationResult &= calculateFileOperationResult();
+                }
+            }
         }
 
         private void compareFile(VirtualFile source, VirtualFile target, FileOperationListener listener) {
@@ -54,11 +64,12 @@ public class CompareOperation extends AbstractFileOperation<InputStream, Boolean
             }
         }
 
-        private void calculateFileOperationResult() {
-            fileOperationResult = true;
+        private boolean calculateFileOperationResult() {
+            boolean result = true;
             for (Boolean streamBufferOperationResult : streamBufferOperationResultList) {
-                fileOperationResult &= streamBufferOperationResult;
+                result &= streamBufferOperationResult;
             }
+            return result;
         }
     }
 

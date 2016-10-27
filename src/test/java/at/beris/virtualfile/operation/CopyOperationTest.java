@@ -68,7 +68,7 @@ public class CopyOperationTest {
 
         new CopyOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
 
-        Mockito.verify(listener, times(1)).startProcessingFile(Matchers.any(VirtualFile.class), Matchers.any(Long.class));
+        Mockito.verify(listener, times(3)).startProcessingFile(Matchers.any(VirtualFile.class), Matchers.any(Long.class));
         Mockito.verify(listener, times(1)).afterStreamBufferProcessed(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
     }
 

@@ -124,7 +124,7 @@ public abstract class AbstractUrlFileTest {
         Mockito.when(copyListener.interrupt()).thenReturn(false);
 
         Integer filesCopied = sourceDirectory.copy(targetDirectory, copyListener);
-        Assert.assertEquals(Integer.valueOf(4), filesCopied);
+        Assert.assertEquals(Integer.valueOf(sourceFileUrlList.size()), filesCopied);
         assertDirectory(sourceFileUrlList, targetFileUrlList);
     }
 

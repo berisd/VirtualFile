@@ -94,20 +94,44 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
     }
 
     @Test
-    @Ignore
     public void compareDirectoryEqual() throws IOException {
-        List<VirtualFile> sourceFileList = TestFilterHelper.createFiles(TEST_SOURCE_DIRECTORY_NAME);
-        List<VirtualFile> targetFileList = TestFilterHelper.createFiles(TEST_TARGET_DIRECTORY_NAME);
+        List<VirtualFile> sourceFileList = null;
+        List<VirtualFile> targetFileList = null;
+        try {
+            sourceFileList = TestFilterHelper.createFiles(TEST_SOURCE_DIRECTORY_NAME + "/");
+            targetFileList = TestFilterHelper.createFiles(TEST_TARGET_DIRECTORY_NAME + "/");
 
-        String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
-        Files.write(sourceFileList.get(1).asFile().toPath(), msg.getBytes());
-        Files.write(targetFileList.get(1).asFile().toPath(), msg.getBytes());
-        Files.write(sourceFileList.get(2).asFile().toPath(), msg.getBytes());
-        msg = "xyzfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
-        Files.write(targetFileList.get(2).asFile().toPath(), msg.getBytes());
-        targetFileList.get(3).rename("subdirnew");
+            String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
+            Files.write(sourceFileList.get(1).asFile().toPath(), msg.getBytes());
+            Files.write(targetFileList.get(1).asFile().toPath(), msg.getBytes());
+            Files.write(sourceFileList.get(2).asFile().toPath(), msg.getBytes());
+            Files.write(targetFileList.get(2).asFile().toPath(), msg.getBytes());
+            assertTrue(sourceFileList.get(0).compare(targetFileList.get(0)));
+        } finally {
+            createFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
+            createFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
+        }
+    }
 
-        sourceFileList.get(0).compare(targetFileList.get(0));
+    @Test
+    public void compareDirectoryNotEqual() throws IOException {
+        List<VirtualFile> sourceFileList = null;
+        List<VirtualFile> targetFileList = null;
+        try {
+            sourceFileList = TestFilterHelper.createFiles(TEST_SOURCE_DIRECTORY_NAME + "/");
+            targetFileList = TestFilterHelper.createFiles(TEST_TARGET_DIRECTORY_NAME + "/");
+
+            String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
+            Files.write(sourceFileList.get(1).asFile().toPath(), msg.getBytes());
+            Files.write(targetFileList.get(1).asFile().toPath(), msg.getBytes());
+            Files.write(sourceFileList.get(2).asFile().toPath(), msg.getBytes());
+            msg = "xyzfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
+            Files.write(targetFileList.get(2).asFile().toPath(), msg.getBytes());
+            assertFalse(sourceFileList.get(0).compare(targetFileList.get(0)));
+        } finally {
+            createFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
+            createFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
+        }
     }
 
     @Test

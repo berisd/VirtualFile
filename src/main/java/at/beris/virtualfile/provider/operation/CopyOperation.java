@@ -35,8 +35,7 @@ public class CopyOperation extends AbstractFileOperation<OutputStream, Integer, 
             throw new OperationNotSupportedException("Can't copy directory to a file!");
         if (!source.isDirectory() && target.isDirectory())
             target = fileContext.newFile(UrlUtils.newUrl(target.getUrl(), source.getName()));
-        CopyFileIterationLogic iterationLogic = new CopyFileIterationLogic(source, target, listener);
-        iterateFilesRecursively(iterationLogic);
+        iterateFilesRecursively(new CopyFileIterationLogic(source, target, listener));
         return fileOperationResult;
     }
 
@@ -48,7 +47,21 @@ public class CopyOperation extends AbstractFileOperation<OutputStream, Integer, 
 
         @Override
         public void executeOperation() {
-            copyFile(source, target, listener);
+            boolean createFile = true;
+            if (target.exists()) {
+                if (listener != null)
+                    createFile = listener.fileExists(target);
+            }
+
+            if (createFile) {
+                if (source.isDirectory()) {
+                    if (!target.exists()) {
+                        target.create();
+                    }
+                } else {
+                    copyFile(source, target, listener);
+                }
+            }
             calculateFileOperationResult();
         }
 
