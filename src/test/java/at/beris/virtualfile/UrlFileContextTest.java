@@ -26,7 +26,7 @@ public class UrlFileContextTest {
     public void beforeTestCase() {
         Configurator configurator = new Configurator();
         configurator.getContextConfiguration().setFileCacheSize(10);
-        fileContext = new UrlFileContext(configurator, new FileCache(10));
+        fileContext = new UrlFileContext(configurator);
     }
 
     @Test

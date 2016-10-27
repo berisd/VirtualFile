@@ -47,10 +47,10 @@ class UrlFileContext implements VirtualFileContext {
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
 
     public UrlFileContext() {
-        this(new Configurator(), new FileCache(8 * 1024));
+        this(new Configurator());
     }
 
-    public UrlFileContext(Configurator configurator, FileCache fileCache) {
+    public UrlFileContext(Configurator configurator) {
         UrlUtils.registerProtocolURLStreamHandlers();
 
         this.configurator = configurator;
@@ -58,9 +58,8 @@ class UrlFileContext implements VirtualFileContext {
         this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
 
-        fileCache.setMaxSize(configurator.getContextConfiguration().getFileCacheSize());
+        fileCache = new FileCache(configurator.getContextConfiguration().getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
-        this.fileCache = fileCache;
 
         contentDetector = new DefaultDetector();
     }
