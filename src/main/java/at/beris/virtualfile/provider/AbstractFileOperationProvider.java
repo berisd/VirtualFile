@@ -14,8 +14,8 @@ import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
-import at.beris.virtualfile.provider.operation.CompareOperation;
-import at.beris.virtualfile.provider.operation.CopyOperation;
+import at.beris.virtualfile.provider.operation.CompareFileOperation;
+import at.beris.virtualfile.provider.operation.CopyFileOperation;
 import at.beris.virtualfile.provider.operation.FileOperation;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
 
@@ -115,12 +115,12 @@ public abstract class AbstractFileOperationProvider<C> implements FileOperationP
 
     @Override
     public Integer copy(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
-        return new CopyOperation(fileContext, this).execute(sourceFile, targetFile, listener);
+        return new CopyFileOperation(fileContext, this).execute(sourceFile, targetFile, listener);
     }
 
     @Override
     public Boolean compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
-        return new CompareOperation(fileContext, this).execute(sourceFile, targetFile, listener);
+        return new CompareFileOperation(fileContext, this).execute(sourceFile, targetFile, listener);
     }
 
     @Override

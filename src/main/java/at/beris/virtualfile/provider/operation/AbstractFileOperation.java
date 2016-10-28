@@ -16,20 +16,21 @@ import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
-public abstract class AbstractFileOperation<T, R, RB> {
+public abstract class AbstractFileOperation<RF, RB> {
 
-    public final static int COPY_BUFFER_SIZE = 1024 * 16;
+    public final static int STREAM_BUFFER_SIZE = 1024 * 16;
 
     protected VirtualFileContext fileContext;
     protected FileOperationProvider fileOperationProvider;
+    protected Integer filesProcessed = 0;
 
-    protected R fileOperationResult;
+    protected RF fileOperationResult;
     protected List<RB> streamBufferOperationResultList;
 
     public AbstractFileOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
@@ -39,51 +40,61 @@ public abstract class AbstractFileOperation<T, R, RB> {
         this.streamBufferOperationResultList = new ArrayList<>();
     }
 
-    public R execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    public RF execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
         if (!source.exists())
             throw new VirtualFileException(Message.NO_SUCH_FILE(source.getPath()));
         return null;
     }
 
-    protected void iterateFilesRecursively(FileIterationLogic iterationLogic) {
-        iterationLogic.executeIteration();
-        if (iterationLogic.getSource().isDirectory()) {
-            for (VirtualFile sourceChildFile : iterationLogic.getSource().list()) {
-                iterationLogic.setSource(sourceChildFile);
-                URL targetUrl = iterationLogic.getTarget().getUrl();
+    protected void processFilesRecursively(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+        executeIteration(source, target, listener);
+        if (source.isDirectory()) {
+            for (VirtualFile sourceChildFile : source.list()) {
+                source = sourceChildFile;
+                URL targetUrl = target.getUrl();
                 URL targetChildUrl;
                 try {
                     targetChildUrl = new URL(targetUrl, targetUrl.getFile() + sourceChildFile.getName() + (sourceChildFile.isDirectory() ? "/" : ""));
                 } catch (MalformedURLException e) {
                     throw new VirtualFileException(e);
                 }
-                VirtualFile parentTarget = iterationLogic.getTarget();
-                iterationLogic.setTarget(fileContext.newFile(targetChildUrl));
-                iterateFilesRecursively(iterationLogic);
-                iterationLogic.setTarget(parentTarget);
+                VirtualFile parentTarget = target;
+                target = fileContext.newFile(targetChildUrl);
+                processFilesRecursively(source, target, listener);
+                target = parentTarget;
             }
         }
-        iterationLogic.getTarget().refresh();
+        target.refresh();
     }
 
-    protected void processStreams(StreamBufferOperationData<T, RB> data, Consumer<StreamBufferOperationData<T, RB>> consumer) throws IOException {
-        byte[] buffer = new byte[COPY_BUFFER_SIZE];
-        data.setSourceBuffer(buffer);
-        int bytesRead;
+    protected <SS extends InputStream, TS> void processStreams(SS sourceStream, TS targetStream, long sourceFileSize, FileOperationListener listener, StreamBufferOperation<RB, SS, TS> streamBufferOperation) throws IOException {
 
-        while ((bytesRead = data.getSourceStream().read(buffer)) > 0) {
-            data.setSourceBytesRead(bytesRead);
-            consumer.accept(data);
-            data.setBytesProcessedBuffer(data.getSourceBytesRead());
-            data.setBytesProcessedTotal(data.getBytesProcessedTotal() + data.getBytesProcessedBuffer());
-            streamBufferOperationResultList.add(data.getResult());
+        byte[] sourceBuffer = new byte[STREAM_BUFFER_SIZE];
+        int sourceBytesRead;
+        long bytesProcessedTotal = 0;
 
-            if (data.getListener() != null) {
-                data.getListener().afterStreamBufferProcessed(data.getFileSize(), data.getBytesProcessedBuffer(), data.getBytesProcessedTotal());
-                if (data.getListener().interrupt())
+        while ((sourceBytesRead = sourceStream.read(sourceBuffer)) > 0) {
+            RB result = streamBufferOperation.process(sourceStream, targetStream, sourceBuffer, sourceBytesRead);
+            bytesProcessedTotal += sourceBytesRead;
+            streamBufferOperationResultList.add(result);
+
+            if (listener != null) {
+                listener.afterStreamBufferProcessed(sourceFileSize, sourceBytesRead, bytesProcessedTotal);
+                if (listener.interrupt())
                     break;
             }
         }
     }
+
+    private void executeIteration(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+        if (listener != null)
+            listener.startProcessingFile(source, filesProcessed + 1);
+        executeFileOperation(source, target, listener);
+        if (listener != null)
+            listener.finishedProcessingFile(source);
+        filesProcessed++;
+    }
+
+    abstract protected void executeFileOperation(VirtualFile source, VirtualFile target, FileOperationListener listener);
 
 }

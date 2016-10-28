@@ -12,7 +12,7 @@ package at.beris.virtualfile.operation;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileContext;
 import at.beris.virtualfile.provider.FileOperationProvider;
-import at.beris.virtualfile.provider.operation.CopyOperation;
+import at.beris.virtualfile.provider.operation.CopyFileOperation;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -26,7 +26,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.times;
 
-public class CopyOperationTest {
+public class CopyFileOperationTest {
     @Test
     public void copyFile() throws Exception {
         VirtualFile sourceFile = createSourceFileMock(new URL("file:/source/foo"), false);
@@ -36,7 +36,7 @@ public class CopyOperationTest {
         VirtualFileContext fileContext = Mockito.mock(VirtualFileContext.class);
         FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
 
-        new CopyOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
+        new CopyFileOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
 
         Mockito.verify(listener, times(1)).startProcessingFile(Matchers.any(VirtualFile.class), Matchers.any(Long.class));
         Mockito.verify(listener, times(1)).afterStreamBufferProcessed(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
@@ -66,7 +66,7 @@ public class CopyOperationTest {
 
         FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
 
-        new CopyOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
+        new CopyFileOperation(fileContext, fileOperationProvider).execute(sourceFile, targetFile, listener);
 
         Mockito.verify(listener, times(3)).startProcessingFile(Matchers.any(VirtualFile.class), Matchers.any(Long.class));
         Mockito.verify(listener, times(1)).afterStreamBufferProcessed(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));

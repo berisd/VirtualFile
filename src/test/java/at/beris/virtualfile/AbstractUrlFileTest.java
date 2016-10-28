@@ -38,7 +38,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static at.beris.virtualfile.FileTestHelper.*;
-import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
+import static at.beris.virtualfile.provider.operation.CopyFileOperation.STREAM_BUFFER_SIZE;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 
@@ -236,10 +236,10 @@ public abstract class AbstractUrlFileTest {
         List<Long> bytesCopiedTotalList = bytesCopiedTotalArgumentCaptor.getAllValues();
 
         assertEquals(2, bytesCopiedBlockList.size());
-        assertEquals(COPY_BUFFER_SIZE, bytesCopiedBlockList.get(0).intValue());
-        assertEquals(COPY_BUFFER_SIZE, bytesCopiedTotalList.get(0).intValue());
+        assertEquals(STREAM_BUFFER_SIZE, bytesCopiedBlockList.get(0).intValue());
+        assertEquals(STREAM_BUFFER_SIZE, bytesCopiedTotalList.get(0).intValue());
 
-        assertEquals(TEST_SOURCE_FILE_SIZE % COPY_BUFFER_SIZE, bytesCopiedBlockList.get(1).intValue());
+        assertEquals(TEST_SOURCE_FILE_SIZE % STREAM_BUFFER_SIZE, bytesCopiedBlockList.get(1).intValue());
         assertEquals(TEST_SOURCE_FILE_SIZE, bytesCopiedTotalList.get(1).intValue());
     }
 

@@ -20,14 +20,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static at.beris.virtualfile.provider.operation.CopyOperation.COPY_BUFFER_SIZE;
+import static at.beris.virtualfile.provider.operation.CopyFileOperation.STREAM_BUFFER_SIZE;
 
 public class FileTestHelper {
     public static final String HOME_DIRECTORY = System.getProperty("user.home") + File.separator + ".VirtualFile";
     public static final String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public static final String TEST_TARGET_FILE_NAME = "targetfile1.txt";
     public static final Date TEST_SOURCE_FILE_LAST_MODIFIED = new Date();
-    public static final int TEST_SOURCE_FILE_SIZE = COPY_BUFFER_SIZE + 10;
+    public static final int TEST_SOURCE_FILE_SIZE = STREAM_BUFFER_SIZE + 10;
 
     public static final String TEST_SOURCE_DIRECTORY_NAME = "testdirectory";
     public static final String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory";
@@ -115,7 +115,7 @@ public class FileTestHelper {
                     file.getParentFile().mkdirs();
 
                 index++;
-                while (dataString.length() < COPY_BUFFER_SIZE * index + 10)
+                while (dataString.length() < STREAM_BUFFER_SIZE * index + 10)
                     dataString.append(testString);
 
                 Files.write(file.toPath(), dataString.toString().getBytes());
