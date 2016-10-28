@@ -1,6 +1,6 @@
 # VirtualFile
 Userfriendly URL based file management library for Java 8.<br/>
-Supported protocols: local, ftp, sftp.<br/>
+Supported protocols: local, http, https, ftp, sftp.<br/>
 Supported archives: zip, tar, 7zip.
 
 ## Building the project ##
