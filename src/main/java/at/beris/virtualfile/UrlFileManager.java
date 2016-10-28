@@ -26,7 +26,7 @@ class UrlFileManager implements VirtualFileManager {
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileManager.class);
 
-    private VirtualFileContext fileContext;
+    private UrlFileContext fileContext;
 
     public UrlFileManager() {
         super();

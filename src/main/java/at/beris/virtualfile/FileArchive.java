@@ -22,15 +22,14 @@ class FileArchive implements VirtualArchive {
 
     private VirtualFile file;
 
-    private VirtualFileContext context;
+    private UrlFileContext context;
 
     private ArchiveOperationProvider archiveOperationProvider;
 
-    public FileArchive(VirtualFile file, VirtualFileContext context) {
+    public FileArchive(VirtualFile file, UrlFileContext context) {
         this.file = file;
         this.context = context;
-        //TODO ArchiveOperationProvider muss vom context kommen
-        this.archiveOperationProvider = new ArchiveOperationProvider(context);
+        this.archiveOperationProvider = context.getArchiveOperationProvider();
     }
 
     @Override

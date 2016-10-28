@@ -19,6 +19,7 @@ import at.beris.virtualfile.config.Configurator;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
+import at.beris.virtualfile.provider.ArchiveOperationProvider;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.tika.detect.DefaultDetector;
@@ -45,6 +46,7 @@ class UrlFileContext implements VirtualFileContext {
     private Map<VirtualClient, FileOperationProvider> clientToFileOperationProviderMap;
     private FileCache fileCache;
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
+    private ArchiveOperationProvider archiveOperationProvider;
 
     public UrlFileContext() {
         this(new Configurator());
@@ -57,6 +59,7 @@ class UrlFileContext implements VirtualFileContext {
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
+        this.archiveOperationProvider = new ArchiveOperationProvider(this);
 
         fileCache = new FileCache(configurator.getContextConfiguration().getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
@@ -261,6 +264,10 @@ class UrlFileContext implements VirtualFileContext {
             entry.getValue().dispose();
             it.remove();
         }
+    }
+
+    public ArchiveOperationProvider getArchiveOperationProvider() {
+        return archiveOperationProvider;
     }
 
     private class CustomFileCacheCallbackHandlerHandler implements FileCacheCallbackHandler {
