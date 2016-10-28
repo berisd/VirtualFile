@@ -84,7 +84,8 @@ class UrlFileContext implements VirtualFileContext {
         VirtualFile file = null;
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (String pathPart : fullPath.split("/")) {
+        String[] pathParts = "/".equals(fullPath) ? new String[]{"/"} : fullPath.split("/");
+        for (String pathPart : pathParts) {
             stringBuilder.append(pathPart);
             if (stringBuilder.length() < fullPath.length())
                 stringBuilder.append('/');

@@ -9,7 +9,6 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.cache.FileCache;
 import at.beris.virtualfile.config.Configurator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,5 +37,11 @@ public class UrlFileContextTest {
         fileContext.newFile(new URL("file:/this/here/is/another/file/test"));
         VirtualFile parentFile3 = fileContext.newFile(new URL("file:/this/"));
         Assert.assertNotSame(parentFile1, parentFile3);
+    }
+
+    @Test
+    public void newRootFile() throws MalformedURLException {
+        VirtualFile virtualFile = fileContext.newFile(new URL("file:/"));
+        Assert.assertNotNull(virtualFile);
     }
 }
