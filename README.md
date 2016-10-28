@@ -1,7 +1,16 @@
 # VirtualFile
-Userfriendly URL based file management library for Java 8.<br/>
+Userfriendly URL based file and archive management library for Java 8.<br/>
 Supported protocols: local, http, https, ftp, sftp.<br/>
-Supported archives: zip, tar, 7zip.
+Supported archives: zip, tar, 7zip.<br/>
+###Required libraries###
+Apache Commons Lang v3.4 (String and Array functions)<br/>
+Apache Commons Compress v1.12 (Archivers and Compression)<br/>
+Apache Tika Core v1.13 (Content detection)<br/>
+Simple Logging Facade for Java API v1.7.12 (Logging)<br/>
+### Optional libraries ###
+Apache Commons Net v3.4 (FTP support)<br/>
+JSch - Java Secure Channel v0.1.53 (SFTP support)<br/>
+XZ Utils v1.5 (LZMA Compression)<br/>
 
 ## Building the project ##
 VirtualFile is built using Apache Maven.<br/>
