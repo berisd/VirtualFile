@@ -2,7 +2,7 @@
 Userfriendly URL based file and archive management library for Java 8.<br/>
 Supported protocols: local, http, https, ftp, sftp.<br/>
 Supported archives: zip, tar, 7zip.<br/>
-###Required libraries###
+### Required libraries ###
 Apache Commons Lang v3.4 (String and Array functions)<br/>
 Apache Commons Compress v1.12 (Archivers and Compression)<br/>
 Apache Tika Core v1.13 (Content detection)<br/>
