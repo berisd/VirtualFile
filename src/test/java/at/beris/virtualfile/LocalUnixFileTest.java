@@ -77,8 +77,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
         String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
         Files.write(Paths.get(TEST_SOURCE_FILE_NAME), msg.getBytes());
         Files.write(Paths.get(TEST_TARGET_FILE_NAME), msg.getBytes());
-        VirtualFile sourceFile = getFileContext().newFile(sourceFileUrl);
-        VirtualFile targetFile = getFileContext().newFile(targetFileUrl);
+        VirtualFile sourceFile = fileManager.newFile(sourceFileUrl);
+        VirtualFile targetFile = fileManager.newFile(targetFileUrl);
         assertTrue(sourceFile.compare(targetFile));
     }
 
@@ -88,8 +88,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
         Files.write(Paths.get(TEST_SOURCE_FILE_NAME), msg.getBytes());
         msg = "xyzfsjhusdfuijfdsuidfsuidfsuifxyzijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
         Files.write(Paths.get(TEST_TARGET_FILE_NAME), msg.getBytes());
-        VirtualFile sourceFile = getFileContext().newFile(sourceFileUrl);
-        VirtualFile targetFile = getFileContext().newFile(targetFileUrl);
+        VirtualFile sourceFile = fileManager.newFile(sourceFileUrl);
+        VirtualFile targetFile = fileManager.newFile(targetFileUrl);
         assertFalse(sourceFile.compare(targetFile));
     }
 
@@ -98,8 +98,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
         List<VirtualFile> sourceFileList = null;
         List<VirtualFile> targetFileList = null;
         try {
-            sourceFileList = TestFilterHelper.createFiles(TEST_SOURCE_DIRECTORY_NAME + "/");
-            targetFileList = TestFilterHelper.createFiles(TEST_TARGET_DIRECTORY_NAME + "/");
+            sourceFileList = TestFilterHelper.createFiles(fileManager, TEST_SOURCE_DIRECTORY_NAME + "/");
+            targetFileList = TestFilterHelper.createFiles(fileManager, TEST_TARGET_DIRECTORY_NAME + "/");
 
             String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
             Files.write(sourceFileList.get(1).asFile().toPath(), msg.getBytes());
@@ -108,8 +108,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
             Files.write(targetFileList.get(2).asFile().toPath(), msg.getBytes());
             assertTrue(sourceFileList.get(0).compare(targetFileList.get(0)));
         } finally {
-            createFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
-            createFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
+            createFileManager().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
+            createFileManager().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
         }
     }
 
@@ -118,8 +118,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
         List<VirtualFile> sourceFileList = null;
         List<VirtualFile> targetFileList = null;
         try {
-            sourceFileList = TestFilterHelper.createFiles(TEST_SOURCE_DIRECTORY_NAME + "/");
-            targetFileList = TestFilterHelper.createFiles(TEST_TARGET_DIRECTORY_NAME + "/");
+            sourceFileList = TestFilterHelper.createFiles(fileManager, TEST_SOURCE_DIRECTORY_NAME + "/");
+            targetFileList = TestFilterHelper.createFiles(fileManager, TEST_TARGET_DIRECTORY_NAME + "/");
 
             String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
             Files.write(sourceFileList.get(1).asFile().toPath(), msg.getBytes());
@@ -129,15 +129,15 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
             Files.write(targetFileList.get(2).asFile().toPath(), msg.getBytes());
             assertFalse(sourceFileList.get(0).compare(targetFileList.get(0)));
         } finally {
-            createFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
-            createFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
+            createFileManager().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
+            createFileManager().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
         }
     }
 
     @Test
     public void rename() {
-        VirtualFile sourceFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
-        VirtualFile targetFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
+        VirtualFile sourceFile = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile targetFile = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
         sourceFile.create();
         assertTrue(sourceFile.exists());
         assertFalse(targetFile.exists());
@@ -148,8 +148,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
 
     @Test
     public void move() {
-        VirtualFile sourceFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
-        VirtualFile targetFile = getFileContext().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
+        VirtualFile sourceFile = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile targetFile = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
         sourceFile.create();
         assertTrue(sourceFile.exists());
         assertFalse(targetFile.exists());
@@ -215,7 +215,7 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
     }
 
     @Override
-    protected VirtualFileContext createFileContext() {
-        return new VirtualFileContext();
+    protected FileManager createFileManager() {
+        return new FileManager();
     }
 }

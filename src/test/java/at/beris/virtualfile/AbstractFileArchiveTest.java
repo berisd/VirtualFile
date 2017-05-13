@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractFileArchiveTest {
 
-    private VirtualFileContext fileContext;
+    private FileManager fileManager;
 
     private VirtualArchive sourceArchive;
 
@@ -35,9 +35,9 @@ public abstract class AbstractFileArchiveTest {
 
     @Before
     public void beforeTestCase() {
-        fileContext = new VirtualFileContext();
-        sourceArchive = fileContext.newFile(sourceArchiveUrl).asArchive();
-        targetDirectory = FileManager.newLocalDirectory("extracted");
+        fileManager = new FileManager();
+        sourceArchive = fileManager.newFile(sourceArchiveUrl).asArchive();
+        targetDirectory = fileManager.newLocalDirectory("extracted");
     }
 
     @After

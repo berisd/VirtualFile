@@ -48,7 +48,7 @@ public abstract class AbstractUrlFileTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractUrlFileTest.class);
 
-    private VirtualFileContext fileContext;
+    protected FileManager fileManager;
 
     protected URL sourceFileUrl;
     protected URL targetFileUrl;
@@ -61,7 +61,7 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void createFile(Optional<Consumer<VirtualFile>> assertHook) {
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileManager.newFile(sourceFileUrl);
         file.create();
 
         if (assertHook.isPresent()) {
@@ -80,7 +80,7 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void createDirectory() {
-        VirtualFile file = fileContext.newFile(sourceDirectoryUrl);
+        VirtualFile file = fileManager.newFile(sourceDirectoryUrl);
         file.create();
 
         assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
@@ -97,7 +97,7 @@ public abstract class AbstractUrlFileTest {
         Files.createSymbolicLink(symLink, dir);
 
         URL symLinkUrl = UrlUtils.getUrlForLocalPath(symLinkName);
-        VirtualFile file = fileContext.newFile(symLinkUrl);
+        VirtualFile file = fileManager.newFile(symLinkUrl);
 
         assertTrue(file.isSymbolicLink());
         assertEquals(dir.toUri().toURL().toString(), file.getLinkTarget().toString());
@@ -107,8 +107,8 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void copyFile() {
-        VirtualFile sourceFile = FileTestHelper.createLocalSourceFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
-        VirtualFile targetFile = fileContext.newFile(targetFileUrl);
+        VirtualFile sourceFile = FileTestHelper.createLocalSourceFile(fileManager, UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile targetFile = fileManager.newFile(targetFileUrl);
         FileOperationListener copyListenerMock = Mockito.mock(FileOperationListener.class);
         sourceFile.copy(targetFile, copyListenerMock);
         assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
@@ -121,8 +121,8 @@ public abstract class AbstractUrlFileTest {
 
         FileTestHelper.createFileTreeData(sourceFileUrlList);
 
-        VirtualFile sourceDirectory = fileContext.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
-        VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
+        VirtualFile sourceDirectory = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
+        VirtualFile targetDirectory = fileManager.newFile(targetDirectoryUrl);
 
         FileOperationListener copyListener = Mockito.mock(FileOperationListener.class);
         Mockito.when(copyListener.interrupt()).thenReturn(false);
@@ -133,7 +133,7 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void deleteFile() {
-        VirtualFile sourceFile = fileContext.newFile(sourceFileUrl);
+        VirtualFile sourceFile = fileManager.newFile(sourceFileUrl);
         sourceFile.create();
         assertTrue(sourceFile.exists());
         sourceFile.delete();
@@ -144,8 +144,8 @@ public abstract class AbstractUrlFileTest {
         List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         FileTestHelper.createFileTreeData(sourceFileUrlList);
 
-        VirtualFile sourceDirectory = fileContext.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
-        VirtualFile targetDirectory = fileContext.newFile(targetDirectoryUrl);
+        VirtualFile sourceDirectory = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
+        VirtualFile targetDirectory = fileManager.newFile(targetDirectoryUrl);
 
         sourceDirectory.copy(targetDirectory, Mockito.mock(FileOperationListener.class));
 
@@ -155,18 +155,18 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void getFileAttributes(Consumer<VirtualFile> assertHook) {
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileManager.newFile(sourceFileUrl);
         file.create();
         assertHook.accept(file);
     }
 
     protected void setFileAttributes(Set<FileAttribute> attributes) {
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileManager.newFile(sourceFileUrl);
         file.create();
         file.setAttributes(attributes.toArray(new FileAttribute[0]));
-        fileContext.dispose(file);
+        fileManager.dispose(file);
 
-        file = fileContext.newFile(sourceFileUrl);
+        file = fileManager.newFile(sourceFileUrl);
         Set<FileAttribute> actualAttributes = file.getAttributes();
 
         assertTrue(attributes.containsAll(actualAttributes));
@@ -174,13 +174,13 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void setOwner(UserPrincipal owner) {
-        VirtualFile file = fileContext.newFile(targetFileUrl);
+        VirtualFile file = fileManager.newFile(targetFileUrl);
         file.create();
         file.setOwner(owner);
 
-        fileContext.dispose(file);
+        fileManager.dispose(file);
 
-        file = fileContext.newFile(targetFileUrl);
+        file = fileManager.newFile(targetFileUrl);
 
         if (owner instanceof UnixUserPrincipal)
             assertEquals(((UnixUserPrincipal)owner).getUid(), ((UnixUserPrincipal)file.getOwner()).getUid());
@@ -193,15 +193,15 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void setGroup(GroupPrincipal group) {
-        VirtualFile file = fileContext.newFile(targetFileUrl);
+        VirtualFile file = fileManager.newFile(targetFileUrl);
         file.create();
         if (group == null)
             group = file.getGroup();
         file.setGroup(group);
 
-        fileContext.dispose(file);
+        fileManager.dispose(file);
 
-        file = fileContext.newFile(targetFileUrl);
+        file = fileManager.newFile(targetFileUrl);
 
         if (group instanceof UnixGroupPrincipal)
             assertEquals(((UnixGroupPrincipal)group).getGid(), ((UnixGroupPrincipal)file.getGroup()).getGid());
@@ -210,15 +210,15 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void setAcl() {
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileManager.newFile(sourceFileUrl);
         file.create();
         List<AclEntry> acl = file.getAcl();
         List<AclEntry> newAcl = new ArrayList<>(acl);
         newAcl.remove(0);
         file.setAcl(newAcl);
-        getFileContext().dispose(file);
+        fileManager.dispose(file);
 
-        file = getFileContext().newFile(sourceFileUrl);
+        file = fileManager.newFile(sourceFileUrl);
         assertEquals(newAcl.size(), file.getAcl().size());
         file.delete();
     }
@@ -258,36 +258,32 @@ public abstract class AbstractUrlFileTest {
     protected void assertDirectory(List<String> sourceFileUrlList, List<String> targetFileUrlList) {
         for (int i = 0; i < sourceFileUrlList.size(); i++) {
 
-            VirtualFile sourceFile = fileContext.newFile(UrlUtils.newUrl(sourceFileUrlList.get(i)));
-            VirtualFile targetFile = fileContext.newFile(UrlUtils.newUrl(targetFileUrlList.get(i)));
+            VirtualFile sourceFile = fileManager.newFile(UrlUtils.newUrl(sourceFileUrlList.get(i)));
+            VirtualFile targetFile = fileManager.newFile(UrlUtils.newUrl(targetFileUrlList.get(i)));
 
             if (!sourceFile.isDirectory())
                 assertArrayEquals(sourceFile.checksum(), targetFile.checksum());
         }
     }
 
-    protected abstract VirtualFileContext createFileContext();
-
-    public VirtualFileContext getFileContext() {
-        return fileContext;
-    }
+    protected abstract FileManager createFileManager();
 
     @Before
     public void beforeTestCase() {
-        fileContext = createFileContext();
+        fileManager = createFileManager();
     }
 
     @After
     public void afterTestCase() {
         cleanupFiles();
-        fileContext.dispose();
+        fileManager.dispose();
     }
 
     private void cleanupFiles() {
         for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
             if (url != null) {
                 try {
-                    VirtualFile file = fileContext.newFile(url);
+                    VirtualFile file = fileManager.newFile(url);
                     if (file.exists())
                         file.delete();
                 }
@@ -307,14 +303,14 @@ public abstract class AbstractUrlFileTest {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileManager.newFile(sourceFileUrl);
         file.create();
         biconsumer.accept(file, fileTime);
-        fileContext.dispose(file);
+        fileManager.dispose(file);
 
-        file = fileContext.newFile(sourceFileUrl);
+        file = fileManager.newFile(sourceFileUrl);
         assertEquals(dateFormat.format(new Date(fileTime.toMillis())), dateFormat.format(new Date(function.apply(file).toMillis())));
         file.delete();
-        fileContext.dispose(file);
+        fileManager.dispose(file);
     }
 }

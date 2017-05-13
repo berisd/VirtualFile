@@ -12,7 +12,6 @@ package at.beris.virtualfile.shell;
 import at.beris.virtualfile.FileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -40,13 +39,13 @@ public class Shell {
     private final static DateFormat TIME_FORMATTER = DateFormat.getTimeInstance();
 
 
-    private VirtualFileManager fileManager;
+    private FileManager fileManager;
     private VirtualFile localFile;
     private VirtualFile workingFile;
     private Scanner scanner;
 
     public Shell() {
-        fileManager = FileManager.newManager();
+        fileManager = new FileManager();
         localFile = fileManager.newLocalFile(System.getProperty("user.dir"));
         scanner = new Scanner(System.in);
         scanner.useDelimiter("\n");

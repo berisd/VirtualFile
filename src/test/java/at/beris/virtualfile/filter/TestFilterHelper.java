@@ -28,7 +28,7 @@ import java.util.List;
 public class TestFilterHelper {
     private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
 
-    public static List<VirtualFile> createFiles(String rootDir) {
+    public static List<VirtualFile> createFiles(FileManager fileManager, String rootDir) {
         List<VirtualFile> fileList = new ArrayList<>();
         String dataString = "0123456789ABCDEF";
 
@@ -40,7 +40,7 @@ public class TestFilterHelper {
         fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ, PosixFilePermission.GROUP_EXECUTE));
 
         for (FileData fileData : fileDataList) {
-            VirtualFile file = FileManager.newLocalFile(fileData.name);
+            VirtualFile file = fileManager.newLocalFile(fileData.name);
             try {
 
                 file.create();

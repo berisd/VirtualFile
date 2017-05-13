@@ -22,10 +22,13 @@ public class DefaultFilterTest {
     private static final String TEST_DIRECTORY = "testdir/";
     private static VirtualFile testDirectory;
 
+    private static FileManager fileManager;
+
     @BeforeClass
     public static void setUp() throws Exception {
-        TestFilterHelper.createFiles(TEST_DIRECTORY);
-        testDirectory = FileManager.newLocalFile(TEST_DIRECTORY);
+        fileManager = new FileManager();
+        TestFilterHelper.createFiles(fileManager, TEST_DIRECTORY);
+        testDirectory = fileManager.newLocalFile(TEST_DIRECTORY);
     }
 
     @AfterClass

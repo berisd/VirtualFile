@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-class FileArchive implements VirtualArchive {
+public class FileArchive implements VirtualArchive {
 
     private static Logger logger = LoggerFactory.getLogger(FileArchive.class);
 

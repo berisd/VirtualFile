@@ -67,7 +67,7 @@ public class FileTestHelper {
         return (dateMillis > (otherMillis - seconds * 1000)) && (dateMillis < otherMillis);
     }
 
-    public static VirtualFile createLocalSourceFile(URL url) {
+    public static VirtualFile createLocalSourceFile(FileManager fileManager, URL url) {
         try {
             File file = new File(url.toURI());
 
@@ -79,7 +79,7 @@ public class FileTestHelper {
             Files.write(file.toPath(), dataString.toString().getBytes());
             Files.setLastModifiedTime(file.toPath(), FileTime.fromMillis(TEST_SOURCE_FILE_LAST_MODIFIED.getTime()));
 
-            return FileManager.newFile(file.toURI().toURL());
+            return fileManager.newFile(file.toURI().toURL());
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
