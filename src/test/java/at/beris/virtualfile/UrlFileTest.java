@@ -28,7 +28,7 @@ import static at.beris.virtualfile.FileTestHelper.TEST_SOURCE_FILE_NAME;
 public class UrlFileTest extends AbstractUrlFileTest {
     private FileOperationProvider provider;
 
-    private UrlFile file;
+    private VirtualFile file;
 
     @Before
     @Override
@@ -38,7 +38,7 @@ public class UrlFileTest extends AbstractUrlFileTest {
             provider = new FileOperationProviderMock();
             sourceFileUrl = new URL(String.format("file:/%s/%s", TEST_SOURCE_DIRECTORY_NAME, TEST_SOURCE_FILE_NAME));
             Mockito.when(getFileContext().getFileOperationProvider(sourceFileUrl.toString())).thenReturn(provider);
-            file = new UrlFile(sourceFileUrl, getFileContext());
+            file = new VirtualFile(sourceFileUrl, getFileContext());
             Mockito.when(getFileContext().newFile(Matchers.eq(sourceFileUrl))).thenReturn(file);
             Mockito.when(getFileContext().createFileModel()).thenReturn(createFileModel());
             // Fix: Sometimes an empty FileModel my be returned and the maven build fails

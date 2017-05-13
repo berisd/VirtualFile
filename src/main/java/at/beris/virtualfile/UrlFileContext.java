@@ -220,8 +220,8 @@ class UrlFileContext implements VirtualFileContext {
         LOGGER.debug("createFileInstance (url: {})", maskedUrlString(url));
 
         try {
-            Constructor constructor = UrlFile.class.getConstructor(URL.class, UrlFileContext.class);
-            return (UrlFile) constructor.newInstance(url, this);
+            Constructor constructor = VirtualFile.class.getConstructor(URL.class, UrlFileContext.class);
+            return (VirtualFile) constructor.newInstance(url, this);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
