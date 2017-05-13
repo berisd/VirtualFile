@@ -79,7 +79,7 @@ public abstract class AbstractFileArchiveTest {
     }
 
     private VirtualArchiveEntry createArchiveEntry(String path, String name, long size, LocalDateTime lastModified, boolean directory) {
-        VirtualArchiveEntry archiveEntry = new VirtualArchiveEntry();
+        VirtualArchiveEntry archiveEntry = new FileArchiveEntry();
         archiveEntry.setPath(path);
         archiveEntry.setName(name);
         archiveEntry.setLastModified(DateUtils.getLocalDateTimeFromInstant(lastModified));

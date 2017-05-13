@@ -9,62 +9,72 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.exception.NotImplementedException;
-import at.beris.virtualfile.provider.ArchiveOperationProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 
-public class VirtualArchive {
+/**
+ * Representation of an Archive
+ */
+public interface VirtualArchive {
 
-    private static Logger logger = LoggerFactory.getLogger(VirtualArchive.class);
+    /**
+     * Get archive file
+     *
+     * @return File
+     */
+    VirtualFile getVirtualFile();
 
-    private VirtualFile file;
+    /**
+     * Add a file to the archive
+     *
+     * @param path Insertion path for then file
+     * @param file file
+     */
+    void add(String path, VirtualFile file);
 
-    private UrlFileContext context;
+    /**
+     * Create a directory
+     *
+     * @param path Path where directory will be created
+     * @param name Directory name
+     */
+    void createDirectory(String path, String name);
 
-    private ArchiveOperationProvider archiveOperationProvider;
+    /**
+     * Remove an archiveEntry from the archive
+     *
+     * @param archiveEntry ArchiveEntry
+     */
+    void remove(VirtualArchiveEntry archiveEntry);
 
-    public VirtualArchive(VirtualFile file, UrlFileContext context) {
-        this.file = file;
-        this.context = context;
-        this.archiveOperationProvider = context.getArchiveOperationProvider();
-    }
+    /**
+     * * Remove an archiveEntry from the archive
+     *
+     * @param path Path
+     * @param name Name
+     */
+    void remove(String path, String name);
 
-    public VirtualFile getVirtualFile() {
-        return file;
-    }
+    /**
+     * Extract archive contents to directory
+     *
+     * @param target Target Directory
+     * @return List of files
+     */
+    List<VirtualFile> extract(VirtualFile target);
 
-    public void add(String path, VirtualFile file) {
-        logger.info("Add {} to path {}", file, path);
-        throw new NotImplementedException();
-    }
+    /**
+     * List all archive entries
+     *
+     * @return List of archive entries
+     */
+    List<VirtualArchiveEntry> list();
 
-    public void createDirectory(String path, String name) {
-        logger.info("Create directory {} at path {}", name, path);
-        throw new NotImplementedException();
-    }
-
-    public void remove(VirtualArchiveEntry archiveEntry) {
-        throw new NotImplementedException();
-    }
-
-    public void remove(String path, String name) {
-        throw new NotImplementedException();
-    }
-
-    public List<VirtualFile> extract(VirtualFile target) {
-        logger.info("Extract {} to {}", this, target);
-        return archiveOperationProvider.extract(this, target);
-    }
-
-    public List<VirtualArchiveEntry> list() {
-        return archiveOperationProvider.list(this);
-    }
-
-    public List<VirtualArchiveEntry> list(String path) {
-        return null;
-    }
+    /**
+     * List archive entries inside the path
+     *
+     * @param path Path
+     * @return List of archive entries
+     */
+    List<VirtualArchiveEntry> list(String path);
 
 }

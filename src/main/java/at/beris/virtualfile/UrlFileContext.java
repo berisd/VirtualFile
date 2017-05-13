@@ -216,7 +216,7 @@ public class UrlFileContext {
     }
 
     public VirtualArchiveEntry createArchiveEntry() {
-        return new VirtualArchiveEntry();
+        return new FileArchiveEntry();
     }
 
     public DefaultDetector getContentDetector() {
@@ -260,7 +260,7 @@ public class UrlFileContext {
         LOGGER.debug("createFileInstance (url: {})", maskedUrlString(url));
 
         try {
-            Constructor constructor = VirtualFile.class.getConstructor(URL.class, UrlFileContext.class);
+            Constructor constructor = UrlFile.class.getConstructor(URL.class, UrlFileContext.class);
             return (VirtualFile) constructor.newInstance(url, this);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

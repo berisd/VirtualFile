@@ -113,7 +113,7 @@ public class VirtualFileManager {
      */
     public VirtualArchive resolveLocalArchive(String path) {
         //TODO Move creation to FileContext
-        return new VirtualArchive(resolveFile(UrlUtils.getUrlForLocalPath(path)), fileContext);
+        return new FileArchive(resolveFile(UrlUtils.getUrlForLocalPath(path)), fileContext);
     }
 
     /**
@@ -125,7 +125,7 @@ public class VirtualFileManager {
     public VirtualArchive resolveArchive(String urlString) {
         //TODO Move creation to FileContext
         try {
-            return new VirtualArchive(resolveFile(new URL(urlString)), fileContext);
+            return new FileArchive(resolveFile(new URL(urlString)), fileContext);
         } catch (MalformedURLException e) {
             throw new VirtualFileException(e);
         }
