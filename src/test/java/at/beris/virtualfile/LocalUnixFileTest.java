@@ -215,7 +215,7 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
     }
 
     @Override
-    protected FileManager createFileManager() {
-        return new FileManager();
+    protected VirtualFileManager createFileManager() {
+        return new VirtualFileManager();
     }
 }

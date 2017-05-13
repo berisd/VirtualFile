@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
@@ -28,7 +28,7 @@ import java.util.List;
 public class TestFilterHelper {
     private final static Logger LOGGER = LoggerFactory.getLogger(File.class);
 
-    public static List<VirtualFile> createFiles(FileManager fileManager, String rootDir) {
+    public static List<VirtualFile> createFiles(VirtualFileManager fileManager, String rootDir) {
         List<VirtualFile> fileList = new ArrayList<>();
         String dataString = "0123456789ABCDEF";
 

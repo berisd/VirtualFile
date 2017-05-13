@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.shell;
 
-import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.PosixFilePermission;
@@ -39,13 +39,13 @@ public class Shell {
     private final static DateFormat TIME_FORMATTER = DateFormat.getTimeInstance();
 
 
-    private FileManager fileManager;
+    private VirtualFileManager fileManager;
     private VirtualFile localFile;
     private VirtualFile workingFile;
     private Scanner scanner;
 
     public Shell() {
-        fileManager = new FileManager();
+        fileManager = new VirtualFileManager();
         localFile = fileManager.newLocalFile(System.getProperty("user.dir"));
         scanner = new Scanner(System.in);
         scanner.useDelimiter("\n");

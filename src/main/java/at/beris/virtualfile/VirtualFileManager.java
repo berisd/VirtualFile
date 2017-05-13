@@ -22,13 +22,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-public class FileManager {
+public class VirtualFileManager {
 
-    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FileManager.class);
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(VirtualFileManager.class);
 
     private VirtualFileContext fileContext;
 
-    public FileManager() {
+    public VirtualFileManager() {
         super();
         fileContext = new VirtualFileContext();
     }

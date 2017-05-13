@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.FileManager;
+import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.VirtualFile;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -22,11 +22,11 @@ public class DefaultFilterTest {
     private static final String TEST_DIRECTORY = "testdir/";
     private static VirtualFile testDirectory;
 
-    private static FileManager fileManager;
+    private static VirtualFileManager fileManager;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        fileManager = new FileManager();
+        fileManager = new VirtualFileManager();
         TestFilterHelper.createFiles(fileManager, TEST_DIRECTORY);
         testDirectory = fileManager.newLocalFile(TEST_DIRECTORY);
     }
