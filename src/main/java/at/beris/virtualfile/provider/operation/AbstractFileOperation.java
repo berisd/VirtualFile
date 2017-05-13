@@ -59,7 +59,7 @@ public abstract class AbstractFileOperation<RF, RB> {
                     throw new VirtualFileException(e);
                 }
                 VirtualFile parentTarget = target;
-                target = fileContext.newFile(targetChildUrl);
+                target = fileContext.resolveFile(targetChildUrl);
                 processFilesRecursively(source, target, listener);
                 target = parentTarget;
             }

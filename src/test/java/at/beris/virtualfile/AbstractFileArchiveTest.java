@@ -36,8 +36,8 @@ public abstract class AbstractFileArchiveTest {
     @Before
     public void beforeTestCase() {
         fileManager = new VirtualFileManager();
-        sourceArchive = fileManager.newFile(sourceArchiveUrl).asArchive();
-        targetDirectory = fileManager.newLocalDirectory("extracted");
+        sourceArchive = fileManager.resolveFile(sourceArchiveUrl).asArchive();
+        targetDirectory = fileManager.resolveLocalDirectory("extracted");
     }
 
     @After

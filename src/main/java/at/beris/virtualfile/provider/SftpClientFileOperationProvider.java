@@ -69,7 +69,7 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
         List<VirtualFile> fileList = new ArrayList<>();
 
         for (SftpFile sftpFile : fileInfoList) {
-            VirtualFile childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), sftpFile.getPath()));
+            VirtualFile childFile = fileContext.resolveFile(UrlUtils.newUrl(model.getUrl(), sftpFile.getPath()));
             FileModel childModel = new FileModel();
             SftpFileTranslator.fillModel(childModel, sftpFile);
             childFile.setModel(childModel);
@@ -180,6 +180,6 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
             throw new VirtualFileException(e);
         }
 
-        return fileContext.newFile(UrlUtils.getUrlForLocalPath(path));
+        return fileContext.resolveFile(UrlUtils.getUrlForLocalPath(path));
     }
 }

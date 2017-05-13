@@ -85,8 +85,8 @@ public class VirtualFileContext {
      * @param url URL
      * @return New File Instance
      */
-    public VirtualFile newFile(URL url) {
-        LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
+    public VirtualFile resolveFile(URL url) {
+        LOGGER.debug("resolveFile (url: {}) ", maskedUrlString(url));
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         if ("".equals(normalizedUrl.getPath()))
             normalizedUrl = UrlUtils.newUrl(normalizedUrl.toString() + "/");

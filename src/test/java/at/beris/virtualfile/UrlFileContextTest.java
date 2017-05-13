@@ -30,18 +30,18 @@ public class UrlFileContextTest {
 
     @Test
     public void getParentFile() throws MalformedURLException {
-        fileContext.newFile(new URL("file:/this/is/a/file/test"));
-        VirtualFile parentFile1 = fileContext.newFile(new URL("file:/this/"));
-        VirtualFile parentFile2 = fileContext.newFile(new URL("file:/this/is/")).getParent();
+        fileContext.resolveFile(new URL("file:/this/is/a/file/test"));
+        VirtualFile parentFile1 = fileContext.resolveFile(new URL("file:/this/"));
+        VirtualFile parentFile2 = fileContext.resolveFile(new URL("file:/this/is/")).getParent();
         Assert.assertSame(parentFile1, parentFile2);
-        fileContext.newFile(new URL("file:/this/here/is/another/file/test"));
-        VirtualFile parentFile3 = fileContext.newFile(new URL("file:/this/"));
+        fileContext.resolveFile(new URL("file:/this/here/is/another/file/test"));
+        VirtualFile parentFile3 = fileContext.resolveFile(new URL("file:/this/"));
         Assert.assertNotSame(parentFile1, parentFile3);
     }
 
     @Test
     public void newRootFile() throws MalformedURLException {
-        VirtualFile virtualFile = fileContext.newFile(new URL("file:/"));
+        VirtualFile virtualFile = fileContext.resolveFile(new URL("file:/"));
         Assert.assertNotNull(virtualFile);
     }
 }

@@ -197,7 +197,7 @@ public class ArchiveOperationProvider {
                     out.close();
                 }
 
-                VirtualFile file = context.newFile(urlMap.get(URL));
+                VirtualFile file = context.resolveFile(urlMap.get(URL));
                 fileList.add(file);
             } catch (URISyntaxException | IOException e) {
                 throw new VirtualFileException(e);

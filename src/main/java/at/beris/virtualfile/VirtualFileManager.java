@@ -55,8 +55,8 @@ public class VirtualFileManager {
      * @param path Path
      * @return New VirtualFile instance
      */
-    public VirtualFile newLocalFile(String path) {
-        return fileContext.newFile(UrlUtils.getUrlForLocalPath(path));
+    public VirtualFile resolveLocalFile(String path) {
+        return fileContext.resolveFile(UrlUtils.getUrlForLocalPath(path));
     }
 
     /**
@@ -65,8 +65,8 @@ public class VirtualFileManager {
      * @param path Path
      * @return New VirtualFile Instance
      */
-    public VirtualFile newLocalDirectory(String path) {
-        return newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
+    public VirtualFile resolveLocalDirectory(String path) {
+        return resolveLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
     }
 
     /**
@@ -75,9 +75,9 @@ public class VirtualFileManager {
      * @param urlString Path
      * @return New VirtualFile Instance
      */
-    public VirtualFile newFile(String urlString) {
+    public VirtualFile resolveFile(String urlString) {
         try {
-            return fileContext.newFile(new URL(urlString));
+            return fileContext.resolveFile(new URL(urlString));
         } catch (MalformedURLException e) {
             throw new VirtualFileException(e);
         }
@@ -89,8 +89,8 @@ public class VirtualFileManager {
      * @param url URL object
      * @return New VirtualFile Instance
      */
-    public VirtualFile newFile(URL url) {
-        return fileContext.newFile(url);
+    public VirtualFile resolveFile(URL url) {
+        return fileContext.resolveFile(url);
     }
 
     /**
@@ -99,11 +99,11 @@ public class VirtualFileManager {
      * @param url URL object
      * @return New VirtualFile Instance
      */
-    public VirtualFile newDirectory(URL url) {
+    public VirtualFile resolveDirectory(URL url) {
         URL normalizedUrl = url;
         if (!url.getPath().endsWith("/"))
             normalizedUrl = UrlUtils.newUrl(url, url.getPath() + "/");
-        return fileContext.newFile(normalizedUrl);
+        return fileContext.resolveFile(normalizedUrl);
     }
 
     /**
@@ -111,9 +111,9 @@ public class VirtualFileManager {
      * @param path Path
      * @return VirtualArchive
      */
-    public VirtualArchive newLocalArchive(String path) {
+    public VirtualArchive resolveLocalArchive(String path) {
         //TODO Move creation to FileContext
-        return new VirtualArchive(newFile(UrlUtils.getUrlForLocalPath(path)), fileContext);
+        return new VirtualArchive(resolveFile(UrlUtils.getUrlForLocalPath(path)), fileContext);
     }
 
     /**
@@ -122,10 +122,10 @@ public class VirtualFileManager {
      * @param urlString URL String
      * @return Archive
      */
-    public VirtualArchive newArchive(String urlString) {
+    public VirtualArchive resolveArchive(String urlString) {
         //TODO Move creation to FileContext
         try {
-            return new VirtualArchive(newFile(new URL(urlString)), fileContext);
+            return new VirtualArchive(resolveFile(new URL(urlString)), fileContext);
         } catch (MalformedURLException e) {
             throw new VirtualFileException(e);
         }

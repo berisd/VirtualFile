@@ -80,7 +80,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider {
         if (model.isDirectory()) {
             try {
                 for (File childFile : new File(model.getUrl().toURI()).listFiles()) {
-                    VirtualFile file = fileContext.newFile(childFile.toURI().toURL());
+                    VirtualFile file = fileContext.resolveFile(childFile.toURI().toURL());
                     if (filter == null || filter.filter(file))
                         fileList.add(file);
                 }

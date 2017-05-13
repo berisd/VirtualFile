@@ -46,7 +46,7 @@ public class Shell {
 
     public Shell() {
         fileManager = new VirtualFileManager();
-        localFile = fileManager.newLocalFile(System.getProperty("user.dir"));
+        localFile = fileManager.resolveLocalFile(System.getProperty("user.dir"));
         scanner = new Scanner(System.in);
         scanner.useDelimiter("\n");
     }
@@ -199,7 +199,7 @@ public class Shell {
     }
 
     private void connect(URL url) {
-        workingFile = fileManager.newFile(url);
+        workingFile = fileManager.resolveFile(url);
     }
 
     private void list(boolean local) {
@@ -297,10 +297,10 @@ public class Shell {
             newUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(file.getUrl().toString() + directoryName + (directoryName.endsWith("/") ? "" : "/")));
         }
 
-        VirtualFile actionFile = fileManager.newFile(newUrl);
+        VirtualFile actionFile = fileManager.resolveFile(newUrl);
 
         if (actionFile.isSymbolicLink())
-            actionFile = fileManager.newFile(actionFile.getLinkTarget());
+            actionFile = fileManager.resolveFile(actionFile.getLinkTarget());
 
         if (actionFile.exists()) {
             if (local)
@@ -318,7 +318,7 @@ public class Shell {
         }
 
         URL actionUrl = UrlUtils.newUrl(workingFile.getUrl(), fileName);
-        VirtualFile actionFile = fileManager.newFile(actionUrl);
+        VirtualFile actionFile = fileManager.resolveFile(actionUrl);
         actionFile.copy(localFile, new CustomCopyListener());
         System.out.println("");
     }
@@ -330,9 +330,9 @@ public class Shell {
         }
 
         URL sourceUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(localFile.getUrl(), fileName));
-        VirtualFile sourceFile = fileManager.newFile(sourceUrl);
+        VirtualFile sourceFile = fileManager.resolveFile(sourceUrl);
         URL targetUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl(workingFile.getUrl(), fileName));
-        VirtualFile targetFile = fileManager.newFile(targetUrl);
+        VirtualFile targetFile = fileManager.resolveFile(targetUrl);
 
         sourceFile.copy(targetFile, new CustomCopyListener());
         System.out.println("");
@@ -345,7 +345,7 @@ public class Shell {
         }
 
         URL actionUrl = UrlUtils.normalizeUrl(UrlUtils.newUrl((local ? localFile : workingFile).getUrl(), fileName));
-        fileManager.newFile(actionUrl).delete();
+        fileManager.resolveFile(actionUrl).delete();
     }
 
     private static void logException(Exception e) {

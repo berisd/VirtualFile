@@ -77,8 +77,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
         String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
         Files.write(Paths.get(TEST_SOURCE_FILE_NAME), msg.getBytes());
         Files.write(Paths.get(TEST_TARGET_FILE_NAME), msg.getBytes());
-        VirtualFile sourceFile = fileManager.newFile(sourceFileUrl);
-        VirtualFile targetFile = fileManager.newFile(targetFileUrl);
+        VirtualFile sourceFile = fileManager.resolveFile(sourceFileUrl);
+        VirtualFile targetFile = fileManager.resolveFile(targetFileUrl);
         assertTrue(sourceFile.compare(targetFile));
     }
 
@@ -88,8 +88,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
         Files.write(Paths.get(TEST_SOURCE_FILE_NAME), msg.getBytes());
         msg = "xyzfsjhusdfuijfdsuidfsuidfsuifxyzijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudf";
         Files.write(Paths.get(TEST_TARGET_FILE_NAME), msg.getBytes());
-        VirtualFile sourceFile = fileManager.newFile(sourceFileUrl);
-        VirtualFile targetFile = fileManager.newFile(targetFileUrl);
+        VirtualFile sourceFile = fileManager.resolveFile(sourceFileUrl);
+        VirtualFile targetFile = fileManager.resolveFile(targetFileUrl);
         assertFalse(sourceFile.compare(targetFile));
     }
 
@@ -108,8 +108,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
             Files.write(targetFileList.get(2).asFile().toPath(), msg.getBytes());
             assertTrue(sourceFileList.get(0).compare(targetFileList.get(0)));
         } finally {
-            createFileManager().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
-            createFileManager().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
+            createFileManager().resolveFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
+            createFileManager().resolveFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
         }
     }
 
@@ -129,15 +129,15 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
             Files.write(targetFileList.get(2).asFile().toPath(), msg.getBytes());
             assertFalse(sourceFileList.get(0).compare(targetFileList.get(0)));
         } finally {
-            createFileManager().newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
-            createFileManager().newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
+            createFileManager().resolveFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/")).delete();
+            createFileManager().resolveFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_DIRECTORY_NAME + "/")).delete();
         }
     }
 
     @Test
     public void rename() {
-        VirtualFile sourceFile = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
-        VirtualFile targetFile = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
+        VirtualFile sourceFile = fileManager.resolveFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile targetFile = fileManager.resolveFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
         sourceFile.create();
         assertTrue(sourceFile.exists());
         assertFalse(targetFile.exists());
@@ -148,8 +148,8 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
 
     @Test
     public void move() {
-        VirtualFile sourceFile = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
-        VirtualFile targetFile = fileManager.newFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
+        VirtualFile sourceFile = fileManager.resolveFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile targetFile = fileManager.resolveFile(UrlUtils.getUrlForLocalPath(TEST_TARGET_FILE_NAME));
         sourceFile.create();
         assertTrue(sourceFile.exists());
         assertFalse(targetFile.exists());

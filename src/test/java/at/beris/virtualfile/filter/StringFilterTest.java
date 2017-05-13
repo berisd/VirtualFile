@@ -27,7 +27,7 @@ public class StringFilterTest {
     public static void setUp() throws Exception {
         fileManager = new VirtualFileManager();
         TestFilterHelper.createFiles(fileManager, TEST_DIRECTORY);
-        testDirectory = fileManager.newLocalFile(TEST_DIRECTORY);
+        testDirectory = fileManager.resolveLocalFile(TEST_DIRECTORY);
     }
 
     @AfterClass

@@ -79,7 +79,7 @@ public class FileTestHelper {
             Files.write(file.toPath(), dataString.toString().getBytes());
             Files.setLastModifiedTime(file.toPath(), FileTime.fromMillis(TEST_SOURCE_FILE_LAST_MODIFIED.getTime()));
 
-            return fileManager.newFile(file.toURI().toURL());
+            return fileManager.resolveFile(file.toURI().toURL());
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }

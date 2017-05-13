@@ -33,7 +33,7 @@ public class CopyFileOperation extends AbstractFileOperation<Integer, Boolean> {
         if (source.isDirectory() && !target.isDirectory())
             throw new OperationNotSupportedException("Can't copy directory to a file!");
         if (!source.isDirectory() && target.isDirectory())
-            target = fileContext.newFile(UrlUtils.newUrl(target.getUrl(), source.getName()));
+            target = fileContext.resolveFile(UrlUtils.newUrl(target.getUrl(), source.getName()));
         processFilesRecursively(source, target, listener);
         return fileOperationResult;
     }

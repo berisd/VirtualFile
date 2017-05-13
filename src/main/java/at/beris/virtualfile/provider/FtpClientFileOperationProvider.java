@@ -72,7 +72,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
             FileModel childModel = new FileModel();
             childModel.setParent(model);
             String childPath = parentPath + ftpFile.getName() + (ftpFile.isDirectory() ? "/" : "");
-            VirtualFile childFile = fileContext.newFile(UrlUtils.newUrl(model.getUrl(), childPath));
+            VirtualFile childFile = fileContext.resolveFile(UrlUtils.newUrl(model.getUrl(), childPath));
             FtpFileTranslator.fillModel(childModel, ftpFile, client);
             childFile.setModel(childModel);
             if (filter == null || filter.filter(childFile)) {
@@ -183,7 +183,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
         }
 
 
-        return fileContext.newFile(UrlUtils.getUrlForLocalPath(path));
+        return fileContext.resolveFile(UrlUtils.getUrlForLocalPath(path));
     }
 
     private URL resolveUrl(FileModel model) {

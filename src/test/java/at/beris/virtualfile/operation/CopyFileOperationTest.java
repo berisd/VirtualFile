@@ -61,8 +61,8 @@ public class CopyFileOperationTest {
         VirtualFile targetChildDirectory = createTargetFileMock(new URL("file:/target/foo/subdir/"), true);
 
         VirtualFileContext fileContext = Mockito.mock(VirtualFileContext.class);
-        Mockito.when(fileContext.newFile(Matchers.any(URL.class))).thenReturn(targetChildFile);
-        Mockito.when(fileContext.newFile(Matchers.any(URL.class))).thenReturn(targetChildDirectory);
+        Mockito.when(fileContext.resolveFile(Matchers.any(URL.class))).thenReturn(targetChildFile);
+        Mockito.when(fileContext.resolveFile(Matchers.any(URL.class))).thenReturn(targetChildDirectory);
 
         FileOperationProvider fileOperationProvider = Mockito.mock(FileOperationProvider.class);
 

@@ -40,7 +40,7 @@ public class TestFilterHelper {
         fileDataList.add(new FileData(rootDir + "subdir/goodmovie.avi", 3200, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_READ, PosixFilePermission.GROUP_EXECUTE));
 
         for (FileData fileData : fileDataList) {
-            VirtualFile file = fileManager.newLocalFile(fileData.name);
+            VirtualFile file = fileManager.resolveLocalFile(fileData.name);
             try {
 
                 file.create();

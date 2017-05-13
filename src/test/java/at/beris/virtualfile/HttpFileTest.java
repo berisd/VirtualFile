@@ -47,8 +47,8 @@ public class HttpFileTest extends AbstractUrlFileTest {
     @Test
     public void copyFile() {
         try {
-            VirtualFile sourceFile = fileManager.newFile(new URL("https://images-3.gog.com/d6fe0ebe40ef6117c1c8979c00777ce64f8a521302fd95ec13afdb8ebfa4349a_196.jpg"));
-            VirtualFile targetFile = fileManager.newFile(targetFileUrl);
+            VirtualFile sourceFile = fileManager.resolveFile(new URL("https://images-3.gog.com/d6fe0ebe40ef6117c1c8979c00777ce64f8a521302fd95ec13afdb8ebfa4349a_196.jpg"));
+            VirtualFile targetFile = fileManager.resolveFile(targetFileUrl);
             FileOperationListener copyListenerMock = Mockito.mock(FileOperationListener.class);
             sourceFile.copy(targetFile, copyListenerMock);
             Assert.assertTrue(targetFile.getSize() > 0);
@@ -59,7 +59,7 @@ public class HttpFileTest extends AbstractUrlFileTest {
 
     @Test
     public void getFile() {
-        VirtualFile file = fileManager.newFile("http://www.beris.at/images/d6fe0ebe40ef6117c1c8979c00777ce64f8a521302fd95ec13afdb8ebfa4349a_196.jpg");
+        VirtualFile file = fileManager.resolveFile("http://www.beris.at/images/d6fe0ebe40ef6117c1c8979c00777ce64f8a521302fd95ec13afdb8ebfa4349a_196.jpg");
         Assert.assertEquals(11069, file.getSize());
         Assert.assertEquals(file.getLastModifiedTime().toInstant(), DateUtils.getLocalDateTimeFromInstant(LocalDateTime.of(2016, 02, 21, 22, 53, 20)));
         Assert.assertEquals("image/jpeg", file.getContentType().toString());
