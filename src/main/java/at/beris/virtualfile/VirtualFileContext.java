@@ -36,6 +36,9 @@ import java.util.Map;
 import static at.beris.virtualfile.util.CollectionUtils.removeEntriesByValueFromMap;
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
+/**
+ * Manage and cache virtual files and their relations.
+ */
 public class VirtualFileContext {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(VirtualFileContext.class);
 
@@ -67,10 +70,21 @@ public class VirtualFileContext {
         contentDetector = new DefaultDetector();
     }
 
+    /**
+     * Get the context configurator.
+     *
+     * @return Configurator
+     */
     public Configurator getConfigurator() {
         return configurator;
     }
 
+    /**
+     * Creates a VirtualFile instance for the given url.
+     *
+     * @param url URL
+     * @return New File Instance
+     */
     public VirtualFile newFile(URL url) {
         LOGGER.debug("newFile (url: {}) ", maskedUrlString(url));
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
@@ -109,6 +123,12 @@ public class VirtualFileContext {
         return file;
     }
 
+    /**
+     * Replace URL of a VirtualFile with a new URL.
+     *
+     * @param oldUrl Old URL
+     * @param newUrl New URL
+     */
     public void replaceFileUrl(URL oldUrl, URL newUrl) {
         VirtualFile file = fileCache.get(oldUrl.toString());
         removeEntriesByValueFromMap(fileToParentFileMap, file);
@@ -118,6 +138,11 @@ public class VirtualFileContext {
         fileCache.put(newUrl.toString(), file);
     }
 
+    /**
+     * Removes a VirtualFile from the context and frees it's allocated resources.
+     *
+     * @param file VirtualFile
+     */
     public void dispose(VirtualFile file) {
         LOGGER.debug("dispose (file : {})", file);
         removeEntriesByValueFromMap(fileToParentFileMap, file);
@@ -125,6 +150,9 @@ public class VirtualFileContext {
         file.dispose();
     }
 
+    /**
+     * Frees all resources allocated by the file context.
+     */
     public void dispose() {
         fileToParentFileMap.clear();
         fileCache.clear();
@@ -132,6 +160,12 @@ public class VirtualFileContext {
         disposeMap(siteUrlToClientMap);
     }
 
+    /**
+     * Gets parent file of the VirtualFile.
+     *
+     * @param file File
+     * @return Parent file
+     */
     public VirtualFile getParentFile(VirtualFile file) {
         VirtualFile parentFile = fileToParentFileMap.get(file);
 
@@ -150,16 +184,33 @@ public class VirtualFileContext {
         return fileToParentFileMap.get(file);
     }
 
+    /**
+     * Gets client for a siteUrlString.
+     *
+     * @param siteUrlString Site UrlString
+     * @return Client
+     */
     public VirtualClient getClient(String siteUrlString) {
         return siteUrlToClientMap.get(siteUrlString);
     }
 
+    /**
+     * Gets FileOperationProvider for the URL string.
+     *
+     * @param urlString UrlString
+     * @return FileOperationProvider
+     */
     public FileOperationProvider getFileOperationProvider(String urlString) {
         VirtualClient client = siteUrlToClientMap.get(UrlUtils.getSiteUrlString(urlString));
         FileOperationProvider fileOperationProvider = clientToFileOperationProviderMap.get(client);
         return fileOperationProvider;
     }
 
+    /**
+     * Creates an empty file model.
+     *
+     * @return FileModel
+     */
     public FileModel createFileModel() {
         return new FileModel();
     }

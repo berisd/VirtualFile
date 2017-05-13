@@ -49,14 +49,32 @@ public class FileManager {
         return fileContext.getConfigurator().getConfiguration(file);
     }
 
+    /**
+     * Creates a VirtualFile representing a local file with the given path.
+     *
+     * @param path Path
+     * @return New VirtualFile instance
+     */
     public VirtualFile newLocalFile(String path) {
         return fileContext.newFile(UrlUtils.getUrlForLocalPath(path));
     }
 
+    /**
+     * Creates a VirtualFile representing a local directory with the given path.
+     *
+     * @param path Path
+     * @return New VirtualFile Instance
+     */
     public VirtualFile newLocalDirectory(String path) {
         return newLocalFile(path + (path.endsWith(File.separator) ? "" : File.separator));
     }
 
+    /**
+     * Creates a VirtualFile representing a network file with the given URL String.
+     *
+     * @param urlString Path
+     * @return New VirtualFile Instance
+     */
     public VirtualFile newFile(String urlString) {
         try {
             return fileContext.newFile(new URL(urlString));
@@ -65,10 +83,22 @@ public class FileManager {
         }
     }
 
+    /**
+     * Creates a VirtualFile representing a network file with the given URL.
+     *
+     * @param url URL object
+     * @return New VirtualFile Instance
+     */
     public VirtualFile newFile(URL url) {
         return fileContext.newFile(url);
     }
 
+    /**
+     * Creates a VirtualFile representing a network directory with the given URL.
+     *
+     * @param url URL object
+     * @return New VirtualFile Instance
+     */
     public VirtualFile newDirectory(URL url) {
         URL normalizedUrl = url;
         if (!url.getPath().endsWith("/"))
@@ -76,11 +106,22 @@ public class FileManager {
         return fileContext.newFile(normalizedUrl);
     }
 
+    /**
+     * Creates a VirtualArchive representing a local archive with the given path.
+     * @param path Path
+     * @return VirtualArchive
+     */
     public VirtualArchive newLocalArchive(String path) {
         //TODO Move creation to FileContext
         return new VirtualArchive(newFile(UrlUtils.getUrlForLocalPath(path)), fileContext);
     }
 
+    /**
+     * Creates an Archive represented by the given URL.
+     *
+     * @param urlString URL String
+     * @return Archive
+     */
     public VirtualArchive newArchive(String urlString) {
         //TODO Move creation to FileContext
         try {
@@ -90,14 +131,25 @@ public class FileManager {
         }
     }
 
+    /**
+     * Frees all resources allocated by the VirtualFileManager.
+     */
     public void dispose() {
         fileContext.dispose();
     }
 
+    /**
+     * Frees all resources allocated by the VirtualFile.
+     */
     public void dispose(VirtualFile file) {
         fileContext.dispose(file);
     }
 
+    /**
+     * Returns the protocols currently enabled.
+     *
+     * @return Enabled protocols.
+     */
     public Set<Protocol> enabledProtocols() {
         Map<Protocol, Pair<String, String>> protocolClassMap = new HashMap<>();
         protocolClassMap.put(Protocol.SFTP, Pair.of("JSch", "com.jcraft.jsch.JSch"));
@@ -122,6 +174,11 @@ public class FileManager {
     }
 
 
+    /**
+     * Returns the protocols supported by this version of the VirtualFile library.
+     *
+     * @return Supported Protocols.
+     */
     public Set<Protocol> supportedProtocols() {
         return EnumSet.allOf(Protocol.class);
     }

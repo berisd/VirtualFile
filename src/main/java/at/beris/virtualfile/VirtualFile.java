@@ -102,6 +102,11 @@ public class VirtualFile implements Comparable<VirtualFile> {
         return lastAccessTime;
     }
 
+    /**
+     * Returns the size in bytes for a file and the number of contained items for a directory.
+     *
+     * @return File size.
+     */
     public long getSize() {
         logger.debug("Get size for {}", this);
         checkModel();
@@ -118,6 +123,9 @@ public class VirtualFile implements Comparable<VirtualFile> {
         return path;
     }
 
+    /**
+     * Deletes the file.
+     */
     public void delete() {
         logger.info("Delete {}", this);
         checkModel();
@@ -213,6 +221,10 @@ public class VirtualFile implements Comparable<VirtualFile> {
         return root;
     }
 
+    /**
+     * Tests wether the file or directory exists.
+     * @return true if the file exists; false otherwise
+     */
     public Boolean exists() {
         logger.info("Check exists for {}", this);
         checkModel();
@@ -221,6 +233,9 @@ public class VirtualFile implements Comparable<VirtualFile> {
         return exists;
     }
 
+    /**
+     * Creates an empty file.
+     */
     public void create() {
         logger.info("Create {}", this);
         checkModel();
@@ -325,6 +340,8 @@ public class VirtualFile implements Comparable<VirtualFile> {
         updateModel();
     }
 
+    //TODO create a move method that combines copy and delete.
+
     public Set<FileAttribute> getAttributes() {
         logger.debug("Get attributes for {}", this);
         checkModel();
@@ -355,6 +372,7 @@ public class VirtualFile implements Comparable<VirtualFile> {
         }
     }
 
+    //TODO Provide also a method with a Set instead of Varargs
     public void addAttributes(FileAttribute... attributes) {
         logger.info("Add attributes {} to {}", FileUtils.getAttributesString(attributes), this);
         checkModel();
@@ -367,6 +385,8 @@ public class VirtualFile implements Comparable<VirtualFile> {
         fileOperationProvider.addAttributes(model);
         updateModel();
     }
+
+    //TODO provide method with set instead of Varargs
 
     public void removeAttributes(FileAttribute... attributes) {
         logger.info("Remove attributes {} from {}", FileUtils.getAttributesString(attributes), this);
@@ -387,6 +407,12 @@ public class VirtualFile implements Comparable<VirtualFile> {
         fileOperationProvider.rename(model, newName);
     }
 
+    /**
+     * Finds files recursively matching a filter.
+     *
+     * @param filter A filter
+     * @return A list of files.
+     */
     public List<VirtualFile> find(Filter filter) {
         logger.info("Find children for {} with filter {}", this, filter);
         checkModel();
@@ -409,6 +435,11 @@ public class VirtualFile implements Comparable<VirtualFile> {
         return fileList;
     }
 
+    /**
+     * Lists contained files non-recursively.
+     *
+     * @return A list of files.
+     */
     public List<VirtualFile> list() {
         logger.info("List children for {}", this);
         checkModel();
@@ -417,6 +448,12 @@ public class VirtualFile implements Comparable<VirtualFile> {
         return fileList;
     }
 
+    /**
+     * Lists contained files non-recursively filtered by a filter.
+     *
+     * @param filter The Filter
+     * @return List of files.
+     */
     public List<VirtualFile> list(Filter filter) {
         logger.info("List children for {} with filter {}", this, filter);
         checkModel();
@@ -431,6 +468,11 @@ public class VirtualFile implements Comparable<VirtualFile> {
         fileOperationProvider.move(model, target);
     }
 
+    /**
+     * Check whether file is an archive.
+     *
+     * @return True if file is an archive; false otherwise.
+     */
     public boolean isArchive() {
         logger.debug("Check isArchive for {}", this);
         checkModel();
@@ -479,6 +521,9 @@ public class VirtualFile implements Comparable<VirtualFile> {
         throw new NotImplementedException();
     }
 
+    /**
+     * Updates the model with information from the physical file
+     */
     public void refresh() {
         logger.info("Refresh {}", this);
         checkModel();
