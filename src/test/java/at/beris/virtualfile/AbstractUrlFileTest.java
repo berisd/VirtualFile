@@ -48,7 +48,7 @@ public abstract class AbstractUrlFileTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractUrlFileTest.class);
 
-    private UrlFileContext fileContext;
+    private VirtualFileContext fileContext;
 
     protected URL sourceFileUrl;
     protected URL targetFileUrl;
@@ -266,9 +266,9 @@ public abstract class AbstractUrlFileTest {
         }
     }
 
-    protected abstract UrlFileContext createFileContext();
+    protected abstract VirtualFileContext createFileContext();
 
-    public UrlFileContext getFileContext() {
+    public VirtualFileContext getFileContext() {
         return fileContext;
     }
 

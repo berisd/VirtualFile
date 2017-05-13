@@ -22,11 +22,11 @@ class FileArchive implements VirtualArchive {
 
     private VirtualFile file;
 
-    private UrlFileContext context;
+    private VirtualFileContext context;
 
     private ArchiveOperationProvider archiveOperationProvider;
 
-    public FileArchive(VirtualFile file, UrlFileContext context) {
+    public FileArchive(VirtualFile file, VirtualFileContext context) {
         this.file = file;
         this.context = context;
         this.archiveOperationProvider = context.getArchiveOperationProvider();

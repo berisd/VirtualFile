@@ -55,8 +55,8 @@ public class UrlFileTest extends AbstractUrlFileTest {
 
 
     @Override
-    protected UrlFileContext createFileContext() {
-        return Mockito.mock(UrlFileContext.class);
+    protected VirtualFileContext createFileContext() {
+        return Mockito.mock(VirtualFileContext.class);
     }
 
     private FileModel createFileModel() {

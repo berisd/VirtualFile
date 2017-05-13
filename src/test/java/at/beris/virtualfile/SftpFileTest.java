@@ -11,7 +11,6 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
-import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -129,7 +128,7 @@ public class SftpFileTest extends AbstractUrlFileTest {
     }
 
     @Override
-    protected UrlFileContext createFileContext() {
-        return new UrlFileContext();
+    protected VirtualFileContext createFileContext() {
+        return new VirtualFileContext();
     }
 }
