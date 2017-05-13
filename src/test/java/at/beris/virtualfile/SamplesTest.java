@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
  * This class contains real world code samples
  */
 public class SamplesTest {
-    private UrlFileManager fileManager;
+    private VirtualFileManager fileManager;
 
     @BeforeClass
     public static void beforeTestCase() {
@@ -32,7 +32,7 @@ public class SamplesTest {
 
     @Before
     public void beforeTest() {
-        fileManager = new UrlFileManager();
+        fileManager = VirtualFileManager.createManager();
     }
 
     @After
