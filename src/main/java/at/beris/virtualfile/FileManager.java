@@ -22,7 +22,7 @@ import java.util.Set;
  * Public interface to the VirtualFile library
  */
 public final class FileManager {
-    private static Optional<UrlFileManager> fileManager = Optional.empty();
+    private static Optional<VirtualFileManager> fileManager = Optional.empty();
 
     private FileManager() {
         super();
@@ -73,7 +73,7 @@ public final class FileManager {
     }
 
     public static VirtualFileManager newManager() {
-        return new UrlFileManager();
+        return new VirtualFileManager();
     }
 
     public static void dispose() {
@@ -88,9 +88,9 @@ public final class FileManager {
         return EnumSet.allOf(Protocol.class);
     }
 
-    private static UrlFileManager fileManager() {
+    private static VirtualFileManager fileManager() {
         if (!fileManager.isPresent())
-            fileManager = Optional.of(new UrlFileManager());
+            fileManager = Optional.of(new VirtualFileManager());
         return fileManager.get();
     }
 }
