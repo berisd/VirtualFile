@@ -28,47 +28,54 @@ The switch ```-Drunintegrationtests=true``` will run IntegrationTests which reqi
 
 *) Extract local zip file
 ```java
-VirtualArchive archive = FileManager.newLocalFile("/home/user/downloads/mytestapp.zip").asArchive();
-VirtualFile targetDirectory = FileManager.newLocalDirectory("extracted");
+VirtualFileManager fileManager = VirtualFileManager.createManager()
+VirtualArchive archive = fileManager.resolveLocalFile("/home/user/downloads/mytestapp.zip").asArchive();
+VirtualFile targetDirectory = fileManager.resolveLocalDirectory("extracted");
 archive.extract(targetDirectory)
 ```
 *) Extract local 7zip file
 ```java
-VirtualArchive archive = FileManager.newLocalArchive("/home/user/downloads/coolstuff.7z");
-VirtualFile directory = FileManager.newLocalDirectory("extracted");
+VirtualFileManager fileManager = VirtualFileManager.createManager()
+VirtualArchive archive = fileManager.resolveLocalArchive("/home/user/downloads/coolstuff.7z");
+VirtualFile directory = fileManager.resolveLocalDirectory("extracted");
 archive.extract(targetDirectory)
 ```
 *) Extract remote zipfile (with sftp protocol)
 ```java
-VirtualArchive archive = FileManager.newArchive("sftp://sshtest:mypwd@www.exmaple.com:22/home/sshtest/mytestapp.zip")
-VirtualFile targetDirectory = FileManager.newLocalDirectory("extracted");
+VirtualFileManager fileManager = VirtualFileManager.createManager()
+VirtualArchive archive = fileManager.resolveArchive("sftp://sshtest:mypwd@www.exmaple.com:22/home/sshtest/mytestapp.zip")
+VirtualFile targetDirectory = fileManager.resolveLocalDirectory("extracted");
 archive.extract(targetDirectory)
 ```
 *) Find files in a directory (ending with .txt) with a simple filter
 ```java
-VirtualFile file = FileManager.newLocalDirectory("documents");
+VirtualFileManager fileManager = VirtualFileManager.createManager()
+VirtualFile file = fileManager.resolveLocalDirectory("documents");
 List<VirtualFile> fileList = file.list(new FileNameFilter().endsWith(".txt"));
 ```
 
 *) Find files in a directory(ending with .txt and greater than 100K) with a combined filter
 ```java
-VirtualFile file = FileManager.newLocalDirectory("documents");
+VirtualFileManager fileManager = VirtualFileManager.createManager()
+VirtualFile file = fileManager.resolveLocalDirectory("documents");
 List<VirtualFile> fileList = file.list(new FileNameFilter().endsWith(".txt").and(new FileSizeFilter().greaterThan(100*1024L)));
 ```
 
 *) Transfer a file with the sftp protocol and public key authentication (stricthostchecking is on by default, so there must be an entry for the host in the known_hosts file (Under Linux that's usually ~/.ssh/known_hosts). You can set the location of the known_hosts file with FileConfig.setKnownHostsFile().
 ```java
-FileManager.getConfiguration().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
+VirtualFileManager fileManager = VirtualFileManager.createManager()
+fileManager.getConfiguration().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
   .setPrivateKeyFile("/home/myuser/.ssh/id_dsa");
-VirtualFile file = FileManager.newFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip");
+VirtualFile file = fileManager.resolveFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip");
 file.copy(FileMananger.newLocalDirectory("."));
 ```
 
 *) Transfer a file with the sftp protocol without stricthostchecking and password authentication.
 ```java
-FileManager.getConfiguration().setStrictHostKeyChecking(false);
-VirtualFile file = FileManager.newFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip", configurator);
-file.copy(FileMananger.newLocalDirectory("."));
+VirtualFileManager fileManager = VirtualFileManager.createManager()
+fileManager.getConfiguration().setStrictHostKeyChecking(false);
+VirtualFile file = fileManager.resolveFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip", configurator);
+file.copy(fileManager.resolveLocalDirectory("."));
 ```
 
 ## Shell ##
