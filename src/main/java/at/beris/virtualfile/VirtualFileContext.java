@@ -165,7 +165,7 @@ public class VirtualFileContext {
     }
 
     public VirtualArchiveEntry createArchiveEntry() {
-        return new FileArchiveEntry();
+        return new VirtualArchiveEntry();
     }
 
     public DefaultDetector getContentDetector() {

@@ -78,13 +78,13 @@ public class FileManager {
 
     public VirtualArchive newLocalArchive(String path) {
         //TODO Move creation to FileContext
-        return new FileArchive(newFile(UrlUtils.getUrlForLocalPath(path)), fileContext);
+        return new VirtualArchive(newFile(UrlUtils.getUrlForLocalPath(path)), fileContext);
     }
 
     public VirtualArchive newArchive(String urlString) {
         //TODO Move creation to FileContext
         try {
-            return new FileArchive(newFile(new URL(urlString)), fileContext);
+            return new VirtualArchive(newFile(new URL(urlString)), fileContext);
         } catch (MalformedURLException e) {
             throw new VirtualFileException(e);
         }

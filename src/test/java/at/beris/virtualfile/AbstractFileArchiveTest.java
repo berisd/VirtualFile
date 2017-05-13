@@ -78,8 +78,8 @@ public abstract class AbstractFileArchiveTest {
         Assert.assertEquals(NUMBER_OF_ARCHIVE_ENTRIES, extractedFiles.size());
     }
 
-    private FileArchiveEntry createArchiveEntry(String path, String name, long size, LocalDateTime lastModified, boolean directory) {
-        FileArchiveEntry archiveEntry = new FileArchiveEntry();
+    private VirtualArchiveEntry createArchiveEntry(String path, String name, long size, LocalDateTime lastModified, boolean directory) {
+        VirtualArchiveEntry archiveEntry = new VirtualArchiveEntry();
         archiveEntry.setPath(path);
         archiveEntry.setName(name);
         archiveEntry.setLastModified(DateUtils.getLocalDateTimeFromInstant(lastModified));

@@ -11,27 +11,55 @@ package at.beris.virtualfile;
 
 import java.time.Instant;
 
-/**
- * Representation of Entry inside an archive
- */
-public interface VirtualArchiveEntry {
-    String getName();
+public class VirtualArchiveEntry {
 
-    void setName(String name);
+    private String name;
 
-    String getPath();
+    private String path;
 
-    void setPath(String path);
+    private Instant lastModified;
 
-    Instant getLastModified();
+    private long size;
 
-    void setLastModified(Instant lastModified);
+    private boolean isDirectory;
 
-    long getSize();
+    public String getName() {
+        return name;
+    }
 
-    void setSize(long size);
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    boolean isDirectory();
+    public String getPath() {
+        return path;
+    }
 
-    void setDirectory(boolean directory);
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public Instant getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public boolean isDirectory() {
+        return isDirectory;
+    }
+
+    public void setDirectory(boolean directory) {
+        isDirectory = directory;
+    }
 }

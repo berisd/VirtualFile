@@ -344,7 +344,7 @@ public class VirtualFile implements Comparable<VirtualFile> {
     }
 
     public VirtualArchive asArchive() {
-        return new FileArchive(this, context);
+        return new VirtualArchive(this, context);
     }
 
     public File asFile() {
