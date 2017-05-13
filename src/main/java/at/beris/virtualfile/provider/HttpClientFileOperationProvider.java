@@ -11,7 +11,7 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.VirtualFileContext;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.client.http.HttpClient;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -27,7 +27,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 public class HttpClientFileOperationProvider extends AbstractFileOperationProvider<HttpClient> {
-    public HttpClientFileOperationProvider(VirtualFileContext fileContext, HttpClient httpURLConnection) {
+    public HttpClientFileOperationProvider(UrlFileContext fileContext, HttpClient httpURLConnection) {
         super(fileContext, httpURLConnection);
         this.supportedOperations = EnumSet.of(FileOperation.GET_INPUT_STREAM, FileOperation.GET_OUTPUT_STREAM);
     }

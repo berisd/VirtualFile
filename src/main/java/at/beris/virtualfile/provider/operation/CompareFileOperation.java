@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.VirtualFileContext;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
 
@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 public class CompareFileOperation extends AbstractFileOperation<Boolean, Boolean> {
 
-    public CompareFileOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
+    public CompareFileOperation(UrlFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
         fileOperationResult = true;
     }

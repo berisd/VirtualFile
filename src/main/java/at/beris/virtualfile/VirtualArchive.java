@@ -22,11 +22,11 @@ public class VirtualArchive {
 
     private VirtualFile file;
 
-    private VirtualFileContext context;
+    private UrlFileContext context;
 
     private ArchiveOperationProvider archiveOperationProvider;
 
-    public VirtualArchive(VirtualFile file, VirtualFileContext context) {
+    public VirtualArchive(VirtualFile file, UrlFileContext context) {
         this.file = file;
         this.context = context;
         this.archiveOperationProvider = context.getArchiveOperationProvider();

@@ -12,7 +12,7 @@ package at.beris.virtualfile.provider;
 import at.beris.virtualfile.VirtualArchive;
 import at.beris.virtualfile.VirtualArchiveEntry;
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.VirtualFileContext;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.compress.archivers.*;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
@@ -35,9 +35,9 @@ public class ArchiveOperationProvider {
     private final static String URL = "url";
     private final static String PARENT_URL = "parentUrl";
 
-    private VirtualFileContext context;
+    private UrlFileContext context;
 
-    public ArchiveOperationProvider(VirtualFileContext context) {
+    public ArchiveOperationProvider(UrlFileContext context) {
         this.context = context;
     }
 

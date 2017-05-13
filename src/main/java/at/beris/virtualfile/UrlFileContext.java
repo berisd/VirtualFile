@@ -37,10 +37,10 @@ import static at.beris.virtualfile.util.CollectionUtils.removeEntriesByValueFrom
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
 /**
- * Manage and cache virtual files and their relations.
+ * Manage and cache virtual files and their relations. Internal use only.
  */
-public class VirtualFileContext {
-    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(VirtualFileContext.class);
+public class UrlFileContext {
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileContext.class);
 
     private Configurator configurator;
     private DefaultDetector contentDetector;
@@ -51,11 +51,11 @@ public class VirtualFileContext {
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
     private ArchiveOperationProvider archiveOperationProvider;
 
-    public VirtualFileContext() {
+    public UrlFileContext() {
         this(new Configurator());
     }
 
-    public VirtualFileContext(Configurator configurator) {
+    public UrlFileContext(Configurator configurator) {
         UrlUtils.registerProtocolURLStreamHandlers();
 
         this.configurator = configurator;
@@ -260,7 +260,7 @@ public class VirtualFileContext {
         LOGGER.debug("createFileInstance (url: {})", maskedUrlString(url));
 
         try {
-            Constructor constructor = VirtualFile.class.getConstructor(URL.class, VirtualFileContext.class);
+            Constructor constructor = VirtualFile.class.getConstructor(URL.class, UrlFileContext.class);
             return (VirtualFile) constructor.newInstance(url, this);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
@@ -271,7 +271,7 @@ public class VirtualFileContext {
         LOGGER.debug("createFileOperationProviderInstance (instanceClass: {}, client: {})", instanceClass, client);
         try {
             Class clientClass = client != null ? client.getClass() : Client.class;
-            Constructor constructor = instanceClass.getConstructor(VirtualFileContext.class, clientClass);
+            Constructor constructor = instanceClass.getConstructor(UrlFileContext.class, clientClass);
             return (FileOperationProvider) constructor.newInstance(this, client);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

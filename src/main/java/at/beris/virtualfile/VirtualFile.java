@@ -41,9 +41,9 @@ public class VirtualFile implements Comparable<VirtualFile> {
     protected FileModel model;
     protected URL url;
     protected FileOperationProvider fileOperationProvider;
-    protected VirtualFileContext context;
+    protected UrlFileContext context;
 
-    public VirtualFile(URL url, VirtualFileContext context) {
+    public VirtualFile(URL url, UrlFileContext context) {
         this.url = url;
         this.context = context;
         this.fileOperationProvider = context.getFileOperationProvider(url.toString());

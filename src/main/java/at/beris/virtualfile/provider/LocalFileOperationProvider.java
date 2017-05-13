@@ -11,7 +11,7 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.VirtualFileContext;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
@@ -40,7 +40,7 @@ import java.util.Set;
 public class LocalFileOperationProvider extends AbstractFileOperationProvider {
     private final static Logger LOGGER = LoggerFactory.getLogger(LocalFileOperationProvider.class);
 
-    public LocalFileOperationProvider(VirtualFileContext fileContext, Client client) {
+    public LocalFileOperationProvider(UrlFileContext fileContext, Client client) {
         super(fileContext, client);
     }
 

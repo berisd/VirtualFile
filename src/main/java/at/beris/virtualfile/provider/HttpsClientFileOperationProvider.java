@@ -9,11 +9,11 @@
 
 package at.beris.virtualfile.provider;
 
-import at.beris.virtualfile.VirtualFileContext;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.client.https.HttpsClient;
 
 public class HttpsClientFileOperationProvider extends HttpClientFileOperationProvider {
-    public HttpsClientFileOperationProvider(VirtualFileContext fileContext, HttpsClient httpsURLConnection) {
+    public HttpsClientFileOperationProvider(UrlFileContext fileContext, HttpsClient httpsURLConnection) {
         super(fileContext, httpsURLConnection);
     }
 }

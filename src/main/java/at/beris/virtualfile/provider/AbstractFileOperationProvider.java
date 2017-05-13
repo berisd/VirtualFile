@@ -11,7 +11,7 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.VirtualFileContext;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.CompareFileOperation;
@@ -27,11 +27,11 @@ public abstract class AbstractFileOperationProvider<C> implements FileOperationP
 
     protected static final Set<FileOperation> BASIC_FILE_OPERATIONS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(FileOperation.values())));
 
-    protected VirtualFileContext fileContext;
+    protected UrlFileContext fileContext;
     protected C client;
     protected Set<FileOperation> supportedOperations;
 
-    public AbstractFileOperationProvider(VirtualFileContext fileContext, C client) {
+    public AbstractFileOperationProvider(UrlFileContext fileContext, C client) {
         super();
         this.fileContext = fileContext;
         this.client = client;

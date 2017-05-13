@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.VirtualFileContext;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -22,7 +22,7 @@ import java.io.OutputStream;
 
 public class CopyFileOperation extends AbstractFileOperation<Integer, Boolean> {
 
-    public CopyFileOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
+    public CopyFileOperation(UrlFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super(fileContext, fileOperationProvider);
         fileOperationResult = 0;
     }

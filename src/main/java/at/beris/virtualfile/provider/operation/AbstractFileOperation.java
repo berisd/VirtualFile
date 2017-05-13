@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider.operation;
 
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.VirtualFileContext;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -26,14 +26,14 @@ public abstract class AbstractFileOperation<RF, RB> {
 
     public final static int STREAM_BUFFER_SIZE = 1024 * 16;
 
-    protected VirtualFileContext fileContext;
+    protected UrlFileContext fileContext;
     protected FileOperationProvider fileOperationProvider;
     protected Integer filesProcessed = 0;
 
     protected RF fileOperationResult;
     protected List<RB> streamBufferOperationResultList;
 
-    public AbstractFileOperation(VirtualFileContext fileContext, FileOperationProvider fileOperationProvider) {
+    public AbstractFileOperation(UrlFileContext fileContext, FileOperationProvider fileOperationProvider) {
         super();
         this.fileContext = fileContext;
         this.fileOperationProvider = fileOperationProvider;

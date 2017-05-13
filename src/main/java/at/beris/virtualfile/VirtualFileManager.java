@@ -26,11 +26,11 @@ public class VirtualFileManager {
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(VirtualFileManager.class);
 
-    private VirtualFileContext fileContext;
+    private UrlFileContext fileContext;
 
     public VirtualFileManager() {
         super();
-        fileContext = new VirtualFileContext();
+        fileContext = new UrlFileContext();
     }
 
     public ContextConfiguration getContextConfiguration() {

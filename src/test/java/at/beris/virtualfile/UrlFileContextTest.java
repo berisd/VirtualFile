@@ -19,13 +19,13 @@ import java.net.URL;
 
 public class UrlFileContextTest {
 
-    private VirtualFileContext fileContext;
+    private UrlFileContext fileContext;
 
     @Before
     public void beforeTestCase() {
         Configurator configurator = new Configurator();
         configurator.getContextConfiguration().setFileCacheSize(10);
-        fileContext = new VirtualFileContext(configurator);
+        fileContext = new UrlFileContext(configurator);
     }
 
     @Test
