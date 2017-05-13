@@ -9,8 +9,8 @@
 
 package at.beris.virtualfile.filter;
 
-import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import org.apache.commons.lang3.StringUtils;

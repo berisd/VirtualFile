@@ -48,7 +48,7 @@ public abstract class AbstractUrlFileTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractUrlFileTest.class);
 
-    protected VirtualFileManager fileManager;
+    protected UrlFileManager fileManager;
 
     protected URL sourceFileUrl;
     protected URL targetFileUrl;
@@ -266,7 +266,7 @@ public abstract class AbstractUrlFileTest {
         }
     }
 
-    protected abstract VirtualFileManager createFileManager();
+    protected abstract UrlFileManager createFileManager();
 
     @Before
     public void beforeTestCase() {

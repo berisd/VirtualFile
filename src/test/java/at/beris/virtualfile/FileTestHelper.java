@@ -67,7 +67,7 @@ public class FileTestHelper {
         return (dateMillis > (otherMillis - seconds * 1000)) && (dateMillis < otherMillis);
     }
 
-    public static VirtualFile createLocalSourceFile(VirtualFileManager fileManager, URL url) {
+    public static VirtualFile createLocalSourceFile(UrlFileManager fileManager, URL url) {
         try {
             File file = new File(url.toURI());
 

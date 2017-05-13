@@ -113,7 +113,7 @@ public class LocalWindowsFileTest extends AbstractUrlFileTest {
     }
 
     @Override
-    protected VirtualFileManager createFileManager() {
-        return new VirtualFileManager();
+    protected UrlFileManager createFileManager() {
+        return new UrlFileManager();
     }
 }

@@ -24,7 +24,7 @@ public class UrlFileManagerTest {
         expectedProtocols.add(Protocol.FTP);
         expectedProtocols.add(Protocol.SFTP);
 
-        VirtualFileManager manager = new VirtualFileManager();
+        UrlFileManager manager = new UrlFileManager();
         Set<Protocol> actualProtocols = manager.enabledProtocols();
 
         Assert.assertTrue(actualProtocols.containsAll(expectedProtocols));

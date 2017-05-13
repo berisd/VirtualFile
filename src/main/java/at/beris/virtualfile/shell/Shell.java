@@ -9,9 +9,9 @@
 
 package at.beris.virtualfile.shell;
 
-import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.attribute.PosixFilePermission;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -45,7 +45,7 @@ public class Shell {
     private Scanner scanner;
 
     public Shell() {
-        fileManager = new VirtualFileManager();
+        fileManager = VirtualFileManager.createManager();
         localFile = fileManager.resolveLocalFile(System.getProperty("user.dir"));
         scanner = new Scanner(System.in);
         scanner.useDelimiter("\n");
