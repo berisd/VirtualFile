@@ -43,9 +43,9 @@ public class SftpFileTest extends AbstractUrlFileTest {
     public void beforeTestCase() {
         super.beforeTestCase();
         URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + FileTestHelper.SSH_HOME_DIRECTORY);
-        sourceFileUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_FILE_NAME);
+        sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
         targetFileUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_TARGET_FILE_NAME);
-        sourceDirectoryUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_SOURCE_DIRECTORY_NAME + "/");
+        sourceDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/");
         targetDirectoryUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
@@ -116,13 +116,13 @@ public class SftpFileTest extends AbstractUrlFileTest {
         super.setFileAttributes(attributes);
     }
 
-    @Test(expected = VirtualFileException.class)
+    @Test
     public void setOwner() {
         UnixUserPrincipal user = new UnixUserPrincipal(1002, 1002);
         super.setOwner(user);
     }
 
-    @Test(expected = VirtualFileException.class)
+    @Test
     public void setGroup() {
         UnixGroupPrincipal group = new UnixGroupPrincipal(1002);
         super.setGroup(group);

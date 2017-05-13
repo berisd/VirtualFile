@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +45,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 
 public abstract class AbstractUrlFileTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractUrlFileTest.class);
 
     private UrlFileContext fileContext;
 
@@ -170,14 +174,18 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void setOwner(UserPrincipal owner) {
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(targetFileUrl);
         file.create();
         file.setOwner(owner);
 
         fileContext.dispose(file);
 
-        file = fileContext.newFile(sourceFileUrl);
-        assertEquals(owner.getName(), file.getOwner().getName());
+        file = fileContext.newFile(targetFileUrl);
+
+        if (owner instanceof UnixUserPrincipal)
+            assertEquals(((UnixUserPrincipal)owner).getUid(), ((UnixUserPrincipal)file.getOwner()).getUid());
+        else
+            assertEquals(owner.getName(), file.getOwner().getName());
     }
 
     protected void setGroup() {
@@ -185,7 +193,7 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void setGroup(GroupPrincipal group) {
-        VirtualFile file = fileContext.newFile(sourceFileUrl);
+        VirtualFile file = fileContext.newFile(targetFileUrl);
         file.create();
         if (group == null)
             group = file.getGroup();
@@ -193,8 +201,12 @@ public abstract class AbstractUrlFileTest {
 
         fileContext.dispose(file);
 
-        file = fileContext.newFile(sourceFileUrl);
-        assertEquals(group.getName(), file.getGroup().getName());
+        file = fileContext.newFile(targetFileUrl);
+
+        if (group instanceof UnixGroupPrincipal)
+            assertEquals(((UnixGroupPrincipal)group).getGid(), ((UnixGroupPrincipal)file.getGroup()).getGid());
+        else
+            assertEquals(group.getName(), file.getGroup().getName());
     }
 
     protected void setAcl() {
@@ -274,9 +286,14 @@ public abstract class AbstractUrlFileTest {
     private void cleanupFiles() {
         for (URL url : new URL[]{sourceFileUrl, targetFileUrl, sourceDirectoryUrl, targetDirectoryUrl}) {
             if (url != null) {
-                VirtualFile file = fileContext.newFile(url);
-                if (file.exists())
-                    file.delete();
+                try {
+                    VirtualFile file = fileContext.newFile(url);
+                    if (file.exists())
+                        file.delete();
+                }
+                catch (RuntimeException e) {
+                    LOGGER.error("Exception occured", e);
+                }
             }
         }
     }

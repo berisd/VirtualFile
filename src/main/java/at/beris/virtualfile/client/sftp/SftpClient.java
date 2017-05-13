@@ -328,6 +328,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     private void handleJSchException(JSchException e, String path) {
         if (e.getMessage().equals("Auth fail"))
             throw new VirtualFileException(Message.ACCESS_DENIED(), e);
+        throw new VirtualFileException(e);
     }
 
     private boolean isDir(String path) throws SftpException {
