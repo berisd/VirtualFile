@@ -4,12 +4,14 @@ Supported protocols: local, http, https, ftp, sftp.<br/>
 Supported archives: zip, tar, 7zip.<br/>
 ### Required libraries ###
 Apache Commons Lang v3.4 (String and Array functions)<br/>
-Apache Commons Compress v1.12 (Archivers and Compression)<br/>
-Apache Tika Core v1.13 (Content detection)<br/>
-Simple Logging Facade for Java API v1.7.12 (Logging)<br/>
+
 ### Optional libraries ###
+Apache Commons Compress v1.12 (Archivers and Compression)<br/>
 Apache Commons Net v3.4 (FTP support)<br/>
+Apache Tika Core v1.14 (Content Type detection)<br/>
+Apache Tika Parsers v1.14 (Content Encoding detection)<br/>
 JSch - Java Secure Channel v0.1.53 (SFTP support)<br/>
+Simple Logging Facade for Java API v1.7.12 (Logging)<br/>
 XZ Utils v1.5 (LZMA Compression)<br/>
 
 ## Building the project ##
