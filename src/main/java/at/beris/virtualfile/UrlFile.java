@@ -20,6 +20,8 @@ import at.beris.virtualfile.util.FileUtils;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.txt.CharsetDetector;
+import org.apache.tika.parser.txt.CharsetMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -378,6 +380,19 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
             DefaultDetector detector = context.getContentDetector();
             MediaType mediaType = detector.detect(inputStream, new Metadata());
             return new ContentType(mediaType);
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
+    }
+
+    @Override
+    public String getContentEncoding() {
+        try (InputStream inputStream = new BufferedInputStream(getInputStream())) {
+            CharsetDetector detector = context.getCharsetDetector();
+            detector.setText(inputStream);
+            CharsetMatch match = detector.detect();
+            return match.getName();
+
         } catch (IOException e) {
             throw new VirtualFileException(e);
         }

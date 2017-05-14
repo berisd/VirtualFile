@@ -23,6 +23,7 @@ import at.beris.virtualfile.provider.ArchiveOperationProvider;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.parser.txt.CharsetDetector;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
@@ -44,6 +45,7 @@ public class UrlFileContext {
 
     private Configurator configurator;
     private DefaultDetector contentDetector;
+    private CharsetDetector charsetDetector;
 
     private Map<String, VirtualClient> siteUrlToClientMap;
     private Map<VirtualClient, FileOperationProvider> clientToFileOperationProviderMap;
@@ -62,12 +64,9 @@ public class UrlFileContext {
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
-        this.archiveOperationProvider = new ArchiveOperationProvider(this);
 
         fileCache = new FileCache(configurator.getContextConfiguration().getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
-
-        contentDetector = new DefaultDetector();
     }
 
     /**
@@ -220,7 +219,17 @@ public class UrlFileContext {
     }
 
     public DefaultDetector getContentDetector() {
+        if (contentDetector == null) {
+            contentDetector = new DefaultDetector();
+        }
         return contentDetector;
+    }
+
+    public CharsetDetector getCharsetDetector() {
+        if (charsetDetector == null) {
+            charsetDetector = new CharsetDetector();
+        }
+        return charsetDetector;
     }
 
     private VirtualClient createClientInstance(URL url) {
@@ -308,6 +317,9 @@ public class UrlFileContext {
     }
 
     public ArchiveOperationProvider getArchiveOperationProvider() {
+        if (archiveOperationProvider == null) {
+            archiveOperationProvider = new ArchiveOperationProvider(this);
+        }
         return archiveOperationProvider;
     }
 

@@ -75,6 +75,8 @@ public interface VirtualFile extends DisposableObject {
 
     ContentType getContentType();
 
+    String getContentEncoding();
+
     FileTime getCreationTime();
 
     GroupPrincipal getGroup();

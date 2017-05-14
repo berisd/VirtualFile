@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import static at.beris.virtualfile.FileTestHelper.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -196,6 +197,16 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
     @Test
     public void setGroup() {
         super.setGroup();
+    }
+
+    @Test
+    public void getContentEncoding() throws IOException {
+        String msg = "jhdfsjhusdfuijfdsuidfsuidfsuifsduijsdfujifsdunfdsunsdfnufsdnusdfundsfnusdfnufnudföüß";
+        Files.write(Paths.get(TEST_SOURCE_FILE_NAME), msg.getBytes());
+        VirtualFile sourceFile = fileManager.resolveFile(sourceFileUrl);
+        System.out.println("Encoding: " + sourceFile.getContentEncoding());
+        assertEquals("UTF-8", sourceFile.getContentEncoding());
+
     }
 
     @Test
