@@ -17,6 +17,9 @@ import at.beris.virtualfile.protocol.Protocol;
 import java.net.URL;
 import java.util.Set;
 
+/**
+ * Public API for virtual file management
+ */
 public interface VirtualFileManager {
 
     static VirtualFileManager createManager() {

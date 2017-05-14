@@ -34,6 +34,9 @@ import java.util.*;
 
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
+/**
+ * Internal class representing a virtual file
+ */
 class UrlFile implements VirtualFile, Comparable<UrlFile> {
 
     private static Logger logger = LoggerFactory.getLogger(UrlFile.class);

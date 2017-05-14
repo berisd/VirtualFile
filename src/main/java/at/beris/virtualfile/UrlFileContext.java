@@ -37,7 +37,7 @@ import static at.beris.virtualfile.util.CollectionUtils.removeEntriesByValueFrom
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 
 /**
- * Manage and cache virtual files and their relations. Internal use only.
+ * Internal class for managing and caching virtual files and their relations.
  */
 public class UrlFileContext {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileContext.class);

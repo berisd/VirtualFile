@@ -12,7 +12,7 @@ package at.beris.virtualfile;
 import java.util.List;
 
 /**
- * Representation of an Archive
+ * Public API for a virtual archive
  */
 public interface VirtualArchive {
 

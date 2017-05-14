@@ -25,6 +25,9 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Public API for a virtual file
+ */
 public interface VirtualFile extends DisposableObject {
 
     VirtualArchive asArchive();
@@ -58,7 +61,7 @@ public interface VirtualFile extends DisposableObject {
     Boolean exists();
 
     /**
-     * Find files recursively matching a filter
+     * Finds files recursively matching a filter
      *
      * @param filter A filter
      * @return A list of files
@@ -99,7 +102,7 @@ public interface VirtualFile extends DisposableObject {
     VirtualFile getRoot();
 
     /**
-     * Returns the size in bytes for a file and the number of contained items for a directory
+     * Returns the size in bytes for a file and the number of contained items for a directory.
      *
      * @return File size
      */
@@ -108,9 +111,9 @@ public interface VirtualFile extends DisposableObject {
     URL getUrl();
 
     /**
-     * Check if file is an archive
+     * Checks whether the file is an archive.
      *
-     * @return True if file is an archive
+     * @return True if file is an archive; false otherwise.
      */
     boolean isArchive();
 
@@ -127,24 +130,24 @@ public interface VirtualFile extends DisposableObject {
     boolean isHidden();
 
     /**
-     * List contained files non-recursively
+     * Lists contained files non-recursively.
      *
-     * @return A list of files
+     * @return A list of files.
      */
     List<VirtualFile> list();
 
     /**
-     * List contained files non-recursively filtered by a filter
+     * Lists contained files non-recursively filtered by a filter.
      *
      * @param filter Filter
-     * @return List of files
+     * @return List of files.
      */
     List<VirtualFile> list(Filter filter);
 
     void move(VirtualFile target);
 
     /**
-     * Updates the model with information from the physical file
+     * Updates the model with information from the physical file.
      */
     void refresh();
 
