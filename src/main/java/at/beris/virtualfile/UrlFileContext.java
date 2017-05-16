@@ -58,8 +58,6 @@ public class UrlFileContext {
     }
 
     public UrlFileContext(Configurator configurator) {
-        UrlUtils.registerProtocolURLStreamHandlers();
-
         this.configurator = configurator;
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProviderMap = new HashMap<>();

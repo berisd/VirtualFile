@@ -21,20 +21,25 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class UrlFileManager implements VirtualFileManager {
+
+    private static AtomicInteger instanceCounter = new AtomicInteger();
 
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileManager.class);
 
     private UrlFileContext fileContext;
 
     public UrlFileManager() {
-        super();
-        this.fileContext = new UrlFileContext();
+        this(new UrlFileContext());
     }
 
     public UrlFileManager(UrlFileContext fileContext) {
         super();
+        if (instanceCounter.incrementAndGet() == 1) {
+            UrlUtils.registerProtocolURLStreamHandlers();
+        }
         this.fileContext = fileContext;
     }
 
@@ -153,6 +158,9 @@ public class UrlFileManager implements VirtualFileManager {
     @Override
     public void dispose() {
         fileContext.dispose();
+        if (instanceCounter.decrementAndGet() == 0) {
+            UrlUtils.unregisterProtocolURLStreamHandlers();
+        }
     }
 
     /**
