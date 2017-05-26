@@ -72,18 +72,6 @@
             <version>1.5</version>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>1.14</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
-            <version>1.14</version>
-            <optional>true</optional>
-        </dependency>
     </dependencies>
     <build>
         <plugins>

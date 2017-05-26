@@ -16,14 +16,15 @@ import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.VirtualClient;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
+import at.beris.virtualfile.content.detect.Detector;
+import at.beris.virtualfile.content.charset.CharsetDetector;
+import at.beris.virtualfile.content.mime.MimeTypes;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.ArchiveOperationProvider;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.util.UrlUtils;
-import org.apache.tika.detect.DefaultDetector;
-import org.apache.tika.parser.txt.CharsetDetector;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
@@ -44,7 +45,7 @@ public class UrlFileContext {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileContext.class);
 
     private Configurator configurator;
-    private DefaultDetector contentDetector;
+    private Detector contentDetector;
     private CharsetDetector charsetDetector;
 
     private Map<String, VirtualClient> siteUrlToClientMap;
@@ -68,7 +69,7 @@ public class UrlFileContext {
     }
 
     /**
-     * Get the context configurator.
+     * Get the content configurator.
      *
      * @return Configurator
      */
@@ -136,7 +137,7 @@ public class UrlFileContext {
     }
 
     /**
-     * Removes a VirtualFile from the context and frees it's allocated resources.
+     * Removes a VirtualFile from the content and frees it's allocated resources.
      *
      * @param file VirtualFile
      */
@@ -148,7 +149,7 @@ public class UrlFileContext {
     }
 
     /**
-     * Frees all resources allocated by the file context.
+     * Frees all resources allocated by the file content.
      */
     public void dispose() {
         fileToParentFileMap.clear();
@@ -216,9 +217,9 @@ public class UrlFileContext {
         return new FileArchiveEntry();
     }
 
-    public DefaultDetector getContentDetector() {
+    public Detector getContentDetector() {
         if (contentDetector == null) {
-            contentDetector = new DefaultDetector();
+            contentDetector = MimeTypes.getDefaultMimeTypes();
         }
         return contentDetector;
     }

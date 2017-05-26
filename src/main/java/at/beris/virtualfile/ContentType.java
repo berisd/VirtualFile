@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import org.apache.tika.mime.MediaType;
+import at.beris.virtualfile.content.mime.MediaType;
 
 public class ContentType {
     private MediaType mediaType;

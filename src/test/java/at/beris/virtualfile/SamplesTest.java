@@ -109,4 +109,11 @@ public class SamplesTest {
         VirtualFile file = fileManager.resolveFile("ftp://gd.tuwien.ac.at/");
         assertTrue(file.list().size() > 0);
     }
+
+    @Test
+    public void getContentAndEncoding() {
+        VirtualFile file = fileManager.resolveLocalFile(ZIP_FILENAME);
+        Assert.assertEquals("windows-1251", file.getContentEncoding());
+        Assert.assertEquals("application/zip", file.getContentType().toString());
+    }
 }

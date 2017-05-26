@@ -10,6 +10,11 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.content.charset.CharsetDetector;
+import at.beris.virtualfile.content.charset.CharsetMatch;
+import at.beris.virtualfile.content.detect.Detector;
+import at.beris.virtualfile.content.metadata.Metadata;
+import at.beris.virtualfile.content.mime.MediaType;
 import at.beris.virtualfile.exception.NotImplementedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.filter.Filter;
@@ -17,11 +22,6 @@ import at.beris.virtualfile.filter.IsDirectoryFilter;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
 import at.beris.virtualfile.util.FileUtils;
-import org.apache.tika.detect.DefaultDetector;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.mime.MediaType;
-import org.apache.tika.parser.txt.CharsetDetector;
-import org.apache.tika.parser.txt.CharsetMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -377,7 +377,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     @Override
     public ContentType getContentType() {
         try (InputStream inputStream = new BufferedInputStream(getInputStream())) {
-            DefaultDetector detector = context.getContentDetector();
+            Detector detector = context.getContentDetector();
             MediaType mediaType = detector.detect(inputStream, new Metadata());
             return new ContentType(mediaType);
         } catch (IOException e) {
