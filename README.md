@@ -3,7 +3,6 @@ Userfriendly URL based file and archive management library for Java 8.<br/>
 Supported protocols: local, http, https, ftp, sftp.<br/>
 Supported archives: zip, tar, 7zip.<br/>
 ### Required libraries ###
-Apache Commons Lang v3.4 (String and Array functions)<br/>
 Simple Logging Facade for Java API v1.7.12 (Logging)<br/>
 
 ### Optional libraries ###
