@@ -14,7 +14,7 @@ import at.beris.virtualfile.config.ContextConfiguration;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.UrlUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import at.beris.virtualfile.util.Pair;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;

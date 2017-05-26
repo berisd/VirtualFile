@@ -21,7 +21,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import at.beris.virtualfile.util.StringUtils;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -211,7 +211,7 @@ public class ArchiveOperationProvider {
         String archiveEntryPath = archiveEntry.getName();
 
         String[] pathParts = archiveEntryPath.split("/");
-        String path = StringUtils.join(pathParts, "/", 0, pathParts.length - 1);
+        String path = StringUtils.join(pathParts, '/', 0, pathParts.length - 1);
 
         String parentUrlString = rootUrl.toString() + (rootUrl.toString().endsWith("/") ? "" : "/")
                 + path + (path.equals("") ? "" : "/");

@@ -9,10 +9,8 @@
 
 package at.beris.virtualfile.util;
 
-import at.beris.virtualfile.FileType;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;

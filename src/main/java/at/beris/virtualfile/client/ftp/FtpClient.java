@@ -14,8 +14,8 @@ import at.beris.virtualfile.client.AbstractClient;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.util.StringUtils;
 import at.beris.virtualfile.util.UrlUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.*;
 import org.slf4j.LoggerFactory;
 

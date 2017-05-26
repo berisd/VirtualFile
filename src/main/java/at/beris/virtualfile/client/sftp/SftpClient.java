@@ -17,8 +17,8 @@ import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.util.StringUtils;
 import com.jcraft.jsch.*;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;

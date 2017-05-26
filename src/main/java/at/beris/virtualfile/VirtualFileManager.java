@@ -96,6 +96,8 @@ public interface VirtualFileManager {
 
     /**
      * Frees all resources allocated by the VirtualFile.
+     *
+     * @param file File to dispose
      */
     void dispose(VirtualFile file);
 

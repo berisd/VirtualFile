@@ -89,9 +89,10 @@ public abstract class AbstractFileArchiveTest {
     }
 
     private boolean isEqualArchiveEntry(VirtualArchiveEntry archiveEntry, VirtualArchiveEntry otherArchiveEntry) {
-        if (!archiveEntry.getPath().equals(otherArchiveEntry.getPath()))
-            return false;
-        if (!archiveEntry.getName().equals(otherArchiveEntry.getName()))
+        String fullPath = archiveEntry.getPath() +  archiveEntry.getName();
+        String fullPathOther = otherArchiveEntry.getPath() +  otherArchiveEntry.getName();
+
+        if (!fullPath.equals(fullPathOther))
             return false;
         if (archiveEntry.getSize() != otherArchiveEntry.getSize())
             return false;

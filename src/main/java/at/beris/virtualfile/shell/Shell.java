@@ -18,8 +18,8 @@ import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
 import at.beris.virtualfile.util.FileUtils;
 import at.beris.virtualfile.util.UrlUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import at.beris.virtualfile.util.StringUtils;
+import at.beris.virtualfile.util.Pair;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;

@@ -13,7 +13,7 @@ import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.VirtualFileManager;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.attribute.PosixFilePermission;
-import org.apache.commons.lang3.StringUtils;
+import at.beris.virtualfile.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
