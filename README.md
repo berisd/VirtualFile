@@ -25,6 +25,39 @@ The switch ```-Drunintegrationtests=true``` will run IntegrationTests which reqi
 
 ## Examples ##
 
+*) Test file attributes (local and remote)
+```java
+import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.VirtualFileManager;
+import at.beris.virtualfile.attribute.PosixFilePermission;
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class AppTest {
+    @Test
+    public void testFileAttributes() {
+        VirtualFileManager fileManager = VirtualFileManager.createManager();
+
+        VirtualFile file = fileManager.resolveLocalFile("/home/bernd/Downloads/ideaIC-2017.1.2.tar.gz");
+        assertThat(file.getAttributes()).contains(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OTHERS_READ);
+        assertThat(file.getSize()).isEqualTo(427932328);
+        assertThat(file.getContentType().toString()).isEqualTo("application/gzip");
+        assertThat(file.getContentEncoding()).isEqualTo("ISO-8859-1");
+        assertThat(file.getLastModifiedTime().toString()).isEqualTo("2017-05-30T16:49:54Z");
+        assertThat(file.getOwner().getName()).isEqualTo("bernd");
+        assertThat(file.getGroup().getName()).isEqualTo("adm");
+        assertThat(file.getName()).isEqualTo("ideaIC-2017.1.2.tar.gz");
+        assertThat(file.getPath()).isEqualTo("/home/bernd/Downloads/ideaIC-2017.1.2.tar.gz");
+
+        file = fileManager.resolveFile("https://en.wikipedia.org/wiki/Main_Page");
+        assertThat(file.getSize()).isEqualTo(73089);
+        assertThat(file.getContentType().toString()).isEqualTo("text/html");
+        assertThat(file.getContentEncoding()).isEqualTo("ISO-8859-1");
+        assertThat(file.getLastModifiedTime().toString()).isEqualTo("2017-05-30T16:46:43Z");
+    }
+}
+```
 *) Extract local 7zip file
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager()
