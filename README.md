@@ -25,13 +25,6 @@ The switch ```-Drunintegrationtests=true``` will run IntegrationTests which reqi
 
 ## Examples ##
 
-*) Extract local zip file
-```java
-VirtualFileManager fileManager = VirtualFileManager.createManager()
-VirtualArchive archive = fileManager.resolveLocalFile("/home/user/downloads/mytestapp.zip").asArchive();
-VirtualFile targetDirectory = fileManager.resolveLocalDirectory("extracted");
-archive.extract(targetDirectory)
-```
 *) Extract local 7zip file
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager()
