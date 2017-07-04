@@ -13,16 +13,19 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.client.ClientFileTranslator;
+import at.beris.virtualfile.client.ftp.FtpClient;
 import com.jcraft.jsch.SftpATTRS;
+import org.apache.commons.net.ftp.FTPFile;
 
 import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SftpFileTranslator {
+public class SftpFileTranslator implements ClientFileTranslator<SftpClient, SftpFile> {
 
-    public static void fillModel(FileModel model, SftpFile fileInfo) {
+    public void fillModel(FileModel model, SftpFile fileInfo, SftpClient client) {
         SftpATTRS sftpATTRS = fileInfo.getFile();
         model.setFileExists(true);
         model.setSize(sftpATTRS.getSize());

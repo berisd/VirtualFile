@@ -123,7 +123,7 @@ public class FtpClientIntegrationTest {
 
         FTPFile fileInfo = ftpClient.getFileInfo(TEST_FILE);
         FileModel model = new FileModel();
-        FtpFileTranslator.fillModel(model, fileInfo, ftpClient);
+        new FtpFileTranslator().fillModel(model, fileInfo, ftpClient);
 
         assertNotNull(model.getLastModifiedTime());
         assertEquals(TEST_STRING.length(), model.getSize());

@@ -29,8 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SftpClientFileOperationProvider extends AbstractFileOperationProvider<SftpClient> {
+
+    private SftpFileTranslator sftpFileTranslator;
+
     public SftpClientFileOperationProvider(UrlFileContext fileContext, SftpClient client) {
         super(fileContext, client);
+        sftpFileTranslator = new SftpFileTranslator();
     }
 
     @Override
@@ -71,7 +75,7 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
         for (SftpFile sftpFile : fileInfoList) {
             VirtualFile childFile = fileContext.resolveFile(UrlUtils.newUrl(model.getUrl(), sftpFile.getPath()));
             FileModel childModel = new FileModel();
-            SftpFileTranslator.fillModel(childModel, sftpFile);
+            sftpFileTranslator.fillModel(childModel, sftpFile, client);
             childFile.setModel(childModel);
             if (filter == null || filter.filter(childFile)) {
                 fileList.add(childFile);
@@ -87,7 +91,7 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
             return;
 
         SftpFile sftpFile = client.getFileInfo(model.getUrl().getPath());
-        SftpFileTranslator.fillModel(model, sftpFile);
+        sftpFileTranslator.fillModel(model, sftpFile, client);
     }
 
     @Override

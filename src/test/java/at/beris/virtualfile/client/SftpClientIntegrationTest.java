@@ -74,7 +74,7 @@ public class SftpClientIntegrationTest {
 
         SftpFile fileInfo = sftpClient.getFileInfo(TEST_FILE);
         FileModel model = new FileModel();
-        SftpFileTranslator.fillModel(model, fileInfo);
+        new SftpFileTranslator().fillModel(model, fileInfo, sftpClient);
 
         assertNotNull(model.getLastModifiedTime());
         assertEquals(TEST_STRING.length(), model.getSize());

@@ -28,8 +28,11 @@ import java.util.List;
 
 public class FtpClientFileOperationProvider extends AbstractFileOperationProvider<FtpClient> {
 
+    private FtpFileTranslator ftpFileTranslator;
+
     public FtpClientFileOperationProvider(UrlFileContext fileContext, FtpClient client) {
         super(fileContext, client);
+        ftpFileTranslator = new FtpFileTranslator();
     }
 
     @Override
@@ -73,7 +76,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
             childModel.setParent(model);
             String childPath = parentPath + ftpFile.getName() + (ftpFile.isDirectory() ? "/" : "");
             VirtualFile childFile = fileContext.resolveFile(UrlUtils.newUrl(model.getUrl(), childPath));
-            FtpFileTranslator.fillModel(childModel, ftpFile, client);
+            ftpFileTranslator.fillModel(childModel, ftpFile, client);
             childFile.setModel(childModel);
             if (filter == null || filter.filter(childFile)) {
                 fileList.add(childFile);
@@ -89,7 +92,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
             return;
 
         FTPFile ftpFile = client.getFileInfo(model.getUrl().getPath());
-        FtpFileTranslator.fillModel(model, ftpFile, client);
+        ftpFileTranslator.fillModel(model, ftpFile, client);
     }
 
     @Override
