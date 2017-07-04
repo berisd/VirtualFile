@@ -13,37 +13,32 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
-
-/**
- * Created by bernd on 25.05.17.
- */
+import java.util.Collections;
 
 public class StringUtilsTest {
 
     @Test
     public void testSplitEmpty() {
-        Assert.assertArrayEquals(new String[] {}, StringUtils.split(null, ','));
-        Assert.assertArrayEquals(new String[] {}, StringUtils.split("", ','));
+        Assert.assertArrayEquals(new String[]{}, StringUtils.split(null, ','));
+        Assert.assertArrayEquals(new String[]{}, StringUtils.split("", ','));
     }
 
     @Test
     public void testSplitSingle() {
-        Assert.assertArrayEquals(new String[] {"abc"}, StringUtils.split("abc", ','));
-        Assert.assertArrayEquals(new String[] {"abc,"}, StringUtils.split("abc,", '|'));
+        Assert.assertArrayEquals(new String[]{"abc"}, StringUtils.split("abc", ','));
+        Assert.assertArrayEquals(new String[]{"abc,"}, StringUtils.split("abc,", '|'));
     }
 
     @Test
     public void testSplitDouble() {
-        Assert.assertArrayEquals(new String[] {"abc", "def"}, StringUtils.split("abc,def", ','));
-        Assert.assertArrayEquals(new String[] {"", "def"}, StringUtils.split(",def", ','));
-        Assert.assertArrayEquals(new String[] {"def", ""}, StringUtils.split("def,", ','));
+        Assert.assertArrayEquals(new String[]{"abc", "def"}, StringUtils.split("abc,def", ','));
+        Assert.assertArrayEquals(new String[]{"", "def"}, StringUtils.split(",def", ','));
+        Assert.assertArrayEquals(new String[]{"def", ""}, StringUtils.split("def,", ','));
     }
 
     @Test
     public void testSplitMulti() {
-        Assert.assertArrayEquals(new String[] {"abc", "def", " asdfghi aabc"}, StringUtils.split("abc,def, asdfghi aabc", ','));
+        Assert.assertArrayEquals(new String[]{"abc", "def", " asdfghi aabc"}, StringUtils.split("abc,def, asdfghi aabc", ','));
     }
 
     @Test
@@ -62,29 +57,29 @@ public class StringUtilsTest {
 
     @Test
     public void testJoinEmpty() {
-        Assert.assertEquals(StringUtils.EMPTY_STRING, StringUtils.join(Arrays.asList(),','));
-        Assert.assertEquals(StringUtils.EMPTY_STRING, StringUtils.join(null,','));
+        Assert.assertEquals(StringUtils.EMPTY_STRING, StringUtils.join(Collections.emptyList(), ','));
+        Assert.assertEquals(StringUtils.EMPTY_STRING, StringUtils.join(null, ','));
     }
 
     @Test
     public void testJoinSingle() {
-        Assert.assertEquals("abc", StringUtils.join(Arrays.asList("abc"),','));
+        Assert.assertEquals("abc", StringUtils.join(Collections.singletonList("abc"), ','));
     }
 
     @Test
     public void testJoinMulti() {
-        Assert.assertEquals("abc,def", StringUtils.join(Arrays.asList("abc", "def"),','));
-        Assert.assertEquals("This is a teststring", StringUtils.join(Arrays.asList("This", "is", "a", "teststring"),' '));
+        Assert.assertEquals("abc,def", StringUtils.join(Arrays.asList("abc", "def"), ','));
+        Assert.assertEquals("This is a teststring", StringUtils.join(Arrays.asList("This", "is", "a", "teststring"), ' '));
     }
 
     @Test
     public void testJoinBounds() {
-        Assert.assertEquals("abc,def,ghi", StringUtils.join(new String[] {"abc", "def", "ghi"},',', 0, 3));
-        Assert.assertEquals("abc,def", StringUtils.join(new String[] {"abc", "def", "ghi"},',', 0, 2));
-        Assert.assertEquals("abc|def", StringUtils.join(new String[] {"abc", "def", "ghi"},'|', 0, 2));
-        Assert.assertEquals("abc", StringUtils.join(new String[] {"abc", "def", "ghi"},',', 0, 1));
-        Assert.assertEquals("def", StringUtils.join(new String[] {"abc", "def", "ghi"},',', 1, 2));
-        Assert.assertEquals(StringUtils.EMPTY_STRING, StringUtils.join(new String[] {"abc", "def", "ghi"},',', 0, 0));
+        Assert.assertEquals("abc,def,ghi", StringUtils.join(new String[]{"abc", "def", "ghi"}, ',', 0, 3));
+        Assert.assertEquals("abc,def", StringUtils.join(new String[]{"abc", "def", "ghi"}, ',', 0, 2));
+        Assert.assertEquals("abc|def", StringUtils.join(new String[]{"abc", "def", "ghi"}, '|', 0, 2));
+        Assert.assertEquals("abc", StringUtils.join(new String[]{"abc", "def", "ghi"}, ',', 0, 1));
+        Assert.assertEquals("def", StringUtils.join(new String[]{"abc", "def", "ghi"}, ',', 1, 2));
+        Assert.assertEquals(StringUtils.EMPTY_STRING, StringUtils.join(new String[]{"abc", "def", "ghi"}, ',', 0, 0));
     }
 
     @Test

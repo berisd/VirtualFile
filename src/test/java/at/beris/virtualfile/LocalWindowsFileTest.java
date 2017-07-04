@@ -20,7 +20,7 @@ import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 import static at.beris.virtualfile.FileTestHelper.*;
@@ -82,7 +82,7 @@ public class LocalWindowsFileTest extends AbstractUrlFileTest {
 
     @Test
     public void setFileAttributes() {
-        super.setFileAttributes(new HashSet(Arrays.asList(DosFileAttribute.HIDDEN)));
+        super.setFileAttributes(new HashSet(Collections.singletonList(DosFileAttribute.HIDDEN)));
     }
 
     @Test

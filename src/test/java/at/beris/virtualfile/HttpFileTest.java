@@ -61,7 +61,7 @@ public class HttpFileTest extends AbstractUrlFileTest {
     public void getFile() {
         VirtualFile file = fileManager.resolveFile("http://www.beris.at/images/d6fe0ebe40ef6117c1c8979c00777ce64f8a521302fd95ec13afdb8ebfa4349a_196.jpg");
         Assert.assertEquals(11069, file.getSize());
-        Assert.assertEquals(file.getLastModifiedTime().toInstant(), DateUtils.getLocalDateTimeFromInstant(LocalDateTime.of(2016, 02, 21, 22, 53, 20)));
+        Assert.assertEquals(file.getLastModifiedTime().toInstant(), DateUtils.getLocalDateTimeFromInstant(LocalDateTime.of(2016, 2, 21, 22, 53, 20)));
         Assert.assertEquals("image/jpeg", file.getContentType().toString());
     }
 

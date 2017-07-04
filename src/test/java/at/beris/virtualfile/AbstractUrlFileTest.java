@@ -183,7 +183,7 @@ public abstract class AbstractUrlFileTest {
         file = fileManager.resolveFile(targetFileUrl);
 
         if (owner instanceof UnixUserPrincipal)
-            assertEquals(((UnixUserPrincipal)owner).getUid(), ((UnixUserPrincipal)file.getOwner()).getUid());
+            assertEquals(((UnixUserPrincipal) owner).getUid(), ((UnixUserPrincipal) file.getOwner()).getUid());
         else
             assertEquals(owner.getName(), file.getOwner().getName());
     }
@@ -204,7 +204,7 @@ public abstract class AbstractUrlFileTest {
         file = fileManager.resolveFile(targetFileUrl);
 
         if (group instanceof UnixGroupPrincipal)
-            assertEquals(((UnixGroupPrincipal)group).getGid(), ((UnixGroupPrincipal)file.getGroup()).getGid());
+            assertEquals(((UnixGroupPrincipal) group).getGid(), ((UnixGroupPrincipal) file.getGroup()).getGid());
         else
             assertEquals(group.getName(), file.getGroup().getName());
     }
@@ -224,18 +224,18 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void setCreationTime() {
-        setTime((object, value) -> object.setCreationTime(value),
-                virtualFile -> virtualFile.getCreationTime());
+        setTime(VirtualFile::setCreationTime,
+                VirtualFile::getCreationTime);
     }
 
     protected void setLastModifiedTime() {
-        setTime((object, value) -> object.setLastModifiedTime(value),
-                virtualFile -> virtualFile.getLastModifiedTime());
+        setTime(VirtualFile::setLastModifiedTime,
+                VirtualFile::getLastModifiedTime);
     }
 
     protected void setLastAccessTime() {
-        setTime((object, value) -> object.setLastAccessTime(value),
-                virtualFile -> virtualFile.getLastAccessTime());
+        setTime(VirtualFile::setLastAccessTime,
+                VirtualFile::getLastAccessTime);
     }
 
     protected void assertCopyListener(FileOperationListener copyListener) {
@@ -286,8 +286,7 @@ public abstract class AbstractUrlFileTest {
                     VirtualFile file = fileManager.resolveFile(url);
                     if (file.exists())
                         file.delete();
-                }
-                catch (RuntimeException e) {
+                } catch (RuntimeException e) {
                     LOGGER.error("Exception occured", e);
                 }
             }
