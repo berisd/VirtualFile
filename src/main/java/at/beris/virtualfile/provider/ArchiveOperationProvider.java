@@ -44,7 +44,7 @@ public class ArchiveOperationProvider {
     public List<VirtualArchiveEntry> list(VirtualArchive archive) {
         List<VirtualArchiveEntry> archiveEntryList = new ArrayList<>();
 
-        IOSructure ioSructure = new IOSructure();
+        IOStructure ioSructure = new IOStructure();
         ioSructure.setArchive(archive);
         ioSructure.setArchiveEntryList(archiveEntryList);
         processArchiveEntries(ioSructure, listFileFromArchive());
@@ -54,7 +54,7 @@ public class ArchiveOperationProvider {
     public List<VirtualFile> extract(VirtualArchive archive, VirtualFile target) {
         List<VirtualFile> fileList = new ArrayList<>();
         target.create();
-        IOSructure ioSructure = new IOSructure();
+        IOStructure ioSructure = new IOStructure();
         ioSructure.setArchive(archive);
         ioSructure.setTarget(target);
         ioSructure.setFileList(fileList);
@@ -62,7 +62,7 @@ public class ArchiveOperationProvider {
         return fileList;
     }
 
-    private void processArchiveEntries(IOSructure ioSructure, Consumer<IOSructure> consumer) {
+    private void processArchiveEntries(IOStructure ioSructure, Consumer<IOStructure> consumer) {
         InputStream fileInputStream = null;
         CompressorInputStream compressorInputStream = null;
 
@@ -115,7 +115,7 @@ public class ArchiveOperationProvider {
         }
     }
 
-    private void iterateArchiveEntries(IOSructure ioSructure, Consumer<IOSructure> operation) {
+    private void iterateArchiveEntries(IOStructure ioSructure, Consumer<IOStructure> operation) {
         try {
             ArchiveInputStream archiveInputStream = ioSructure.getArchiveInputStream();
             ArchiveEntry archiveEntry;
@@ -128,7 +128,7 @@ public class ArchiveOperationProvider {
         }
     }
 
-    private void iterateSevenZipArchiveEntries(IOSructure ioSructure, Consumer<IOSructure> operation) {
+    private void iterateSevenZipArchiveEntries(IOStructure ioSructure, Consumer<IOStructure> operation) {
         SevenZFile sevenZFile = null;
         try {
             VirtualArchive virtualArchive = ioSructure.getArchive();
@@ -154,7 +154,7 @@ public class ArchiveOperationProvider {
         }
     }
 
-    private Consumer<IOSructure> listFileFromArchive() {
+    private Consumer<IOStructure> listFileFromArchive() {
         return ioSructure -> {
             ArchiveEntry commonsArchiveEntry = ioSructure.getCommonsArchiveEntry();
             List<VirtualArchiveEntry> archiveEntryList = ioSructure.getArchiveEntryList();
@@ -173,7 +173,7 @@ public class ArchiveOperationProvider {
         };
     }
 
-    private Consumer<IOSructure> copyFileFromArchive() {
+    private Consumer<IOStructure> copyFileFromArchive() {
         return ioSructure -> {
             try {
                 ArchiveEntry archiveEntry = ioSructure.getCommonsArchiveEntry();
@@ -223,7 +223,7 @@ public class ArchiveOperationProvider {
         return urlMap;
     }
 
-    private class IOSructure {
+    private class IOStructure {
         private ArchiveInputStream archiveInputStream;
         private VirtualArchive archive;
         private VirtualFile target;

@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LocalFileOperationProvider extends AbstractFileOperationProvider {
+public class LocalFileOperationProvider extends AbstractFileOperationProvider<Client> {
     private final static Logger LOGGER = LoggerFactory.getLogger(LocalFileOperationProvider.class);
 
     public LocalFileOperationProvider(UrlFileContext fileContext, Client client) {
