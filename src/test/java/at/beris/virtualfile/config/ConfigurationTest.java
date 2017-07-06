@@ -22,11 +22,11 @@ public class ConfigurationTest {
     private static final String USERNAME = "user1";
     private static final String PASSWORD = "password1";
 
-    private Configuration config;
+    private UrlFileConfiguration config;
 
     @Before
     public void setUp() {
-        config = new Configuration();
+        config = new UrlFileConfiguration();
     }
 
     @Test
@@ -45,19 +45,19 @@ public class ConfigurationTest {
     @Test
     public void removeValues() {
         _setValues();
-        config.remove(ConfigurationOption.AUTHENTICATION_TYPE);
+        config.remove(UrlFileConfigurationOption.AUTHENTICATION_TYPE);
         assertNull(config.getAuthenticationType());
-        config.remove(ConfigurationOption.STRICT_HOSTKEY_CHECKING);
+        config.remove(UrlFileConfigurationOption.STRICT_HOSTKEY_CHECKING);
         assertNull(config.isStrictHostKeyChecking());
-        config.remove(ConfigurationOption.TIMEOUT);
+        config.remove(UrlFileConfigurationOption.TIMEOUT);
         assertNull(config.getTimeOut());
-        config.remove(ConfigurationOption.KNOWN_HOSTS_FILE);
+        config.remove(UrlFileConfigurationOption.KNOWN_HOSTS_FILE);
         assertNull(config.getKnownHostsFile());
-        config.remove(ConfigurationOption.PRIVATE_KEY_FILE);
+        config.remove(UrlFileConfigurationOption.PRIVATE_KEY_FILE);
         assertNull(config.getPrivateKeyFile());
-        config.remove(ConfigurationOption.USERNAME);
+        config.remove(UrlFileConfigurationOption.USERNAME);
         assertNull(config.getUsername());
-        config.remove(ConfigurationOption.PASSWORD);
+        config.remove(UrlFileConfigurationOption.PASSWORD);
         assertNull(config.getPassword());
     }
 

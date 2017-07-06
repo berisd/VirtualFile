@@ -23,21 +23,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Configurator {
+    private ContextConfiguration contextConfiguration;
     private Map<Protocol, Class> fileOperationProviderClassMap;
     private Map<Protocol, Class> clientClassMap;
 
-    private Configuration defaultConfiguration;
-    private Map<Protocol, Configuration> configurationPerProtocolMap;
-    private Map<URL, Configuration> configurationPerUrlMap;
+    private UrlFileConfiguration defaultUrlFileConfiguration;
+    private Map<Protocol, UrlFileConfiguration> configurationPerProtocolMap;
+    private Map<URL, UrlFileConfiguration> configurationPerUrlMap;
 
     public Configurator() {
+        contextConfiguration = new ContextConfiguration();
+
         fileOperationProviderClassMap = new HashMap<>();
         clientClassMap = new HashMap<>();
         configurationPerProtocolMap = new HashMap<>();
         configurationPerUrlMap = new HashMap<>();
 
-        defaultConfiguration = new Configuration();
-        defaultConfiguration.initValues();
+        defaultUrlFileConfiguration = new UrlFileConfiguration();
+        defaultUrlFileConfiguration.initValues();
 
         clientClassMap.put(Protocol.FILE, null);
         clientClassMap.put(Protocol.SFTP, SftpClient.class);
@@ -52,7 +55,7 @@ public class Configurator {
         fileOperationProviderClassMap.put(Protocol.HTTPS, HttpsClientFileOperationProvider.class);
 
         for (Protocol protocol : Protocol.values()) {
-            configurationPerProtocolMap.put(protocol, new Configuration(defaultConfiguration));
+            configurationPerProtocolMap.put(protocol, new UrlFileConfiguration(defaultUrlFileConfiguration));
         }
     }
 
@@ -69,36 +72,54 @@ public class Configurator {
         clientClassMap.put(protocol, clientClass);
     }
 
-    public Configuration createConfiguration(URL url) {
+    public UrlFileConfiguration createConfiguration(URL url) {
         Protocol protocol = UrlUtils.getProtocol(url);
 
-        Configuration protocolConfig = configurationPerProtocolMap.get(protocol);
+        UrlFileConfiguration protocolConfig = configurationPerProtocolMap.get(protocol);
         if (protocolConfig == null) {
-            protocolConfig = new Configuration(defaultConfiguration);
+            protocolConfig = new UrlFileConfiguration(defaultUrlFileConfiguration);
             configurationPerProtocolMap.put(protocol, protocolConfig);
         }
 
         URL siteUrl = UrlUtils.newUrl(UrlUtils.getSiteUrlString(url.toString()));
-        Configuration urlConfig = configurationPerUrlMap.get(siteUrl);
+        UrlFileConfiguration urlConfig = configurationPerUrlMap.get(siteUrl);
         if (urlConfig == null) {
-            urlConfig = new Configuration(protocolConfig);
+            urlConfig = new UrlFileConfiguration(protocolConfig);
             configurationPerUrlMap.put(siteUrl, urlConfig);
         }
 
         return urlConfig;
     }
 
-    public Configuration getConfiguration() {
-        return defaultConfiguration;
+    public UrlFileConfiguration getConfiguration() {
+        return defaultUrlFileConfiguration;
     }
 
-    public Configuration getConfiguration(Protocol protocol) {
+    public UrlFileConfiguration getConfiguration(Protocol protocol) {
         return configurationPerProtocolMap.get(protocol);
     }
 
-    public Configuration getConfiguration(VirtualFile file) {
+    public UrlFileConfiguration getConfiguration(VirtualFile file) {
         URL siteUrl = UrlUtils.newUrl(UrlUtils.getSiteUrlString(file.getUrl().toString()));
         return configurationPerUrlMap.get(siteUrl);
     }
 
+
+    public String getHome() {
+        return contextConfiguration.getHome();
+    }
+
+    public Configurator setHome(String path) {
+        contextConfiguration.setHome(path);
+        return this;
+    }
+
+    public int getFileCacheSize() {
+        return contextConfiguration.getFileCacheSize();
+    }
+
+    public Configurator setFileCacheSize(int size) {
+        contextConfiguration.setFileCacheSize(size);
+        return this;
+    }
 }

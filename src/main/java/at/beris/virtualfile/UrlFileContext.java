@@ -14,9 +14,8 @@ import at.beris.virtualfile.cache.FileCache;
 import at.beris.virtualfile.cache.FileCacheCallbackHandler;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.VirtualClient;
-import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.config.ContextConfiguration;
+import at.beris.virtualfile.config.UrlFileConfiguration;
 import at.beris.virtualfile.content.charset.CharsetDetector;
 import at.beris.virtualfile.content.detect.Detector;
 import at.beris.virtualfile.content.mime.MimeTypes;
@@ -55,22 +54,13 @@ public class UrlFileContext {
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
     private ArchiveOperationProvider archiveOperationProvider;
 
-    private ContextConfiguration contextConfiguration;
-
-    public UrlFileContext() {
-        this(new Configurator());
-    }
-
     public UrlFileContext(Configurator configurator) {
         this.configurator = configurator;
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
 
-        contextConfiguration = new ContextConfiguration();
-        contextConfiguration.initValues();
-
-        fileCache = new FileCache(contextConfiguration.getFileCacheSize());
+        fileCache = new FileCache(configurator.getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
 
         //TODO load sites
@@ -193,7 +183,7 @@ public class UrlFileContext {
     /**
      * Gets client for a siteUrlString.
      *
-     * @param siteUrlString Site UrlString
+     * @param siteUrlString at.beris.virtualfile.Site UrlString
      * @return Client
      */
     public VirtualClient getClient(String siteUrlString) {
@@ -245,8 +235,8 @@ public class UrlFileContext {
         Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
         if (clientClass != null) {
             try {
-                Configuration configuration = configurator.createConfiguration(url);
-                Constructor constructor = clientClass.getConstructor(URL.class, Configuration.class);
+                UrlFileConfiguration configuration = configurator.createConfiguration(url);
+                Constructor constructor = clientClass.getConstructor(URL.class, UrlFileConfiguration.class);
                 return (VirtualClient) constructor.newInstance(url, configuration);
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
@@ -331,20 +321,20 @@ public class UrlFileContext {
     }
 
     public void setHome(String home) {
-        contextConfiguration.setHome(home);
+        configurator.setHome(home);
     }
 
     public String getHome() {
-        return contextConfiguration.getHome();
+        return configurator.getHome();
     }
 
     public void setFileCacheSize(int size) {
-        contextConfiguration.setFileCacheSize(size);
+        configurator.setFileCacheSize(size);
         fileCache.setMaxSize(size);
     }
 
     public int getFileCacheSize() {
-        return contextConfiguration.getFileCacheSize();
+        return configurator.getFileCacheSize();
     }
 
 

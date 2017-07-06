@@ -13,7 +13,7 @@ import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.AbstractClient;
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.config.UrlFileConfiguration;
 import at.beris.virtualfile.config.value.AuthenticationType;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -41,7 +41,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
     private ChannelSftp sftpChannel;
     private boolean isInitialized = false;
 
-    public SftpClient(URL url, Configuration config) {
+    public SftpClient(URL url, UrlFileConfiguration config) {
         super(url, config);
     }
 

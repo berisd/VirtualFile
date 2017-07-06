@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.config;
 
-public enum ConfigurationOption {
+public enum UrlFileConfigurationOption {
     KNOWN_HOSTS_FILE,
     TIMEOUT,
     STRICT_HOSTKEY_CHECKING,

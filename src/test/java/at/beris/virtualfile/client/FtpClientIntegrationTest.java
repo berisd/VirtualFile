@@ -13,7 +13,7 @@ import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.FileTestHelper;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.ftp.FtpFileTranslator;
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.config.UrlFileConfiguration;
 import at.beris.virtualfile.exception.VirtualFileException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.ftpserver.FtpServer;
@@ -179,7 +179,7 @@ public class FtpClientIntegrationTest {
     }
 
     private static FtpClient createFtpClient() throws Exception {
-        Configuration configuration = new Configuration();
+        UrlFileConfiguration configuration = new UrlFileConfiguration();
         configuration.initValues();
 //        URL url = new URL("ftp://gd.tuwien.ac.at");
         URL url = new URL("ftp://ftptest:test123@localhost:" + FTP_PORT);

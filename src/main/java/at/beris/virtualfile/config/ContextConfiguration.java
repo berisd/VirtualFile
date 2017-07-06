@@ -22,11 +22,7 @@ public class ContextConfiguration {
 
     public ContextConfiguration() {
         settings = new HashMap<>();
-    }
-
-    public void initValues() {
-        settings.put(ContextConfigurationOption.FILE_CACHE_SIZE, new IntegerConfigValue(10000));
-        settings.put(ContextConfigurationOption.HOME, new StringConfigValue(System.getProperty("user.home") + File.separator + ".VirtualFile"));
+        initValues();
     }
 
     public Integer getFileCacheSize() {
@@ -47,5 +43,10 @@ public class ContextConfiguration {
     public ContextConfiguration setHome(String path) {
         settings.put(ContextConfigurationOption.HOME, new StringConfigValue(path));
         return this;
+    }
+
+    private void initValues() {
+        settings.put(ContextConfigurationOption.FILE_CACHE_SIZE, new IntegerConfigValue(10000));
+        settings.put(ContextConfigurationOption.HOME, new StringConfigValue(System.getProperty("user.home") + File.separator + ".VirtualFile"));
     }
 }

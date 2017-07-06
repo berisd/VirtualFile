@@ -9,7 +9,8 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.config.Configurator;
+import at.beris.virtualfile.config.UrlFileConfiguration;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.Pair;
@@ -31,7 +32,7 @@ public class UrlFileManager implements VirtualFileManager {
     private UrlFileContext fileContext;
 
     public UrlFileManager() {
-        this(new UrlFileContext());
+        this(new UrlFileContext(new Configurator()));
     }
 
     public UrlFileManager(UrlFileContext fileContext) {
@@ -43,17 +44,19 @@ public class UrlFileManager implements VirtualFileManager {
     }
 
     @Override
-    public Configuration getConfiguration() {
+    @Deprecated
+    public UrlFileConfiguration getConfiguration() {
         return fileContext.getConfigurator().getConfiguration();
     }
 
     @Override
-    public Configuration getConfiguration(Protocol protocol) {
+    @Deprecated
+    public UrlFileConfiguration getConfiguration(Protocol protocol) {
         return fileContext.getConfigurator().getConfiguration(protocol);
     }
 
     @Override
-    public Configuration getConfiguration(VirtualFile file) {
+    public UrlFileConfiguration getConfiguration(VirtualFile file) {
         return fileContext.getConfigurator().getConfiguration(file);
     }
 

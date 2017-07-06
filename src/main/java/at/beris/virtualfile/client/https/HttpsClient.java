@@ -10,13 +10,13 @@
 package at.beris.virtualfile.client.https;
 
 import at.beris.virtualfile.client.http.HttpClient;
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.config.UrlFileConfiguration;
 
 import java.net.URL;
 
 public class HttpsClient extends HttpClient {
 
-    public HttpsClient(URL url, Configuration config) {
+    public HttpsClient(URL url, UrlFileConfiguration config) {
         super(url, config);
     }
 }

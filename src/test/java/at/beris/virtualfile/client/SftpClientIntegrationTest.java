@@ -14,9 +14,8 @@ import at.beris.virtualfile.FileTestHelper;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.client.sftp.SftpFile;
 import at.beris.virtualfile.client.sftp.SftpFileTranslator;
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.config.UrlFileConfiguration;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.util.UrlUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -111,7 +110,7 @@ public class SftpClientIntegrationTest {
     }
 
     private static SftpClient createSftpClient() throws Exception {
-        Configuration configuration = new Configuration();
+        UrlFileConfiguration configuration = new UrlFileConfiguration();
         configuration.initValues();
         char[] password = FileTestHelper.readSftpPassword().toCharArray();
         URL url = new URL("sftp://sshtest:" + String.valueOf(password) + "@www.beris.at:22");

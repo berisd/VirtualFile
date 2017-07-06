@@ -36,8 +36,8 @@ public class ConfiguratorTest {
     public void createClientConfigCheckCloning() throws Exception {
         URL url1 = new URL("file://test:pwd@site1.example.com:22/test.txt");
         URL url2 = new URL("file://test:pwd@site2.example.com:22/test.txt");
-        Configuration siteConfig1 = config.createConfiguration(url1);
-        Configuration siteConfig2 = config.createConfiguration(url2);
+        UrlFileConfiguration siteConfig1 = config.createConfiguration(url1);
+        UrlFileConfiguration siteConfig2 = config.createConfiguration(url2);
 
         assertNotSame(siteConfig1, siteConfig2);
         siteConfig1.setTimeOut(1);
@@ -59,7 +59,7 @@ public class ConfiguratorTest {
         Mockito.when(file.getUrl()).thenReturn(new URL("sftp://test:pwd@site.example.com:22/test.txt"));
 
         config.getConfiguration().setTimeOut(111);
-        Configuration configuration = config.createConfiguration(file.getUrl());
+        UrlFileConfiguration configuration = config.createConfiguration(file.getUrl());
         assertEquals(111, (int) configuration.getTimeOut());
 
         config.getConfiguration(Protocol.SFTP).setTimeOut(222);
@@ -81,14 +81,14 @@ public class ConfiguratorTest {
         config.getConfiguration().setTimeOut(111);
         config.getConfiguration(Protocol.SFTP).setTimeOut(222);
         config.getConfiguration(file).setTimeOut(333);
-        Configuration configuration = config.createConfiguration(file.getUrl());
+        UrlFileConfiguration configuration = config.createConfiguration(file.getUrl());
         assertEquals(333, (int) configuration.getTimeOut());
 
-        config.getConfiguration(file).remove(ConfigurationOption.TIMEOUT);
+        config.getConfiguration(file).remove(UrlFileConfigurationOption.TIMEOUT);
         configuration = config.createConfiguration(file.getUrl());
         assertEquals(222, (int) configuration.getTimeOut());
 
-        config.getConfiguration(Protocol.SFTP).remove(ConfigurationOption.TIMEOUT);
+        config.getConfiguration(Protocol.SFTP).remove(UrlFileConfigurationOption.TIMEOUT);
         configuration = config.createConfiguration(file.getUrl());
         assertEquals(111, (int) configuration.getTimeOut());
     }
@@ -123,11 +123,11 @@ public class ConfiguratorTest {
         assertEquals(30, (int) config.getConfiguration(file).getTimeOut());
 
         assertEquals(Integer.valueOf(30), config.getConfiguration(file).getTimeOut());
-        config.getConfiguration(file).remove(ConfigurationOption.TIMEOUT);
+        config.getConfiguration(file).remove(UrlFileConfigurationOption.TIMEOUT);
         assertEquals(Integer.valueOf(20), config.getConfiguration(file).getTimeOut());
-        config.getConfiguration(Protocol.SFTP).remove(ConfigurationOption.TIMEOUT);
+        config.getConfiguration(Protocol.SFTP).remove(UrlFileConfigurationOption.TIMEOUT);
         assertEquals(Integer.valueOf(10), config.getConfiguration(file).getTimeOut());
-        config.getConfiguration().remove(ConfigurationOption.TIMEOUT);
+        config.getConfiguration().remove(UrlFileConfigurationOption.TIMEOUT);
         assertNull(config.getConfiguration(file).getTimeOut());
     }
 }
