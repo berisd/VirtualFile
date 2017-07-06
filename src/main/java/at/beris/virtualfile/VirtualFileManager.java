@@ -11,7 +11,6 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.config.ContextConfiguration;
 import at.beris.virtualfile.protocol.Protocol;
 
 import java.net.URL;
@@ -25,8 +24,6 @@ public interface VirtualFileManager {
     static VirtualFileManager createManager() {
         return new UrlFileManager(new UrlFileContext(new Configurator()));
     }
-
-    ContextConfiguration getContextConfiguration();
 
     Configuration getConfiguration();
 
@@ -76,6 +73,7 @@ public interface VirtualFileManager {
 
     /**
      * Creates a VirtualArchive representing a local archive with the given path.
+     *
      * @param path Path
      * @return VirtualArchive
      */
@@ -115,4 +113,14 @@ public interface VirtualFileManager {
      * @return Supported Protocols.
      */
     Set<Protocol> supportedProtocols();
+
+    void setHome(String home);
+
+    String getHome();
+
+    void setFileCacheSize(int size);
+
+    int getFileCacheSize();
+
+
 }

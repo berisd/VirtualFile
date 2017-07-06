@@ -11,7 +11,9 @@ package at.beris.virtualfile.config;
 
 import at.beris.virtualfile.config.value.ConfigValue;
 import at.beris.virtualfile.config.value.IntegerConfigValue;
+import at.beris.virtualfile.config.value.StringConfigValue;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ public class ContextConfiguration {
 
     public void initValues() {
         settings.put(ContextConfigurationOption.FILE_CACHE_SIZE, new IntegerConfigValue(10000));
+        settings.put(ContextConfigurationOption.HOME, new StringConfigValue(System.getProperty("user.home") + File.separator + ".VirtualFile"));
     }
 
     public Integer getFileCacheSize() {
@@ -33,6 +36,16 @@ public class ContextConfiguration {
 
     public ContextConfiguration setFileCacheSize(int fileCacheSize) {
         settings.put(ContextConfigurationOption.FILE_CACHE_SIZE, new IntegerConfigValue(fileCacheSize));
+        return this;
+    }
+
+    public String getHome() {
+        ConfigValue configValue = settings.get(ContextConfigurationOption.HOME);
+        return configValue != null ? (String) configValue.getValue() : null;
+    }
+
+    public ContextConfiguration setHome(String path) {
+        settings.put(ContextConfigurationOption.HOME, new StringConfigValue(path));
         return this;
     }
 }

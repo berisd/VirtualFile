@@ -26,8 +26,6 @@ public class Configurator {
     private Map<Protocol, Class> fileOperationProviderClassMap;
     private Map<Protocol, Class> clientClassMap;
 
-    private ContextConfiguration contextConfiguration;
-
     private Configuration defaultConfiguration;
     private Map<Protocol, Configuration> configurationPerProtocolMap;
     private Map<URL, Configuration> configurationPerUrlMap;
@@ -37,9 +35,6 @@ public class Configurator {
         clientClassMap = new HashMap<>();
         configurationPerProtocolMap = new HashMap<>();
         configurationPerUrlMap = new HashMap<>();
-
-        contextConfiguration = new ContextConfiguration();
-        contextConfiguration.initValues();
 
         defaultConfiguration = new Configuration();
         defaultConfiguration.initValues();
@@ -106,7 +101,4 @@ public class Configurator {
         return configurationPerUrlMap.get(siteUrl);
     }
 
-    public ContextConfiguration getContextConfiguration() {
-        return contextConfiguration;
-    }
 }

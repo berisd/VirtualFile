@@ -10,5 +10,5 @@
 package at.beris.virtualfile.config;
 
 public enum ContextConfigurationOption {
-    FILE_CACHE_SIZE
+    FILE_CACHE_SIZE, HOME
 }

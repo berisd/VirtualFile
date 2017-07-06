@@ -10,11 +10,10 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.config.Configuration;
-import at.beris.virtualfile.config.ContextConfiguration;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
-import at.beris.virtualfile.util.UrlUtils;
 import at.beris.virtualfile.util.Pair;
+import at.beris.virtualfile.util.UrlUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -41,11 +40,6 @@ public class UrlFileManager implements VirtualFileManager {
             UrlUtils.registerProtocolURLStreamHandlers();
         }
         this.fileContext = fileContext;
-    }
-
-    @Override
-    public ContextConfiguration getContextConfiguration() {
-        return fileContext.getConfigurator().getContextConfiguration();
     }
 
     @Override
@@ -127,6 +121,7 @@ public class UrlFileManager implements VirtualFileManager {
 
     /**
      * Creates a VirtualArchive representing a local archive with the given path.
+     *
      * @param path Path
      * @return VirtualArchive
      */
@@ -209,6 +204,26 @@ public class UrlFileManager implements VirtualFileManager {
     @Override
     public Set<Protocol> supportedProtocols() {
         return EnumSet.allOf(Protocol.class);
+    }
+
+    @Override
+    public void setHome(String home) {
+        fileContext.setHome(home);
+    }
+
+    @Override
+    public String getHome() {
+        return fileContext.getHome();
+    }
+
+    @Override
+    public void setFileCacheSize(int size) {
+        fileContext.setFileCacheSize(size);
+    }
+
+    @Override
+    public int getFileCacheSize() {
+        return fileContext.getFileCacheSize();
     }
 
 }

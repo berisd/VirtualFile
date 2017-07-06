@@ -16,8 +16,9 @@ import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.VirtualClient;
 import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.content.detect.Detector;
+import at.beris.virtualfile.config.ContextConfiguration;
 import at.beris.virtualfile.content.charset.CharsetDetector;
+import at.beris.virtualfile.content.detect.Detector;
 import at.beris.virtualfile.content.mime.MimeTypes;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -54,6 +55,8 @@ public class UrlFileContext {
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
     private ArchiveOperationProvider archiveOperationProvider;
 
+    private ContextConfiguration contextConfiguration;
+
     public UrlFileContext() {
         this(new Configurator());
     }
@@ -64,8 +67,13 @@ public class UrlFileContext {
         this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
 
-        fileCache = new FileCache(configurator.getContextConfiguration().getFileCacheSize());
+        contextConfiguration = new ContextConfiguration();
+        contextConfiguration.initValues();
+
+        fileCache = new FileCache(contextConfiguration.getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
+
+        //TODO load sites
     }
 
     /**
@@ -321,6 +329,24 @@ public class UrlFileContext {
         }
         return archiveOperationProvider;
     }
+
+    public void setHome(String home) {
+        contextConfiguration.setHome(home);
+    }
+
+    public String getHome() {
+        return contextConfiguration.getHome();
+    }
+
+    public void setFileCacheSize(int size) {
+        contextConfiguration.setFileCacheSize(size);
+        fileCache.setMaxSize(size);
+    }
+
+    public int getFileCacheSize() {
+        return contextConfiguration.getFileCacheSize();
+    }
+
 
     private class CustomFileCacheCallbackHandlerHandler implements FileCacheCallbackHandler {
 
