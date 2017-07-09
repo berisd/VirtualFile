@@ -42,7 +42,7 @@ public abstract class AbstractFileOperation<RF, RB> {
 
     public RF execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
         if (!source.exists())
-            throw new VirtualFileException(Message.NO_SUCH_FILE(source.getPath()));
+            throw new VirtualFileException(Message.FILE_NOT_FOUND(source.getPath()));
         return null;
     }
 

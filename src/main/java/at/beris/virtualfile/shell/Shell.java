@@ -308,7 +308,7 @@ public class Shell {
             else
                 workingFile = actionFile;
         } else
-            throw new RuntimeException(Message.NO_SUCH_FILE(actionFile.getUrl().toString()).toString());
+            throw new RuntimeException(Message.FILE_NOT_FOUND(actionFile.getUrl().toString()).toString());
     }
 
     private void get(String fileName) {

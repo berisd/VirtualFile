@@ -29,8 +29,8 @@ public class Message {
         return new Message(ID_ACCESS_DENIED, "Access denied.");
     }
 
-    public static Message NO_SUCH_FILE(String filename) {
-        return new Message(ID_NO_SUCH_FILE, String.format("No such file: %s.", filename));
+    public static Message FILE_NOT_FOUND(String filename) {
+        return new Message(ID_NO_SUCH_FILE, String.format("File not found: %s.", filename));
     }
 
     public static Message PROTOCOL_NOT_CONFIGURED(Protocol protocol) {

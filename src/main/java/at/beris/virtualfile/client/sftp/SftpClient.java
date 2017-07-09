@@ -322,7 +322,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
         if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
             throw new VirtualFileException(Message.ACCESS_DENIED(), e);
         else if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-            throw new VirtualFileException(Message.NO_SUCH_FILE(e.getMessage()), e);
+            throw new VirtualFileException(Message.FILE_NOT_FOUND(e.getMessage()), e);
     }
 
     private void handleJSchException(JSchException e, String path) {
