@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static at.beris.virtualfile.FileTestHelper.NUMBER_OF_ARCHIVE_ENTRIES;
+import static at.beris.virtualfile.TestHelper.NUMBER_OF_ARCHIVE_ENTRIES;
 import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractFileArchiveTest {
@@ -35,7 +35,7 @@ public abstract class AbstractFileArchiveTest {
 
     @Before
     public void beforeTestCase() {
-        fileManager = new UrlFileManager();
+        fileManager = TestHelper.createFileManager();
         sourceArchive = fileManager.resolveFile(sourceArchiveUrl).asArchive();
         targetDirectory = fileManager.resolveLocalDirectory("extracted");
     }

@@ -9,6 +9,8 @@
 
 package at.beris.virtualfile;
 
+import at.beris.virtualfile.config.Configurator;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,8 +24,8 @@ import java.util.List;
 
 import static at.beris.virtualfile.provider.operation.CopyFileOperation.STREAM_BUFFER_SIZE;
 
-public class FileTestHelper {
-    public static final String HOME_DIRECTORY = System.getProperty("user.home") + File.separator + ".VirtualFile";
+public class TestHelper {
+    public static final String TEST_HOME_DIRECTORY = System.getProperty("user.home") + File.separator + ".VirtualFile" + File.separator + ".test";
     public static final String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public static final String TEST_TARGET_FILE_NAME = "targetfile1.txt";
     public static final Date TEST_SOURCE_FILE_LAST_MODIFIED = new Date();
@@ -31,8 +33,6 @@ public class FileTestHelper {
 
     public static final String TEST_SOURCE_DIRECTORY_NAME = "testdirectory";
     public static final String TEST_TARGET_DIRECTORY_NAME = "targettestdirectory";
-
-    public static final String TEST_CREDENTIALS_DIRECTORY = HOME_DIRECTORY + File.separator + "test" + File.separator;
 
     public static final String SSH_HOME_DIRECTORY = "/home/sshtest/";
 
@@ -43,13 +43,13 @@ public class FileTestHelper {
 
     public static void initIntegrationTest() {
         org.junit.Assume.assumeTrue("Ignore Integration Tests.", Boolean.parseBoolean(System.getProperty("runintegrationtests")));
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestHelper.TEST_HOME_DIRECTORY).toPath()));
     }
 
     public static String readSftpPassword() {
         List<String> stringList = null;
         try {
-            stringList = Files.readAllLines(new File(TEST_CREDENTIALS_DIRECTORY + File.separator + "sshlogin.txt").toPath(), Charset.defaultCharset());
+            stringList = Files.readAllLines(new File(TEST_HOME_DIRECTORY + File.separator + "sshlogin.txt").toPath(), Charset.defaultCharset());
         } catch (IOException e) {
             return "";
         }
@@ -122,5 +122,9 @@ public class FileTestHelper {
             }
         }
         return fileList;
+    }
+
+    public static UrlFileManager createFileManager() {
+        return new UrlFileManager(new UrlFileContext(new Configurator().setHome(TEST_HOME_DIRECTORY)));
     }
 }

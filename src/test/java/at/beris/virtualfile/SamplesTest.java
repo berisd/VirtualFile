@@ -16,7 +16,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
-import static at.beris.virtualfile.FileTestHelper.*;
+import static at.beris.virtualfile.TestHelper.*;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -27,7 +27,7 @@ public class SamplesTest {
 
     @BeforeClass
     public static void beforeTestCase() {
-        FileTestHelper.initIntegrationTest();
+        TestHelper.initIntegrationTest();
     }
 
     @Before
@@ -78,7 +78,7 @@ public class SamplesTest {
 
     @Test
     public void copyFileToDirectory() {
-        VirtualFile file = fileManager.resolveFile("sftp://sshtest:" + FileTestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
+        VirtualFile file = fileManager.resolveFile("sftp://sshtest:" + TestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/dokuwiki-stable.tgz");
         Integer filesCopied = file.copy(fileManager.resolveLocalFile("."));
         Assert.assertEquals(Integer.valueOf(1), filesCopied);
         VirtualFile copiedFile = fileManager.resolveLocalFile("dokuwiki-stable.tgz");
@@ -88,18 +88,18 @@ public class SamplesTest {
 
     @Test
     public void AuthWithPublicKey() {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestHelper.TEST_HOME_DIRECTORY).toPath()));
         fileManager.getConfiguration().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
-                .setPrivateKeyFile(FileTestHelper.TEST_CREDENTIALS_DIRECTORY + File.separator + "id_dsa");
-        VirtualFile file = fileManager.resolveFile("sftp://sshtest:" + FileTestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
+                .setPrivateKeyFile(TestHelper.TEST_HOME_DIRECTORY + File.separator + "id_dsa");
+        VirtualFile file = fileManager.resolveFile("sftp://sshtest:" + TestHelper.readSftpPassword() + "@www.beris.at:22/home/sshtest/.ssh");
         assertTrue(file.isDirectory());
     }
 
     @Test
     public void AuthWithPasswordNoStrictHost() {
-        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(FileTestHelper.TEST_CREDENTIALS_DIRECTORY).toPath()));
+        org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestHelper.TEST_HOME_DIRECTORY).toPath()));
         VirtualFile file = fileManager.resolveFile("sftp://sshtest:@www.beris.at:22/home/sshtest/.ssh");
-        fileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(FileTestHelper.readSftpPassword());
+        fileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(TestHelper.readSftpPassword());
         assertTrue(file.isDirectory());
     }
 

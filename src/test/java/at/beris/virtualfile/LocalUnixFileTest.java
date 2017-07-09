@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static at.beris.virtualfile.FileTestHelper.*;
+import static at.beris.virtualfile.TestHelper.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -227,6 +227,6 @@ public class LocalUnixFileTest extends AbstractUrlFileTest {
 
     @Override
     protected UrlFileManager createFileManager() {
-        return new UrlFileManager();
+        return TestHelper.createFileManager();
     }
 }

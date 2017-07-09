@@ -23,7 +23,7 @@ import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Collections;
 import java.util.HashSet;
 
-import static at.beris.virtualfile.FileTestHelper.*;
+import static at.beris.virtualfile.TestHelper.*;
 
 public class LocalWindowsFileTest extends AbstractUrlFileTest {
 
@@ -114,6 +114,6 @@ public class LocalWindowsFileTest extends AbstractUrlFileTest {
 
     @Override
     protected UrlFileManager createFileManager() {
-        return new UrlFileManager();
+        return TestHelper.createFileManager();
     }
 }

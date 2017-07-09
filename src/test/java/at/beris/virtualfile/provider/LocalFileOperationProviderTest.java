@@ -25,7 +25,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import static at.beris.virtualfile.FileTestHelper.*;
+import static at.beris.virtualfile.TestHelper.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalFileOperationProviderTest extends AbstractFileOperationProviderTest<LocalFileOperationProvider, Client> {

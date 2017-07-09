@@ -39,7 +39,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static at.beris.virtualfile.FileTestHelper.*;
+import static at.beris.virtualfile.TestHelper.*;
 import static at.beris.virtualfile.provider.operation.CopyFileOperation.STREAM_BUFFER_SIZE;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
@@ -70,9 +70,9 @@ public abstract class AbstractUrlFileTest {
             assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
             // FileStore.readAttributes for Windows might return old value, so don't check
             if (OsUtils.detectOSFamily() != OsFamily.WINDOWS)
-                assertTrue(FileTestHelper.isDateCloseToNow(file.getCreationTime(), 10));
-            assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
-            assertTrue(FileTestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
+                assertTrue(TestHelper.isDateCloseToNow(file.getCreationTime(), 10));
+            assertTrue(TestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
+            assertTrue(TestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
             assertTrue(file.getOwner() != null);
             assertEquals(0, file.getSize());
             assertFalse(file.isDirectory());
@@ -84,7 +84,7 @@ public abstract class AbstractUrlFileTest {
         file.create();
 
         assertEquals(TEST_SOURCE_DIRECTORY_NAME, file.getName());
-        assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
+        assertTrue(TestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
         assertTrue(file.isDirectory());
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractUrlFileTest {
     }
 
     protected void copyFile() {
-        VirtualFile sourceFile = FileTestHelper.createLocalSourceFile(fileManager, UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
+        VirtualFile sourceFile = TestHelper.createLocalSourceFile(fileManager, UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME));
         VirtualFile targetFile = fileManager.resolveFile(targetFileUrl);
         FileOperationListener copyListenerMock = Mockito.mock(FileOperationListener.class);
         sourceFile.copy(targetFile, copyListenerMock);
@@ -119,7 +119,7 @@ public abstract class AbstractUrlFileTest {
         List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
         List<String> targetFileUrlList = createFilenamesTree(targetDirectoryUrl.toString());
 
-        FileTestHelper.createFileTreeData(sourceFileUrlList);
+        TestHelper.createFileTreeData(sourceFileUrlList);
 
         VirtualFile sourceDirectory = fileManager.resolveFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
         VirtualFile targetDirectory = fileManager.resolveFile(targetDirectoryUrl);
@@ -142,7 +142,7 @@ public abstract class AbstractUrlFileTest {
 
     protected void deleteDirectory() throws IOException, URISyntaxException {
         List<String> sourceFileUrlList = createFilenamesTree(new File(TEST_SOURCE_DIRECTORY_NAME).toURI().toURL().toString() + "/");
-        FileTestHelper.createFileTreeData(sourceFileUrlList);
+        TestHelper.createFileTreeData(sourceFileUrlList);
 
         VirtualFile sourceDirectory = fileManager.resolveFile(UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME));
         VirtualFile targetDirectory = fileManager.resolveFile(targetDirectoryUrl);

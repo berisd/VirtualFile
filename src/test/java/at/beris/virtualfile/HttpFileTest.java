@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
 
-import static at.beris.virtualfile.FileTestHelper.initIntegrationTest;
+import static at.beris.virtualfile.TestHelper.initIntegrationTest;
 
 public class HttpFileTest extends AbstractUrlFileTest {
 
@@ -67,6 +67,6 @@ public class HttpFileTest extends AbstractUrlFileTest {
 
     @Override
     protected UrlFileManager createFileManager() {
-        return new UrlFileManager();
+        return TestHelper.createFileManager();
     }
 }

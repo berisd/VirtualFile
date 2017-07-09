@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static at.beris.virtualfile.FileTestHelper.*;
+import static at.beris.virtualfile.TestHelper.*;
 import static org.junit.Assert.*;
 
 public class SftpFileTest extends AbstractUrlFileTest {
@@ -41,11 +41,11 @@ public class SftpFileTest extends AbstractUrlFileTest {
     @Override
     public void beforeTestCase() {
         super.beforeTestCase();
-        URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + FileTestHelper.SSH_HOME_DIRECTORY);
+        URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestHelper.SSH_HOME_DIRECTORY);
         sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);
-        targetFileUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_TARGET_FILE_NAME);
+        targetFileUrl = UrlUtils.newUrl(siteUrl, TestHelper.SSH_HOME_DIRECTORY + TEST_TARGET_FILE_NAME);
         sourceDirectoryUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_DIRECTORY_NAME + "/");
-        targetDirectoryUrl = UrlUtils.newUrl(siteUrl, FileTestHelper.SSH_HOME_DIRECTORY + TEST_TARGET_DIRECTORY_NAME + "/");
+        targetDirectoryUrl = UrlUtils.newUrl(siteUrl, TestHelper.SSH_HOME_DIRECTORY + TEST_TARGET_DIRECTORY_NAME + "/");
     }
 
     @After
@@ -59,8 +59,8 @@ public class SftpFileTest extends AbstractUrlFileTest {
     public void createFile() {
         super.createFile(Optional.of(file -> {
             assertEquals(TEST_SOURCE_FILE_NAME, file.getName());
-            assertTrue(FileTestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
-            assertTrue(FileTestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
+            assertTrue(TestHelper.isDateCloseToNow(file.getLastModifiedTime(), 10));
+            assertTrue(TestHelper.isDateCloseToNow(file.getLastAccessTime(), 10));
             assertTrue(file.getOwner() instanceof UserPrincipal);
             assertTrue(file.getGroup() instanceof GroupPrincipal);
             assertTrue(file.getAttributes().size() > 0);
@@ -129,6 +129,6 @@ public class SftpFileTest extends AbstractUrlFileTest {
 
     @Override
     protected UrlFileManager createFileManager() {
-        return new UrlFileManager();
+        return TestHelper.createFileManager();
     }
 }

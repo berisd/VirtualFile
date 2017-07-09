@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.filter;
 
+import at.beris.virtualfile.TestHelper;
 import at.beris.virtualfile.UrlFileManager;
 import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.FileAttribute;
@@ -29,7 +30,7 @@ public class CollectionFilterTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        fileManager = new UrlFileManager();
+        fileManager = TestHelper.createFileManager();
         TestFilterHelper.createFiles(fileManager, TEST_DIRECTORY);
         testDirectory = fileManager.resolveLocalFile(TEST_DIRECTORY);
     }

@@ -12,7 +12,7 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.BeforeClass;
 
-import static at.beris.virtualfile.FileTestHelper.TAR_GZIP_FILENAME;
+import static at.beris.virtualfile.TestHelper.TAR_GZIP_FILENAME;
 
 public class TarGzipFileArchiveTest extends AbstractFileArchiveTest {
 

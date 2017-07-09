@@ -12,7 +12,7 @@ package at.beris.virtualfile;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.BeforeClass;
 
-import static at.beris.virtualfile.FileTestHelper.SEVEN_ZIP_FILENAME;
+import static at.beris.virtualfile.TestHelper.SEVEN_ZIP_FILENAME;
 
 public class SevenZipFileArchiveTest extends AbstractFileArchiveTest {
 
