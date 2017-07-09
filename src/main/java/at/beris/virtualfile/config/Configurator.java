@@ -206,6 +206,9 @@ public class Configurator {
             PrintWriter pw = new PrintWriter(new FileWriter(settingsPath.toFile()));
             for (Map.Entry<ConfigOption, ConfigValue> entry : settings.entrySet()) {
                 ConfigOption configOption = entry.getKey();
+                if (!configOption.isPersisted())
+                    continue;
+
                 ConfigValue configValue = entry.getValue();
                 String value;
                 if (configValue instanceof CharArrayConfigValue)

@@ -10,15 +10,27 @@
 package at.beris.virtualfile.config;
 
 public enum ConfigOption {
-    FILE_CACHE_SIZE(Integer.class), HOME(String.class), MASTER_PASSWORD(char[].class);
+    FILE_CACHE_SIZE(Integer.class), HOME(String.class, false), MASTER_PASSWORD(char[].class);
 
     private Class<?> configValueClass;
 
+    private boolean isPersisted;
+
     ConfigOption(Class<?> configValueClass) {
         this.configValueClass = configValueClass;
+        this.isPersisted = true;
+    }
+
+    ConfigOption(Class<?> configValueClass, boolean isPersisted) {
+        this.configValueClass = configValueClass;
+        this.isPersisted = isPersisted;
     }
 
     public Class<?> getConfigValueClass() {
         return configValueClass;
+    }
+
+    public boolean isPersisted() {
+        return isPersisted;
     }
 }
