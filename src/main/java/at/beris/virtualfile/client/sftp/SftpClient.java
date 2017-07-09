@@ -49,7 +49,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
         LOGGER.debug("init");
         java.util.Properties sessionConfig = new java.util.Properties();
         sessionConfig.put("StrictHostKeyChecking", config.isStrictHostKeyChecking() ? "yes" : "no");
-        sessionConfig.put("PreferredAuthentications", config.getAuthenticationType().getJschConfigValue());
+        sessionConfig.put("PreferredAuthentications", config.getAuthenticationType().getValue());
 
         jsch = new JSch();
 

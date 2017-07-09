@@ -13,13 +13,13 @@ public enum AuthenticationType {
     PASSWORD("password"),
     PUBLIC_KEY("publickey");
 
-    private String jschConfigValue;
+    private String value;
 
-    AuthenticationType(String jschConfigValue) {
-        this.jschConfigValue = jschConfigValue;
+    AuthenticationType(String value) {
+        this.value = value;
     }
 
-    public String getJschConfigValue() {
-        return jschConfigValue;
+    public String getValue() {
+        return value;
     }
 }

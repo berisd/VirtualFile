@@ -36,7 +36,6 @@ public class UrlFileManager implements VirtualFileManager {
     }
 
     public UrlFileManager(UrlFileContext fileContext) {
-        super();
         if (instanceCounter.incrementAndGet() == 1) {
             UrlUtils.registerProtocolURLStreamHandlers();
         }
@@ -210,23 +209,42 @@ public class UrlFileManager implements VirtualFileManager {
     }
 
     @Override
-    public void setHome(String home) {
-        fileContext.setHome(home);
+    public VirtualFileManager setHome(String home) {
+        fileContext.getConfigurator().setHome(home);
+        return this;
     }
 
     @Override
     public String getHome() {
-        return fileContext.getHome();
+        return fileContext.getConfigurator().getHome();
     }
 
     @Override
-    public void setFileCacheSize(int size) {
-        fileContext.setFileCacheSize(size);
+    public VirtualFileManager setFileCacheSize(int size) {
+        fileContext.getConfigurator().setFileCacheSize(size);
+        return this;
     }
 
     @Override
     public int getFileCacheSize() {
-        return fileContext.getFileCacheSize();
+        return fileContext.getConfigurator().getFileCacheSize();
+    }
+
+    @Override
+    public VirtualFileManager setMasterPassword(String password) {
+        fileContext.getConfigurator().setMasterPassword(password.toCharArray());
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager setMasterPassword(char[] password) {
+        fileContext.getConfigurator().setMasterPassword(password);
+        return this;
+    }
+
+    @Override
+    public char[] getMasterPassword() {
+        return fileContext.getConfigurator().getMasterPassword();
     }
 
 }

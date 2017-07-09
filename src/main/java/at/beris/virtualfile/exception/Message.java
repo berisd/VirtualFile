@@ -19,6 +19,8 @@ public class Message {
     public static Integer ID_PROTOCOL_NOT_CONFIGURED = 4;
     public static Integer ID_OPERATION_NOT_SUPPORTED = 5;
 
+    public static Integer ID_UNKNOWN_CONFIG_VALUE_CLASS = 10000;
+
     public static Message FILE_ALREADY_EXISTS(String filename) {
         return new Message(ID_FILE_ALREADY_EXISTS, String.format("File already exists: %s.", filename));
     }
@@ -37,6 +39,10 @@ public class Message {
 
     public static Message OPERATION_NOT_SUPPORTED(String message) {
         return new Message(ID_OPERATION_NOT_SUPPORTED, String.format("Operation not supported: %s.", message));
+    }
+
+    public static Message UNKNOWN_CONFIG_VALUE_CLASS() {
+        return new Message(ID_UNKNOWN_CONFIG_VALUE_CLASS, "Can't create ConfigValue. Unknown Class.");
     }
 
     private Integer id;

@@ -120,13 +120,19 @@ public interface VirtualFileManager {
      */
     Set<Protocol> supportedProtocols();
 
-    void setHome(String home);
+    VirtualFileManager setHome(String home);
 
     String getHome();
 
-    void setFileCacheSize(int size);
+    VirtualFileManager setFileCacheSize(int size);
 
     int getFileCacheSize();
+
+    VirtualFileManager setMasterPassword(String password);
+
+    VirtualFileManager setMasterPassword(char[] password);
+
+    char[] getMasterPassword();
 
 
 }

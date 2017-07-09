@@ -14,16 +14,36 @@ import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.http.HttpClient;
 import at.beris.virtualfile.client.https.HttpsClient;
 import at.beris.virtualfile.client.sftp.SftpClient;
+import at.beris.virtualfile.config.value.CharArrayConfigValue;
+import at.beris.virtualfile.config.value.ConfigValue;
+import at.beris.virtualfile.config.value.IntegerConfigValue;
+import at.beris.virtualfile.config.value.StringConfigValue;
+import at.beris.virtualfile.crypto.EncoderDecoder;
+import at.beris.virtualfile.crypto.PasswordEncoderDecoder;
+import at.beris.virtualfile.exception.Message;
+import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.provider.*;
+import at.beris.virtualfile.util.CharUtils;
 import at.beris.virtualfile.util.UrlUtils;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Configurator {
-    private ContextConfiguration contextConfiguration;
+    private static final String SETTINGS_FILENAME = "settings.ini";
+
+    private static final int MASTER_PASSWORD_LENGTH = 20;
+
     private Map<Protocol, Class> fileOperationProviderClassMap;
     private Map<Protocol, Class> clientClassMap;
 
@@ -31,8 +51,15 @@ public class Configurator {
     private Map<Protocol, UrlFileConfiguration> configurationPerProtocolMap;
     private Map<URL, UrlFileConfiguration> configurationPerUrlMap;
 
+    private Map<ConfigOption, ConfigValue> settings;
+
+    private EncoderDecoder passwordEncoderDecoder;
+
+    private ConfiguratorCallbackHandler callbackHandler;
+
     public Configurator() {
-        contextConfiguration = new ContextConfiguration();
+        callbackHandler = new EmptyCallBackHandler();
+        passwordEncoderDecoder = new PasswordEncoderDecoder();
 
         fileOperationProviderClassMap = new HashMap<>();
         clientClassMap = new HashMap<>();
@@ -57,6 +84,22 @@ public class Configurator {
         for (Protocol protocol : Protocol.values()) {
             configurationPerProtocolMap.put(protocol, new UrlFileConfiguration(defaultUrlFileConfiguration));
         }
+
+        settings = new LinkedHashMap<>();
+        initDefaultSettings();
+        Path settingsPath = Paths.get(getHome(), SETTINGS_FILENAME);
+        File settingsFile = settingsPath.toFile();
+
+        if (settingsFile.exists()) {
+            loadSettings(settingsPath);
+        } else {
+            setMasterPassword(CharUtils.generateCharSequence(MASTER_PASSWORD_LENGTH));
+            saveSettings(settingsPath);
+        }
+    }
+
+    public void setCallbackHandler(ConfiguratorCallbackHandler callbackHandler) {
+        this.callbackHandler = callbackHandler;
     }
 
     public Class getFileOperationProviderClass(Protocol protocol) {
@@ -91,10 +134,12 @@ public class Configurator {
         return urlConfig;
     }
 
+    @Deprecated
     public UrlFileConfiguration getConfiguration() {
         return defaultUrlFileConfiguration;
     }
 
+    @Deprecated
     public UrlFileConfiguration getConfiguration(Protocol protocol) {
         return configurationPerProtocolMap.get(protocol);
     }
@@ -106,20 +151,98 @@ public class Configurator {
 
 
     public String getHome() {
-        return contextConfiguration.getHome();
+        return ((StringConfigValue) settings.get(ConfigOption.HOME)).getValue();
+
     }
 
     public Configurator setHome(String path) {
-        contextConfiguration.setHome(path);
+        settings.put(ConfigOption.HOME, new StringConfigValue(path));
         return this;
     }
 
     public int getFileCacheSize() {
-        return contextConfiguration.getFileCacheSize();
+        return ((IntegerConfigValue) settings.get(ConfigOption.FILE_CACHE_SIZE)).getValue();
     }
 
     public Configurator setFileCacheSize(int size) {
-        contextConfiguration.setFileCacheSize(size);
+        settings.put(ConfigOption.FILE_CACHE_SIZE, new IntegerConfigValue(size));
+        callbackHandler.changedFileCacheSize(size);
         return this;
+    }
+
+    public char[] getMasterPassword() {
+        return passwordEncoderDecoder.decode(((CharArrayConfigValue) settings.get(ConfigOption.MASTER_PASSWORD)).getValue());
+    }
+
+    public Configurator setMasterPassword(char[] password) {
+        settings.put(ConfigOption.MASTER_PASSWORD, new CharArrayConfigValue(passwordEncoderDecoder.encode(password)));
+        return this;
+    }
+
+    private void initDefaultSettings() {
+        settings.put(ConfigOption.FILE_CACHE_SIZE, new IntegerConfigValue(10000));
+        settings.put(ConfigOption.HOME, new StringConfigValue(System.getProperty("user.home") + File.separator + ".VirtualFile"));
+        settings.put(ConfigOption.MASTER_PASSWORD, new CharArrayConfigValue(passwordEncoderDecoder.encode(CharUtils.generateCharSequence(MASTER_PASSWORD_LENGTH))));
+    }
+
+
+    private void loadSettings(Path settingsPath) {
+        try {
+            //TODO To make the masterpassword more secure you shouldn't use strings but bytes
+            for (String line : Files.readAllLines(settingsPath)) {
+                int posKeyValueSeperator = line.indexOf('=');
+                String key = line.substring(0, posKeyValueSeperator).trim().toUpperCase();
+                String value = line.substring(posKeyValueSeperator + 1).trim();
+                ConfigOption configOption = ConfigOption.valueOf(key);
+                setSetting(configOption, value);
+            }
+        } catch (IOException e) {
+            new VirtualFileException(e);
+        }
+    }
+
+    private void saveSettings(Path settingsPath) {
+        try {
+            PrintWriter pw = new PrintWriter(new FileWriter(settingsPath.toFile()));
+            for (Map.Entry<ConfigOption, ConfigValue> entry : settings.entrySet()) {
+                ConfigOption configOption = entry.getKey();
+                ConfigValue configValue = entry.getValue();
+                String value;
+                if (configValue instanceof CharArrayConfigValue)
+                    value = String.valueOf((char[]) configValue.getValue());
+                else
+                    value = configValue.getValue().toString();
+                pw.printf("%s = %s", configOption, value);
+                pw.println();
+            }
+            pw.close();
+        } catch (IOException e) {
+            throw new VirtualFileException(e);
+        }
+    }
+
+    private void setSetting(ConfigOption configOption, String stringValue) {
+        ConfigValue configValue = createConfigValue(configOption.getConfigValueClass(), stringValue);
+        settings.put(configOption, configValue);
+    }
+
+    private ConfigValue createConfigValue(Class<?> clazz, String stringValue) {
+        if (clazz.equals(Integer.class)) {
+            return new IntegerConfigValue(Integer.valueOf(stringValue));
+        } else if (clazz.equals(char[].class)) {
+            return new CharArrayConfigValue(stringValue.toCharArray());
+        } else if (clazz.equals(String.class)) {
+            return new StringConfigValue(stringValue);
+        } else {
+            throw new VirtualFileException(Message.UNKNOWN_CONFIG_VALUE_CLASS());
+        }
+    }
+
+    private class EmptyCallBackHandler implements ConfiguratorCallbackHandler {
+
+        @Override
+        public void changedFileCacheSize(int newSize) {
+
+        }
     }
 }

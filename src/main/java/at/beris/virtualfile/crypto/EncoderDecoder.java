@@ -7,17 +7,10 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile.crypto;
 
-public class ClientConfiguration {
+public interface EncoderDecoder {
+    char[] encode(char[] decodedCharArray);
 
-    private int timeout;
-
-    private String username;
-
-    private char[] password;
-
-    private String hostname;
-
-    private int port;
+    char[] decode(char[] encodedCharArray);
 }

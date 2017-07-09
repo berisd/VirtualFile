@@ -15,6 +15,7 @@ import at.beris.virtualfile.cache.FileCacheCallbackHandler;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.VirtualClient;
 import at.beris.virtualfile.config.Configurator;
+import at.beris.virtualfile.config.ConfiguratorCallbackHandler;
 import at.beris.virtualfile.config.UrlFileConfiguration;
 import at.beris.virtualfile.content.charset.CharsetDetector;
 import at.beris.virtualfile.content.detect.Detector;
@@ -56,12 +57,14 @@ public class UrlFileContext {
 
     public UrlFileContext(Configurator configurator) {
         this.configurator = configurator;
+        configurator.setCallbackHandler(new CustomConfiguratorCallbackHandler());
+
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
 
         fileCache = new FileCache(configurator.getFileCacheSize());
-        fileCache.setCallbackHandler(new CustomFileCacheCallbackHandlerHandler());
+        fileCache.setCallbackHandler(new CustomFileCacheCallbackHandler());
 
         //TODO load sites
     }
@@ -320,29 +323,19 @@ public class UrlFileContext {
         return archiveOperationProvider;
     }
 
-    public void setHome(String home) {
-        configurator.setHome(home);
-    }
-
-    public String getHome() {
-        return configurator.getHome();
-    }
-
-    public void setFileCacheSize(int size) {
-        configurator.setFileCacheSize(size);
-        fileCache.setMaxSize(size);
-    }
-
-    public int getFileCacheSize() {
-        return configurator.getFileCacheSize();
-    }
-
-
-    private class CustomFileCacheCallbackHandlerHandler implements FileCacheCallbackHandler {
+    private class CustomFileCacheCallbackHandler implements FileCacheCallbackHandler {
 
         @Override
         public void afterEntryPurged(VirtualFile file) {
             dispose(file);
+        }
+    }
+
+    private class CustomConfiguratorCallbackHandler implements ConfiguratorCallbackHandler {
+
+        @Override
+        public void changedFileCacheSize(int newSize) {
+            fileCache.setMaxSize(newSize);
         }
     }
 }
