@@ -9,8 +9,19 @@
 
 package at.beris.virtualfile.config;
 
+import at.beris.virtualfile.config.value.AuthenticationType;
+
 public enum ConfigOption {
-    FILE_CACHE_SIZE(Integer.class), HOME(String.class, false), MASTER_PASSWORD(char[].class);
+    FILE_CACHE_SIZE(Integer.class),
+    HOME(String.class, false),
+    MASTER_PASSWORD(char[].class),
+    KNOWN_HOSTS_FILE(String.class),
+    TIMEOUT(Integer.class),
+    STRICT_HOSTKEY_CHECKING(Boolean.class),
+    AUTHENTICATION_TYPE(AuthenticationType.class),
+    PRIVATE_KEY_FILE(String.class),
+    USERNAME(String.class),
+    PASSWORD(char[].class);
 
     private Class<?> configValueClass;
 

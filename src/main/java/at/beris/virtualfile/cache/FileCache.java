@@ -22,7 +22,7 @@ public class FileCache {
     private float loadFactor;
     private int capacity;
     private int maxSize;
-    private FileCacheCallbackHandler callbackHandler;
+    private CallbackHandler callbackHandler;
 
     private Map<String, VirtualFile> cacheMap;
 
@@ -72,7 +72,7 @@ public class FileCache {
         return (int) (maxSize * PURGE_FACTOR);
     }
 
-    public void setCallbackHandler(FileCacheCallbackHandler callbackHandler) {
+    public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
     }
 
@@ -103,5 +103,9 @@ public class FileCache {
                 numOfEntriesPurged++;
             }
         }
+    }
+
+    public interface CallbackHandler {
+        void afterEntryPurged(VirtualFile value);
     }
 }

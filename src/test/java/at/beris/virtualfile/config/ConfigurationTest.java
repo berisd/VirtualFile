@@ -13,7 +13,8 @@ import at.beris.virtualfile.config.value.AuthenticationType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ConfigurationTest {
 
@@ -22,11 +23,11 @@ public class ConfigurationTest {
     private static final String USERNAME = "user1";
     private static final String PASSWORD = "password1";
 
-    private UrlFileConfiguration config;
+    private Configuration config;
 
     @Before
     public void setUp() {
-        config = new UrlFileConfiguration();
+        config = Configuration.create();
     }
 
     @Test
@@ -40,25 +41,6 @@ public class ConfigurationTest {
         assertEquals(PRIVATE_KEY_FILE, config.getPrivateKeyFile());
         assertEquals(USERNAME, config.getUsername());
         assertEquals(PASSWORD, String.valueOf(config.getPassword()));
-    }
-
-    @Test
-    public void removeValues() {
-        _setValues();
-        config.remove(UrlFileConfigurationOption.AUTHENTICATION_TYPE);
-        assertNull(config.getAuthenticationType());
-        config.remove(UrlFileConfigurationOption.STRICT_HOSTKEY_CHECKING);
-        assertNull(config.isStrictHostKeyChecking());
-        config.remove(UrlFileConfigurationOption.TIMEOUT);
-        assertNull(config.getTimeOut());
-        config.remove(UrlFileConfigurationOption.KNOWN_HOSTS_FILE);
-        assertNull(config.getKnownHostsFile());
-        config.remove(UrlFileConfigurationOption.PRIVATE_KEY_FILE);
-        assertNull(config.getPrivateKeyFile());
-        config.remove(UrlFileConfigurationOption.USERNAME);
-        assertNull(config.getUsername());
-        config.remove(UrlFileConfigurationOption.PASSWORD);
-        assertNull(config.getPassword());
     }
 
     void _setValues() {

@@ -9,8 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.config.UrlFileConfiguration;
+import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.protocol.Protocol;
 
 import java.net.URL;
@@ -21,21 +20,16 @@ import java.util.Set;
  */
 public interface VirtualFileManager {
 
-    static VirtualFileManager createManager(Configurator configurator) {
-        return new UrlFileManager(new UrlFileContext(configurator));
+    static VirtualFileManager createManager(Configuration configuraton) {
+        return new UrlFileManager(new UrlFileContext(configuraton));
     }
 
     static VirtualFileManager createManager() {
-        return new UrlFileManager(new UrlFileContext(new Configurator()));
+        return new UrlFileManager(new UrlFileContext(Configuration.create()));
     }
 
     @Deprecated
-    UrlFileConfiguration getConfiguration();
-
-    @Deprecated
-    UrlFileConfiguration getConfiguration(Protocol protocol);
-
-    UrlFileConfiguration getConfiguration(VirtualFile file);
+    Configuration getConfiguration();
 
     /**
      * Creates a VirtualFile representing a local file with the given path.
@@ -119,20 +113,5 @@ public interface VirtualFileManager {
      * @return Supported Protocols.
      */
     Set<Protocol> supportedProtocols();
-
-    VirtualFileManager setHome(String home);
-
-    String getHome();
-
-    VirtualFileManager setFileCacheSize(int size);
-
-    int getFileCacheSize();
-
-    VirtualFileManager setMasterPassword(String password);
-
-    VirtualFileManager setMasterPassword(char[] password);
-
-    char[] getMasterPassword();
-
 
 }

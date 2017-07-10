@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configurator;
+import at.beris.virtualfile.config.Configuration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,9 +23,7 @@ public class UrlFileContextTest {
 
     @Before
     public void beforeTestCase() {
-        Configurator configurator = new Configurator();
-        configurator.setFileCacheSize(10);
-        fileContext = new UrlFileContext(configurator);
+        fileContext = new UrlFileContext(Configuration.create().setFileCacheSize(10));
     }
 
     @Test

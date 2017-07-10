@@ -9,8 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.config.UrlFileConfiguration;
+import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.Pair;
@@ -31,10 +30,6 @@ public class UrlFileManager implements VirtualFileManager {
 
     private UrlFileContext fileContext;
 
-    public UrlFileManager() {
-        this(new UrlFileContext(new Configurator()));
-    }
-
     public UrlFileManager(UrlFileContext fileContext) {
         if (instanceCounter.incrementAndGet() == 1) {
             UrlUtils.registerProtocolURLStreamHandlers();
@@ -43,20 +38,8 @@ public class UrlFileManager implements VirtualFileManager {
     }
 
     @Override
-    @Deprecated
-    public UrlFileConfiguration getConfiguration() {
-        return fileContext.getConfigurator().getConfiguration();
-    }
-
-    @Override
-    @Deprecated
-    public UrlFileConfiguration getConfiguration(Protocol protocol) {
-        return fileContext.getConfigurator().getConfiguration(protocol);
-    }
-
-    @Override
-    public UrlFileConfiguration getConfiguration(VirtualFile file) {
-        return fileContext.getConfigurator().getConfiguration(file);
+    public Configuration getConfiguration() {
+        return fileContext.getConfiguration();
     }
 
     /**
@@ -206,45 +189,6 @@ public class UrlFileManager implements VirtualFileManager {
     @Override
     public Set<Protocol> supportedProtocols() {
         return EnumSet.allOf(Protocol.class);
-    }
-
-    @Override
-    public VirtualFileManager setHome(String home) {
-        fileContext.getConfigurator().setHome(home);
-        return this;
-    }
-
-    @Override
-    public String getHome() {
-        return fileContext.getConfigurator().getHome();
-    }
-
-    @Override
-    public VirtualFileManager setFileCacheSize(int size) {
-        fileContext.getConfigurator().setFileCacheSize(size);
-        return this;
-    }
-
-    @Override
-    public int getFileCacheSize() {
-        return fileContext.getConfigurator().getFileCacheSize();
-    }
-
-    @Override
-    public VirtualFileManager setMasterPassword(String password) {
-        fileContext.getConfigurator().setMasterPassword(password.toCharArray());
-        return this;
-    }
-
-    @Override
-    public VirtualFileManager setMasterPassword(char[] password) {
-        fileContext.getConfigurator().setMasterPassword(password);
-        return this;
-    }
-
-    @Override
-    public char[] getMasterPassword() {
-        return fileContext.getConfigurator().getMasterPassword();
     }
 
 }

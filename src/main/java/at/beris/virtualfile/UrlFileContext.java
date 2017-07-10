@@ -11,20 +11,20 @@ package at.beris.virtualfile;
 
 import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.cache.FileCache;
-import at.beris.virtualfile.cache.FileCacheCallbackHandler;
 import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.client.VirtualClient;
-import at.beris.virtualfile.config.Configurator;
-import at.beris.virtualfile.config.ConfiguratorCallbackHandler;
-import at.beris.virtualfile.config.UrlFileConfiguration;
+import at.beris.virtualfile.client.ftp.FtpClient;
+import at.beris.virtualfile.client.http.HttpClient;
+import at.beris.virtualfile.client.https.HttpsClient;
+import at.beris.virtualfile.client.sftp.SftpClient;
+import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.content.charset.CharsetDetector;
 import at.beris.virtualfile.content.detect.Detector;
 import at.beris.virtualfile.content.mime.MimeTypes;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
-import at.beris.virtualfile.provider.ArchiveOperationProvider;
-import at.beris.virtualfile.provider.FileOperationProvider;
+import at.beris.virtualfile.provider.*;
 import at.beris.virtualfile.util.UrlUtils;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,6 @@ import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 public class UrlFileContext {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UrlFileContext.class);
 
-    private Configurator configurator;
     private Detector contentDetector;
     private CharsetDetector charsetDetector;
 
@@ -55,27 +54,26 @@ public class UrlFileContext {
     private Map<VirtualFile, VirtualFile> fileToParentFileMap;
     private ArchiveOperationProvider archiveOperationProvider;
 
-    public UrlFileContext(Configurator configurator) {
-        this.configurator = configurator;
-        configurator.setCallbackHandler(new CustomConfiguratorCallbackHandler());
+    private Configuration configuration;
+    private Map<Protocol, Class> fileOperationProviderClassMap;
+    private Map<Protocol, Class> clientClassMap;
+    private Map<URL, Configuration> siteConfigurationMap;
+
+    public UrlFileContext(Configuration configuration) {
+        this.configuration = configuration;
+        configuration.setCallbackHandler(new CustomConfigurationCallbackHandler());
+        configuration.load();
+
+
+        clientClassMap = createClientClassMap();
+        fileOperationProviderClassMap = createFileOperationProviderClassMap();
 
         this.siteUrlToClientMap = new HashMap<>();
         this.clientToFileOperationProviderMap = new HashMap<>();
         this.fileToParentFileMap = new HashMap();
 
-        fileCache = new FileCache(configurator.getFileCacheSize());
+        fileCache = new FileCache(configuration.getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandler());
-
-        //TODO load sites
-    }
-
-    /**
-     * Get the content configurator.
-     *
-     * @return Configurator
-     */
-    public Configurator getConfigurator() {
-        return configurator;
     }
 
     /**
@@ -232,14 +230,29 @@ public class UrlFileContext {
         return charsetDetector;
     }
 
+    public ArchiveOperationProvider getArchiveOperationProvider() {
+        if (archiveOperationProvider == null) {
+            archiveOperationProvider = new ArchiveOperationProvider(this);
+        }
+        return archiveOperationProvider;
+    }
+
+    /**
+     * This method will be removed and dynamic configuration will be handled with sites
+     */
+    @Deprecated
+    public Configuration getConfiguration() {
+        return this.configuration;
+    }
+
     private VirtualClient createClientInstance(URL url) {
         LOGGER.debug("createClientInstance (url: {})", maskedUrlString(url));
 
-        Class clientClass = configurator.getClientClass(UrlUtils.getProtocol(url));
+        Class clientClass = clientClassMap.get(UrlUtils.getProtocol(url));
         if (clientClass != null) {
             try {
-                UrlFileConfiguration configuration = configurator.createConfiguration(url);
-                Constructor constructor = clientClass.getConstructor(URL.class, UrlFileConfiguration.class);
+                Configuration configuration = createConfiguration(url);
+                Constructor constructor = clientClass.getConstructor(URL.class, Configuration.class);
                 return (VirtualClient) constructor.newInstance(url, configuration);
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
@@ -252,7 +265,7 @@ public class UrlFileContext {
         LOGGER.debug("createFile (url : {})", maskedUrlString(url));
 
         Protocol protocol = UrlUtils.getProtocol(url);
-        if (configurator.getFileOperationProviderClass(protocol) == null)
+        if (fileOperationProviderClassMap.get(protocol) == null)
             throw new VirtualFileException(Message.PROTOCOL_NOT_CONFIGURED(protocol));
 
         try {
@@ -301,7 +314,7 @@ public class UrlFileContext {
         LOGGER.debug("initFileOperationProvider(url: {}, protocol: {}, client: {})", maskedUrlString(url), protocol, client);
         FileOperationProvider fileOperationProvider = getFileOperationProvider(url.toString());
         if (fileOperationProvider == null) {
-            Class instanceClass = configurator.getFileOperationProviderClass(protocol);
+            Class instanceClass = fileOperationProviderClassMap.get(protocol);
             fileOperationProvider = createFileOperationProviderInstance(instanceClass, client);
             clientToFileOperationProviderMap.put(client, fileOperationProvider);
         }
@@ -316,14 +329,40 @@ public class UrlFileContext {
         }
     }
 
-    public ArchiveOperationProvider getArchiveOperationProvider() {
-        if (archiveOperationProvider == null) {
-            archiveOperationProvider = new ArchiveOperationProvider(this);
-        }
-        return archiveOperationProvider;
+    private Map<Protocol, Class> createClientClassMap() {
+        Map<Protocol, Class> map = new HashMap<>();
+        map.put(Protocol.FILE, null);
+        map.put(Protocol.SFTP, SftpClient.class);
+        map.put(Protocol.FTP, FtpClient.class);
+        map.put(Protocol.HTTP, HttpClient.class);
+        map.put(Protocol.HTTPS, HttpsClient.class);
+        return map;
     }
 
-    private class CustomFileCacheCallbackHandler implements FileCacheCallbackHandler {
+    private Map<Protocol, Class> createFileOperationProviderClassMap() {
+        Map<Protocol, Class> map = new HashMap<>();
+        map.put(Protocol.FILE, LocalFileOperationProvider.class);
+        map.put(Protocol.SFTP, SftpClientFileOperationProvider.class);
+        map.put(Protocol.FTP, FtpClientFileOperationProvider.class);
+        map.put(Protocol.HTTP, HttpClientFileOperationProvider.class);
+        map.put(Protocol.HTTPS, HttpsClientFileOperationProvider.class);
+        return map;
+    }
+
+    private Configuration createConfiguration(URL url) {
+        //TODO consider data from Sites. clone default
+//        URL siteUrl = UrlUtils.newUrl(UrlUtils.getSiteUrlString(url.toString()));
+//        Configuration urlConfig = siteConfigurationMap.get(siteUrl);
+//        if (urlConfig == null) {
+//            urlConfig = new Configuration(protocolConfig);
+//            siteConfigurationMap.put(siteUrl, urlConfig);
+//        }
+//
+//        return urlConfig;
+        return configuration;
+    }
+
+    private class CustomFileCacheCallbackHandler implements FileCache.CallbackHandler {
 
         @Override
         public void afterEntryPurged(VirtualFile file) {
@@ -331,7 +370,7 @@ public class UrlFileContext {
         }
     }
 
-    private class CustomConfiguratorCallbackHandler implements ConfiguratorCallbackHandler {
+    private class CustomConfigurationCallbackHandler implements Configuration.CallbackHandler {
 
         @Override
         public void changedFileCacheSize(int newSize) {

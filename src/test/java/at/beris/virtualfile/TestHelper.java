@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configurator;
+import at.beris.virtualfile.config.Configuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,6 +125,6 @@ public class TestHelper {
     }
 
     public static UrlFileManager createFileManager() {
-        return new UrlFileManager(new UrlFileContext(new Configurator().setHome(TEST_HOME_DIRECTORY)));
+        return new UrlFileManager(new UrlFileContext(Configuration.create().setHome(TEST_HOME_DIRECTORY)));
     }
 }

@@ -99,7 +99,7 @@ public class SamplesTest {
     public void AuthWithPasswordNoStrictHost() {
         org.junit.Assume.assumeTrue("Integration Test Data directory could not be found.", Files.exists(new File(TestHelper.TEST_HOME_DIRECTORY).toPath()));
         VirtualFile file = fileManager.resolveFile("sftp://sshtest:@www.beris.at:22/home/sshtest/.ssh");
-        fileManager.getConfiguration(file).setStrictHostKeyChecking(false).setPassword(TestHelper.readSftpPassword());
+        fileManager.getConfiguration().setStrictHostKeyChecking(false).setPassword(TestHelper.readSftpPassword());
         assertTrue(file.isDirectory());
     }
 

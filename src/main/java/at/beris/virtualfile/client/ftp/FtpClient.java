@@ -11,7 +11,7 @@ package at.beris.virtualfile.client.ftp;
 
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.client.AbstractClient;
-import at.beris.virtualfile.config.UrlFileConfiguration;
+import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.util.StringUtils;
@@ -38,7 +38,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
     private boolean reconnect;
     private FTPClient ftpClient;
 
-    public FtpClient(URL url, UrlFileConfiguration config) {
+    public FtpClient(URL url, Configuration config) {
         super(url, config);
         init();
     }

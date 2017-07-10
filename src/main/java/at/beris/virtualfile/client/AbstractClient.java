@@ -9,15 +9,15 @@
 
 package at.beris.virtualfile.client;
 
-import at.beris.virtualfile.config.UrlFileConfiguration;
+import at.beris.virtualfile.config.Configuration;
 
 import java.net.URL;
 
 public abstract class AbstractClient<T> implements Client<T> {
-    protected UrlFileConfiguration config;
+    protected Configuration config;
     protected URL url;
 
-    public AbstractClient(URL url, UrlFileConfiguration config) {
+    public AbstractClient(URL url, Configuration config) {
         this.config = config;
         this.url = url;
     }

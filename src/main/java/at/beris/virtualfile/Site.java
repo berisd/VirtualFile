@@ -9,7 +9,6 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.ClientConfiguration;
 import at.beris.virtualfile.protocol.Protocol;
 
 public class Site {
@@ -18,6 +17,14 @@ public class Site {
 
     private String name;
 
-    private ClientConfiguration clientConfiguration;
+    private int timeout;
+
+    private String username;
+
+    private String passwordReference;
+
+    private String hostname;
+
+    private int port;
 
 }

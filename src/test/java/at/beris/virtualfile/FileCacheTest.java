@@ -10,7 +10,6 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.cache.FileCache;
-import at.beris.virtualfile.cache.FileCacheCallbackHandler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +33,7 @@ public class FileCacheTest {
     private FileCache fileCache;
 
     @Mock
-    private FileCacheCallbackHandler callbackHandlerMock;
+    private FileCache.CallbackHandler callbackHandlerMock;
 
     @Before
     public void setUp() {
