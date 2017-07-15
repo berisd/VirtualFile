@@ -11,6 +11,6 @@ package at.beris.virtualfile.exception;
 
 public class NotImplementedException extends VirtualFileException {
     public NotImplementedException() {
-        super();
+        super(Message.OPERATION_NOT_IMPLEMENTED());
     }
 }
