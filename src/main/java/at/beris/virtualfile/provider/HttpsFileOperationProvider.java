@@ -24,8 +24,8 @@ import java.net.URLConnection;
 import java.nio.file.attribute.FileTime;
 import java.util.List;
 
-public class HttpsClientFileOperationProvider extends AbstractFileOperationProvider<HttpsClient> {
-    public HttpsClientFileOperationProvider(UrlFileContext fileContext, HttpsClient httpsURLConnection) {
+public class HttpsFileOperationProvider extends AbstractFileOperationProvider<HttpsClient> {
+    public HttpsFileOperationProvider(UrlFileContext fileContext, HttpsClient httpsURLConnection) {
         super(fileContext, httpsURLConnection);
     }
 

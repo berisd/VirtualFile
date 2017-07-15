@@ -26,8 +26,8 @@ import java.nio.file.attribute.FileTime;
 import java.util.EnumSet;
 import java.util.List;
 
-public class HttpClientFileOperationProvider extends AbstractFileOperationProvider<HttpClient> {
-    public HttpClientFileOperationProvider(UrlFileContext fileContext, HttpClient httpURLConnection) {
+public class HttpFileOperationProvider extends AbstractFileOperationProvider<HttpClient> {
+    public HttpFileOperationProvider(UrlFileContext fileContext, HttpClient httpURLConnection) {
         super(fileContext, httpURLConnection);
         this.supportedOperations = EnumSet.of(FileOperation.GET_INPUT_STREAM, FileOperation.GET_OUTPUT_STREAM);
     }

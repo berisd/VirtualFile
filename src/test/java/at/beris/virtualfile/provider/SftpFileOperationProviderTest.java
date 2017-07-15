@@ -27,7 +27,7 @@ import static at.beris.virtualfile.TestHelper.*;
 import static org.mockito.Mockito.never;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SftpClientFileOperationProviderTest extends AbstractFileOperationProviderTest<SftpClientFileOperationProvider, SftpClient> {
+public class SftpFileOperationProviderTest extends AbstractFileOperationProviderTest<SftpFileOperationProvider, SftpClient> {
 
     @Before
     @Override
@@ -35,7 +35,7 @@ public class SftpClientFileOperationProviderTest extends AbstractFileOperationPr
         super.beforeTestCase();
 
         client = Mockito.mock(SftpClient.class);
-        provider = new SftpClientFileOperationProvider(fileContext, client);
+        provider = new SftpFileOperationProvider(fileContext, client);
 
         URL siteUrl = UrlUtils.newUrl("sftp://sshtest:" + readSftpPassword() + "@www.beris.at:22" + TestHelper.SSH_HOME_DIRECTORY);
         sourceFileUrl = UrlUtils.getUrlForLocalPath(TEST_SOURCE_FILE_NAME);

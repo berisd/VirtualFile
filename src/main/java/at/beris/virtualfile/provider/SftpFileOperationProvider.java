@@ -28,11 +28,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SftpClientFileOperationProvider extends AbstractFileOperationProvider<SftpClient> {
+public class SftpFileOperationProvider extends AbstractFileOperationProvider<SftpClient> {
 
     private SftpFileTranslator sftpFileTranslator;
 
-    public SftpClientFileOperationProvider(UrlFileContext fileContext, SftpClient client) {
+    public SftpFileOperationProvider(UrlFileContext fileContext, SftpClient client) {
         super(fileContext, client);
         sftpFileTranslator = new SftpFileTranslator();
     }

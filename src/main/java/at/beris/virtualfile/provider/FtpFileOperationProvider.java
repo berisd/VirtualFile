@@ -26,11 +26,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FtpClientFileOperationProvider extends AbstractFileOperationProvider<FtpClient> {
+public class FtpFileOperationProvider extends AbstractFileOperationProvider<FtpClient> {
 
     private FtpFileTranslator ftpFileTranslator;
 
-    public FtpClientFileOperationProvider(UrlFileContext fileContext, FtpClient client) {
+    public FtpFileOperationProvider(UrlFileContext fileContext, FtpClient client) {
         super(fileContext, client);
         ftpFileTranslator = new FtpFileTranslator();
     }
