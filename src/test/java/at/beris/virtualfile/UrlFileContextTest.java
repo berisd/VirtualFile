@@ -9,7 +9,10 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.client.sftp.SftpClient;
+import at.beris.virtualfile.client.sftp.SftpClientConfiguration;
+import at.beris.virtualfile.util.UrlUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +26,8 @@ public class UrlFileContextTest {
 
     @Before
     public void beforeTestCase() {
-        fileContext = new UrlFileContext(Configuration.create().setFileCacheSize(10));
+        UrlUtils.registerProtocolURLStreamHandlers();
+        fileContext = new UrlFileContext(Configuration.create().setFileCacheSize(10), SiteManager.create());
     }
 
     @Test
@@ -35,6 +39,18 @@ public class UrlFileContextTest {
         fileContext.resolveFile(new URL("file:/this/here/is/another/file/test"));
         VirtualFile parentFile3 = fileContext.resolveFile(new URL("file:/this/"));
         Assert.assertNotSame(parentFile1, parentFile3);
+    }
+
+    @Test
+    public void createClientInstance() throws MalformedURLException {
+        Client client = fileContext.createClientInstance(new URL("sftp://www.example.com/test.file"));
+        Assert.assertTrue(client instanceof SftpClient);
+        Assert.assertTrue(client.getConfiguration() instanceof SftpClientConfiguration);
+    }
+
+    @Test
+    public void createClientConfiguration() throws MalformedURLException {
+        fileContext.createClientConfiguration(new URL("sftp://www.example.com/test.file"), SftpClientConfiguration.class);
     }
 
     @Test

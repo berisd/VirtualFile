@@ -12,10 +12,11 @@ package at.beris.virtualfile.client;
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.TestHelper;
 import at.beris.virtualfile.client.sftp.SftpClient;
+import at.beris.virtualfile.client.sftp.SftpClientConfiguration;
 import at.beris.virtualfile.client.sftp.SftpFile;
 import at.beris.virtualfile.client.sftp.SftpFileTranslator;
-import at.beris.virtualfile.config.Configuration;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.util.UrlUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,6 +36,7 @@ public class SftpClientIntegrationTest {
 
     @BeforeClass
     public static void beforeTest() throws Exception {
+        UrlUtils.registerProtocolURLStreamHandlers();
         TestHelper.initIntegrationTest();
         sftpClient = createSftpClient();
         sftpClient.connect();
@@ -45,6 +47,7 @@ public class SftpClientIntegrationTest {
         cleanUp();
         if (sftpClient != null)
             sftpClient.disconnect();
+        UrlUtils.unregisterProtocolURLStreamHandlers();
     }
 
     @Test
@@ -110,10 +113,10 @@ public class SftpClientIntegrationTest {
     }
 
     private static SftpClient createSftpClient() throws Exception {
-        Configuration configuration = Configuration.create();
+        SftpClientConfiguration configuration = ClientConfiguration.createSFtpConfiguration();
         char[] password = TestHelper.readSftpPassword().toCharArray();
-        URL url = new URL("sftp://sshtest:" + String.valueOf(password) + "@www.beris.at:22");
-        return new SftpClient(url, configuration);
+        configuration.fillFromUrl(new URL("sftp://sshtest:" + String.valueOf(password) + "@www.beris.at:22"));
+        return new SftpClient(configuration);
     }
 
     private static void cleanUp() {

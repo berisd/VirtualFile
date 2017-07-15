@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration>
+    <fileCacheSize>10000</fileCacheSize>
+    <masterPassword>103</masterPassword>
+    <masterPassword>72</masterPassword>
+    <masterPassword>83</masterPassword>
+    <masterPassword>65</masterPassword>
+    <masterPassword>90</masterPassword>
+    <masterPassword>89</masterPassword>
+    <masterPassword>66</masterPassword>
+    <masterPassword>122</masterPassword>
+    <masterPassword>103</masterPassword>
+    <masterPassword>72</masterPassword>
+    <masterPassword>81</masterPassword>
+    <masterPassword>61</masterPassword>
+    <sftpClientConfiguration>
+        <port>22</port>
+        <timeout>30</timeout>
+        <username></username>
+        <authenticationType>PASSWORD</authenticationType>
+        <knownHostsFile>/home/bernd/.ssh/known_hosts</knownHostsFile>
+        <privateKeyFile></privateKeyFile>
+        <strictHostKeyChecking>true</strictHostKeyChecking>
+    </sftpClientConfiguration>
+    <ftpClientConfiguration>
+        <port>21</port>
+        <timeout>30</timeout>
+        <username>anonymous</username>
+    </ftpClientConfiguration>
+    <httpClientConfiguration>
+        <port>80</port>
+        <timeout>30</timeout>
+        <username></username>
+    </httpClientConfiguration>
+    <httpsClientConfiguration>
+        <port>443</port>
+        <timeout>30</timeout>
+        <username></username>
+    </httpsClientConfiguration>
+</configuration>

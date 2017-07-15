@@ -132,4 +132,14 @@ public class StringUtilsTest {
         Assert.assertFalse(StringUtils.isEmpty("abc"));
         Assert.assertFalse(StringUtils.isEmpty(" abc "));
     }
+
+    @Test
+    public void getWordsFromCamelCaseString() {
+        Assert.assertArrayEquals(new String[]{}, StringUtils.getWordsFromCamelCaseString(""));
+        Assert.assertArrayEquals(new String[]{"Test"}, StringUtils.getWordsFromCamelCaseString("Test"));
+        Assert.assertArrayEquals(new String[]{"test"}, StringUtils.getWordsFromCamelCaseString("test"));
+        Assert.assertArrayEquals(new String[]{"Test", "Run"}, StringUtils.getWordsFromCamelCaseString("TestRun"));
+        Assert.assertArrayEquals(new String[]{"test", "Run"}, StringUtils.getWordsFromCamelCaseString("testRun"));
+        Assert.assertArrayEquals(new String[]{"A", "Test", "Run"}, StringUtils.getWordsFromCamelCaseString("ATestRun"));
+    }
 }

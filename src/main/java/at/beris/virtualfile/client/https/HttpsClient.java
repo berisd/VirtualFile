@@ -9,14 +9,105 @@
 
 package at.beris.virtualfile.client.https;
 
-import at.beris.virtualfile.client.http.HttpClient;
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.client.Client;
+import at.beris.virtualfile.client.http.HttpFile;
 
-import java.net.URL;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.UserPrincipal;
+import java.util.List;
+import java.util.Set;
 
-public class HttpsClient extends HttpClient {
+public class HttpsClient implements Client<HttpFile, HttpsClientConfiguration> {
 
-    public HttpsClient(URL url, Configuration config) {
-        super(url, config);
+    public HttpsClient(HttpsClientConfiguration configuration) {
+    }
+
+    @Override
+    public void connect() {
+
+    }
+
+    @Override
+    public void disconnect() {
+
+    }
+
+    @Override
+    public void deleteFile(String path) {
+
+    }
+
+    @Override
+    public void createFile(String path) {
+
+    }
+
+    @Override
+    public boolean exists(String path) {
+        return false;
+    }
+
+    @Override
+    public void createDirectory(String path) {
+
+    }
+
+    @Override
+    public void deleteDirectory(String path) {
+
+    }
+
+    @Override
+    public InputStream getInputStream(String path) {
+        return null;
+    }
+
+    @Override
+    public OutputStream getOutputStream(String path) {
+        return null;
+    }
+
+    @Override
+    public HttpFile getFileInfo(String path) {
+        return null;
+    }
+
+    @Override
+    public List<HttpFile> list(String path) {
+        return null;
+    }
+
+    @Override
+    public void setLastModifiedTime(String path, FileTime time) {
+
+    }
+
+    @Override
+    public void setAttributes(String path, Set<FileAttribute> attributes) {
+
+    }
+
+    @Override
+    public void setOwner(String path, UserPrincipal owner) {
+
+    }
+
+    @Override
+    public void setGroup(String path, GroupPrincipal group) {
+
+    }
+
+    @Override
+    public void dispose() {
+
+    }
+
+    @Override
+    public HttpsClientConfiguration getConfiguration() {
+        return null;
     }
 }

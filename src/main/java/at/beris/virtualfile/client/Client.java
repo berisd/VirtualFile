@@ -10,21 +10,17 @@
 package at.beris.virtualfile.client;
 
 import at.beris.virtualfile.attribute.FileAttribute;
+import at.beris.virtualfile.util.DisposableObject;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Set;
 
-public interface Client<T> extends VirtualClient {
-    URL getUrl();
-
-    void setUrl(URL url);
-
+public interface Client<F, C> extends DisposableObject {
     void connect();
 
     void disconnect();
@@ -43,9 +39,9 @@ public interface Client<T> extends VirtualClient {
 
     OutputStream getOutputStream(String path);
 
-    T getFileInfo(String path);
+    F getFileInfo(String path);
 
-    List<T> list(String path);
+    List<F> list(String path);
 
     void setLastModifiedTime(String path, FileTime time);
 
@@ -56,4 +52,6 @@ public interface Client<T> extends VirtualClient {
     void setGroup(String path, GroupPrincipal group);
 
     void dispose();
+
+    C getConfiguration();
 }

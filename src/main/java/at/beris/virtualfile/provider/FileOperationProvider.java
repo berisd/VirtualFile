@@ -11,10 +11,10 @@ package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
 import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.cache.DisposableObject;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.FileOperation;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
+import at.beris.virtualfile.util.DisposableObject;
 
 import java.io.InputStream;
 import java.io.OutputStream;

@@ -51,7 +51,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     public UrlFile(URL url, UrlFileContext context) {
         this.url = url;
         this.context = context;
-        this.fileOperationProvider = context.getFileOperationProvider(url.toString());
+        this.fileOperationProvider = context.getFileOperationProvider(url);
     }
 
     @Override
@@ -348,6 +348,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
+    //TODO use Set instead of Varargs
     public void setAttributes(FileAttribute... attributes) {
         logger.info("Set attributes for {}", this);
         checkModel();
@@ -427,6 +428,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
+    //TODO use Set instead of Varargs
     public void removeAttributes(FileAttribute... attributes) {
         logger.info("Remove attributes {} from {}", FileUtils.getAttributesString(attributes), this);
         checkModel();

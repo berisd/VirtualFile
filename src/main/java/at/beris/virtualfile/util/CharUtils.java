@@ -54,4 +54,8 @@ public class CharUtils {
         return buf;
     }
 
+    public static boolean isEmpty(char[] charArray) {
+        return charArray == null || charArray.length == 0;
+    }
+
 }

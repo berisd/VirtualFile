@@ -13,6 +13,9 @@ import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.attribute.FileAttribute;
 import at.beris.virtualfile.filter.Filter;
 
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 public class FileUtils {
@@ -78,5 +81,38 @@ public class FileUtils {
         if (path.endsWith("/"))
             path = path.substring(0, path.lastIndexOf('/'));
         return path.substring(path.lastIndexOf('/') + 1);
+    }
+
+    /**
+     * Delete a directory recursively.
+     *
+     * @param directory
+     * @throws IOException
+     */
+    public static void deleteDirectory(String directory) throws IOException {
+        deleteDirectory(Paths.get(directory));
+    }
+
+    /**
+     * Delete a directory recursively.
+     *
+     * @param directory
+     * @throws IOException
+     */
+    public static void deleteDirectory(Path directory) throws IOException {
+        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+
+        });
     }
 }

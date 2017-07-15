@@ -7,20 +7,19 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config.value;
+package at.beris.virtualfile.client.sftp;
 
-public abstract class ConfigValue<T> {
-    protected T value;
+public enum AuthenticationType {
+    PASSWORD("password"),
+    PUBLIC_KEY("publickey");
 
-    public ConfigValue(T value) {
+    private String value;
+
+    AuthenticationType(String value) {
         this.value = value;
     }
 
-    public T getValue() {
+    public String getValue() {
         return value;
-    }
-
-    public void setValue(T value) {
-        this.value = value;
     }
 }

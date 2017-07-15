@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.util;
 
+import at.beris.virtualfile.SiteManager;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 
@@ -18,6 +19,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class UrlUtils {
@@ -26,14 +28,6 @@ public class UrlUtils {
 
     public static Protocol getProtocol(URL url) {
         return Protocol.valueOf(url.getProtocol().toUpperCase());
-    }
-
-    public static String getSiteUrlString(String urlString) {
-        int indexPathBegin = urlString.indexOf("/", urlString.indexOf("//") + 2);
-        if (indexPathBegin == -1)
-            return urlString;
-        else
-            return urlString.substring(0, indexPathBegin);
     }
 
     public static URL normalizeUrl(URL url) {
@@ -124,7 +118,7 @@ public class UrlUtils {
             return null;
 
         String parentPath = UrlUtils.getParentPath(url.toString());
-        return newUrl(newUrl(getSiteUrlString(url.toString())), parentPath);
+        return newUrl(newUrl(SiteManager.getSiteUrlString(url)), parentPath);
     }
 
     public static String getParentPath(String urlPath) {
@@ -159,5 +153,25 @@ public class UrlUtils {
             partSet.remove(at.beris.virtualfile.protocol.Protocol.class.getPackage().getName());
             System.getProperties().setProperty(PROPERTY_KEY_PROTOCOL_HANDLER_PKGS, StringUtils.join(partSet, '|'));
         }
+    }
+
+    public static Optional<String> getUsernameFromUrl(URL url) {
+        String userInfo = url.getUserInfo();
+        if (userInfo != null) {
+            String userInfoParts[] = url.getUserInfo().split(":");
+            return Optional.of(userInfoParts[0]);
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<String> getPasswordFromUrl(URL url) {
+        String userInfo = url.getUserInfo();
+        if (userInfo != null) {
+            String userInfoParts[] = url.getUserInfo().split(":");
+            if (userInfoParts.length > 1) {
+                return Optional.of(userInfoParts[1]);
+            }
+        }
+        return Optional.empty();
     }
 }

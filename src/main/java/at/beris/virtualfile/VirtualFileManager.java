@@ -9,27 +9,44 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.client.ftp.FtpClientConfiguration;
+import at.beris.virtualfile.client.http.HttpClientConfiguration;
+import at.beris.virtualfile.client.https.HttpsClientConfiguration;
+import at.beris.virtualfile.client.sftp.AuthenticationType;
+import at.beris.virtualfile.client.sftp.SftpClientConfiguration;
 import at.beris.virtualfile.protocol.Protocol;
 
 import java.net.URL;
 import java.util.Set;
 
 /**
- * Public API for virtual file management
+ * Public API for a virtualfile manager.
  */
 public interface VirtualFileManager {
 
+    /**
+     * Create a FileManager with the supplied configuration.
+     *
+     * @param configuraton Configuration
+     * @return Filemanager instance
+     */
     static VirtualFileManager createManager(Configuration configuraton) {
-        return new UrlFileManager(new UrlFileContext(configuraton));
+        return UrlFileManager.create(configuraton);
     }
 
+    /**
+     * Create a FileManager.
+     *
+     * @return Filemanager instance
+     */
     static VirtualFileManager createManager() {
-        return new UrlFileManager(new UrlFileContext(Configuration.create()));
+        return UrlFileManager.create();
     }
 
-    @Deprecated
-    Configuration getConfiguration();
+    /**
+     * Save the current configuration.
+     */
+    void saveConfiguration();
 
     /**
      * Creates a VirtualFile representing a local file with the given path.
@@ -114,4 +131,97 @@ public interface VirtualFileManager {
      */
     Set<Protocol> supportedProtocols();
 
+    /**
+     * Return the master password. This is the password used to protect all sensitive data.
+     *
+     * @return Master password
+     */
+    char[] getMasterPassword();
+
+    /**
+     * Get the path where the configuration resides.
+     *
+     * @return Path
+     */
+    String getHome();
+
+    /**
+     * Get the default configuration for a new SFTP Client.
+     * When a new SFTP client is created it will be configured with this configuration.
+     *
+     * @return SFTP Client default configuration
+     */
+    SftpClientConfiguration getClientDefaultConfigurationSftp();
+
+    /**
+     * Get the default configuration for a new FTP Client.
+     * When a new FTP client is created it will be configured with this configuration.
+     *
+     * @return FTP Client default configuration
+     */
+    FtpClientConfiguration getClientDefaultConfigurationFtp();
+
+    /**
+     * Get the default configuration for a new HTTP Client.
+     * When a new HTTP client is created it will be configured with this configuration.
+     *
+     * @return HTTP Client default configuration
+     */
+    HttpClientConfiguration getClientDefaultConfigurationHttp();
+
+    /**
+     * Get the default configuration for a new HTTPS Client.
+     * When a new HTTPS client is created it will be configured with this configuration.
+     *
+     * @return HTTPS Client default configuration
+     */
+    HttpsClientConfiguration getClientDefaultConfigurationHttps();
+
+    /**
+     * Set AuthenticationType for all Client Default Configurations that support it (sugar function)
+     *
+     * @param authenticationType
+     * @return
+     */
+    VirtualFileManager setAuthenticationType(AuthenticationType authenticationType);
+
+    /**
+     * Set PrivateKeyFile for all Client Default Configurations that support it (sugar function)
+     *
+     * @param privateKeyFile
+     * @return
+     */
+    VirtualFileManager setPrivateKeyFile(String privateKeyFile);
+
+    /**
+     * Set Timeout for all Client Default Configurations that support it (sugar function)
+     *
+     * @param timeout
+     * @return
+     */
+    VirtualFileManager setTimeout(int timeout);
+
+    /**
+     * Set Username for all Client Default Configurations that support it (sugar function)
+     *
+     * @param username
+     * @return
+     */
+    VirtualFileManager setUsername(String username);
+
+    /**
+     * Set Password for all Client Default Configurations that support it (sugar function)
+     *
+     * @param password
+     * @return
+     */
+    VirtualFileManager setPassword(char[] password);
+
+    /**
+     * Set Password for all Client Default Configurations that support it (sugar function)
+     *
+     * @param password
+     * @return
+     */
+    VirtualFileManager setPassword(String password);
 }

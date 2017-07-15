@@ -17,16 +17,11 @@ public class StringUtils {
     public static final String EMPTY_STRING = "";
 
     /**
-     * <p>The maximum size to which the padding constant(s) can expand.</p>
-     */
-    private static final int PAD_LIMIT = 8192;
-
-    /**
      * <p>Splits the provided text into an array, separator specified.</p>
      * The separator is not included in the returned String array.
      *
-     * @param str  the String to parse, may be null
-     * @param separatorChar  the character used as the delimiter
+     * @param str           the String to parse, may be null
+     * @param separatorChar the character used as the delimiter
      * @return an array of parsed Strings
      */
     public static String[] split(String str, char separatorChar) {
@@ -39,7 +34,7 @@ public class StringUtils {
         int startpos = 0;
         int i;
 
-        for(i = 0; i < strlen; i++) {
+        for (i = 0; i < strlen; i++) {
             if (str.charAt(i) == separatorChar) {
                 list.add(str.substring(startpos, i));
                 startpos = ++i;
@@ -54,7 +49,7 @@ public class StringUtils {
     /**
      * <p>Checks if a CharSequence is whitespace, empty ("") or null.</p>
      *
-     * @param cs  the CharSequence to check, may be null
+     * @param cs the CharSequence to check, may be null
      * @return {@code true} if the CharSequence is null, empty or whitespace
      */
     public static boolean isBlank(final CharSequence cs) {
@@ -73,16 +68,16 @@ public class StringUtils {
     /**
      * <p>Joins the elements of the provided {@code Iterable} into
      * a single String containing the provided elements.</p>
-     *
+     * <p>
      * <p>No delimiter is added before or after the list. Null objects or empty
      * strings within the iteration are represented by empty strings.</p>
      *
      * @param iterable  the {@code Iterable} providing the values to join together, may be null
-     * @param separator  the separator character to use
+     * @param separator the separator character to use
      * @return the joined String, {@code null} if null iterator input
      */
     public static String join(final Iterable<?> iterable, final char separator) {
-        if (iterable == null || ! iterable.iterator().hasNext()) {
+        if (iterable == null || !iterable.iterator().hasNext()) {
             return EMPTY_STRING;
         }
 
@@ -123,10 +118,10 @@ public class StringUtils {
      * <p>Repeat a String {@code repeat} times to form a
      * new String.</p>
      *
-     * @param str  the String to repeat, may be null
-     * @param repeat  number of times to repeat str, negative treated as zero
+     * @param str    the String to repeat, may be null
+     * @param repeat number of times to repeat str, negative treated as zero
      * @return a new String consisting of the original String repeated,
-     *  {@code null} if null String input
+     * {@code null} if null String input
      */
     public static String repeat(final String str, final int repeat) {
         if (str == null || repeat <= 0)
@@ -153,7 +148,7 @@ public class StringUtils {
      * <p>Removes control characters (char &lt;= 32) from both
      * ends of this String,.</p>
      *
-     * @param str  the String to be trimmed, may be null
+     * @param str the String to be trimmed, may be null
      * @return the trimmed string
      */
     public static String trim(final String str) {
@@ -162,14 +157,14 @@ public class StringUtils {
 
     /**
      * <p>Right pad a String with a specified character.</p>
-     *
+     * <p>
      * <p>The String is padded to the size of {@code size}.</p>
      *
-     * @param str  the String to pad out, may be null
-     * @param size  the size to pad to
-     * @param padChar  the character to pad with
+     * @param str     the String to pad out, may be null
+     * @param size    the size to pad to
+     * @param padChar the character to pad with
      * @return right padded String or original String if no padding is necessary,
-     *  {@code null} if null String input
+     * {@code null} if null String input
      */
     public static String rightPad(final String str, final int size, final char padChar) {
         if (str == null) {
@@ -192,11 +187,11 @@ public class StringUtils {
     /**
      * <p>Left pad a String with a specified character.</p>
      *
-     * @param str  the String to pad out, may be null
-     * @param size  the size to pad to
-     * @param padChar  the character to pad with
+     * @param str     the String to pad out, may be null
+     * @param size    the size to pad to
+     * @param padChar the character to pad with
      * @return left padded String or original String if no padding is necessary,
-     *  {@code null} if null String input
+     * {@code null} if null String input
      */
     public static String leftPad(final String str, final int size, final char padChar) {
         if (str == null) {
@@ -221,11 +216,32 @@ public class StringUtils {
     /**
      * <p>Checks if a CharSequence is empty ("") or null.</p>
      *
-     * @param cs  the CharSequence to check, may be null
+     * @param cs the CharSequence to check, may be null
      * @return {@code true} if the CharSequence is empty or null
      */
     public static boolean isEmpty(final CharSequence cs) {
         return cs == null || cs.length() == 0;
+    }
+
+    /**
+     * Get the list of words froma CamelCase String (e.g. ThisIsATest)
+     *
+     * @param str Camelcase String
+     * @return list of words
+     */
+    public static String[] getWordsFromCamelCaseString(String str) {
+        List<String> wordList = new ArrayList<>();
+        int startpos = 0;
+        for (int i = 1; i < str.length(); i++) {
+            if (Character.isUpperCase(str.charAt(i))) {
+                wordList.add(str.substring(startpos, i));
+                startpos = i;
+            }
+        }
+        if (startpos < str.length()) {
+            wordList.add(str.substring(startpos, str.length()));
+        }
+        return wordList.toArray(new String[0]);
     }
 
 }

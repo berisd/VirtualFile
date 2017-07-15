@@ -9,7 +9,6 @@
 
 package at.beris.virtualfile.util;
 
-import at.beris.virtualfile.FileType;
 import at.beris.virtualfile.protocol.Protocol;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,12 +26,6 @@ public class UrlUtilsTest {
     @Test
     public void getProtocol() throws MalformedURLException {
         Assert.assertEquals(Protocol.FTP, UrlUtils.getProtocol(new URL(FILE_URL_STRING)));
-    }
-
-    @Test
-    public void getSiteUrlString() {
-        Assert.assertEquals("ftp://www.example.com", UrlUtils.getSiteUrlString(FILE_URL_STRING));
-        Assert.assertEquals("ftp://www.example.com", UrlUtils.getSiteUrlString("ftp://www.example.com/test/"));
     }
 
     @Test

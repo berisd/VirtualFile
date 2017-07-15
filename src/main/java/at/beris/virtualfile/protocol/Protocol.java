@@ -10,5 +10,15 @@
 package at.beris.virtualfile.protocol;
 
 public enum Protocol {
-    FILE, SFTP, FTP, HTTP, HTTPS
+    FILE(-1), SFTP(22), FTP(21), HTTP(80), HTTPS(443);
+
+    private int defaultPort;
+
+    Protocol(int defaultPort) {
+        this.defaultPort = defaultPort;
+    }
+
+    public int getDefaultPort() {
+        return defaultPort;
+    }
 }

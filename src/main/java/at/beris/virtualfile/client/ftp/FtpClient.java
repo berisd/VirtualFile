@@ -10,11 +10,9 @@
 package at.beris.virtualfile.client.ftp;
 
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.client.AbstractClient;
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
-import at.beris.virtualfile.util.StringUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import org.apache.commons.net.ftp.*;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
@@ -31,15 +28,17 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public class FtpClient extends AbstractClient<FTPFile> {
+public class FtpClient implements Client<FTPFile, FtpClientConfiguration> {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FtpClient.class);
     private final static int MAX_CONNECTION_ATTEMPTS = 3;
     private String physicalRootPath;
     private boolean reconnect;
     private FTPClient ftpClient;
 
-    public FtpClient(URL url, Configuration config) {
-        super(url, config);
+    private FtpClientConfiguration configuration;
+
+    public FtpClient(FtpClientConfiguration configuration) {
+        this.configuration = configuration;
         init();
     }
 
@@ -51,10 +50,10 @@ public class FtpClient extends AbstractClient<FTPFile> {
 
     @Override
     public void connect() {
-        LOGGER.info("Connecting to " + username() + "@" + host() + ":" + String.valueOf(port()));
+        LOGGER.info("Connecting to " + configuration.getUsername() + "@" + configuration.getHostname() + ":" + String.valueOf(configuration.getPassword()));
         reconnect = true;
         try {
-            ftpClient.connect(host(), port());
+            ftpClient.connect(configuration.getHostname(), configuration.getPort());
         } catch (IOException e) {
             throw new VirtualFileException(e);
         }
@@ -68,7 +67,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
 
     @Override
     public void disconnect() {
-        LOGGER.info("Disconnecting from " + username() + "@" + host() + ":" + String.valueOf(port()));
+        LOGGER.info("Disconnecting from " + configuration.getUsername() + "@" + configuration.getHostname() + ":" + String.valueOf(configuration.getPort()));
         executionHandler(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -229,16 +228,6 @@ public class FtpClient extends AbstractClient<FTPFile> {
         });
     }
 
-    protected String username() {
-        String username = super.username();
-        return StringUtils.isBlank(username) ? "anonymous" : username;
-    }
-
-    @Override
-    protected int defaultPort() {
-        return 21;
-    }
-
     public List<FTPFile> list(final String path) {
         LOGGER.debug("list (path: {})", path);
 
@@ -294,7 +283,7 @@ public class FtpClient extends AbstractClient<FTPFile> {
         executionHandler(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                ftpClient.login(username(), String.valueOf(password()));
+                ftpClient.login(configuration.getUsername(), String.valueOf(configuration.getPassword()));
                 return null;
             }
         });
@@ -348,5 +337,10 @@ public class FtpClient extends AbstractClient<FTPFile> {
             }
         }
         return null;
+    }
+
+    @Override
+    public FtpClientConfiguration getConfiguration() {
+        return configuration;
     }
 }

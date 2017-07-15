@@ -9,8 +9,6 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configuration;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -125,6 +123,6 @@ public class TestHelper {
     }
 
     public static UrlFileManager createFileManager() {
-        return new UrlFileManager(new UrlFileContext(Configuration.create().setHome(TEST_HOME_DIRECTORY)));
+        return new UrlFileManager(new UrlFileContext(Configuration.create(TEST_HOME_DIRECTORY), SiteManager.create()));
     }
 }

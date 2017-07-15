@@ -9,7 +9,11 @@
 
 package at.beris.virtualfile;
 
-import at.beris.virtualfile.config.Configuration;
+import at.beris.virtualfile.client.ftp.FtpClientConfiguration;
+import at.beris.virtualfile.client.http.HttpClientConfiguration;
+import at.beris.virtualfile.client.https.HttpsClientConfiguration;
+import at.beris.virtualfile.client.sftp.AuthenticationType;
+import at.beris.virtualfile.client.sftp.SftpClientConfiguration;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.Pair;
@@ -37,9 +41,18 @@ public class UrlFileManager implements VirtualFileManager {
         this.fileContext = fileContext;
     }
 
+    public static UrlFileManager create() {
+        return create(Configuration.create());
+    }
+
+    public static UrlFileManager create(Configuration configuraton) {
+        UrlFileContext fileContext = new UrlFileContext(configuraton, SiteManager.create());
+        return new UrlFileManager(fileContext);
+    }
+
     @Override
-    public Configuration getConfiguration() {
-        return fileContext.getConfiguration();
+    public void saveConfiguration() {
+        fileContext.getConfiguration().save();
     }
 
     /**
@@ -189,6 +202,72 @@ public class UrlFileManager implements VirtualFileManager {
     @Override
     public Set<Protocol> supportedProtocols() {
         return EnumSet.allOf(Protocol.class);
+    }
+
+    @Override
+    public char[] getMasterPassword() {
+        return fileContext.getConfiguration().getMasterPassword();
+    }
+
+    @Override
+    public String getHome() {
+        return fileContext.getConfiguration().getHomeDirectory();
+    }
+
+    @Override
+    public SftpClientConfiguration getClientDefaultConfigurationSftp() {
+        return fileContext.getConfiguration().getSftpClientConfiguration();
+    }
+
+    @Override
+    public FtpClientConfiguration getClientDefaultConfigurationFtp() {
+        return fileContext.getConfiguration().getFtpClientConfiguration();
+    }
+
+    @Override
+    public HttpClientConfiguration getClientDefaultConfigurationHttp() {
+        return fileContext.getConfiguration().getHttpClientConfiguration();
+    }
+
+    @Override
+    public HttpsClientConfiguration getClientDefaultConfigurationHttps() {
+        return fileContext.getConfiguration().getHttpsClientConfiguration();
+    }
+
+    @Override
+    public VirtualFileManager setAuthenticationType(AuthenticationType authenticationType) {
+        fileContext.getConfiguration().setAuthenticationType(authenticationType);
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager setPrivateKeyFile(String privateKeyFile) {
+        fileContext.getConfiguration().setPrivateKeyFile(privateKeyFile);
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager setTimeout(int timeout) {
+        fileContext.getConfiguration().setTimeout(timeout);
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager setUsername(String username) {
+        fileContext.getConfiguration().setUsername(username);
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager setPassword(char[] password) {
+        fileContext.getConfiguration().setPassword(password);
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager setPassword(String password) {
+        fileContext.getConfiguration().setPassword(password.toCharArray());
+        return this;
     }
 
 }

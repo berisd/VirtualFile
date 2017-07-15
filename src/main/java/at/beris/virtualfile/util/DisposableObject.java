@@ -7,17 +7,8 @@
  * Some rights reserved. See COPYING, AUTHORS.
  */
 
-package at.beris.virtualfile.config;
+package at.beris.virtualfile.util;
 
-public class ClientConfiguration {
-
-    private int timeout;
-
-    private String username;
-
-    private char[] password;
-
-    private String hostname;
-
-    private int port;
+public interface DisposableObject {
+    void dispose();
 }

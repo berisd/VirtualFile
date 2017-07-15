@@ -12,9 +12,7 @@ package at.beris.virtualfile.client.sftp;
 import at.beris.virtualfile.UnixGroupPrincipal;
 import at.beris.virtualfile.UnixUserPrincipal;
 import at.beris.virtualfile.attribute.FileAttribute;
-import at.beris.virtualfile.client.AbstractClient;
-import at.beris.virtualfile.config.Configuration;
-import at.beris.virtualfile.config.value.AuthenticationType;
+import at.beris.virtualfile.client.Client;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.util.StringUtils;
@@ -24,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.UserPrincipal;
@@ -33,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-public class SftpClient extends AbstractClient<SftpFile> {
+public class SftpClient implements Client<SftpFile, SftpClientConfiguration> {
     private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SftpClient.class);
 
     private JSch jsch;
@@ -41,30 +38,36 @@ public class SftpClient extends AbstractClient<SftpFile> {
     private ChannelSftp sftpChannel;
     private boolean isInitialized = false;
 
-    public SftpClient(URL url, Configuration config) {
-        super(url, config);
+    private SftpClientConfiguration configuration;
+
+    public SftpClient(SftpClientConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     private void init() {
         LOGGER.debug("init");
         java.util.Properties sessionConfig = new java.util.Properties();
-        sessionConfig.put("StrictHostKeyChecking", config.isStrictHostKeyChecking() ? "yes" : "no");
-        sessionConfig.put("PreferredAuthentications", config.getAuthenticationType().getValue());
+        sessionConfig.put("StrictHostKeyChecking", configuration.isStrictHostKeyChecking() ? "yes" : "no");
+        sessionConfig.put("PreferredAuthentications", configuration.getAuthenticationType().getValue());
 
         jsch = new JSch();
 
         try {
-            if (config.isStrictHostKeyChecking() && !StringUtils.isBlank(config.getKnownHostsFile()))
-                jsch.setKnownHosts(config.getKnownHostsFile());
+            if (configuration.isStrictHostKeyChecking() && !StringUtils.isBlank(configuration.getKnownHostsFile()))
+                jsch.setKnownHosts(configuration.getKnownHostsFile());
 
-            if (config.getAuthenticationType() == AuthenticationType.PUBLIC_KEY && !StringUtils.isBlank(String.valueOf(config.getPrivateKeyFile())))
-                jsch.addIdentity(String.valueOf(config.getPrivateKeyFile()));
+            if (configuration.getAuthenticationType() == AuthenticationType.PUBLIC_KEY && !StringUtils.isBlank(String.valueOf(configuration.getPrivateKeyFile())))
+                jsch.addIdentity(configuration.getPrivateKeyFile());
 
-            session = jsch.getSession(username(), host(), port());
+            session = jsch.getSession(configuration.getUsername(), configuration.getHostname(), configuration.getPort());
             session.setConfig(sessionConfig);
-            if (config.getAuthenticationType() == AuthenticationType.PASSWORD)
-                session.setPassword(String.valueOf(password()));
-            session.setTimeout(config.getTimeOut() * 1000);
+            if (configuration.getAuthenticationType() == AuthenticationType.PASSWORD) {
+//                session.setPassword(CharUtils.charArrayToByteArray(configuration.getPassword()));
+                //TODO session.setPassword(byte[]) doesn'T seem to work
+                //TODO not sure if CharUtils.charArrayToByteArray is working correct (contains additional zeros)
+                session.setPassword(new String(configuration.getPassword()));
+            }
+            session.setTimeout(configuration.getTimeout() * 1000);
             isInitialized = true;
         } catch (JSchException e) {
             handleJSchException(e, null);
@@ -72,18 +75,8 @@ public class SftpClient extends AbstractClient<SftpFile> {
     }
 
     @Override
-    public URL getUrl() {
-        return url;
-    }
-
-    @Override
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
-    @Override
     public void connect() {
-        LOGGER.info("Connecting to " + username() + "@" + host() + ":" + String.valueOf(port()));
+        LOGGER.info("Connecting to " + configuration.getUsername() + "@" + configuration.getHostname() + ":" + String.valueOf(configuration.getPort()));
         try {
             if (!isInitialized)
                 init();
@@ -99,7 +92,7 @@ public class SftpClient extends AbstractClient<SftpFile> {
 
     @Override
     public void disconnect() {
-        LOGGER.info("Disconnecting from " + username() + "@" + host() + ":" + String.valueOf(port()));
+        LOGGER.info("Disconnecting from " + configuration.getUsername() + "@" + configuration.getHostname() + ":" + String.valueOf(configuration.getPort()));
         if (sftpChannel != null)
             sftpChannel.disconnect();
         if (session != null)
@@ -305,6 +298,11 @@ public class SftpClient extends AbstractClient<SftpFile> {
         jsch = null;
     }
 
+    @Override
+    public SftpClientConfiguration getConfiguration() {
+        return configuration;
+    }
+
     private void checkChannel() {
         try {
             if (session == null)
@@ -335,8 +333,4 @@ public class SftpClient extends AbstractClient<SftpFile> {
         return sftpChannel.stat(path).isDir();
     }
 
-    @Override
-    protected int defaultPort() {
-        return 22;
-    }
 }
