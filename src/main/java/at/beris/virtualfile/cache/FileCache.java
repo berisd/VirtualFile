@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.cache;
 
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -24,7 +24,7 @@ public class FileCache {
     private int maxSize;
     private CallbackHandler callbackHandler;
 
-    private Map<String, VirtualFile> cacheMap;
+    private Map<String, UrlFile> cacheMap;
 
     public FileCache(int maxSize) {
         this.maxSize = maxSize;
@@ -33,7 +33,7 @@ public class FileCache {
         createMap();
     }
 
-    public VirtualFile put(String key, VirtualFile value) {
+    public UrlFile put(String key, UrlFile value) {
         if (isCacheFull()) {
             purgeCache();
         }
@@ -41,7 +41,7 @@ public class FileCache {
         return value;
     }
 
-    public VirtualFile remove(String key) {
+    public UrlFile remove(String key) {
         return cacheMap.remove(key);
     }
 
@@ -49,7 +49,7 @@ public class FileCache {
         return cacheMap.size();
     }
 
-    public VirtualFile get(String key) {
+    public UrlFile get(String key) {
         return cacheMap.get(key);
     }
 
@@ -93,10 +93,10 @@ public class FileCache {
         int numOfEntriesToPurge = getPurgeSize();
         int numOfEntriesPurged = 0;
 
-        Iterator<Map.Entry<String, VirtualFile>> it = cacheMap.entrySet().iterator();
+        Iterator<Map.Entry<String, UrlFile>> it = cacheMap.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, VirtualFile> entry = it.next();
-            VirtualFile file = entry.getValue();
+            Map.Entry<String, UrlFile> entry = it.next();
+            UrlFile file = entry.getValue();
             if (numOfEntriesPurged < numOfEntriesToPurge) {
                 it.remove();
                 callbackHandler.afterEntryPurged(file);
@@ -106,6 +106,6 @@ public class FileCache {
     }
 
     public interface CallbackHandler {
-        void afterEntryPurged(VirtualFile value);
+        void afterEntryPurged(UrlFile value);
     }
 }

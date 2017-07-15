@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -26,14 +26,14 @@ public class CompareFileOperation extends AbstractFileOperation<Boolean, Boolean
     }
 
     @Override
-    public Boolean execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    public Boolean execute(UrlFile source, UrlFile target, FileOperationListener listener) {
         super.execute(source, target, listener);
         processFilesRecursively(source, target, listener);
         return fileOperationResult;
     }
 
     @Override
-    protected void executeFileOperation(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    protected void executeFileOperation(UrlFile source, UrlFile target, FileOperationListener listener) {
         if (source.isDirectory()) {
             if (target.isDirectory())
                 fileOperationResult = source.getName().equals(target.getName());
@@ -49,7 +49,7 @@ public class CompareFileOperation extends AbstractFileOperation<Boolean, Boolean
         }
     }
 
-    private void compareFile(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    private void compareFile(UrlFile source, UrlFile target, FileOperationListener listener) {
         CompareStreamBufferOperation streamBufferOperation = new CompareStreamBufferOperation();
         try (InputStream sourceStream = source.getInputStream(); InputStream targetStream = target.getInputStream()) {
             processStreams(sourceStream, targetStream, source.getSize(), listener, streamBufferOperation);

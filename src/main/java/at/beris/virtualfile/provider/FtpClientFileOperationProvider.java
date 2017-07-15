@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.client.ftp.FtpClient;
 import at.beris.virtualfile.client.ftp.FtpFileTranslator;
@@ -61,21 +61,21 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     public Byte[] checksum(FileModel model) {
         String tempDir = System.getProperty("java.io.tmpdir");
         String tempFilePath = tempDir + File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
-        VirtualFile tempFile = copyToLocalFile(model, tempFilePath);
+        UrlFile tempFile = copyToLocalFile(model, tempFilePath);
         return tempFile.checksum();
     }
 
     @Override
-    public List<VirtualFile> list(FileModel model, Filter filter) {
+    public List<UrlFile> list(FileModel model, Filter filter) {
         List<FTPFile> ftpFileList = client.list(resolveUrl(model).getPath());
-        List<VirtualFile> fileList = new ArrayList<>();
+        List<UrlFile> fileList = new ArrayList<>();
 
         String parentPath = model.getUrl().getPath();
         for (FTPFile ftpFile : ftpFileList) {
             FileModel childModel = new FileModel();
             childModel.setParent(model);
             String childPath = parentPath + ftpFile.getName() + (ftpFile.isDirectory() ? "/" : "");
-            VirtualFile childFile = fileContext.resolveFile(UrlUtils.newUrl(model.getUrl(), childPath));
+            UrlFile childFile = fileContext.resolveFile(UrlUtils.newUrl(model.getUrl(), childPath));
             ftpFileTranslator.fillModel(childModel, ftpFile, client);
             childFile.setModel(childModel);
             if (filter == null || filter.filter(childFile)) {
@@ -146,7 +146,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
     }
 
     @Override
-    public void move(FileModel model, VirtualFile targetFile) {
+    public void move(FileModel model, UrlFile targetFile) {
         throw new OperationNotSupportedException();
     }
 
@@ -170,7 +170,7 @@ public class FtpClientFileOperationProvider extends AbstractFileOperationProvide
         throw new OperationNotSupportedException();
     }
 
-    private VirtualFile copyToLocalFile(FileModel model, String path) {
+    private UrlFile copyToLocalFile(FileModel model, String path) {
         byte[] buffer = new byte[1024];
         int length;
 

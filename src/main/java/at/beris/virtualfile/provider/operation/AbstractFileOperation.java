@@ -9,8 +9,9 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.exception.Message;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -40,17 +41,17 @@ public abstract class AbstractFileOperation<RF, RB> {
         this.streamBufferOperationResultList = new ArrayList<>();
     }
 
-    public RF execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    public RF execute(UrlFile source, UrlFile target, FileOperationListener listener) {
         if (!source.exists())
             throw new VirtualFileException(Message.FILE_NOT_FOUND(source.getPath()));
         return null;
     }
 
-    protected void processFilesRecursively(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    protected void processFilesRecursively(UrlFile source, UrlFile target, FileOperationListener listener) {
         executeIteration(source, target, listener);
         if (source.isDirectory()) {
             for (VirtualFile sourceChildFile : source.list()) {
-                source = sourceChildFile;
+                source = (UrlFile)sourceChildFile;
                 URL targetUrl = target.getUrl();
                 URL targetChildUrl;
                 try {
@@ -58,7 +59,7 @@ public abstract class AbstractFileOperation<RF, RB> {
                 } catch (MalformedURLException e) {
                     throw new VirtualFileException(e);
                 }
-                VirtualFile parentTarget = target;
+                UrlFile parentTarget = target;
                 target = fileContext.resolveFile(targetChildUrl);
                 processFilesRecursively(source, target, listener);
                 target = parentTarget;
@@ -86,7 +87,7 @@ public abstract class AbstractFileOperation<RF, RB> {
         }
     }
 
-    private void executeIteration(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    private void executeIteration(UrlFile source, UrlFile target, FileOperationListener listener) {
         if (listener != null)
             listener.startProcessingFile(source, filesProcessed + 1);
         executeFileOperation(source, target, listener);
@@ -95,6 +96,6 @@ public abstract class AbstractFileOperation<RF, RB> {
         filesProcessed++;
     }
 
-    abstract protected void executeFileOperation(VirtualFile source, VirtualFile target, FileOperationListener listener);
+    abstract protected void executeFileOperation(UrlFile source, UrlFile target, FileOperationListener listener);
 
 }

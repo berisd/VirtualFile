@@ -9,8 +9,9 @@
 
 package at.beris.virtualfile.operation;
 
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
+import at.beris.virtualfile.VirtualFile;
 import at.beris.virtualfile.provider.FileOperationProvider;
 import at.beris.virtualfile.provider.operation.CopyFileOperation;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
@@ -29,8 +30,8 @@ import static org.mockito.Mockito.times;
 public class CopyFileOperationTest {
     @Test
     public void copyFile() throws Exception {
-        VirtualFile sourceFile = createSourceFileMock(new URL("file:/source/foo"), false);
-        VirtualFile targetFile = createTargetFileMock(new URL("file:/target/foo"), false);
+        UrlFile sourceFile = createSourceFileMock(new URL("file:/source/foo"), false);
+        UrlFile targetFile = createTargetFileMock(new URL("file:/target/foo"), false);
 
         FileOperationListener listener = Mockito.mock(FileOperationListener.class);
         UrlFileContext fileContext = Mockito.mock(UrlFileContext.class);
@@ -44,21 +45,21 @@ public class CopyFileOperationTest {
 
     @Test
     public void copyDirectory() throws Exception {
-        VirtualFile sourceFile = createSourceFileMock(new URL("file:/source/foo/"), true);
-        VirtualFile targetFile = createTargetFileMock(new URL("file:/target/foo/"), true);
+        UrlFile sourceFile = createSourceFileMock(new URL("file:/source/foo/"), true);
+        UrlFile targetFile = createTargetFileMock(new URL("file:/target/foo/"), true);
 
         FileOperationListener listener = Mockito.mock(FileOperationListener.class);
 
-        VirtualFile sourceChildFile = createSourceFileMock(new URL("file:/source/foo/file.txt"), false);
-        VirtualFile sourceChildDirectory = createSourceFileMock(new URL("file:/source/foo/subdir/"), true);
+        UrlFile sourceChildFile = createSourceFileMock(new URL("file:/source/foo/file.txt"), false);
+        UrlFile sourceChildDirectory = createSourceFileMock(new URL("file:/source/foo/subdir/"), true);
 
         List<VirtualFile> fileList = new ArrayList<>();
         fileList.add(sourceChildFile);
         fileList.add(sourceChildDirectory);
         Mockito.when(sourceFile.list()).thenReturn(fileList);
 
-        VirtualFile targetChildFile = createTargetFileMock(new URL("file:/target/foo/file.txt"), false);
-        VirtualFile targetChildDirectory = createTargetFileMock(new URL("file:/target/foo/subdir/"), true);
+        UrlFile targetChildFile = createTargetFileMock(new URL("file:/target/foo/file.txt"), false);
+        UrlFile targetChildDirectory = createTargetFileMock(new URL("file:/target/foo/subdir/"), true);
 
         UrlFileContext fileContext = Mockito.mock(UrlFileContext.class);
         Mockito.when(fileContext.resolveFile(Matchers.any(URL.class))).thenReturn(targetChildFile);
@@ -72,28 +73,28 @@ public class CopyFileOperationTest {
         Mockito.verify(listener, times(1)).afterStreamBufferProcessed(Matchers.any(Long.class), Matchers.eq(10L), Matchers.eq(10L));
     }
 
-    private VirtualFile createSourceFileMock(URL url, boolean isDirectory) throws Exception {
+    private UrlFile createSourceFileMock(URL url, boolean isDirectory) throws Exception {
         InputStream inputStream = Mockito.mock(InputStream.class);
         Mockito.when(inputStream.read(Mockito.any(byte[].class))).thenReturn(10).thenReturn(0);
 
-        VirtualFile sourceFile = createFileMock(url, isDirectory);
+        UrlFile sourceFile = createFileMock(url, isDirectory);
         Mockito.when(sourceFile.getInputStream()).thenReturn(inputStream);
         Mockito.when(sourceFile.exists()).thenReturn(true);
         return sourceFile;
     }
 
-    private VirtualFile createTargetFileMock(URL url, boolean isDirectory) throws Exception {
+    private UrlFile createTargetFileMock(URL url, boolean isDirectory) throws Exception {
         OutputStream outputStream = Mockito.mock(OutputStream.class);
 
-        VirtualFile targetFile = createFileMock(url, isDirectory);
+        UrlFile targetFile = createFileMock(url, isDirectory);
         Mockito.when(targetFile.getOutputStream()).thenReturn(outputStream);
         Mockito.when(targetFile.exists()).thenReturn(false);
         return targetFile;
     }
 
-    private VirtualFile createFileMock(URL url, boolean isDirectory) {
+    private UrlFile createFileMock(URL url, boolean isDirectory) {
         String[] pathParts = url.toString().split("/");
-        VirtualFile sourceFile = Mockito.mock(VirtualFile.class);
+        UrlFile sourceFile = Mockito.mock(UrlFile.class);
         Mockito.when(sourceFile.getUrl()).thenReturn(url);
         Mockito.when(sourceFile.getName()).thenReturn(pathParts[pathParts.length - 1]);
         Mockito.when(sourceFile.isDirectory()).thenReturn(false);

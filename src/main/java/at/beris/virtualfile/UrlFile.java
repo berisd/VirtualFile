@@ -39,7 +39,7 @@ import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
 /**
  * Internal class representing a virtual file
  */
-class UrlFile implements VirtualFile, Comparable<UrlFile> {
+public class UrlFile implements VirtualFile, Comparable<UrlFile> {
 
     private static Logger logger = LoggerFactory.getLogger(UrlFile.class);
 
@@ -48,7 +48,10 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     protected FileOperationProvider fileOperationProvider;
     protected UrlFileContext context;
 
-    public UrlFile(URL url, UrlFileContext context) {
+    private UrlFile() {
+    }
+
+    UrlFile(URL url, UrlFileContext context) {
         this.url = url;
         this.context = context;
         this.fileOperationProvider = context.getFileOperationProvider(url);
@@ -61,7 +64,6 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
         return url;
     }
 
-    @Override
     public FileModel getModel() {
         logger.debug("Get model for {}", this);
         checkModel();
@@ -305,7 +307,6 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
         updateModel();
     }
 
-    @Override
     public void setUrl(URL url) {
         logger.info("Set url to {} for {}", url, this);
         this.url = url;
@@ -367,6 +368,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
+    //TODO create a move method that combines copy and delete
     public Set<FileAttribute> getAttributes() {
         logger.debug("Get attributes for {}", this);
         checkModel();
@@ -414,6 +416,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     }
 
     @Override
+    //TODO use Set instead of Varargs
     public void addAttributes(FileAttribute... attributes) {
         logger.info("Add attributes {} to {}", FileUtils.getAttributesString(attributes), this);
         checkModel();
@@ -456,7 +459,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
         Filter directoriesFilter = new IsDirectoryFilter().equalTo(true);
         Filter withDirectoriesFilter = ((Filter) filter.clone()).or(new IsDirectoryFilter().equalTo(true));
 
-        List<VirtualFile> fileList = fileOperationProvider.list(model, withDirectoriesFilter);
+        List<VirtualFile> fileList = new ArrayList<>(fileOperationProvider.list(model, withDirectoriesFilter));
 
         Map<Filter, List<VirtualFile>> partitionedFileList = FileUtils.groupFileListByFilters(fileList, Arrays.asList(filter, directoriesFilter));
 
@@ -476,7 +479,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     public List<VirtualFile> list() {
         logger.info("List children for {}", this);
         checkModel();
-        List<VirtualFile> fileList = fileOperationProvider.list(model, null);
+        List<VirtualFile> fileList = new ArrayList<>(fileOperationProvider.list(model, null));
         logger.info("Returns: {} entries", fileList.size());
         return fileList;
     }
@@ -485,7 +488,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     public List<VirtualFile> list(Filter filter) {
         logger.info("List children for {} with filter {}", this, filter);
         checkModel();
-        List<VirtualFile> fileList = fileOperationProvider.list(model, filter);
+        List<VirtualFile> fileList = new ArrayList<>(fileOperationProvider.list(model, filter));
         logger.info("Returns: {} entries", fileList.size());
         return fileList;
     }
@@ -494,7 +497,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     public void move(VirtualFile target) {
         logger.info("Move {} to {}", this, target);
         checkModel();
-        fileOperationProvider.move(model, target);
+        fileOperationProvider.move(model, (UrlFile) target);
     }
 
     @Override
@@ -510,7 +513,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     public Integer copy(VirtualFile targetFile) {
         logger.info("Copy {} to {}", this, targetFile);
         checkModel();
-        Integer filesCopied = fileOperationProvider.copy(this, targetFile, null);
+        Integer filesCopied = fileOperationProvider.copy(this, (UrlFile) targetFile, null);
         logger.debug("Returns: {}", filesCopied);
         return filesCopied;
     }
@@ -519,7 +522,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     public Integer copy(VirtualFile targetFile, FileOperationListener listener) {
         logger.info("Copy {} to {} with FileOperationListener", this, targetFile);
         checkModel();
-        Integer filesCopied = fileOperationProvider.copy(this, targetFile, listener);
+        Integer filesCopied = fileOperationProvider.copy(this, (UrlFile) targetFile, listener);
         logger.debug("Returns: {}", filesCopied);
         return filesCopied;
     }
@@ -528,7 +531,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     public Boolean compare(VirtualFile targetFile) {
         logger.info("Compare {} with {}", this, targetFile);
         checkModel();
-        Boolean result = fileOperationProvider.compare(this, targetFile, null);
+        Boolean result = fileOperationProvider.compare(this, (UrlFile) targetFile, null);
         logger.debug("Returns: equal={}", result);
         return result;
     }
@@ -537,7 +540,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     public Boolean compare(VirtualFile targetFile, FileOperationListener listener) {
         logger.info("Compare {} with {} with FileOperationListener", this, targetFile);
         checkModel();
-        Boolean result = fileOperationProvider.compare(this, targetFile, listener);
+        Boolean result = fileOperationProvider.compare(this, (UrlFile) targetFile, listener);
         logger.debug("Returns: equal={}", result);
         return result;
     }
@@ -585,11 +588,10 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
         return url.toString().compareTo(url.toString());
     }
 
-    @Override
     public void setModel(FileModel model) {
         logger.debug("Set model to {} for {}", model, this);
         this.model = model;
-        VirtualFile parent = context.getParentFile(this);
+        UrlFile parent = context.getParentFile(this);
         if (parent != null)
             model.setParent(parent.getModel());
         model.setUrl(url);
@@ -612,7 +614,7 @@ class UrlFile implements VirtualFile, Comparable<UrlFile> {
     private void createModel() {
         logger.debug("Create model for {}", this);
         model = context.createFileModel();
-        VirtualFile parent = context.getParentFile(this);
+        UrlFile parent = context.getParentFile(this);
         if (parent != null)
             model.setParent(parent.getModel());
         model.setUrl(url);

@@ -44,7 +44,12 @@ public interface VirtualFile extends DisposableObject {
      */
     File asFile();
 
-    //TODO use Set instead of Varargs
+
+    /**
+     * Add attributes to this file
+     *
+     * @param attributes
+     */
     void addAttributes(FileAttribute... attributes);
 
     /**
@@ -132,7 +137,11 @@ public interface VirtualFile extends DisposableObject {
      */
     List<AclEntry> getAcl();
 
-    //TODO create a move method that combines copy and delete
+    /**
+     * Get attributes for this file
+     *
+     * @return attributes
+     */
     Set<FileAttribute> getAttributes();
 
     /**
@@ -190,8 +199,6 @@ public interface VirtualFile extends DisposableObject {
      * @return Link target
      */
     URL getLinkTarget();
-
-    FileModel getModel();
 
     /**
      * Get file name.
@@ -376,16 +383,12 @@ public interface VirtualFile extends DisposableObject {
      */
     void setLastModifiedTime(FileTime time);
 
-    void setModel(FileModel model);
-
     /**
      * Set the unix owner. (Only works on unixlike operationsystems)
      *
      * @param owner New owner
      */
     void setOwner(UserPrincipal owner);
-
-    void setUrl(URL url);
 
     /**
      * Free all resources allocated by this file.

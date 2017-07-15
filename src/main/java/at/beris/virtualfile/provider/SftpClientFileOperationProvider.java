@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.client.sftp.SftpClient;
 import at.beris.virtualfile.client.sftp.SftpFile;
@@ -63,17 +63,17 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
     public Byte[] checksum(FileModel model) {
         String tempDir = System.getProperty("java.io.tmpdir");
         String tempFilePath = tempDir + java.io.File.separator + "tmpfile_" + Thread.currentThread().getName() + "_" + System.currentTimeMillis();
-        VirtualFile tempFile = copyToLocalFile(model, tempFilePath);
+        UrlFile tempFile = copyToLocalFile(model, tempFilePath);
         return tempFile.checksum();
     }
 
     @Override
-    public List<VirtualFile> list(FileModel model, Filter filter) {
+    public List<UrlFile> list(FileModel model, Filter filter) {
         List<SftpFile> fileInfoList = client.list(model.getUrl().getPath());
-        List<VirtualFile> fileList = new ArrayList<>();
+        List<UrlFile> fileList = new ArrayList<>();
 
         for (SftpFile sftpFile : fileInfoList) {
-            VirtualFile childFile = fileContext.resolveFile(UrlUtils.newUrl(model.getUrl(), sftpFile.getPath()));
+            UrlFile childFile = fileContext.resolveFile(UrlUtils.newUrl(model.getUrl(), sftpFile.getPath()));
             FileModel childModel = new FileModel();
             sftpFileTranslator.fillModel(childModel, sftpFile, client);
             childFile.setModel(childModel);
@@ -145,7 +145,7 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
     }
 
     @Override
-    public void move(FileModel model, VirtualFile targetFile) {
+    public void move(FileModel model, UrlFile targetFile) {
         throw new OperationNotSupportedException();
     }
 
@@ -169,7 +169,7 @@ public class SftpClientFileOperationProvider extends AbstractFileOperationProvid
         throw new OperationNotSupportedException();
     }
 
-    private VirtualFile copyToLocalFile(FileModel model, String path) {
+    private UrlFile copyToLocalFile(FileModel model, String path) {
         byte[] buffer = new byte[1024];
         int length;
 

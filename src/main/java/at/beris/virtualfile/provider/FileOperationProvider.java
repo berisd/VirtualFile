@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.operation.FileOperation;
 import at.beris.virtualfile.provider.operation.FileOperationListener;
@@ -46,7 +46,7 @@ public interface FileOperationProvider extends DisposableObject {
      * @param filter Filter
      * @return List of files
      */
-    List<VirtualFile> list(FileModel model, Filter filter);
+    List<UrlFile> list(FileModel model, Filter filter);
 
     /**
      * Updates the Model with information from the physical file.
@@ -69,13 +69,13 @@ public interface FileOperationProvider extends DisposableObject {
 
     void setOwner(FileModel model);
 
-    List<VirtualFile> extract(FileModel model, VirtualFile target);
+    List<UrlFile> extract(FileModel model, UrlFile target);
 
     boolean isOperationSupported(FileOperation fileOperation);
 
     Set<FileOperation> supportedOperations();
 
-    void add(FileModel model, VirtualFile file);
+    void add(FileModel model, UrlFile file);
 
     void addAttributes(FileModel model);
 
@@ -83,11 +83,11 @@ public interface FileOperationProvider extends DisposableObject {
 
     void rename(FileModel model, String newName);
 
-    void move(FileModel model, VirtualFile targetFile);
+    void move(FileModel model, UrlFile targetFile);
 
-    Integer copy(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener);
+    Integer copy(UrlFile sourceFile, UrlFile targetFile, FileOperationListener listener);
 
-    Boolean compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener);
+    Boolean compare(UrlFile sourceFile, UrlFile targetFile, FileOperationListener listener);
 
     void dispose();
 

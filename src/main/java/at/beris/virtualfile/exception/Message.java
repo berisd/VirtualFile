@@ -20,6 +20,8 @@ public class Message {
     public static Integer ID_OPERATION_NOT_SUPPORTED = 5;
     public static Integer ID_OPERATION_NOT_IMPLEMENTED = 6;
 
+    public static Integer ID_CONSTRUCTOR_NOT_FOUND = 1000;
+
     public static Message FILE_ALREADY_EXISTS(String filename) {
         return new Message(ID_FILE_ALREADY_EXISTS, String.format("File already exists: %s.", filename));
     }
@@ -42,6 +44,10 @@ public class Message {
 
     public static Message OPERATION_NOT_IMPLEMENTED() {
         return new Message(ID_OPERATION_NOT_IMPLEMENTED, "Operation not implemented.");
+    }
+
+    public static Message CONSTRUCTOR_NOT_FOUND(String className) {
+        return new Message(ID_CONSTRUCTOR_NOT_FOUND, String.format("Constructor not found for Class %s.", className));
     }
 
     private Integer id;

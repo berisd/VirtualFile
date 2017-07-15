@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.attribute.DosFileAttribute;
 import at.beris.virtualfile.attribute.FileAttribute;
@@ -75,12 +75,12 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider<Cl
     }
 
     @Override
-    public List<VirtualFile> list(FileModel model, Filter filter) {
-        List<VirtualFile> fileList = new ArrayList<>();
+    public List<UrlFile> list(FileModel model, Filter filter) {
+        List<UrlFile> fileList = new ArrayList<>();
         if (model.isDirectory()) {
             try {
                 for (File childFile : new File(model.getUrl().toURI()).listFiles()) {
-                    VirtualFile file = fileContext.resolveFile(childFile.toURI().toURL());
+                    UrlFile file = fileContext.resolveFile(childFile.toURI().toURL());
                     if (filter == null || filter.filter(file))
                         fileList.add(file);
                 }
@@ -282,7 +282,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider<Cl
     }
 
     @Override
-    public List<VirtualFile> extract(FileModel model, VirtualFile target) {
+    public List<UrlFile> extract(FileModel model, UrlFile target) {
         throw new OperationNotSupportedException();
     }
 
@@ -300,7 +300,7 @@ public class LocalFileOperationProvider extends AbstractFileOperationProvider<Cl
     }
 
     @Override
-    public void move(FileModel model, VirtualFile file) {
+    public void move(FileModel model, UrlFile file) {
         try {
             File sourceFile = new File(model.getUrl().toURI());
             File targetFile = new File(file.getUrl().toURI());

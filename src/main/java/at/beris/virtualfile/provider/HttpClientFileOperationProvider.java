@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.client.http.HttpClient;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
@@ -75,7 +75,7 @@ public class HttpClientFileOperationProvider extends AbstractFileOperationProvid
     }
 
     @Override
-    public List<VirtualFile> list(FileModel model, Filter filter) {
+    public List<UrlFile> list(FileModel model, Filter filter) {
         throw new OperationNotSupportedException();
     }
 
@@ -131,7 +131,7 @@ public class HttpClientFileOperationProvider extends AbstractFileOperationProvid
     }
 
     @Override
-    public void move(FileModel model, VirtualFile targetFile) {
+    public void move(FileModel model, UrlFile targetFile) {
         throw new OperationNotSupportedException();
     }
 

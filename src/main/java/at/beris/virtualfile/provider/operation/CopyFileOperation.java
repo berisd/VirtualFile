@@ -9,7 +9,7 @@
 
 package at.beris.virtualfile.provider.operation;
 
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.exception.VirtualFileException;
@@ -28,7 +28,7 @@ public class CopyFileOperation extends AbstractFileOperation<Integer, Boolean> {
     }
 
     @Override
-    public Integer execute(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    public Integer execute(UrlFile source, UrlFile target, FileOperationListener listener) {
         super.execute(source, target, listener);
         if (source.isDirectory() && !target.isDirectory())
             throw new OperationNotSupportedException("Can't copy directory to a file!");
@@ -39,7 +39,7 @@ public class CopyFileOperation extends AbstractFileOperation<Integer, Boolean> {
     }
 
     @Override
-    protected void executeFileOperation(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    protected void executeFileOperation(UrlFile source, UrlFile target, FileOperationListener listener) {
         boolean createFile = true;
         if (target.exists()) {
             if (listener != null)
@@ -58,7 +58,7 @@ public class CopyFileOperation extends AbstractFileOperation<Integer, Boolean> {
         calculateFileOperationResult();
     }
 
-    private void copyFile(VirtualFile source, VirtualFile target, FileOperationListener listener) {
+    private void copyFile(UrlFile source, UrlFile target, FileOperationListener listener) {
         CopyStreamBufferOperation streamBufferOperation = new CopyStreamBufferOperation();
 
         try (InputStream sourceStream = source.getInputStream(); OutputStream targetStream = target.getOutputStream()) {

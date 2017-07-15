@@ -9,11 +9,12 @@
 
 package at.beris.virtualfile.provider;
 
+import at.beris.virtualfile.UrlFile;
+import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.VirtualArchive;
 import at.beris.virtualfile.VirtualArchiveEntry;
-import at.beris.virtualfile.VirtualFile;
-import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.VirtualFileException;
+import at.beris.virtualfile.util.StringUtils;
 import org.apache.commons.compress.archivers.*;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
@@ -21,7 +22,6 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.utils.IOUtils;
-import at.beris.virtualfile.util.StringUtils;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -51,8 +51,8 @@ public class ArchiveOperationProvider {
         return archiveEntryList;
     }
 
-    public List<VirtualFile> extract(VirtualArchive archive, VirtualFile target) {
-        List<VirtualFile> fileList = new ArrayList<>();
+    public List<UrlFile> extract(VirtualArchive archive, UrlFile target) {
+        List<UrlFile> fileList = new ArrayList<>();
         target.create();
         IOStructure ioSructure = new IOStructure();
         ioSructure.setArchive(archive);
@@ -177,8 +177,8 @@ public class ArchiveOperationProvider {
         return ioSructure -> {
             try {
                 ArchiveEntry archiveEntry = ioSructure.getCommonsArchiveEntry();
-                List<VirtualFile> fileList = ioSructure.getFileList();
-                VirtualFile target = ioSructure.getTarget();
+                List<UrlFile> fileList = ioSructure.getFileList();
+                UrlFile target = ioSructure.getTarget();
 
                 ArchiveInputStream archiveInputStream = ioSructure.getArchiveInputStream();
                 Map<String, URL> urlMap = getArchiveEntryURLMap(target.getUrl(), archiveEntry);
@@ -197,7 +197,7 @@ public class ArchiveOperationProvider {
                     out.close();
                 }
 
-                VirtualFile file = context.resolveFile(urlMap.get(URL));
+                UrlFile file = context.resolveFile(urlMap.get(URL));
                 fileList.add(file);
             } catch (URISyntaxException | IOException e) {
                 throw new VirtualFileException(e);
@@ -226,8 +226,8 @@ public class ArchiveOperationProvider {
     private class IOStructure {
         private ArchiveInputStream archiveInputStream;
         private VirtualArchive archive;
-        private VirtualFile target;
-        private List<VirtualFile> fileList;
+        private UrlFile target;
+        private List<UrlFile> fileList;
         private List<VirtualArchiveEntry> archiveEntryList;
         private ArchiveEntry commonsArchiveEntry;
         private byte[] commonsArchiveEntryContent;
@@ -248,19 +248,19 @@ public class ArchiveOperationProvider {
             this.archive = archive;
         }
 
-        public VirtualFile getTarget() {
+        public UrlFile getTarget() {
             return target;
         }
 
-        public void setTarget(VirtualFile target) {
+        public void setTarget(UrlFile target) {
             this.target = target;
         }
 
-        public List<VirtualFile> getFileList() {
+        public List<UrlFile> getFileList() {
             return fileList;
         }
 
-        public void setFileList(List<VirtualFile> fileList) {
+        public void setFileList(List<UrlFile> fileList) {
             this.fileList = fileList;
         }
 

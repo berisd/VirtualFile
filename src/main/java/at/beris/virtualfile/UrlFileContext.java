@@ -32,10 +32,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static at.beris.virtualfile.util.CollectionUtils.removeEntriesByValueFromMap;
 import static at.beris.virtualfile.util.UrlUtils.maskedUrlString;
@@ -52,7 +49,7 @@ public class UrlFileContext {
     private Map<String, Client> siteUrlToClientMap;
     private Map<Site, FileOperationProvider> siteToFileOperationProviderMap;
     private FileCache fileCache;
-    private Map<VirtualFile, VirtualFile> fileToParentFileMap;
+    private Map<UrlFile, UrlFile> fileToParentFileMap;
     private ArchiveOperationProvider archiveOperationProvider;
 
     private Configuration configuration;
@@ -60,7 +57,10 @@ public class UrlFileContext {
     private SiteManager temporarySiteManager;
     private Map<Protocol, Class> fileOperationProviderClassMap;
 
-    public UrlFileContext(Configuration configuration, SiteManager siteManager) {
+    private UrlFileContext() {
+    }
+
+    UrlFileContext(Configuration configuration, SiteManager siteManager) {
         this.configuration = configuration;
         configuration.setCallbackHandler(new CustomConfigurationCallbackHandler());
 
@@ -100,20 +100,20 @@ public class UrlFileContext {
     }
 
     /**
-     * Creates a VirtualFile instance for the given url.
+     * Creates a UrlFile instance for the given url.
      *
      * @param url URL
      * @return New File Instance
      */
-    public VirtualFile resolveFile(URL url) {
+    public UrlFile resolveFile(URL url) {
         LOGGER.debug("resolveFile (url: {}) ", maskedUrlString(url));
         URL normalizedUrl = UrlUtils.normalizeUrl(url);
         if ("".equals(normalizedUrl.getPath()))
             normalizedUrl = UrlUtils.newUrl(normalizedUrl.toString() + "/");
 
         String fullPath = normalizedUrl.getPath();
-        VirtualFile parentFile = null;
-        VirtualFile file = null;
+        UrlFile parentFile = null;
+        UrlFile file = null;
         StringBuilder stringBuilder = new StringBuilder();
 
         String[] pathParts = "/".equals(fullPath) ? new String[]{"/"} : fullPath.split("/");
@@ -144,13 +144,13 @@ public class UrlFileContext {
     }
 
     /**
-     * Replace URL of a VirtualFile with a new URL.
+     * Replace URL of a UrlFile with a new URL.
      *
      * @param oldUrl Old URL
      * @param newUrl New URL
      */
     public void replaceFileUrl(URL oldUrl, URL newUrl) {
-        VirtualFile file = fileCache.get(oldUrl.toString());
+        UrlFile file = fileCache.get(oldUrl.toString());
         removeEntriesByValueFromMap(fileToParentFileMap, file);
         fileToParentFileMap.remove(file.getUrl().toString());
         fileCache.remove(oldUrl.toString());
@@ -159,11 +159,11 @@ public class UrlFileContext {
     }
 
     /**
-     * Removes a VirtualFile from the content and frees it's allocated resources.
+     * Removes a UrlFile from the content and frees it's allocated resources.
      *
-     * @param file VirtualFile
+     * @param file UrlFile
      */
-    public void dispose(VirtualFile file) {
+    public void dispose(UrlFile file) {
         LOGGER.debug("dispose (file : {})", file);
         removeEntriesByValueFromMap(fileToParentFileMap, file);
         fileCache.remove(file.getUrl().toString());
@@ -182,13 +182,13 @@ public class UrlFileContext {
     }
 
     /**
-     * Gets parent file of the VirtualFile.
+     * Gets parent file of the UrlFile.
      *
      * @param file File
      * @return Parent file
      */
-    public VirtualFile getParentFile(VirtualFile file) {
-        VirtualFile parentFile = fileToParentFileMap.get(file);
+    public UrlFile getParentFile(UrlFile file) {
+        UrlFile parentFile = fileToParentFileMap.get(file);
 
         if (parentFile == null) {
             URL parentUrl = UrlUtils.getParentUrl(file.getUrl());
@@ -274,9 +274,9 @@ public class UrlFileContext {
             return null;
 
         Class fileOperationProviderClass = fileOperationProviderClassMap.get(protocol);
-        Class clientClass = fileOperationProviderClass.getConstructors()[0].getParameterTypes()[1];
-        Constructor clientClassConstructor = clientClass.getConstructors()[0];
-        Class clientConfigurationClass = clientClassConstructor.getParameterTypes()[0];
+        Class clientClass = getClientClass(fileOperationProviderClass);
+        Constructor clientClassConstructor = getClientConstructor(clientClass);
+        Class clientConfigurationClass = getClientConfigurationClass(clientClassConstructor);
 
         try {
             ClientConfiguration clientConfiguration = createClientConfiguration(url, clientConfigurationClass);
@@ -303,7 +303,7 @@ public class UrlFileContext {
         }
     }
 
-    private VirtualFile createFile(URL url) {
+    private UrlFile createFile(URL url) {
         LOGGER.debug("createFile (url : {})", maskedUrlString(url));
 
         Protocol protocol = UrlUtils.getProtocol(url);
@@ -318,12 +318,12 @@ public class UrlFileContext {
         }
     }
 
-    private VirtualFile createFileInstance(URL url) {
+    private UrlFile createFileInstance(URL url) {
         LOGGER.debug("createFileInstance (url: {})", maskedUrlString(url));
 
         try {
-            Constructor constructor = UrlFile.class.getConstructor(URL.class, UrlFileContext.class);
-            return (VirtualFile) constructor.newInstance(url, this);
+            Constructor constructor = getUrlFileConstructor();
+            return (UrlFile) constructor.newInstance(url, this);
         } catch (ReflectiveOperationException e) {
             throw new VirtualFileException(e);
         }
@@ -371,10 +371,32 @@ public class UrlFileContext {
         }
     }
 
+    private Constructor getUrlFileConstructor() {
+        Class[] requiredParameterTypes = {URL.class, UrlFileContext.class};
+
+        for (Constructor<?> constructor : UrlFile.class.getDeclaredConstructors()) {
+            if (Arrays.equals(constructor.getParameterTypes(), requiredParameterTypes))
+                return constructor;
+        }
+        throw new VirtualFileException(Message.CONSTRUCTOR_NOT_FOUND(UrlFile.class.getName()));
+    }
+
+    private Class getClientClass(Class fileOperationProviderClass) {
+        return fileOperationProviderClass.getConstructors()[0].getParameterTypes()[1];
+    }
+
+    private Constructor getClientConstructor(Class clientClass) {
+        return clientClass.getConstructors()[0];
+    }
+
+    private Class getClientConfigurationClass(Constructor clientClassConstructor) {
+        return clientClassConstructor.getParameterTypes()[0];
+    }
+
     private class CustomFileCacheCallbackHandler implements FileCache.CallbackHandler {
 
         @Override
-        public void afterEntryPurged(VirtualFile file) {
+        public void afterEntryPurged(UrlFile file) {
             dispose(file);
         }
     }

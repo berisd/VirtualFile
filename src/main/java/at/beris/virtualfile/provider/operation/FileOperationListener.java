@@ -9,6 +9,7 @@
 
 package at.beris.virtualfile.provider.operation;
 
+
 import at.beris.virtualfile.VirtualFile;
 
 public interface FileOperationListener {

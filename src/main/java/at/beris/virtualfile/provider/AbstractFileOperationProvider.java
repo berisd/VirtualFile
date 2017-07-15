@@ -10,7 +10,7 @@
 package at.beris.virtualfile.provider;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.UrlFileContext;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
@@ -57,7 +57,7 @@ public abstract class AbstractFileOperationProvider<C> implements FileOperationP
     public abstract OutputStream getOutputStream(FileModel model);
 
     @Override
-    public abstract List<VirtualFile> list(FileModel model, Filter filter);
+    public abstract List<UrlFile> list(FileModel model, Filter filter);
 
     @Override
     public abstract void updateModel(FileModel model);
@@ -84,12 +84,12 @@ public abstract class AbstractFileOperationProvider<C> implements FileOperationP
     public abstract void setOwner(FileModel model);
 
     @Override
-    public List<VirtualFile> extract(FileModel model, VirtualFile target) {
+    public List<UrlFile> extract(FileModel model, UrlFile target) {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public void add(FileModel model, VirtualFile file) {
+    public void add(FileModel model, UrlFile file) {
         throw new OperationNotSupportedException();
     }
 
@@ -114,12 +114,12 @@ public abstract class AbstractFileOperationProvider<C> implements FileOperationP
     }
 
     @Override
-    public Integer copy(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
+    public Integer copy(UrlFile sourceFile, UrlFile targetFile, FileOperationListener listener) {
         return new CopyFileOperation(fileContext, this).execute(sourceFile, targetFile, listener);
     }
 
     @Override
-    public Boolean compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
+    public Boolean compare(UrlFile sourceFile, UrlFile targetFile, FileOperationListener listener) {
         return new CompareFileOperation(fileContext, this).execute(sourceFile, targetFile, listener);
     }
 

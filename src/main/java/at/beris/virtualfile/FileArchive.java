@@ -14,6 +14,7 @@ import at.beris.virtualfile.provider.ArchiveOperationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,7 +66,7 @@ public class FileArchive implements VirtualArchive {
     @Override
     public List<VirtualFile> extract(VirtualFile target) {
         logger.info("Extract {} to {}", this, target);
-        return archiveOperationProvider.extract(this, target);
+        return new ArrayList<>(archiveOperationProvider.extract(this, (UrlFile)target));
     }
 
     @Override

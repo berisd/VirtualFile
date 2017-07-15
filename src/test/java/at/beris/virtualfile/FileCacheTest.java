@@ -43,28 +43,28 @@ public class FileCacheTest {
 
     @Test
     public void putEntry() {
-        putValue(TEST_URL, Mockito.mock(VirtualFile.class));
+        putValue(TEST_URL, Mockito.mock(UrlFile.class));
         Assert.assertEquals(1, fileCache.size());
     }
 
     @Test
     public void removeEntry() {
-        putValue(TEST_URL, Mockito.mock(VirtualFile.class));
+        putValue(TEST_URL, Mockito.mock(UrlFile.class));
         removeValue(TEST_URL);
         Assert.assertEquals(0, fileCache.size());
     }
 
     @Test
     public void purgeCache() {
-        List<VirtualFile> entries = new ArrayList<>();
+        List<UrlFile> entries = new ArrayList<>();
         for (int i = 0; i < CACHE_SIZE + 1; i++) {
-            VirtualFile file = Mockito.mock(VirtualFile.class);
+            UrlFile file = Mockito.mock(UrlFile.class);
             entries.add(file);
             putValue(TEST_URL + String.valueOf(i), file);
         }
 
         Assert.assertEquals(91, fileCache.size());
-        verify(callbackHandlerMock, times(10)).afterEntryPurged(any(VirtualFile.class));
+        verify(callbackHandlerMock, times(10)).afterEntryPurged(any(UrlFile.class));
         assertOldestEntriesNotExist();
         newestNewestEntriesExist();
     }
@@ -81,7 +81,7 @@ public class FileCacheTest {
         }
     }
 
-    private void putValue(String key, VirtualFile file) {
+    private void putValue(String key, UrlFile file) {
         fileCache.put(key, file);
     }
 

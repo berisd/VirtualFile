@@ -10,7 +10,7 @@
 package at.beris.virtualfile.mock;
 
 import at.beris.virtualfile.FileModel;
-import at.beris.virtualfile.VirtualFile;
+import at.beris.virtualfile.UrlFile;
 import at.beris.virtualfile.exception.OperationNotSupportedException;
 import at.beris.virtualfile.filter.Filter;
 import at.beris.virtualfile.provider.FileOperationProvider;
@@ -56,7 +56,7 @@ public class FileOperationProviderMock implements FileOperationProvider {
     }
 
     @Override
-    public List<VirtualFile> list(FileModel model, Filter filter) {
+    public List<UrlFile> list(FileModel model, Filter filter) {
         return null;
     }
 
@@ -101,7 +101,7 @@ public class FileOperationProviderMock implements FileOperationProvider {
     }
 
     @Override
-    public List<VirtualFile> extract(FileModel model, VirtualFile target) {
+    public List<UrlFile> extract(FileModel model, UrlFile target) {
         return null;
     }
 
@@ -116,7 +116,7 @@ public class FileOperationProviderMock implements FileOperationProvider {
     }
 
     @Override
-    public void add(FileModel model, VirtualFile file) {
+    public void add(FileModel model, UrlFile file) {
 
     }
 
@@ -136,17 +136,17 @@ public class FileOperationProviderMock implements FileOperationProvider {
     }
 
     @Override
-    public void move(FileModel model, VirtualFile targetFile) {
+    public void move(FileModel model, UrlFile targetFile) {
         throw new OperationNotSupportedException();
     }
 
     @Override
-    public Integer copy(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
+    public Integer copy(UrlFile sourceFile, UrlFile targetFile, FileOperationListener listener) {
         return 0;
     }
 
     @Override
-    public Boolean compare(VirtualFile sourceFile, VirtualFile targetFile, FileOperationListener listener) {
+    public Boolean compare(UrlFile sourceFile, UrlFile targetFile, FileOperationListener listener) {
         return null;
     }
 
