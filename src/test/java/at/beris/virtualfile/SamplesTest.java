@@ -10,11 +10,11 @@
 package at.beris.virtualfile;
 
 import at.beris.virtualfile.client.sftp.AuthenticationType;
+import at.beris.virtualfile.protocol.Protocol;
 import org.junit.*;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static at.beris.virtualfile.TestHelper.*;
@@ -125,5 +125,65 @@ public class SamplesTest {
         VirtualFile file = fileManager.resolveLocalFile(ZIP_FILENAME);
         Assert.assertEquals("windows-1251", file.getContentEncoding());
         Assert.assertEquals("application/zip", file.getContentType().toString());
+    }
+
+    @Test
+    public void accessFileWithSite() {
+        Site site = Site.create().setHostname("www.beris.at").setProtocol(Protocol.SFTP).setUsername("sshtest")
+                .setPassword(TestHelper.readSftpPassword().toCharArray());
+        VirtualFileManager fileManager = VirtualFileManager.createManager();
+        fileManager.addSite(site);
+        VirtualFile file = fileManager.resolveFile(site);
+        Assert.assertEquals("/home/sshtest/", file.getPath());
+
+        VirtualFile file2 = fileManager.resolveDirectory(site, "/home");
+        Assert.assertEquals("/home/", file2.getPath());
+
+        VirtualFile file3 = fileManager.resolveFile(site, "dokuwiki-stable.tgz");
+        Assert.assertEquals("/home/sshtest/dokuwiki-stable.tgz", file3.getPath());
+
+        VirtualFile file4 = fileManager.resolveFile(site, "/home/sshtest/dokuwiki-stable.tgz");
+        Assert.assertEquals("/home/sshtest/dokuwiki-stable.tgz", file4.getPath());
+
+    }
+
+    @Test
+    public void copyFileFromSftpSiteWithRelativePath() {
+        Site site = Site.create().setHostname("www.beris.at").setProtocol(Protocol.SFTP).setUsername("sshtest")
+                .setPassword(TestHelper.readSftpPassword().toCharArray());
+        VirtualFileManager fileManager = VirtualFileManager.createManager();
+        fileManager.addSite(site);
+
+        VirtualFile file = fileManager.resolveFile(site, "readme.txt");
+        file.copy(fileManager.resolveLocalDirectory("."));
+        Assert.assertTrue(file.exists());
+        Assert.assertTrue(file.getSize() > 0);
+    }
+
+    @Test
+    public void copyFileFromSftpSiteWithAbsolutePath() {
+        Site site = Site.create().setHostname("www.beris.at").setProtocol(Protocol.SFTP).setUsername("sshtest")
+                .setPassword(TestHelper.readSftpPassword().toCharArray());
+        VirtualFileManager fileManager = VirtualFileManager.createManager();
+        fileManager.addSite(site);
+
+        VirtualFile file = fileManager.resolveFile(site, "/home/sshtest/readme.txt");
+        file.copy(fileManager.resolveLocalDirectory("."));
+        Assert.assertTrue(file.exists());
+        Assert.assertTrue(file.getSize() > 0);
+    }
+
+    @Test
+    public void copyDirectoryFromSftpSite() {
+        Site site = Site.create().setHostname("www.beris.at").setProtocol(Protocol.SFTP).setUsername("sshtest")
+                .setPassword(TestHelper.readSftpPassword().toCharArray());
+
+        VirtualFileManager fileManager = VirtualFileManager.createManager();
+        fileManager.addSite(site);
+
+        VirtualFile localdirectory = fileManager.resolveLocalDirectory("mybackup");
+        fileManager.resolveDirectory(site, "backup").copy(localdirectory);
+
+        localdirectory.delete();
     }
 }

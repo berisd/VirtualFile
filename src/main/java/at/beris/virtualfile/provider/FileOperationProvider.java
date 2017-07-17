@@ -21,7 +21,10 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
 
-public interface FileOperationProvider extends DisposableObject {
+public interface FileOperationProvider<C> extends DisposableObject {
+
+    C getClient();
+
     Byte[] checksum(FileModel model);
 
     /**

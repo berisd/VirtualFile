@@ -23,6 +23,7 @@ import java.util.List;
 import static at.beris.virtualfile.provider.operation.CopyFileOperation.STREAM_BUFFER_SIZE;
 
 public class TestHelper {
+    public static final char[] TEST_MASTER_PASSWORD = new char[]{'t', 'e', 's', 't', 'p', 'w', 'd'};
     public static final String TEST_HOME_DIRECTORY = System.getProperty("user.home") + File.separator + ".VirtualFile" + File.separator + ".test";
     public static final String TEST_SOURCE_FILE_NAME = "testfile1.txt";
     public static final String TEST_TARGET_FILE_NAME = "targetfile1.txt";
@@ -123,6 +124,17 @@ public class TestHelper {
     }
 
     public static UrlFileManager createFileManager() {
-        return new UrlFileManager(new UrlFileContext(Configuration.create(TEST_HOME_DIRECTORY), SiteManager.create()));
+        Configuration configuration = createConfiguration();
+        KeyStoreManager keyStoreManager = KeyStoreManager.create(configuration);
+        return new UrlFileManager(new UrlFileContext(configuration, SiteManager.create(configuration, keyStoreManager), keyStoreManager));
+    }
+
+    public static Configuration createConfiguration() {
+        return Configuration.create(TEST_HOME_DIRECTORY).setMasterPassword(TEST_MASTER_PASSWORD);
+    }
+
+    public static SiteManager createSiteManager() {
+        Configuration configuration = createConfiguration();
+        return SiteManager.create(configuration, KeyStoreManager.create(configuration));
     }
 }

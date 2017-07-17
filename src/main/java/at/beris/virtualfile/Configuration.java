@@ -106,16 +106,16 @@ public final class Configuration {
     public static Configuration create(String homeDirectory) {
         File configurationFile = Paths.get(homeDirectory, CONFIGURATION_FILENAME).toFile();
         if (configurationFile.exists()) {
-            Configuration configuration = createFromXmlFile(configurationFile);
-            configuration.settHomeDirectory(homeDirectory);
+            Configuration configuration = loadFromXmlFile(configurationFile);
+            configuration.setHomeDirectory(homeDirectory);
             return configuration;
         } else {
             return new Configuration(homeDirectory);
         }
     }
 
-    static Configuration createFromXmlFile(File file) {
-        LOGGER.info("Creating configuration from file '{}'", file.toString());
+    static Configuration loadFromXmlFile(File file) {
+        LOGGER.info("Loading configuration from file '{}'", file.toString());
         JAXBContext jaxbContext = null;
         try {
             jaxbContext = JAXBContext.newInstance(Configuration.class);
@@ -126,7 +126,7 @@ public final class Configuration {
         }
     }
 
-    String settHomeDirectory(String homeDirectory) {
+    private String setHomeDirectory(String homeDirectory) {
         return this.homeDirectory = homeDirectory;
 
     }

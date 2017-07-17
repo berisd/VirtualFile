@@ -13,22 +13,36 @@ import at.beris.virtualfile.client.sftp.AuthenticationType;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.UrlUtils;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.net.URL;
 import java.util.Optional;
+import java.util.UUID;
 
+@XmlRootElement(name = "site")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Site {
 
     private String id;
 
     private Protocol protocol;
 
+    private String shortName;
+
     private String name;
+
+    private String description;
 
     private int timeout;
 
     private String username;
 
+    @XmlTransient
     private char[] password;
+
+    private String passwordReference;
 
     private String hostname;
 
@@ -43,7 +57,10 @@ public class Site {
     private String privateKeyFile;
 
     private Site() {
-
+        this.id = UUID.randomUUID().toString();
+        setAuthenticationType(AuthenticationType.PASSWORD);
+        setTimeout(30);
+        setProtocol(Protocol.SFTP);
     }
 
     public static Site create() {
@@ -54,17 +71,15 @@ public class Site {
         return id;
     }
 
-    public Site setId(String id) {
-        this.id = id;
-        return this;
-    }
-
     public Protocol getProtocol() {
         return protocol;
     }
 
     public Site setProtocol(Protocol protocol) {
         this.protocol = protocol;
+
+        if (getPort() <= 0)
+            setPort(protocol.getDefaultPort());
         return this;
     }
 
@@ -156,6 +171,32 @@ public class Site {
     public Site setPrivateKeyFile(String privateKeyFile) {
         this.privateKeyFile = privateKeyFile;
         return this;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public Site setShortName(String shortName) {
+        this.shortName = shortName;
+        return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Site setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    String getPasswordReference() {
+        return passwordReference;
+    }
+
+    void setPasswordReference(String passwordReference) {
+        this.passwordReference = passwordReference;
     }
 
     public Site fillFromUrl(URL url) {

@@ -110,4 +110,9 @@ public class HttpsClient implements Client<HttpFile, HttpsClientConfiguration> {
     public HttpsClientConfiguration getConfiguration() {
         return null;
     }
+
+    @Override
+    public String getCurrentDirectory() {
+        return "/";
+    }
 }

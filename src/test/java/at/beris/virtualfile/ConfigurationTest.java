@@ -116,7 +116,7 @@ public class ConfigurationTest {
 
     @Test
     public void loadConfiguration() {
-        Configuration configuration = Configuration.createFromXmlFile(new File(TEST_CONFIGURATION_FILE));
+        Configuration configuration = Configuration.loadFromXmlFile(new File(TEST_CONFIGURATION_FILE));
         Assert.assertEquals(10000, configuration.getFileCacheSize());
     }
 

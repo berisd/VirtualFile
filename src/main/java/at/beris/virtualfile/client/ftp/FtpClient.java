@@ -343,4 +343,18 @@ public class FtpClient implements Client<FTPFile, FtpClientConfiguration> {
     public FtpClientConfiguration getConfiguration() {
         return configuration;
     }
+
+    @Override
+    public String getCurrentDirectory() {
+        LOGGER.debug("Get current directory");
+        String currentDirectory = executionHandler(new Callable<String>() {
+
+            @Override
+            public String call() throws Exception {
+                return ftpClient.printWorkingDirectory();
+            }
+        });
+        LOGGER.debug("Returns: '{}'", currentDirectory);
+        return currentDirectory;
+    }
 }

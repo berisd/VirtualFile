@@ -15,10 +15,13 @@ import at.beris.virtualfile.client.sftp.SftpClientConfiguration;
 import at.beris.virtualfile.util.UrlUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static at.beris.virtualfile.TestHelper.TEST_HOME_DIRECTORY;
 
 public class UrlFileContextTest {
 
@@ -27,7 +30,9 @@ public class UrlFileContextTest {
     @Before
     public void beforeTestCase() {
         UrlUtils.registerProtocolURLStreamHandlers();
-        fileContext = new UrlFileContext(Configuration.create().setFileCacheSize(10), SiteManager.create());
+        Configuration configuration = Configuration.create(TEST_HOME_DIRECTORY);
+        KeyStoreManager keyStoreManager = KeyStoreManager.create(configuration);
+        fileContext = new UrlFileContext(Configuration.create().setFileCacheSize(10), SiteManager.create(configuration, keyStoreManager), keyStoreManager);
     }
 
     @Test
@@ -57,5 +62,12 @@ public class UrlFileContextTest {
     public void newRootFile() throws MalformedURLException {
         VirtualFile virtualFile = fileContext.resolveFile(new URL("file:/"));
         Assert.assertNotNull(virtualFile);
+    }
+
+    @Test
+    @Ignore
+    public void resolveFileUsingSite() {
+        Site site = Site.create();
+        fileContext.resolveFile(site, "home/", true);
     }
 }

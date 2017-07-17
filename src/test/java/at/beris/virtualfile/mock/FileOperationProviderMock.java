@@ -26,6 +26,11 @@ public class FileOperationProviderMock implements FileOperationProvider {
     private boolean exists;
 
     @Override
+    public Object getClient() {
+        return null;
+    }
+
+    @Override
     public Byte[] checksum(FileModel model) {
         return new Byte[0];
     }

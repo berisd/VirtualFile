@@ -54,4 +54,7 @@ public interface Client<F, C> extends DisposableObject {
     void dispose();
 
     C getConfiguration();
+
+    String getCurrentDirectory();
+
 }

@@ -17,6 +17,8 @@ import at.beris.virtualfile.client.sftp.SftpClientConfiguration;
 import at.beris.virtualfile.protocol.Protocol;
 
 import java.net.URL;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -44,9 +46,9 @@ public interface VirtualFileManager {
     }
 
     /**
-     * Save the current configuration.
+     * Save the current configuration, sites, cryptograhic keys and certificates.
      */
-    void saveConfiguration();
+    void save();
 
     /**
      * Creates a VirtualFile representing a local file with the given path.
@@ -224,4 +226,99 @@ public interface VirtualFileManager {
      * @return
      */
     VirtualFileManager setPassword(String password);
+
+    /**
+     * Add a site to the list of sites.
+     *
+     * @param site
+     * @return
+     */
+    VirtualFileManager addSite(Site site);
+
+    /**
+     * Remove a site from the list of sites.
+     *
+     * @param site
+     * @return
+     */
+    VirtualFileManager removeSite(Site site);
+
+    /**
+     * Clear the list of sites.
+     *
+     * @return
+     */
+    VirtualFileManager clearSites();
+
+    /**
+     * Load the list of sites. (List will be cleared before.)
+     *
+     * @return
+     */
+    VirtualFileManager loadSites();
+
+    /**
+     * Save the list of sites.
+     *
+     * @return
+     */
+    VirtualFileManager saveSites();
+
+    /**
+     * Get the list of sites.
+     *
+     * @return List of sites
+     */
+    List<Site> getSites();
+
+    /**
+     * Find a site by ID.
+     *
+     * @param id
+     * @return Site
+     */
+    Optional<Site> findSiteById(String id);
+
+    /**
+     * Find a site by name.
+     *
+     * @param name
+     * @return Site
+     */
+    Optional<Site> findSiteByName(String name);
+
+    /**
+     * Find a site by shortname.
+     *
+     * @param shortName
+     * @return Site
+     */
+    Optional<Site> findSiteByShortName(String shortName);
+
+    /**
+     * Resolve a file using a site.
+     * Connects to the site and returns the current directory.
+     *
+     * @param site
+     * @return
+     */
+    VirtualFile resolveFile(Site site);
+
+    /**
+     * Resolve a file connecting to a site with a path relative to the current directory.
+     *
+     * @param site Site
+     * @param path Absolute or relative path.
+     * @return
+     */
+    VirtualFile resolveFile(Site site, String path);
+
+    /**
+     * Resolve a directory connecting to a site with a path relative to the current directory.
+     *
+     * @param site
+     * @param path Absolute or relative path.
+     * @return
+     */
+    VirtualFile resolveDirectory(Site site, String path);
 }

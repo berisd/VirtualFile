@@ -17,6 +17,7 @@ import at.beris.virtualfile.client.sftp.SftpClientConfiguration;
 import at.beris.virtualfile.exception.VirtualFileException;
 import at.beris.virtualfile.protocol.Protocol;
 import at.beris.virtualfile.util.Pair;
+import at.beris.virtualfile.util.StringUtils;
 import at.beris.virtualfile.util.UrlUtils;
 import org.slf4j.LoggerFactory;
 
@@ -46,13 +47,16 @@ public class UrlFileManager implements VirtualFileManager {
     }
 
     public static UrlFileManager create(Configuration configuraton) {
-        UrlFileContext fileContext = new UrlFileContext(configuraton, SiteManager.create());
+        KeyStoreManager keyStoreManager = KeyStoreManager.create(configuraton);
+        SiteManager siteManager = SiteManager.create(configuraton, keyStoreManager);
+        UrlFileContext fileContext = new UrlFileContext(configuraton, siteManager, keyStoreManager);
         return new UrlFileManager(fileContext);
     }
 
     @Override
-    public void saveConfiguration() {
-        fileContext.getConfiguration().save();
+    public void save() {
+        fileContext.save();
+
     }
 
     /**
@@ -268,6 +272,71 @@ public class UrlFileManager implements VirtualFileManager {
     public VirtualFileManager setPassword(String password) {
         fileContext.getConfiguration().setPassword(password.toCharArray());
         return this;
+    }
+
+    @Override
+    public VirtualFileManager addSite(Site site) {
+        fileContext.getSiteManager().addSite(site);
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager removeSite(Site site) {
+        fileContext.getSiteManager().removeSite(site);
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager clearSites() {
+        fileContext.getSiteManager().clearSites();
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager loadSites() {
+        fileContext.getSiteManager().load();
+        return this;
+    }
+
+    @Override
+    public VirtualFileManager saveSites() {
+        fileContext.getSiteManager().save();
+        return this;
+    }
+
+    @Override
+    public List<Site> getSites() {
+        return fileContext.getSiteManager().getSites();
+    }
+
+    @Override
+    public Optional<Site> findSiteById(String id) {
+        return fileContext.getSiteManager().findSiteById(id);
+    }
+
+    @Override
+    public Optional<Site> findSiteByName(String name) {
+        return fileContext.getSiteManager().findSiteByName(name);
+    }
+
+    @Override
+    public Optional<Site> findSiteByShortName(String shortName) {
+        return fileContext.getSiteManager().findSiteByShortName(shortName);
+    }
+
+    @Override
+    public VirtualFile resolveFile(Site site) {
+        return fileContext.resolveFile(site, StringUtils.EMPTY_STRING, false);
+    }
+
+    @Override
+    public VirtualFile resolveFile(Site site, String path) {
+        return fileContext.resolveFile(site, path, false);
+    }
+
+    @Override
+    public VirtualFile resolveDirectory(Site site, String path) {
+        return fileContext.resolveFile(site, path, true);
     }
 
 }

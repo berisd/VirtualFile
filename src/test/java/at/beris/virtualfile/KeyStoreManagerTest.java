@@ -13,16 +13,19 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class KeyStoreManagerTest {
-    private static final char[] KEY_STORE_PASSWORD = {'f', 'o', 'o', 'b', 'a', 'r'};
     @Test
     public void createStore() {
         char[] password = new char[]{'t', 'e', 's', 't'};
 
-        KeyStoreManager keyStoreManager = new KeyStoreManager(TestHelper.TEST_HOME_DIRECTORY, KEY_STORE_PASSWORD);
+        Configuration configuration = TestHelper.createConfiguration();
+
+
+        KeyStoreManager keyStoreManager = KeyStoreManager.create(configuration);
         String entryAlias = keyStoreManager.addPassword(password);
         keyStoreManager.save();
 
-        KeyStoreManager keyStoreManager2 = new KeyStoreManager(TestHelper.TEST_HOME_DIRECTORY, KEY_STORE_PASSWORD);
+        KeyStoreManager keyStoreManager2 = KeyStoreManager.create(configuration);
+        keyStoreManager2.load();
         Assert.assertArrayEquals(password, keyStoreManager2.getPassword(entryAlias));
     }
 

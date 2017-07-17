@@ -53,6 +53,7 @@ public class UrlFileContext {
     private ArchiveOperationProvider archiveOperationProvider;
 
     private Configuration configuration;
+    private KeyStoreManager keyStoreManager;
     private SiteManager siteManager;
     private SiteManager temporarySiteManager;
     private Map<Protocol, Class> fileOperationProviderClassMap;
@@ -60,9 +61,10 @@ public class UrlFileContext {
     private UrlFileContext() {
     }
 
-    UrlFileContext(Configuration configuration, SiteManager siteManager) {
+    UrlFileContext(Configuration configuration, SiteManager siteManager, KeyStoreManager keyStoreManager) {
         this.configuration = configuration;
         configuration.setCallbackHandler(new CustomConfigurationCallbackHandler());
+        this.keyStoreManager = keyStoreManager;
 
         fileOperationProviderClassMap = createFileOperationProviderClassMap();
 
@@ -71,7 +73,7 @@ public class UrlFileContext {
         this.fileToParentFileMap = new HashMap();
 
         this.siteManager = siteManager;
-        this.temporarySiteManager = SiteManager.create();
+        this.temporarySiteManager = SiteManager.create(configuration, keyStoreManager);
 
         fileCache = new FileCache(configuration.getFileCacheSize());
         fileCache.setCallbackHandler(new CustomFileCacheCallbackHandler());
@@ -141,6 +143,33 @@ public class UrlFileContext {
             parentFile = file;
         }
         return file;
+    }
+
+    public UrlFile resolveFile(Site site, String path, boolean isDirectory) {
+        try {
+            initFileOperationProvider(site);
+
+            Client client = (Client) siteToFileOperationProviderMap.get(site).getClient();
+
+            String filePath = StringUtils.EMPTY_STRING;
+            if (!path.startsWith("/") || StringUtils.isEmpty(path)) {
+                filePath = client.getCurrentDirectory();
+                if (!filePath.endsWith("/")) {
+                    filePath += '/';
+                }
+            }
+            filePath += path;
+
+            if (isDirectory && !StringUtils.isEmpty(path) && !path.endsWith("/")) {
+                filePath += '/';
+            }
+
+            URL fileUrl = UrlUtils.normalizeUrl(new URL(siteManager.getSiteUrlString(site) + filePath));
+
+            return createFileInstance(fileUrl);
+        } catch (MalformedURLException e) {
+            throw new VirtualFileException(e);
+        }
     }
 
     /**
@@ -268,6 +297,16 @@ public class UrlFileContext {
         return this.configuration;
     }
 
+    SiteManager getSiteManager() {
+        return this.siteManager;
+    }
+
+    public void save() {
+        configuration.save();
+        keyStoreManager.save();
+        siteManager.save();
+    }
+
     Client createClientInstance(URL url) {
         Protocol protocol = UrlUtils.getProtocol(url);
         if (protocol == Protocol.FILE)
@@ -311,7 +350,7 @@ public class UrlFileContext {
             throw new VirtualFileException(Message.PROTOCOL_NOT_CONFIGURED(protocol));
 
         try {
-            initFileOperationProvider(url, protocol);
+            initFileOperationProvider(url);
             return createFileInstance(url);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new VirtualFileException(e);
@@ -340,8 +379,9 @@ public class UrlFileContext {
         }
     }
 
-    private void initFileOperationProvider(URL url, Protocol protocol) throws InstantiationException, IllegalAccessException {
-        LOGGER.debug("initFileOperationProvider(url: {})", maskedUrlString(url));
+    private void initFileOperationProvider(URL url) throws InstantiationException, IllegalAccessException {
+        LOGGER.debug("Initialize FileOperationProvider for URL {}", maskedUrlString(url));
+        Protocol protocol = UrlUtils.getProtocol(url);
         FileOperationProvider fileOperationProvider = getFileOperationProvider(url);
         if (fileOperationProvider == null) {
             Client client = createClientInstance(UrlUtils.newUrl(url.toString()));
@@ -360,6 +400,30 @@ public class UrlFileContext {
 
             siteToFileOperationProviderMap.put(site, fileOperationProvider);
         }
+    }
+
+    private void initFileOperationProvider(Site site) {
+        LOGGER.debug("iInitialize FileOperationProvider for site {})", site);
+        Protocol protocol = site.getProtocol();
+
+        FileOperationProvider fileOperationProvider = siteToFileOperationProviderMap.get(site);
+        if (fileOperationProvider == null) {
+            Class fileOperationProviderClass = fileOperationProviderClassMap.get(protocol);
+            Class clientClass = getClientClass(fileOperationProviderClass);
+            Constructor clientClassConstructor = getClientConstructor(clientClass);
+            Class clientConfigurationClass = getClientConfigurationClass(clientClassConstructor);
+
+            try {
+                ClientConfiguration clientConfiguration = (ClientConfiguration) clientConfigurationClass.newInstance();
+                clientConfiguration.fillFromSite(site);
+                Client client = (Client) clientClassConstructor.newInstance(clientConfiguration);
+                fileOperationProvider = createFileOperationProviderInstance(fileOperationProviderClass, client);
+                siteToFileOperationProviderMap.put(site, fileOperationProvider);
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                throw new VirtualFileException(e);
+            }
+        }
+
     }
 
     private <K, V extends DisposableObject> void disposeMap(Map<K, V> map) {

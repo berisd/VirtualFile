@@ -303,6 +303,21 @@ public class SftpClient implements Client<SftpFile, SftpClientConfiguration> {
         return configuration;
     }
 
+    @Override
+    public String getCurrentDirectory() {
+        LOGGER.debug("Get current directory");
+        String currentDirectory = StringUtils.EMPTY_STRING;
+        try {
+            checkChannel();
+            currentDirectory = sftpChannel.pwd();
+
+        } catch (SftpException e) {
+            handleSftpException(e);
+        }
+        LOGGER.debug("Returns: '{}'", currentDirectory);
+        return currentDirectory;
+    }
+
     private void checkChannel() {
         try {
             if (session == null)
