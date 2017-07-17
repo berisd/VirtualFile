@@ -25,6 +25,55 @@ The switch ```-Drunintegrationtests=true``` will run IntegrationTests which reqi
 
 ## Examples ##
 
+*) Create a VirtualFileManager instance. This is the entry point to the library functions. You can change the Default Configuration with setter methods.
+```java
+VirtualFileManager fileManager = VirtualFileManager.createManager();
+fileManager.setAuthenticationType(AuthenticationType.PUBLIC_KEY);
+fileManager.setTimeout(60);
+
+// To change the default configuration for a specififc protocol
+fileManager.getClientDefaultConfigurationSftp().setPort(1212);
+```
+
+*) Create a VirtualFileManager instance. You can pass a Configuration instance to the createManager() method. Here the default home and masterpassword is set. All data is saved to the home directory (e.g. the configuration, keystore data and sites). The masterpassword is used to protect all sensitive data.
+```java
+Configuration configuration = Configuration.create("/home/test/newvirtualfilehome")
+        .setMasterPassword(new char[] {'p', 'w', 'd'})
+        .setTimeout(60)
+        .setAuthenticationType(AuthenticationType.PUBLIC_KEY);
+
+VirtualFileManager fileManager = VirtualFileManager.createManager(configuration);
+```
+
+*) Transfer a file with the sftp protocol and public key authentication (stricthostchecking is on by default, so there must be an entry for the host in the known_hosts file (Under Linux that's usually ~/.ssh/known_hosts). You can set the location of the known_hosts file with FileConfig.setKnownHostsFile().
+```java
+VirtualFileManager fileManager = VirtualFileManager.createManager()
+fileManager.setAuthenticationType(AuthenticationType.PUBLIC_KEY)
+  .setPrivateKeyFile("/home/myuser/.ssh/id_dsa");
+VirtualFile file = fileManager.resolveFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip");
+file.copy(fileManager.newLocalDirectory("."));
+```
+
+*) Transfer a file with the sftp protocol without stricthostchecking and password authentication.
+```java
+VirtualFileManager fileManager = VirtualFileManager.createManager();
+fileManager.setStrictHostKeyChecking(false);
+VirtualFile file = fileManager.resolveFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip");
+file.copy(fileManager.resolveLocalDirectory("."));
+```
+
+*) Transfer a directory with the sftp protocol using a site. A site defines a place in a network and how to connect there (take for example a website http://www.example.com; you connect there with the http protocol on port 80 (default) to the host www.example.com). Sites can be saved with fileManager.save() and will be available next time you create a filemanager instance.
+```java
+Site site = Site.create().setHostname("www.beris.at").setProtocol(Protocol.SFTP).setUsername("sshtest")
+        .setPassword(TestHelper.readSftpPassword().toCharArray());
+
+VirtualFileManager fileManager = VirtualFileManager.createManager();
+fileManager.addSite(site);
+
+VirtualFile localdirectory = fileManager.resolveLocalDirectory("mybackup");
+fileManager.resolveDirectory(site, "backup").copy(localdirectory);
+```
+
 *) Test file attributes (local and remote)
 ```java
 import at.beris.virtualfile.VirtualFile;
@@ -58,6 +107,7 @@ public class AppTest {
     }
 }
 ```
+
 *) Extract local 7zip file
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager()
@@ -65,6 +115,7 @@ VirtualArchive archive = fileManager.resolveLocalArchive("/home/user/downloads/c
 VirtualFile directory = fileManager.resolveLocalDirectory("extracted");
 archive.extract(targetDirectory)
 ```
+
 *) Extract remote zipfile (with sftp protocol)
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager()
@@ -72,6 +123,7 @@ VirtualArchive archive = fileManager.resolveArchive("sftp://sshtest:mypwd@www.ex
 VirtualFile targetDirectory = fileManager.resolveLocalDirectory("extracted");
 archive.extract(targetDirectory)
 ```
+
 *) Find files in a directory (ending with .txt) with a simple filter
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager()
@@ -84,23 +136,6 @@ List<VirtualFile> fileList = file.list(new FileNameFilter().endsWith(".txt"));
 VirtualFileManager fileManager = VirtualFileManager.createManager()
 VirtualFile file = fileManager.resolveLocalDirectory("documents");
 List<VirtualFile> fileList = file.list(new FileNameFilter().endsWith(".txt").and(new FileSizeFilter().greaterThan(100*1024L)));
-```
-
-*) Transfer a file with the sftp protocol and public key authentication (stricthostchecking is on by default, so there must be an entry for the host in the known_hosts file (Under Linux that's usually ~/.ssh/known_hosts). You can set the location of the known_hosts file with FileConfig.setKnownHostsFile().
-```java
-VirtualFileManager fileManager = VirtualFileManager.createManager()
-fileManager.getConfiguration().setAuthenticationType(AuthenticationType.PUBLIC_KEY)
-  .setPrivateKeyFile("/home/myuser/.ssh/id_dsa");
-VirtualFile file = fileManager.resolveFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip");
-file.copy(FileMananger.newLocalDirectory("."));
-```
-
-*) Transfer a file with the sftp protocol without stricthostchecking and password authentication.
-```java
-VirtualFileManager fileManager = VirtualFileManager.createManager()
-fileManager.getConfiguration().setStrictHostKeyChecking(false);
-VirtualFile file = fileManager.resolveFile("sftp://myuser:mypassword@www.example.com:22/home/myuser/mydocuments.zip", configurator);
-file.copy(fileManager.resolveLocalDirectory("."));
 ```
 
 ## Shell ##
