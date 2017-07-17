@@ -275,6 +275,12 @@ public class UrlFileManager implements VirtualFileManager {
     }
 
     @Override
+    public VirtualFileManager setStrictHostKeyChecking(boolean strictHostKeyChecking) {
+        fileContext.getConfiguration().setStrictHostKeyChecking(strictHostKeyChecking);
+        return this;
+    }
+
+    @Override
     public VirtualFileManager addSite(Site site) {
         fileContext.getSiteManager().addSite(site);
         return this;

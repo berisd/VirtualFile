@@ -228,6 +228,14 @@ public interface VirtualFileManager {
     VirtualFileManager setPassword(String password);
 
     /**
+     * Set StrictHostKeyChecking for all Client Default Configurations that support it (sugar function)
+     *
+     * @param strictHostKeyChecking
+     * @return
+     */
+    VirtualFileManager setStrictHostKeyChecking(boolean strictHostKeyChecking);
+
+    /**
      * Add a site to the list of sites.
      *
      * @param site
