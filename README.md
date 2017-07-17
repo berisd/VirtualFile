@@ -1,5 +1,6 @@
 # VirtualFile
 Userfriendly URL based file and archive management library for Java 8.<br/>
+Provides a fluent, userfriendly interface and can be used as backend for your own filemanager implementation.<br/>
 Supported protocols: local, http, https, ftp, sftp.<br/>
 Supported archives: zip, tar, 7zip.<br/>
 ### Required libraries ###
@@ -35,7 +36,7 @@ fileManager.setTimeout(60);
 fileManager.getClientDefaultConfigurationSftp().setPort(1212);
 ```
 
-*) Create a VirtualFileManager instance. You can pass a Configuration instance to the createManager() method. Here the default home and masterpassword is set. All data is saved to the home directory (e.g. the configuration, keystore data and sites). The masterpassword is used to protect all sensitive data.
+*) Create a VirtualFileManager instance. You can pass a Configuration instance to the createManager() method. Here the default home and masterpassword is set. All data is saved to the home directory (e.g. the configuration, keystore data and sites). The masterpassword is used to protect sensitive data (e.g. site passwords).
 ```java
 Configuration configuration = Configuration.create("/home/test/newvirtualfilehome")
         .setMasterPassword(new char[] {'p', 'w', 'd'})
