@@ -17,16 +17,16 @@ VirtualFile is built using Apache Maven.<br/>
 Change to the VirtualFile directory (containing the pom.xml) and type:<br/>
 ```mvn clean install```<br/>
 
-You can generate the Java API docs with:<br/>
+Generate the Java API docs with:<br/>
 ```mvn javadoc:jar```<br/>
 
-Note on building project:<br/>
+Note on building the project:<br/>
 I'm developing on Linux, sometimes not all tests pass on Windows.<br/>
-The switch ```-Drunintegrationtests=true``` will run IntegrationTests which reqire a special setup that currently only exists on my PC.
+The switch ```-Drunintegrationtests=true``` will run the IntegrationTests which reqire a special setup that currently only exists on my PC.
 
 ## Examples ##
 
-*) Create a VirtualFileManager instance. This is the entry point to the library functions. You can change the Default Configuration with setter methods.
+*) Create a VirtualFileManager instance. This is the entry point to the library functions. You may change the Default Configuration with setter methods.
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager();
 fileManager.setAuthenticationType(AuthenticationType.PUBLIC_KEY);
@@ -36,7 +36,7 @@ fileManager.setTimeout(60);
 fileManager.getClientDefaultConfigurationSftp().setPort(1212);
 ```
 
-*) Create a VirtualFileManager instance. You can pass a Configuration instance to the createManager() method. Here the default home and masterpassword is set. All data is saved to the home directory (e.g. the configuration, keystore data and sites). The masterpassword is used to protect sensitive data (e.g. site passwords).
+*) Create a VirtualFileManager instance. Optionally pass a Configuration instance to the createManager() method. Here the default home and masterpassword is set. All data is saved to the home directory (e.g. the configuration, keystore data and sites). The masterpassword is used to protect sensitive data (e.g. site passwords).
 ```java
 Configuration configuration = Configuration.create("/home/test/newvirtualfilehome")
         .setMasterPassword(new char[] {'p', 'w', 'd'})
@@ -46,7 +46,7 @@ Configuration configuration = Configuration.create("/home/test/newvirtualfilehom
 VirtualFileManager fileManager = VirtualFileManager.createManager(configuration);
 ```
 
-*) Transfer a file with the sftp protocol and public key authentication (stricthostchecking is on by default, so there must be an entry for the host in the known_hosts file (Under Linux that's usually ~/.ssh/known_hosts). You can set the location of the known_hosts file with FileConfig.setKnownHostsFile().
+*) Transfer a file using the sftp protocol and public key authentication (stricthostchecking is on by default, so there must be an entry for the host in the known_hosts file (Under Linux that's usually ~/.ssh/known_hosts). Change the location of the known_hosts file with FileConfig.setKnownHostsFile().
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager()
 fileManager.setAuthenticationType(AuthenticationType.PUBLIC_KEY)
@@ -55,7 +55,7 @@ VirtualFile file = fileManager.resolveFile("sftp://myuser:mypassword@www.example
 file.copy(fileManager.newLocalDirectory("."));
 ```
 
-*) Transfer a file with the sftp protocol without stricthostchecking and password authentication.
+*) Transfer a file using the sftp protocol without stricthostchecking and password authentication.
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager();
 fileManager.setStrictHostKeyChecking(false);
@@ -63,7 +63,7 @@ VirtualFile file = fileManager.resolveFile("sftp://myuser:mypassword@www.example
 file.copy(fileManager.resolveLocalDirectory("."));
 ```
 
-*) Transfer a directory with the sftp protocol using a site. A site defines a place in a network and how to connect there (take for example a website http://www.example.com; you connect there with the http protocol on port 80 (default) to the host www.example.com). Sites can be saved with fileManager.save() and will be available next time you create a filemanager instance.
+*) Transfer a directory using the sftp protocol and a site. A site defines a network location and how to connect there (take for example a website http://www.example.com; you connect there using the http protocol on port 80 (default) to the host www.example.com). Sites can be saved with fileManager.save() and will be available next time you create a filemanager instance.
 ```java
 Site site = Site.create().setHostname("www.beris.at").setProtocol(Protocol.SFTP).setUsername("sshtest")
         .setPassword(TestHelper.readSftpPassword().toCharArray());
@@ -117,7 +117,7 @@ VirtualFile directory = fileManager.resolveLocalDirectory("extracted");
 archive.extract(targetDirectory)
 ```
 
-*) Extract remote zipfile (with sftp protocol)
+*) Extract remote zipfile (using sftp protocol)
 ```java
 VirtualFileManager fileManager = VirtualFileManager.createManager()
 VirtualArchive archive = fileManager.resolveArchive("sftp://sshtest:mypwd@www.exmaple.com:22/home/sshtest/mytestapp.zip")
@@ -141,7 +141,7 @@ List<VirtualFile> fileList = file.list(new FileNameFilter().endsWith(".txt").and
 
 ## Shell ##
 
-You can play around with the shell to see the VirtualFile library in action.
+Play around with the shell to see the VirtualFile library in action.
 Run the class at.beris.virtualfile.shell.Shell to start it. type "help" for Help.
 
 e.g. Those commands will connect to a remote site, download a file, delete the downloaded file and quit the shell
